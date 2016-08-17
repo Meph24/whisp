@@ -28,9 +28,8 @@ MainApp::MainApp() :
 contextSettings(24, 8, 0, 3, 3),
 window(sf::VideoMode(800, 600), "This is a test !", sf::Style::Default, contextSettings)
 {
-
-	//Output OpenGL stats
 	
+	//Output OpenGL stats
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
@@ -81,15 +80,8 @@ void MainApp::windowClear(float r, float g, float b, float a, float depth)
 	windowClear();
 }
 
-
-
 void MainApp::run()
 {
-	
-	//Game Loop
-	
-	
-
 	Vertex vertices[] = {
 
 		Vertex(glm::vec3(-2.0, 0.0, 0.0), glm::vec2(0.0, 1.0)),
@@ -113,21 +105,17 @@ void MainApp::run()
 
 	counter = 0; //test variable
 
-
 	EventHandler eventHandler;
-	SFMLEventMapper EventMapper(eventHandler, window);
+	SFMLEventMapper EventMapper(eventHandler);
 
-	
+	sf::Event e;
+	sf::Keyboard::setVirtualKeyboardVisible(true);
 	
 	while (window.isOpen())
 	{
-		
-		counter += 0.01f;
+			counter += 0.01f;
 
-		EventMapper.handleEvents();
-
-
-		transform.pos.z = sinf(counter);
+		    transform.pos.z = sinf(counter);
 			shader.Bind();
 			texture.bind();
 			shader.Update(transform, camera);
@@ -135,11 +123,37 @@ void MainApp::run()
 			mesh.draw();
 			
 			window.display();		
+
+			while (window.pollEvent(e))
+			{
+				preHandleEvent(e);
+				EventMapper.handleEvent(e);
+				postHandleEvent(e);
+			}
 	}
 
+}
+
+void MainApp::preHandleEvent(sf::Event& e)
+{
+	
+}
+
+void MainApp::postHandleEvent(sf::Event& e)
+{
+	switch (e.type)
+	{
+	case sf::Event::EventType::Closed:
+		window.close();
+
+		break;
 
 
+	// for testing
 
+	case sf::Event::EventType::MouseButtonPressed:
+		break;
+	}
 }
 
 MainApp::~MainApp()
