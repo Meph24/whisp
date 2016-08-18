@@ -13,11 +13,10 @@
 class SFMLEventMapper
 {
 	EventHandler& EH;
-	sf::Window& w;
-
+	
 public:
-	SFMLEventMapper(EventHandler& EH, sf::Window& w);
+	SFMLEventMapper(EventHandler& EH);
 
-	void handleEvents();
+	void handleEvent(sf::Event& e);
 };
 

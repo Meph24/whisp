@@ -1,24 +1,19 @@
 #include "SFMLEventMapper.h"
 
 
-SFMLEventMapper::SFMLEventMapper(EventHandler& EH, sf::Window& w)
+SFMLEventMapper::SFMLEventMapper(EventHandler& EH)
 	:
-	EH(EH), w(w)
+	EH(EH)
 {
 }
 
-void SFMLEventMapper::handleEvents()
+void SFMLEventMapper::handleEvent(sf::Event& e)
 {
-	sf::Vector2u size;
 
-	sf::Event e;
-	while (w.pollEvent(e))
-	{
 		switch (e.type)
 		{
 		case sf::Event::EventType::Closed:
 			EH.handle(EH.createEvent(EventHandler::eventType::System, 0, 1));
-			w.close();
 			break;
 
 		case sf::Event::EventType::Resized:
@@ -76,10 +71,7 @@ void SFMLEventMapper::handleEvents()
 		case sf::Event::EventType::MouseButtonPressed:
 			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 0, e.mouseButton.x));
 			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 1, e.mouseButton.y));
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 1));
-			size = w.getSize();
-			sf::Mouse::setPosition(w.getPosition() + sf::Vector2i(size.x / 2, size.y / 2));
-					
+			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 1));		
 			break;
 
 		case sf::Event::EventType::MouseButtonReleased:
@@ -101,5 +93,5 @@ void SFMLEventMapper::handleEvents()
 			break;
 		}
 
-	}
+	
 }
