@@ -13,19 +13,21 @@ class MainApp
 
 	float counter; //test variable;
 
+
 	void setClearParameters(float r, float g, float b, float a = 255, float depth = 1.0f);
 	void windowClear();
 	void windowClear(float r, float g, float b, float a = 255, float depth = 1.0f);
 
+	void tick(int us);
+
 	void preHandleEvent(sf::Event& e);
 	void postHandleEvent(sf::Event& e);
 public:
-	
-	
+
+
 	MainApp();
 	~MainApp();
 	void run();
 	friend std::ostream& operator<< (std::ostream& os, const MainApp& A);
-	
-};
 
+};
