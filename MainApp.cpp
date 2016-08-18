@@ -20,7 +20,7 @@
 #define MEPH_GRAPHICS_HEIGHT 600
 
 
-#define PHYSICS_TICKLENGTH 100000
+#define PHYSICS_MAX_TICKLENGTH 20000
 
 
 
@@ -28,7 +28,6 @@ MainApp::MainApp() :
 contextSettings(24, 8, 0, 3, 3),
 window(sf::VideoMode(800, 600), "This is a test !", sf::Style::Default, contextSettings)
 {
-	
 	//Output OpenGL stats
 
 	GLenum err = glewInit();
@@ -38,7 +37,7 @@ window(sf::VideoMode(800, 600), "This is a test !", sf::Style::Default, contextS
 	}
 
 	glClearDepth(1.f);
-	glClearColor(0.f, 0.f, 255.f, 0.f);
+	glClearColor(0.f, 0.f, 0.1f, 0.f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 
@@ -65,7 +64,7 @@ std::ostream& operator<< (std::ostream& os, const MainApp& A)
 void MainApp::windowClear()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 }
 
 void MainApp::setClearParameters(float r, float g, float b, float a, float depth)
@@ -76,8 +75,13 @@ void MainApp::setClearParameters(float r, float g, float b, float a, float depth
 
 void MainApp::windowClear(float r, float g, float b, float a, float depth)
 {
-	setClearParameters(r, g , b, a, depth);
+	setClearParameters(r, g, b, a, depth);
 	windowClear();
+}
+
+void MainApp::tick(int us)
+{
+	counter += us*0.000002f;
 }
 
 void MainApp::run()
@@ -91,7 +95,7 @@ void MainApp::run()
 
 	};
 
-	unsigned int indices[] = { 0, 1, 2};
+	unsigned int indices[] = { 0, 1, 2 };
 
 	Mesh mesh(vertices, sizeof(vertices) / sizeof(vertices[0]), indices, sizeof(indices) / sizeof(indices[0]));
 
@@ -110,33 +114,46 @@ void MainApp::run()
 
 	sf::Event e;
 	sf::Keyboard::setVirtualKeyboardVisible(true);
-	
+
+	sf::Clock clock;
+
 	while (window.isOpen())
 	{
-			counter += 0.01f;
+		//tick
+		sf::Time elapsed = clock.restart();
+		int us = elapsed.asMicroseconds();
+		if (us > PHYSICS_MAX_TICKLENGTH) us = PHYSICS_MAX_TICKLENGTH;
+		tick(us);
 
-		    transform.pos.z = sinf(counter);
-			shader.Bind();
-			texture.bind();
-			shader.Update(transform, camera);
-			windowClear();
-			mesh.draw();
-			
-			window.display();		
 
-			while (window.pollEvent(e))
-			{
-				preHandleEvent(e);
-				EventMapper.handleEvent(e);
-				postHandleEvent(e);
-			}
+
+		//render
+		transform.pos.z = sinf(counter);
+		shader.Bind();
+		texture.bind();
+		shader.Update(transform, camera);
+		windowClear();
+		mesh.draw();
+
+		window.display();
+
+
+		//handle events
+		while (window.pollEvent(e))
+		{
+			preHandleEvent(e);
+			EventMapper.handleEvent(e);
+			postHandleEvent(e);
+		}
 	}
 
 }
 
+
+
 void MainApp::preHandleEvent(sf::Event& e)
 {
-	
+
 }
 
 void MainApp::postHandleEvent(sf::Event& e)
@@ -149,7 +166,7 @@ void MainApp::postHandleEvent(sf::Event& e)
 		break;
 
 
-	// for testing
+		// for testing
 
 	case sf::Event::EventType::MouseButtonPressed:
 		break;
