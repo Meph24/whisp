@@ -26,7 +26,8 @@
 
 MainApp::MainApp() :
 contextSettings(24, 8, 0, 3, 3),
-window(sf::VideoMode(800, 600), "This is a test !", sf::Style::Default, contextSettings)
+window(sf::VideoMode(800, 600), "This is a test !", sf::Style::None, contextSettings),
+hardcursorhandle(window)
 {
 	//Output OpenGL stats
 
@@ -91,8 +92,6 @@ void MainApp::run()
 		Vertex(glm::vec3(-2.0, 0.0, 0.0), glm::vec2(0.0, 1.0)),
 		Vertex(glm::vec3(0.0, 0.0, 3.0), glm::vec2(0.5, 0.0)),
 		Vertex(glm::vec3(2.0, 0.0, 0.0), glm::vec2(1.0, 1.0))
-
-
 	};
 
 	unsigned int indices[] = { 0, 1, 2 };
@@ -111,6 +110,7 @@ void MainApp::run()
 
 	EventHandler eventHandler;
 	SFMLEventMapper EventMapper(eventHandler);
+	
 
 	sf::Event e;
 	sf::Keyboard::setVirtualKeyboardVisible(true);
@@ -153,6 +153,36 @@ void MainApp::run()
 
 void MainApp::preHandleEvent(sf::Event& e)
 {
+
+	switch (e.type)
+	{
+
+	case sf::Event::EventType::MouseMoved:
+		hardcursorhandle.cursorMoved(e);
+		break;
+
+	case sf::Event::EventType::Resized:
+		hardcursorhandle.updateLockPosition();
+		std::cout << window.getSize().x << "/" << window.getSize().y;
+		break;
+
+	case sf::Event::EventType::GainedFocus:
+		hardcursorhandle.updateLockPosition();	// no way to check if window was moved
+		std::cout<< "Stuff !!";
+		break;
+
+		// _test_begin
+	case sf::Event::EventType::KeyPressed:
+		if (e.key.code == sf::Keyboard::Key::L) hardcursorhandle.setLocked(true);
+		if (e.key.code == sf::Keyboard::Key::U) hardcursorhandle.setLocked(false);
+		if (e.key.code == sf::Keyboard::Key::R) window.setSize (sf::Vector2u(400, 400));
+		break;
+		
+
+		// _test_end
+
+	}
+
 
 }
 
