@@ -8,42 +8,25 @@
 #include "Camera.h"
 
 #include "EventHandler.h"
-#include "SFMLEventMapper.h"
+
+#include <vector>
 
 
 
 // error handling
 #include <iostream>
 
-#define MEPH_GRAPHICS_FOV 70.0f
-#define MEPH_GRAPHICS_WIDTH 800
-#define MEPH_GRAPHICS_HEIGHT 600
+
 
 
 #define PHYSICS_MAX_TICKLENGTH 20000
 
 
 
-MainApp::MainApp() :
-contextSettings(24, 8, 0, 3, 3),
-window(sf::VideoMode(800, 600), "This is a test !", sf::Style::None, contextSettings),
-hardcursorhandle(window)
+MainApp::MainApp()
 {
-	//Output OpenGL stats
-
-	GLenum err = glewInit();
-	if (err != GLEW_OK)
-	{
-		std::cerr << "GLEW failed to initialize !" << std::endl;
-	}
-
-	glClearDepth(1.f);
-	glClearColor(0.f, 0.f, 0.1f, 0.f);
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
-
 }
-
+/*
 std::ostream& operator<< (std::ostream& os, const MainApp& A)
 {
 	os << "OPENGL: " << std::endl;
@@ -61,24 +44,8 @@ std::ostream& operator<< (std::ostream& os, const MainApp& A)
 
 	return os;
 }
+*/
 
-void MainApp::windowClear()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-}
-
-void MainApp::setClearParameters(float r, float g, float b, float a, float depth)
-{
-	glClearDepth(depth);
-	glClearColor(r, g, b, a);
-}
-
-void MainApp::windowClear(float r, float g, float b, float a, float depth)
-{
-	setClearParameters(r, g, b, a, depth);
-	windowClear();
-}
 
 void MainApp::tick(int us)
 {
@@ -87,37 +54,42 @@ void MainApp::tick(int us)
 
 void MainApp::run()
 {
-	Vertex vertices[] = {
+	
+	/*
+
+	//old code
+	
+	std::vector<Vertex> vertices = {
 
 		Vertex(glm::vec3(-2.0, 0.0, 0.0), glm::vec2(0.0, 1.0)),
 		Vertex(glm::vec3(0.0, 0.0, 3.0), glm::vec2(0.5, 0.0)),
 		Vertex(glm::vec3(2.0, 0.0, 0.0), glm::vec2(1.0, 1.0))
+
 	};
+	
 
-	unsigned int indices[] = { 0, 1, 2 };
+	std::vector<unsigned int> indices = { 0, 1, 2 };
+	
 
-	Mesh mesh(vertices, sizeof(vertices) / sizeof(vertices[0]), indices, sizeof(indices) / sizeof(indices[0]));
+	Mesh mesh(&(vertices[0]), vertices.size(), &(indices[0]), indices.size());
+	
+
 
 	Shader shader("./res/basicShader");
-
 	Texture texture("./res/testTexture.jpg");
-
 	Camera camera(glm::vec3(0, 1, -3), MEPH_GRAPHICS_FOV, (float)MEPH_GRAPHICS_WIDTH / (float)MEPH_GRAPHICS_HEIGHT, 0.01f, 1000.0f);
 
 	Transform transform;
 
-	counter = 0; //test variable
+	*/
 
-	EventHandler eventHandler;
-	SFMLEventMapper EventMapper(eventHandler);
-	
 
-	sf::Event e;
+
 	sf::Keyboard::setVirtualKeyboardVisible(true);
 
 	sf::Clock clock;
 
-	while (window.isOpen())
+	while (oshandle.window.isOpen())
 	{
 		//tick
 		sf::Time elapsed = clock.restart();
@@ -128,80 +100,18 @@ void MainApp::run()
 
 
 		//render
-		transform.pos.z = sinf(counter);
-		shader.Bind();
-		texture.bind();
-		shader.Update(transform, camera);
-		windowClear();
-		mesh.draw();
-
-		window.display();
-
+		graphics.render();
+		
+		oshandle.window.display();
 
 		//handle events
-		while (window.pollEvent(e))
-		{
-			preHandleEvent(e);
-			EventMapper.handleEvent(e);
-			postHandleEvent(e);
-		}
+		oshandle.pollEvents();		
 	}
 
 }
 
 
 
-void MainApp::preHandleEvent(sf::Event& e)
-{
-
-	switch (e.type)
-	{
-
-	case sf::Event::EventType::MouseMoved:
-		hardcursorhandle.cursorMoved(e);
-		break;
-
-	case sf::Event::EventType::Resized:
-		hardcursorhandle.updateLockPosition();
-		std::cout << window.getSize().x << "/" << window.getSize().y;
-		break;
-
-	case sf::Event::EventType::GainedFocus:
-		hardcursorhandle.updateLockPosition();	// no way to check if window was moved
-		std::cout<< "Stuff !!";
-		break;
-
-		// _test_begin
-	case sf::Event::EventType::KeyPressed:
-		if (e.key.code == sf::Keyboard::Key::L) hardcursorhandle.setLocked(true);
-		if (e.key.code == sf::Keyboard::Key::U) hardcursorhandle.setLocked(false);
-		if (e.key.code == sf::Keyboard::Key::R) window.setSize (sf::Vector2u(400, 400));
-		break;
-		
-
-		// _test_end
-
-	}
-
-
-}
-
-void MainApp::postHandleEvent(sf::Event& e)
-{
-	switch (e.type)
-	{
-	case sf::Event::EventType::Closed:
-		window.close();
-
-		break;
-
-
-		// for testing
-
-	case sf::Event::EventType::MouseButtonPressed:
-		break;
-	}
-}
 
 MainApp::~MainApp()
 {
