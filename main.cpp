@@ -6,9 +6,6 @@
 int main()
 {
 	MainApp A;
-
-	std::cout << A;
-
 	A.run();
 
 

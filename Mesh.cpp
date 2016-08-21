@@ -1,7 +1,8 @@
 #include "Mesh.h"
 #include <vector>
 
-
+Mesh::Mesh()
+{}
 
 Mesh::Mesh(Vertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices)
 {
