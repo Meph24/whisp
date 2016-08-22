@@ -37,6 +37,11 @@ Graphics::Graphics()
 
 Graphics::~Graphics()
 {
+	delete mesh;
+	delete shader;
+	delete texture;
+	delete camera;
+	delete transform;
 }
 
 
