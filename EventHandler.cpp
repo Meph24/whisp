@@ -16,9 +16,27 @@ EventHandler::Filter::~Filter()
 
 bool EventHandler::Filter::filter(EventHandler::event e)
 {
-	if (e.ID == 4) return true;
-	if (prevValue[e.ID] == e.value) return false;
-	return true;
+	switch (e.ID)
+	{
+	case 4:
+		//text entered events
+		return true;			
+		break;
+
+		//Mousewheel 1 events have to be excluded due to no reset event(value = 0) will be sent
+	case 2050:
+		return true;
+		break;
+
+		//Mousewheel 1 events have to be excluded due to no reset event(value = 0) will be sent
+	case 2051:
+		return true;
+		break;
+	default:
+		if (prevValue[e.ID] == e.value) return false;
+		return true;
+		break;
+	}
 }
 
 void EventHandler::Filter::updateFilter(event e)
