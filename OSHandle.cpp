@@ -3,6 +3,7 @@
 #include <GL\glew.h>
 #include <iostream>
 
+
 #define MOUSE_WHEEL_OFFSET 2
 #define MOUSE_BUTTON_OFFSET 4 
 #define JOYSTICK_ID_OFFSET 48
@@ -27,95 +28,102 @@ OSHandle::~OSHandle()
 {
 }
 
+void OSHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
+{
+	switch (e.type)
+	{
+	case sf::Event::EventType::Closed:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 0, 1));
+		break;
+
+	case sf::Event::EventType::Resized:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 1, e.size.width));
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 2, e.size.height));
+		break;
+
+	case sf::Event::EventType::LostFocus:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 3, 1));
+		break;
+
+	case sf::Event::EventType::GainedFocus:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 3, 0));
+		break;
+
+	case sf::Event::EventType::TextEntered:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 4, e.text.unicode));
+		break;
+
+	case sf::Event::EventType::MouseEntered:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 5, 1));
+		break;
+
+	case sf::Event::EventType::MouseLeft:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 5, 0));
+		break;
+
+	case sf::Event::EventType::JoystickDisconnected:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 6 + e.joystickConnect.joystickId, 1));
+		break;
+
+	case sf::Event::EventType::JoystickConnected:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::System, 6 + e.joystickConnect.joystickId, 0));
+		break;
+
+	case sf::Event::EventType::KeyPressed:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::Keyboard, e.key.code, 1));
+		break;
+
+	case sf::Event::EventType::KeyReleased:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::Keyboard, e.key.code, 0));
+		break;
+
+	case sf::Event::EventType::MouseMoved:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::Mouse, 0, e.mouseMove.x));
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::Mouse, 1, e.mouseMove.y));
+		break;
+
+	case sf::Event::EventType::MouseWheelScrolled:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::Mouse, MOUSE_WHEEL_OFFSET + e.mouseWheelScroll.wheel, e.mouseWheelScroll.delta));
+		break;
+
+	case sf::Event::EventType::MouseButtonPressed:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 1));
+		break;
+
+	case sf::Event::EventType::MouseButtonReleased:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 0));
+		break;
+
+	case sf::Event::EventType::JoystickMoved:
+		eventBuffer.add(EH.createEvent(EventHandler::Joystick, e.joystickMove.joystickId*JOYSTICK_ID_OFFSET + e.joystickMove.axis, e.joystickMove.position));
+		break;
+
+	case sf::Event::EventType::JoystickButtonPressed:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId*JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 1));
+		break;
+
+	case sf::Event::EventType::JoystickButtonReleased:
+		eventBuffer.add(EH.createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId *JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 0));
+		break;
+	}
+}
+
 void OSHandle::pollEvents()
 {
 	sf::Event e;
+	Buffer < EventHandler::event, 4 >  eventBuffer;
 	//handle events
 	while (window.pollEvent(e))
 	{
 		preHandleEvent(e);
-		switch (e.type)
+		
+		mapSFEventToEventHandlerEvent(e, eventBuffer);
+		//handle mapped events
+		while (!eventBuffer.nodata())
 		{
-		case sf::Event::EventType::Closed:
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 0, 1));
-			break;
-
-		case sf::Event::EventType::Resized:
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 1, e.size.width));
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 2, e.size.height));
-			break;
-
-		case sf::Event::EventType::LostFocus:
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 3, 1));
-			break;
-
-		case sf::Event::EventType::GainedFocus:
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 3, 0));
-			break;
-
-		case sf::Event::EventType::TextEntered:
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 4, e.text.unicode));
-			break;
-
-		case sf::Event::EventType::MouseEntered:
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 5, 1));
-			break;
-
-		case sf::Event::EventType::MouseLeft:
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 5, 0));
-			break;
-
-		case sf::Event::EventType::JoystickDisconnected:
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 6 + e.joystickConnect.joystickId, 1));
-			break;
-
-		case sf::Event::EventType::JoystickConnected:
-			EH.handle(EH.createEvent(EventHandler::eventType::System, 6 + e.joystickConnect.joystickId, 0));
-			break;
-
-		case sf::Event::EventType::KeyPressed:
-			EH.handle(EH.createEvent(EventHandler::eventType::Keyboard, e.key.code, 1));
-			break;
-
-		case sf::Event::EventType::KeyReleased:
-			EH.handle(EH.createEvent(EventHandler::eventType::Keyboard, e.key.code, 0));
-			break;
-
-		case sf::Event::EventType::MouseMoved:
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 0, e.mouseMove.x));
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 1, e.mouseMove.y));
-			break;
-
-		case sf::Event::EventType::MouseWheelScrolled:
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 0, e.mouseWheelScroll.x));
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 1, e.mouseWheelScroll.y));
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, MOUSE_WHEEL_OFFSET + e.mouseWheelScroll.wheel, e.mouseWheelScroll.delta));
-			break;
-
-		case sf::Event::EventType::MouseButtonPressed:
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 0, e.mouseButton.x));
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 1, e.mouseButton.y));
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 1));
-			break;
-
-		case sf::Event::EventType::MouseButtonReleased:
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 0, e.mouseButton.x));
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, 1, e.mouseButton.y));
-			EH.handle(EH.createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 0));
-			break;
-
-		case sf::Event::EventType::JoystickMoved:
-			EH.handle(EH.createEvent(EventHandler::Joystick, e.joystickMove.joystickId*JOYSTICK_ID_OFFSET + e.joystickMove.axis, e.joystickMove.position));
-			break;
-
-		case sf::Event::EventType::JoystickButtonPressed:
-			EH.handle(EH.createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId*JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 1));
-			break;
-
-		case sf::Event::EventType::JoystickButtonReleased:
-			EH.handle(EH.createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId *JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 0));
-			break;
+			EH.handle(eventBuffer.readnext());
 		}
+		eventBuffer.empty();
 
 		postHandleEvent(e);
 	}
