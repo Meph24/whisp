@@ -11,7 +11,7 @@
 
 #include <vector>
 
-
+#include "IMediaHandle.h"
 
 // error handling
 #include <iostream>
@@ -25,6 +25,14 @@
 
 MainApp::MainApp()
 {
+	IMediaHandle::ContextSettings settings;
+	settings.depth = 24;
+	settings.stencil = 8;
+	settings.antialiasing = 0;
+	settings.openglmajor = 3;
+	settings.openglminor = 3;
+	SFMLHandle.createWindow("Test", 800, 600, settings);
+	graphics.init();
 }
 /*
 std::ostream& operator<< (std::ostream& os, const MainApp& A)
@@ -55,57 +63,27 @@ void MainApp::tick(int us)
 void MainApp::run()
 {
 	
-	/*
-
-	//old code
-	
-	std::vector<Vertex> vertices = {
-
-		Vertex(glm::vec3(-2.0, 0.0, 0.0), glm::vec2(0.0, 1.0)),
-		Vertex(glm::vec3(0.0, 0.0, 3.0), glm::vec2(0.5, 0.0)),
-		Vertex(glm::vec3(2.0, 0.0, 0.0), glm::vec2(1.0, 1.0))
-
-	};
-	
-
-	std::vector<unsigned int> indices = { 0, 1, 2 };
-	
-
-	Mesh mesh(&(vertices[0]), vertices.size(), &(indices[0]), indices.size());
-	
-
-
-	Shader shader("./res/basicShader");
-	Texture texture("./res/testTexture.jpg");
-	Camera camera(glm::vec3(0, 1, -3), MEPH_GRAPHICS_FOV, (float)MEPH_GRAPHICS_WIDTH / (float)MEPH_GRAPHICS_HEIGHT, 0.01f, 1000.0f);
-
-	Transform transform;
-
-	*/
-
-
-
-	sf::Keyboard::setVirtualKeyboardVisible(true);
-
 	sf::Clock clock;
 
-	while (oshandle.window.isOpen())
+	while (SFMLHandle.window.isOpen())
 	{
+		/*
 		//tick
 		sf::Time elapsed = clock.restart();
 		int us = elapsed.asMicroseconds();
 		if (us > PHYSICS_MAX_TICKLENGTH) us = PHYSICS_MAX_TICKLENGTH;
 		tick(us);
-
+*/
 
 
 		//render
 		graphics.render();
 		
-		oshandle.window.display();
+		SFMLHandle.window.display();
 
 		//handle events
-		oshandle.pollEvents();		
+		SFMLHandle.pollEvents();	
+		
 	}
 
 }

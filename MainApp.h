@@ -4,16 +4,15 @@
 #include <fstream>
 #include "SFML\Graphics.hpp"
 
-#include "OSHandle.h"
+#include "SFMLHandle.h"
 #include "Graphics.h"
 
 #include "HardCursorHandle.h"
 
 class MainApp
 {
-	OSHandle oshandle;
+	SFMLHandle SFMLHandle;
 	Graphics graphics;
-	std::ofstream MainAppInfo;
 
 	// _test_begin
 	float counter;

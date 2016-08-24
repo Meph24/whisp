@@ -1,10 +1,13 @@
 #pragma once
 
+
+#include "IMediaHandle.h"
 #include <SFML\Window.hpp>
 #include "EventHandler.h"
 #include "Buffer.h"
+#include <string>
 
-class OSHandle
+class SFMLHandle : public IMediaHandle
 {
 	// handler of the events
 	EventHandler EH;
@@ -14,11 +17,16 @@ class OSHandle
 	void postHandleEvent(sf::Event& e);
 	void preHandleEvent(sf::Event& e);
 public:
+
+
 	sf::ContextSettings contextSettings;
 	sf::Window window;
-	OSHandle();
-	~OSHandle();
+	SFMLHandle();
+	SFMLHandle(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
+	~SFMLHandle();
 
+
+	void createWindow(std::string name,  int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
 	void pollEvents();
 };
 

@@ -10,6 +10,14 @@
 
 class Graphics
 {
+public: 
+	struct settings
+	{
+		int someplaceholdersetting; // delete when add some real settings to it
+	};
+
+
+private:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	Mesh* mesh;
@@ -25,7 +33,10 @@ class Graphics
 
 public:
 	Graphics();
+	Graphics(settings settings);
 	~Graphics();
+
+	void init();
 
 
 	void setClearParameters(float r, float g, float b, float a = 255, float depth = 1.0f);
