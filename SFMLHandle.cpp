@@ -1,4 +1,4 @@
-#include "OSHandle.h"
+#include "SFMLHandle.h"
 
 #include <GL\glew.h>
 #include <iostream>
@@ -10,25 +10,35 @@
 #define JOYSTICK_BUTTON_OFFSET 8
 
 
-OSHandle::OSHandle() :
+
+
+SFMLHandle::SFMLHandle()
+{}
+
+SFMLHandle::SFMLHandle(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings) :
 contextSettings(24, 8, 0, 3, 3),
-window(sf::VideoMode(800, 600), "This is a test !", sf::Style::None, contextSettings)
-
-{
-	GLenum err = glewInit();
-	if (err != GLEW_OK)
-	{
-		std::cerr << "GLEW failed to initialize !" << std::endl;
-	}
-
-}
-
-
-OSHandle::~OSHandle()
+window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
 {
 }
 
-void OSHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
+
+SFMLHandle::~SFMLHandle()
+{
+}
+
+void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
+{
+	contextSettings.depthBits = settings.depth;
+	contextSettings.stencilBits = settings.stencil;
+	contextSettings.antialiasingLevel = settings.antialiasing;
+	contextSettings.majorVersion = settings.openglmajor;
+	contextSettings.minorVersion = settings.openglminor;
+
+	
+	window.create(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings);
+}
+
+void SFMLHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
 {
 	switch (e.type)
 	{
@@ -108,7 +118,7 @@ void OSHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::
 	}
 }
 
-void OSHandle::pollEvents()
+void SFMLHandle::pollEvents()
 {
 	sf::Event e;
 	Buffer < EventHandler::event, 4 >  eventBuffer;
@@ -129,7 +139,7 @@ void OSHandle::pollEvents()
 	}
 }
 
-void OSHandle::preHandleEvent(sf::Event& e)
+void SFMLHandle::preHandleEvent(sf::Event& e)
 {
 
 	switch (e.type)
@@ -141,7 +151,7 @@ void OSHandle::preHandleEvent(sf::Event& e)
 
 		case sf::Event::EventType::Resized:
 		//hardcursorhandle.updateLockPosition();
-		std::cout << oshandle.window.getSize().x << "/" << oshandle.window.getSize().y;
+		std::cout << SFMLHandle.window.getSize().x << "/" << SFMLHandle.window.getSize().y;
 		break;
 
 		case sf::Event::EventType::GainedFocus:
@@ -153,7 +163,7 @@ void OSHandle::preHandleEvent(sf::Event& e)
 		case sf::Event::EventType::KeyPressed:
 		if (e.key.code == sf::Keyboard::Key::L) hardcursorhandle.setLocked(true);
 		if (e.key.code == sf::Keyboard::Key::U) hardcursorhandle.setLocked(false);
-		if (e.key.code == sf::Keyboard::Key::R) oshandle.window.setSize (sf::Vector2u(400, 400));
+		if (e.key.code == sf::Keyboard::Key::R) SFMLHandle.window.setSize (sf::Vector2u(400, 400));
 		break;
 
 		*/
@@ -164,11 +174,11 @@ void OSHandle::preHandleEvent(sf::Event& e)
 
 }
 
-void OSHandle::postHandleEvent(sf::Event& e)
+void SFMLHandle::postHandleEvent(sf::Event& e)
 {
 	switch (e.type)
 	{
-		/*
+		
 		case sf::Event::EventType::Closed:
 		window.close();
 
@@ -179,6 +189,6 @@ void OSHandle::postHandleEvent(sf::Event& e)
 
 		case sf::Event::EventType::MouseButtonPressed:
 		break;
-		*/
+		
 	}
 }
