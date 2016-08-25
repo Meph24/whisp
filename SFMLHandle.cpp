@@ -19,6 +19,8 @@ SFMLHandle::SFMLHandle(std::string name, int reswidth, int resheight, IMediaHand
 contextSettings(24, 8, 0, 3, 3),
 window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
 {
+	//important because of the ability to activate the context in another thread
+	window.setActive(false);
 }
 
 
@@ -36,6 +38,9 @@ void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMe
 
 	
 	window.create(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings);
+
+	//important because of the ability to activate the context in another thread
+	window.setActive(false);
 }
 
 void SFMLHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
@@ -191,4 +196,14 @@ void SFMLHandle::postHandleEvent(sf::Event& e)
 		break;
 		
 	}
+}
+
+void SFMLHandle::setContextToMyThread()
+{
+	window.setActive(true);
+}
+
+void SFMLHandle::display()
+{
+	window.display();
 }

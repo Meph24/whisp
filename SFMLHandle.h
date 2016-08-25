@@ -28,5 +28,7 @@ public:
 
 	void createWindow(std::string name,  int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
 	void pollEvents();
+	void setContextToMyThread();
+	void display();
 };
 
