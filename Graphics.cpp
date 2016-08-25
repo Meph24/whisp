@@ -6,9 +6,28 @@
 #define MEPH_GRAPHICS_WIDTH 800
 #define MEPH_GRAPHICS_HEIGHT 600
 
-Graphics::Graphics()
+Graphics::Graphics(IMediaHandle& mediaHandle) :
+mediaHandle(mediaHandle)
 {}
 
+Graphics::Graphics(IMediaHandle& mediaHandle, Graphics::settings settings) :
+Graphics(mediaHandle)
+{
+
+	init();
+
+}
+
+Graphics::~Graphics()
+{
+	stop();
+
+	delete mesh;
+	delete shader;
+	delete texture;
+	delete camera;
+	delete transform;
+}
 
 void Graphics::init()
 {	
@@ -45,22 +64,46 @@ void Graphics::init()
 	transform = new Transform();
 }
 
-
-Graphics::Graphics(Graphics::settings settings)
+void Graphics::start()
 {
-	
+	if (!thread_isOn)
+	{
+		thread_isOn = true;
+	}
+	else
+	{
+
+	}
+	graphicThread = std::thread(&Graphics::graphicMain, this);
+}
+
+void Graphics::stop()
+{
+	if (thread_isOn)
+	{
+		thread_isOn = false;
+		if (graphicThread.joinable()) graphicThread.join();
+	}
+}
+
+void Graphics::graphicMain()
+{
+	mediaHandle.setContextToMyThread();
 	init();
-	
+
+	while (thread_isOn)
+	{
+		render();
+	}
 }
 
 
-Graphics::~Graphics()
-{
-}
 
 
 
-void Graphics::windowClear()
+
+
+void Graphics::clear()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -72,22 +115,21 @@ void Graphics::setClearParameters(float r, float g, float b, float a, float dept
 	glClearColor(r, g, b, a);
 }
 
-void Graphics::windowClear(float r, float g, float b, float a, float depth)
+void Graphics::clear(float r, float g, float b, float a, float depth)
 {
 	setClearParameters(r, g, b, a, depth);
-	windowClear();
+	clear();
 }
 
 void Graphics::render()
 {
 	
 	//transform stuff
-
-
 	shader->Bind();
 	texture->bind();
 	shader->Update(*transform, *camera);
-	windowClear();
+	clear();
 	mesh->draw();
+	mediaHandle.display();
 	
 }

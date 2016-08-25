@@ -15,4 +15,6 @@ public:
 
 	virtual void createWindow(std::string name, int reswidth, int resheigt, ContextSettings& contextSettings) = 0;
 	virtual void pollEvents() = 0;
+	virtual void setContextToMyThread() = 0;
+	virtual void display() = 0;
 };
