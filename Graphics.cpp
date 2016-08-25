@@ -66,14 +66,11 @@ void Graphics::init()
 
 void Graphics::start()
 {
-	if (!thread_isOn)
+	if (thread_isOn)
 	{
-		thread_isOn = true;
+		stop();
 	}
-	else
-	{
-
-	}
+	thread_isOn = true;
 	graphicThread = std::thread(&Graphics::graphicMain, this);
 }
 

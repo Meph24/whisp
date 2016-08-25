@@ -127,6 +127,7 @@ public:
 
 	/*
 	//	starts the graphic thread
+	//	can also be used to restart the thread completely by calling while the thread is still running
 	*/
 	void start();
 
