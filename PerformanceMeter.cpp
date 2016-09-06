@@ -1,15 +1,15 @@
 #include "PerformanceMeter.h"
 #include <ctgmath>
 
-PerformanceMeter::PerformanceMeter(int count)
+PerformanceMeter::PerformanceMeter(int stepCount)
 {
-	n = count;
-	time = new int[count*5];
-	maxTolerated = time+count;
-	maxMeasured = time + count*2;
-	avg = (float *) (time + count*3);//dirty: blame HL65536
-	spikes = (float *)(time + count * 4);
-	names = new std::string[count];
+	n = stepCount;
+	time = new int[stepCount * 5];
+	maxTolerated = time + stepCount;
+	maxMeasured = time + stepCount * 2;
+	avg = (float *)(time + stepCount * 3);//dirty: blame HL65536
+	spikes = (float *)(time + stepCount * 4);
+	names = new std::string[stepCount];
 	clear();
 	for (int i = 0; i < n; i++)
 		maxTolerated[i] = 99999999;
