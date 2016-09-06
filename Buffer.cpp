@@ -105,6 +105,8 @@ T Buffer<T, size>::readat(unsigned int index)
 	return data[index%size];
 }
 
+//TODO Possible optimization by using memcpy instead of for loops in read and write
+
 template <typename T, int size>
 bool Buffer<T, size>::write(T* container, unsigned int amount)
 {
