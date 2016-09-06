@@ -7,6 +7,7 @@
 #define FLAG_AVG 2
 #define FLAG_SPIKES 4
 #define FLAG_ALL_TIME_MAX 8
+#define FLAG_ALL_TIME_MIN 16
 
 class PerformanceMeter
 {
@@ -49,6 +50,9 @@ public:
 	//clear data about the maximum ever measured time for each step
 	void clearMax();
 
+	//clear data about the minimum ever measured time for each step
+	void clearMin();
+
 	//returns the last measured time for the given step (in us)
 	int getTime(int stepID);
 
@@ -60,6 +64,9 @@ public:
 
 	//returns maximum time ever measured for the given step (in us)
 	int getMaxMeasured(int stepID);
+
+	//returns minimum time ever measured for the given step (in us)
+	int getMinMeasured(int stepID);
 
 	void setMaxTolerated(int stepID, int us);
 
@@ -74,6 +81,8 @@ public:
 
 	//clears all collected info
 	void clear();
+
+
 
 
 	void setSpikeHalfLifeTime(float seconds);
@@ -91,6 +100,7 @@ private:
 	int * time;
 	int * maxTolerated;
 	int * maxMeasured;
+	int * minMeasured;
 	float * avg;
 	float * spikes;
 
