@@ -182,6 +182,7 @@ bool PerformanceMeter::registerTime(int stepID) //4K/s; 500K budget
 		exceededMax(stepID);
 		return true;
 	}
+	return false;
 }
 
 void PerformanceMeter::setSpikeHalfLifeTime(float seconds)
