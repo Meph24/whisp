@@ -4,11 +4,12 @@
 PerformanceMeter::PerformanceMeter(int stepCount)
 {
 	n = stepCount;
-	time = new int[stepCount * 5];
+	time = new int[stepCount * 6];
 	maxTolerated = time + stepCount;
 	maxMeasured = time + stepCount * 2;
-	avg = (float *)(time + stepCount * 3);//dirty: blame HL65536
-	spikes = (float *)(time + stepCount * 4);
+	minMeasured = time + stepCount * 3;
+	avg = (float *)(time + stepCount * 4);//dirty: blame HL65536
+	spikes = (float *)(time + stepCount * 5);
 	names = new std::string[stepCount];
 	clear();
 	for (int i = 0; i < n; i++)
@@ -26,12 +27,18 @@ void PerformanceMeter::clearMax()
 	for (int i = 0; i < n; i++)
 		maxMeasured[i] = -1;
 }
+void PerformanceMeter::clearMin()
+{
+	for (int i = 0; i < n; i++)
+		maxMeasured[i] = -1;
+}
 void PerformanceMeter::clear()
 {
 	for (int i = 0; i < n; i++)
 	{
 		time[i] = 0;
 		maxMeasured[i] = -1;
+		minMeasured[i] = ~(1 << 31);
 		avg[i] = 0;
 		spikes[i] = 0;
 	}
@@ -44,6 +51,34 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 	format[5] = '.';
 	std::string ret = names[stepID] + ':';
 	int num;
+	if (infoFlags&FLAG_ALL_TIME_MIN)
+	{
+		infoFlags -= FLAG_ALL_TIME_MIN;
+		num = minMeasured[stepID];
+		format[8] = '0' + (num % 10);
+		num /= 10;
+		format[7] = '0' + (num % 10);
+		num /= 10;
+		format[6] = '0' + (num % 10);
+		num /= 10;
+		format[4] = '0' + (num % 10);
+		num /= 10;
+		format[3] = '0' + (num % 10);
+		num /= 10;
+		format[2] = '0' + (num % 10);
+		num /= 10;
+		format[1] = '0' + (num % 10);
+		num /= 10;
+		format[0] = '0' + (num % 10);
+		for (int i = 0; i < 4; i++)
+		{
+			if (format[i] == '0') format[i] = ' ';
+			else break;
+		}
+		std::string avgString(format, 9);
+		if (infoFlags) ret = ret + avgString + "ms min; ";
+		else ret = ret + avgString + "ms min";
+	}
 	if (infoFlags&FLAG_NOW)
 	{
 		infoFlags -= FLAG_NOW;
@@ -172,10 +207,8 @@ bool PerformanceMeter::registerTime(int stepID) //4K/s; 500K budget
 		spikes[stepID] = spike * pow<float>(0.5f, f);
 	}
 	if (spike<t) spikes[stepID] = t;
-	if (t > maxMeasured[stepID])
-	{
-		maxMeasured[stepID] = t;
-	}
+	if (t > maxMeasured[stepID]) maxMeasured[stepID] = t;
+	if (t < minMeasured[stepID]) minMeasured[stepID] = t;
 	bool tooLong = t > maxTolerated[stepID];
 	if (tooLong)
 	{
@@ -209,6 +242,11 @@ void PerformanceMeter::setName(std::string name, int  stepID)
 int PerformanceMeter::getMaxMeasured(int stepID)
 {
 	return maxMeasured[stepID];
+}
+
+int PerformanceMeter::getMinMeasured(int stepID)
+{
+	return minMeasured[stepID];
 }
 
 int PerformanceMeter::getTime(int stepID)
