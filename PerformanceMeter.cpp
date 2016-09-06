@@ -30,7 +30,7 @@ void PerformanceMeter::clearMax()
 void PerformanceMeter::clearMin()
 {
 	for (int i = 0; i < n; i++)
-		maxMeasured[i] = -1;
+		minMeasured[i] = ~(1 << 31);
 }
 void PerformanceMeter::clear()
 {
