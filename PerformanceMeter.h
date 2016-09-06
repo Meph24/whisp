@@ -16,6 +16,7 @@ public:
 
 	//return: exceeded maximum time
 	bool registerTime(int stepID);
+
 	void clearMax();
 	int getMaxMeasured(int stepID);
 	int getTime(int stepID);
@@ -33,9 +34,10 @@ private:
 	void exceededMax(int stepID);
 
 	sf::Clock clock; //TODO replace
+
 	int n;
 
-	std::string * names; //TODO implement
+	std::string * names;
 
 	int * time;
 	int * maxTolerated;
