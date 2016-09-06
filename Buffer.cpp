@@ -9,7 +9,6 @@ template <typename T, int size >
 Buffer<T, size>::Buffer()
 	:
 	borderOffset(0),
-	readPtrOffset(0),
 	writePtrOffset(0)
 {
 }
@@ -32,7 +31,7 @@ T* Buffer<T, size>::getwrite() const
 template <typename T, int size >
 T* Buffer<T, size>:: getread() const
 {
-	return data + (readPtrOffset% size);
+	return data + (beginOffset()% size);
 }
 template <typename T, int size >
 unsigned int Buffer<T, size>:: beginOffset() const
@@ -51,36 +50,26 @@ unsigned int Buffer<T, size>::getfreespace() const
 	return endOffset() - writePtrOffset;
 }
 
-template <typename T, int size >
-void Buffer<T, size>::fit()
-{
-	borderOffset = readPtrOffset;
-	repairOffsets();
-}
+
 
 template <typename T, int size >
 void Buffer<T, size>::repairOffsets()
 {
 	if (borderOffset > size)
 	{
-		// get offsets
-		unsigned int borderoff = borderOffset % size;
-		unsigned int writeoff = writePtrOffset % size;
-		unsigned int readoff = readPtrOffset % size;
-
-		//get the "round count" the offset actually has
+		// get offsets and the "round count" the offset actually has
 		unsigned int borderdiv = borderOffset / size;
+		unsigned int borderoff = borderOffset % size;
+		
 		unsigned int writediv = writePtrOffset / size;
-		unsigned int readdiv = readPtrOffset / size;
+		unsigned int writeoff = writePtrOffset % size;
 
 		//set the roundcount as low as possible
 		writediv -= borderdiv;
-		readdiv -= borderdiv;
 
 		// apply new values
 		borderOffset = borderoff;
 		writePtrOffset = writediv * size + writeoff;
-		readPtrOffset = readdiv * size + readoff;
 	}
 }
 
@@ -95,13 +84,13 @@ bool Buffer<T, size>::isfull() const
 template <typename T, int size>
 bool Buffer<T, size>::nodata() const
 {
-	return readPtrOffset >= writePtrOffset;
+	return beginOffset() >= writePtrOffset;
 }
 
 template <typename T, int size>
 void Buffer<T, size>::empty()
 {
-	borderOffset = readPtrOffset = writePtrOffset;
+	borderOffset = writePtrOffset;
 }
 
 template <typename T, int size>
@@ -139,14 +128,14 @@ bool Buffer<T, size>::write(T value)
 template <typename T, int size>
 bool Buffer<T, size>::read(T* container, unsigned int amount)
 {
-	if ((readPtrOffset+amount) > writePtrOffset) return false;
+	if ((beginOffset()+amount) > writePtrOffset) return false;
 	
 	for (size_t i = 0; i < amount; i++)
 	{
 		container[i] = readat(readPtrOffset + i);
 	}
-	readPtrOffset += amount;
-	fit();
+	borderOffset += amount;
+	repairOffsets();
 	return true;
 }
 
