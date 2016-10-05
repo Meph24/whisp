@@ -13,9 +13,7 @@ mediaHandle(mediaHandle)
 Graphics::Graphics(IMediaHandle& mediaHandle, Graphics::settings settings) :
 Graphics(mediaHandle)
 {
-
 	init();
-
 }
 
 Graphics::~Graphics()
@@ -94,16 +92,22 @@ void Graphics::graphicMain()
 	}
 }
 
+void Graphics::render()
+{
+	//transform stuff
 
-
-
-
-
+	
+	//shader->Bind();
+	//texture->bind();
+	//shader->Update(*transform, *camera);
+	clear();
+	//mesh->draw();
+	mediaHandle.display();	
+}
 
 void Graphics::clear()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 }
 
 void Graphics::setClearParameters(float r, float g, float b, float a, float depth)
@@ -118,15 +122,3 @@ void Graphics::clear(float r, float g, float b, float a, float depth)
 	clear();
 }
 
-void Graphics::render()
-{
-	
-	//transform stuff
-	shader->Bind();
-	texture->bind();
-	shader->Update(*transform, *camera);
-	clear();
-	mesh->draw();
-	mediaHandle.display();
-	
-}

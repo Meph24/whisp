@@ -31,7 +31,7 @@ T* Buffer<T, size>::getwrite() const
 template <typename T, int size >
 T* Buffer<T, size>:: getread() const
 {
-	return data + (beginOffset()% size);
+	return data + (readPtrOffset% size);
 }
 template <typename T, int size >
 unsigned int Buffer<T, size>:: beginOffset() const
@@ -50,19 +50,26 @@ unsigned int Buffer<T, size>::getfreespace() const
 	return endOffset() - writePtrOffset;
 }
 
-
+template <typename T, int size >
+void Buffer<T, size>::fit()
+{
+	repairOffsets();
+}
 
 template <typename T, int size >
 void Buffer<T, size>::repairOffsets()
 {
 	if (borderOffset > size)
 	{
-		// get offsets and the "round count" the offset actually has
-		unsigned int borderdiv = borderOffset / size;
+		// get offsets
 		unsigned int borderoff = borderOffset % size;
-		
-		unsigned int writediv = writePtrOffset / size;
 		unsigned int writeoff = writePtrOffset % size;
+		
+
+		//get the "round count" the offset actually has
+		unsigned int borderdiv = borderOffset / size;
+		unsigned int writediv = writePtrOffset / size;
+		
 
 		//set the roundcount as low as possible
 		writediv -= borderdiv;
@@ -70,6 +77,7 @@ void Buffer<T, size>::repairOffsets()
 		// apply new values
 		borderOffset = borderoff;
 		writePtrOffset = writediv * size + writeoff;
+		
 	}
 }
 
@@ -84,7 +92,7 @@ bool Buffer<T, size>::isfull() const
 template <typename T, int size>
 bool Buffer<T, size>::nodata() const
 {
-	return beginOffset() >= writePtrOffset;
+	return borderOffset >= writePtrOffset;
 }
 
 template <typename T, int size>
@@ -104,8 +112,6 @@ T Buffer<T, size>::readat(unsigned int index)
 {
 	return data[index%size];
 }
-
-//TODO Possible optimization by using memcpy instead of for loops in read and write
 
 template <typename T, int size>
 bool Buffer<T, size>::write(T* container, unsigned int amount)
@@ -130,14 +136,14 @@ bool Buffer<T, size>::write(T value)
 template <typename T, int size>
 bool Buffer<T, size>::read(T* container, unsigned int amount)
 {
-	if ((beginOffset()+amount) > writePtrOffset) return false;
+	if ((borderOffset+amount) > writePtrOffset) return false;
 	
 	for (size_t i = 0; i < amount; i++)
 	{
-		container[i] = readat(readPtrOffset + i);
+		container[i] = readat(borderOffset + i);
 	}
 	borderOffset += amount;
-	repairOffsets();
+	fit();
 	return true;
 }
 

@@ -28,6 +28,8 @@ SFMLHandle::~SFMLHandle()
 {
 }
 
+// https://de.wikipedia.org/wiki/Sto%C3%9F_%28Physik%29
+
 void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
 {
 	contextSettings.depthBits = settings.depth;

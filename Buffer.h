@@ -17,7 +17,7 @@ class Buffer
 	T data [size];
 
 	// Offsets for pointer calculation
-	unsigned int borderOffset, writePtrOffset, readPtrOffset;
+	unsigned int borderOffset, writePtrOffset;
 
 	// returns a pointer to the border in the buffer where the begin or and 
 	inline T* getborder() const;
@@ -33,6 +33,9 @@ class Buffer
 
 	// calculates the index the buffer save space ends
 	inline unsigned int endOffset() const;
+
+	// fit() matches the position of the beginOffset to the readOffset and is so freeing save space in the buffer of data that has already been read
+	void fit();
 
 	// repairOffsets() is called frequently on read() calls to decrease offset values to a lower basis and prevents from bugs throug overflow 
 	void repairOffsets();
@@ -109,7 +112,7 @@ public:
 		os << "Full : " << b.isfull() << endl;
 		os << "Nodata : " << b.nodata() << endl;
 		os << "BorderOffset : " << b.borderOffset << " | begin / end : " << b.beginOffset() << "/" << b.endOffset() << std::endl;
-		os << "WriteOffset : " << b.writePtrOffset << std::endl;
+		os << "WriteOffset / ReadOffset : " << b.writePtrOffset << "/" << b.readPtrOffset << std::endl;
 		os << "Buffer:" << std::endl;
 		for (size_t i = 0; i < size; i++)
 		{
