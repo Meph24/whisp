@@ -42,6 +42,7 @@ void PerformanceMeter::clear()
 		avg[i] = 0;
 		spikes[i] = 0;
 	}
+	roundtriptime = 0;
 }
 
 //works for a maximum time <100s
@@ -194,18 +195,21 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 bool PerformanceMeter::registerTime(int stepID) //4K/s; 500K budget
 {
 	int t = clock.restart().asMicroseconds();//TODO replace: 2k cycles
+	roundtriptime += t - time[stepID];
 	time[stepID] = t;
 	avg[stepID] = avg[stepID] * (1 - avgWeight) + t * avgWeight;
 	float spike = spikes[stepID];
+	float spklwd;
 	if (useFastApproximation)
 	{
-		spikes[stepID] =  spike - spike * t * spikeMultiplier;
+		spklwd =  spike - spike * roundtriptime * spikeMultiplier;//TODO round trip time
 	}
 	else
 	{
-		float f = t*spikeHalfLifeInv;
-		spikes[stepID] = spike * pow<float>(0.5f, f);
+		float f = roundtriptime*spikeHalfLifeInv;
+		spklwd = spike * pow<float>(0.5f, f);
 	}
+	spikes[stepID] = spklwd;
 	if (spike<t) spikes[stepID] = t;
 	if (t > maxMeasured[stepID]) maxMeasured[stepID] = t;
 	if (t < minMeasured[stepID]) minMeasured[stepID] = t;
