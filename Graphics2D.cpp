@@ -133,6 +133,8 @@ subsection Graphics2D::generateSubsection(float snapx, float snapy, float sizex,
 	float size = sizex<sizey ? sizex : sizey;
 	float newSizex = sizex / size;
 	float newSizey = sizey / size;
+	ret.maxi.x = newSizex;
+	ret.maxi.y = newSizey;
 	float oldSizex = curMax[stack].x;
 	float oldSizey = curMax[stack].y;
 	int locx = (snappoint % 3) - 1;
