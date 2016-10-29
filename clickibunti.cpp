@@ -107,20 +107,22 @@ void clickibunti()
 		c.b = ((i + 1) / 4) % 2;
 		g.fillRect(posx - 0.5f, 0.4f, now, 0.2f, c);
 		posx += now;
-	}
-
-
-
-	subsection s = g.generateSubsection(0, 0, 0.4f, 0.4f, SNAP_W,10);
-	if (test == 0)
+	}posx = 0;
+	for (int i = 0; i < 1; i++)
 	{
-		test = 1;
-		for (int i = 0; i < 4; i++)
-		{
-			std::cout << std::fixed << std::setprecision(3) << s.mat[i * 4] << "		" << s.mat[i * 4 + 1] << "		" << s.mat[i * 4 + 2] << "		" << s.mat[i * 4 + 3] << std::endl << std::endl;
-		}
-		std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
+		float now = pm.roundtriptime*144.0f / 1000000.0f;
+		color c;
+		c.r = (i + 1) % 2;
+		c.g = ((i + 1) / 2) % 2;
+		c.b = ((i + 1) / 4) % 2;
+		g.fillRect(posx - 0.5f, 0.6f, now, 0.2f, c);
+		posx += now;
 	}
+
+
+
+
+	subsection s = g.generateSubsection(0, 0, 0.4f, 0.4f, SNAP_MID,30);
 	g.setSubsection(&s);
 	glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
 	g.fillOval(0, 0, 1, 1);
@@ -133,23 +135,33 @@ void clickibunti()
 	glVertex2f(-1,-1);
 	glVertex2f(1,-1);
 	glEnd();
-	g.resetLastSubsection();
+	subsection s2 = g.generateSubsection(0, 0, 0.8f, 0.8f, SNAP_W,-30);
 
-	subsection s2 = g.generateSubsection(0, 0, 0.4f, 0.4f, SNAP_E, 10);
-
+	if (test == 0)
+	{
+		float * mat = s2.mat;
+		test = 1;
+		for (int i = 0; i < 4; i++)
+		{
+			std::cout << std::fixed << std::setprecision(3) << mat[i * 4] << "		" << mat[i * 4 + 1] << "		" << mat[i * 4 + 2] << "		" << mat[i * 4 + 3] << std::endl << std::endl;
+		}
+		std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
+	}
 	g.setSubsection(&s2);
-	glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
+	glColor4f(1.0f, 1.0f, 1.0f, 0.75f);
 	g.fillOval(0, 0, 1, 1);
 
 	glBegin(GL_POLYGON);            // These vertices form a closed polygon
 
-	glColor3f(1.0f, 1.0f, 0.0f);
+	glColor3f(0.0f, 0.0f, 1.0f);
 	glVertex2f(0.2f, 1);
 	glVertex2f(-0.2f, 1);
 	glVertex2f(-1, -1);
 	glVertex2f(1, -1);
 	glEnd();
 	g.resetLastSubsection();
+	g.resetLastSubsection();
+
 
 
 	//glTranslatef(0.2f, 0.2f, 0.0f);
