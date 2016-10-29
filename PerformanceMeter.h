@@ -37,6 +37,7 @@ public:
 		doThingC();
 		pm.registerTime(2);
 	}
+
 	cout<<"most time ever spent doing thing A: "<<(pm.getMaxMeasured(0)/1000.0f)<<"ms"<<endl;
 	
 	*/
@@ -44,7 +45,7 @@ public:
 
 
 	//return: if measurement exceeded maximum time
-	bool registerTime(int stepID);
+	bool registerTime(int stepID);//TODO add more comments
 
 	//clear data about the maximum ever measured time for each step
 	void clearMax();
@@ -94,23 +95,24 @@ private:
 
 	int n;
 
-	std::string * names;
+	std::string * names; //TODO format shit (+' ')
 
 	int * time;
 	int * maxTolerated;
 	int * maxMeasured;
 	int * minMeasured;
-	float * avg;
+	float * avg;//TODO recent avg vs total avg (sum)
 	float * spikes;
-
 
 	float spikeHalfLifeInv = 1.0f/10000000;
 	float spikeMultiplier=0.00000005f;
 public:
 
+	float roundtriptime;//TODO add as another time that can be queried//TODO put back to private
 	//avg[stepID] = avg[stepID] * (1 - avgWeight) + t * avgWeight;
 	float avgWeight = 0.01f;
 
 	//use a faster algorithm for applying the half life of spikes (inaccurate)
 	bool useFastApproximation = true;
 };
+
