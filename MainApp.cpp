@@ -1,5 +1,5 @@
 #include "MainApp.h"
-#include <GL\glew.h>
+#include <GL/glew.h>
 
 #include "Mesh.h"
 #include "Shader.h"
@@ -24,7 +24,7 @@
 
 
 MainApp::MainApp():
-graphics(SFMLHandle)
+graphics(sfmlHandle)
 {
 	IMediaHandle::ContextSettings settings;
 	settings.depth = 24;
@@ -32,7 +32,7 @@ graphics(SFMLHandle)
 	settings.antialiasing = 0;
 	settings.openglmajor = 3;
 	settings.openglminor = 3;
-	SFMLHandle.createWindow("Test", 800, 600, settings);
+	sfmlHandle.createWindow("Test", 960,540, settings);
 }
 
 void MainApp::tick(int us)
@@ -47,7 +47,7 @@ void MainApp::run()
 
 
 	graphics.start();
-	while (SFMLHandle.window.isOpen())
+	while (sfmlHandle.window.isOpen())
 	{
 		
 		//tick
@@ -55,11 +55,13 @@ void MainApp::run()
 		int us = elapsed.asMicroseconds();
 		if (us > PHYSICS_MAX_TICKLENGTH) us = PHYSICS_MAX_TICKLENGTH;
 		tick(us);
-		
+
+		sf::Time t = sf::microseconds(1000);
+		sf::sleep(t);
 		
 
 		//handle events
-		SFMLHandle.pollEvents();	
+		sfmlHandle.pollEvents();	
 		
 	}
 

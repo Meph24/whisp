@@ -1,6 +1,6 @@
 #include "ICamera.h"
 
-#include <GL\glew.h>
+#include <GL/glew.h>
 
 ICamera::ICamera():
 posX(0), posY(0), posZ(0)

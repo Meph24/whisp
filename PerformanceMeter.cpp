@@ -4,16 +4,19 @@
 PerformanceMeter::PerformanceMeter(int stepCount)
 {
 	n = stepCount;
-	time = new int[stepCount * 6];
+	time = new int[stepCount * 8];
 	maxTolerated = time + stepCount;
 	maxMeasured = time + stepCount * 2;
 	minMeasured = time + stepCount * 3;
-	avg = (float *)(time + stepCount * 4);//dirty: blame HL65536
+	avgRecent = (float *)(time + stepCount * 4);//dirty: blame HL65536
 	spikes = (float *)(time + stepCount * 5);
+	sum = (float *)(time + stepCount * 6);
+	runs = time + stepCount * 7;
 	names = new std::string[stepCount];
 	clear();
 	for (int i = 0; i < n; i++)
 		maxTolerated[i] = 99999999;
+	roundtripUpdateIndex = stepCount - 1;
 }
 
 PerformanceMeter::~PerformanceMeter()
@@ -32,6 +35,15 @@ void PerformanceMeter::clearMin()
 	for (int i = 0; i < n; i++)
 		minMeasured[i] = ~(1 << 31);
 }
+void PerformanceMeter::clearTotalAVG()
+{
+	for (int i = 0; i < n; i++)
+		sum[i] = 0;
+}
+float PerformanceMeter::getTotalAVG(int stepID)
+{
+	return sum[stepID] / runs[stepID];
+}
 void PerformanceMeter::clear()
 {
 	for (int i = 0; i < n; i++)
@@ -39,7 +51,9 @@ void PerformanceMeter::clear()
 		time[i] = 0;
 		maxMeasured[i] = -1;
 		minMeasured[i] = ~(1 << 31);
-		avg[i] = 0;
+		avgRecent[i] = 0;
+		sum[i] = 0;
+		runs[i] = 0;
 		spikes[i] = 0;
 	}
 	roundtriptime = 0;
@@ -108,10 +122,10 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 		if (infoFlags) ret = ret + avgString + "ms now; ";
 		else ret = ret + avgString + "ms now";
 	}
-	if (infoFlags&FLAG_AVG)
+	if (infoFlags&FLAG_RECENTAVG)
 	{
-		infoFlags -= FLAG_AVG;
-		num = (int)(avg[stepID] + 0.5f);
+		infoFlags -= FLAG_RECENTAVG;
+		num = (int)(avgRecent[stepID] + 0.5f);
 		format[8] = '0' + (num % 10);
 		num /= 10;
 		format[7] = '0' + (num % 10);
@@ -133,8 +147,38 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 			else break;
 		}
 		std::string avgString(format, 9);
-		if (infoFlags) ret = ret + avgString + "ms avg; ";
-		else ret = ret + avgString + "ms avg";
+		if (infoFlags) ret = ret + avgString + "ms recent avg; ";
+		else ret = ret + avgString + "ms recent avg";
+	}
+	if (infoFlags&FLAG_TOTALAVG)
+	{
+		infoFlags -= FLAG_TOTALAVG;
+		int numRuns = runs[stepID];
+		if (numRuns == 0) num = 0;
+		else num = (int)(sum[stepID]/numRuns + 0.5f);
+		format[8] = '0' + (num % 10);
+		num /= 10;
+		format[7] = '0' + (num % 10);
+		num /= 10;
+		format[6] = '0' + (num % 10);
+		num /= 10;
+		format[4] = '0' + (num % 10);
+		num /= 10;
+		format[3] = '0' + (num % 10);
+		num /= 10;
+		format[2] = '0' + (num % 10);
+		num /= 10;
+		format[1] = '0' + (num % 10);
+		num /= 10;
+		format[0] = '0' + (num % 10);
+		for (int i = 0; i < 4; i++)
+		{
+			if (format[i] == '0') format[i] = ' ';
+			else break;
+		}
+		std::string avgString(format, 9);
+		if (infoFlags) ret = ret + avgString + "ms total avg; ";
+		else ret = ret + avgString + "ms total avg";
 	}
 	if (infoFlags&FLAG_SPIKES)
 	{
@@ -196,21 +240,23 @@ bool PerformanceMeter::registerTime(int stepID) //4K/s; 500K budget
 {
 	int t = clock.restart().asMicroseconds();//TODO replace: 2k cycles
 	roundtriptime += t - time[stepID];
+	runs[stepID]++;
 	time[stepID] = t;
-	avg[stepID] = avg[stepID] * (1 - avgWeight) + t * avgWeight;
+	avgRecent[stepID] = avgRecent[stepID] * (1 - avgWeight) + t * avgWeight;
 	float spike = spikes[stepID];
 	float spklwd;
 	if (useFastApproximation)
 	{
-		spklwd =  spike - spike * roundtriptime * spikeMultiplier;//TODO round trip time
+		spklwd =  spike - spike * roundtriptime * spikeMultiplier;
 	}
 	else
 	{
 		float f = roundtriptime*spikeHalfLifeInv;
-		spklwd = spike * pow<float>(0.5f, f);
+		spklwd = spike * powf(0.5f, f);
 	}
 	spikes[stepID] = spklwd;
 	if (spike<t) spikes[stepID] = t;
+	sum[stepID] += t;
 	if (t > maxMeasured[stepID]) maxMeasured[stepID] = t;
 	if (t < minMeasured[stepID]) minMeasured[stepID] = t;
 	bool tooLong = t > maxTolerated[stepID];
@@ -258,9 +304,9 @@ int PerformanceMeter::getTime(int stepID)
 	return time[stepID];
 }
 
-float PerformanceMeter::getAVG(int stepID)
+float PerformanceMeter::getRecentAVG(int stepID)
 {
-	return avg[stepID];
+	return avgRecent[stepID];
 }
 
 float PerformanceMeter::getSpikes(int stepID)

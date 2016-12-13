@@ -1,10 +1,11 @@
 #include "Graphics2D.h"
 #include <cmath>
+#include "TextureStatic2D.h"
 
-
-Graphics2D::Graphics2D(int circleSegments)
+Graphics2D::Graphics2D(int circleSegments, ITexture * myFont) :
+font(myFont),
+segments(circleSegments)
 {
-	segments = circleSegments;
 	if (segments < 3) segments = 0;
 	if (segments != 0)
 	{
@@ -22,16 +23,36 @@ Graphics2D::Graphics2D(int circleSegments)
 	maxStack = 256;//TODO add optional parameter
 	curMax = new point[maxStack];
 	curMax[0] = maxi;
-	for (int i = 0; i < 4; i++)
+}
+Graphics2D::Graphics2D(int circleSegments) :
+segments(circleSegments)
+{
+	tps = new TexParamSet(2, 2);
+	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	tps->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	tps->addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	tps->addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	font = new TextureStatic2D(tps, "./res/font.png");
+	font->update();
+	if (segments < 3) segments = 0;
+	if (segments != 0)
 	{
-		for (int j = 0; j < 4; j++)
+		xCircle = new float[segments];
+		yCircle = new float[segments];
+		float mult = TAU / circleSegments;
+		for (int i = 0; i < circleSegments; i++)
 		{
-			if (j == i) emptyMat[i * 4 + j] = 1;
-			else emptyMat[i * 4 + j] = 0;
+			xCircle[i] = sin(i*mult);
+			yCircle[i] = cos(i*mult);
 		}
 	}
+	maxi.x = 1;//TODO correct
+	maxi.y = 1;
+	maxStack = 256;//TODO add optional parameter
+	curMax = new point[maxStack];
+	curMax[0] = maxi;
 }
-
 
 Graphics2D::~Graphics2D()
 {
@@ -41,11 +62,16 @@ Graphics2D::~Graphics2D()
 		delete[] yCircle;
 	}
 	delete[] curMax;
+	if (tps != 0)
+	{
+		delete (TextureStatic2D *)font;
+		delete tps;
+	}
 }
 
 void Graphics2D::beginDraw()
 {
-
+	glLoadIdentity();
 }
 
 void Graphics2D::endDraw()
@@ -119,7 +145,7 @@ subsection Graphics2D::generateSubsection(float snapx, float snapy, float sizex,
 	float newSelectedx = newSizex*locx;
 	float newSelectedy = newSizey*locy;
 	glPushMatrix();//save the matrix to create a new matrix from scratch
-	glLoadMatrixf(emptyMat);
+	glLoadIdentity();
 	glTranslatef(oldSelectedx + snapx - newSelectedx*size*0.5f, oldSelectedy + snapy - newSelectedy*size*0.5f, 0.0f);
 	glScalef(size*0.5f, size*0.5f, 1.0f);
 	glGetFloatv(GL_MODELVIEW_MATRIX, ret.mat);
@@ -144,7 +170,8 @@ subsection Graphics2D::generateSubsection(float snapx, float snapy, float sizex,
 	float newSelectedx = newSizex*locx;
 	float newSelectedy = newSizey*locy;
 	glPushMatrix();//save the matrix to create a new matrix from scratch
-	glLoadMatrixf(emptyMat);
+	//glLoadMatrixf(emptyMat);
+	glLoadIdentity();
 	glTranslatef(oldSelectedx + snapx - newSelectedx*size*0.5f, oldSelectedy + snapy - newSelectedy*size*0.5f, 0.0f);
 	glScalef(size*0.5f, size*0.5f, 1.0f);
 	glRotatef(angle, 0, 0, 1.0f);
@@ -178,6 +205,7 @@ void Graphics2D::fillRect(float x, float y, float width, float height,color c)
 	glEnd();
 }
 
+//TODO replace with image drawing
 void Graphics2D::feedRects(unsigned int count, float * x, float * y, float * width, float * height)
 {
 	glBegin(GL_QUADS);
@@ -237,7 +265,28 @@ void Graphics2D::fillOval(float xCenter, float yCenter, float xRad, float yRad)
 	glEnd();
 }
 
-void Graphics2D::drawString(char * str, float x, float y)
+void Graphics2D::drawString(char * str,int len, float xll, float yll, float size)
 {
-	//glutStrokeCharacter(GLUT_STROKE_ROMAN, str[0]);//TODO find alternative
+	for (int i = 0; i < len; i++)
+	{
+		float tx = (str[i] % 16)/16.0f;
+		float ty = (str[i] / 16)/16.0f;
+		float dx = xll + i*charLen*size;
+		float dy = yll;
+		//TODO insert texture
+		//font->bind();
+		glEnable(GL_TEXTURE_2D);
+		glBegin(GL_QUADS);
+		glColor3f(1.0f, 1.0f, 0.0f);
+		glTexCoord2f(tx, ty + 1.0f / 16.0f);
+		glVertex2f(dx, dy);
+		glTexCoord2f(tx + 1.0f / 16.0f, ty + 1.0f / 16.0f);
+		glVertex2f(dx + charLen*size, dy);
+		glTexCoord2f(tx + 1.0f / 16.0f, ty);
+		glVertex2f(dx + charLen*size, dy + size);
+		glTexCoord2f(tx, ty);
+		glVertex2f(dx, dy + size);
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+	}
 }

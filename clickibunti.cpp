@@ -1,18 +1,23 @@
 #include "clickibunti.h"
-#include <GL\glew.h>
+#include <GL/glew.h>
 #include "Graphics2D.h"
 #include "PerformanceMeter.h"
 #include <iostream>
 #include <iomanip>
-
+#include "TexParamSet.h"
+#include "TextureStatic2D.h"
+#include "MatrixLib.h"
+#include "MathModel.h"
 Graphics2D g(256);
 PerformanceMeter pm(6);
+TexParamSet tps(2,2);
+TextureStatic2D * t2D; 
 
 int test = 0;
 void clickibunti()
 {
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
-	glLoadIdentity();
+	g.beginDraw();
 	/*glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
 	glColor3f(1.0f, 0.0f, 0.0f); // Red
 	glVertex2f(-0.8f, 0.1f);     // Define vertices in counter-clockwise (CCW) order
@@ -63,6 +68,14 @@ void clickibunti()
 	glFlush();  // Render now*/
 	if (test == 0)
 	{
+		if(!tps.addI(GL_TEXTURE_WRAP_S, GL_REPEAT)) std::cout<<"fuckshit"<<std::endl;
+		if (!tps.addI(GL_TEXTURE_WRAP_T, GL_REPEAT)) std::cout << "fuckshit" << std::endl;
+		if (!tps.addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
+		if (!tps.addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
+
+		t2D = new TextureStatic2D(&tps, "./res/testTexture.jpg");
+		t2D->update();
+
 		//test = 1;
 		//glViewport(0,0,320,320);
 	}
@@ -90,7 +103,7 @@ void clickibunti()
 	}posx = 0;
 	for (int i = 0; i < 6; i++)
 	{
-		float now = pm.getAVG(i)*144.0f / 1000000.0f;
+		float now = pm.getTotalAVG(i)*144.0f / 1000000.0f;
 		color c;
 		c.r = (i + 1) % 2;
 		c.g = ((i + 1) / 2) % 2;
@@ -127,17 +140,23 @@ void clickibunti()
 	glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
 	g.fillOval(0, 0, 1, 1);
 
+	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_POLYGON);            // These vertices form a closed polygon
 
-	glColor3f(1.0f, 1.0f, 0.0f);
-	glVertex2f(0.2f,1);
-	glVertex2f(-0.2f,1);
-	glVertex2f(-1,-1);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(1.0, 1.0);
+	glVertex2f(0.2f, 1);
+	glTexCoord2f(0.0, 1.0);
+	glVertex2f(-0.2f, 1);
+	glTexCoord2f(0.0, 0.0);
+	glVertex2f(-1, -1);
+	glTexCoord2f(1.0, 0.0);
 	glVertex2f(1,-1);
 	glEnd();
+	glDisable(GL_TEXTURE_2D);
 	subsection s2 = g.generateSubsection(0, 0, 0.8f, 0.8f, SNAP_W,-30);
 
-	if (test == 0)
+	if (test == 245562)
 	{
 		float * mat = s2.mat;
 		test = 1;
@@ -148,17 +167,23 @@ void clickibunti()
 		std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
 	}
 	g.setSubsection(&s2);
-	glColor4f(1.0f, 1.0f, 1.0f, 0.75f);
+	glColor4f(1.0f, 1.0f, 0.0f, 0.75f);
 	g.fillOval(0, 0, 1, 1);
 
-	glBegin(GL_POLYGON);            // These vertices form a closed polygon
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);            // These vertices form a closed polygon
 
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex2f(0.2f, 1);
-	glVertex2f(-0.2f, 1);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(1.0, 1.0);
+	glVertex2f(1.0f, 1);
+	glTexCoord2f(0.0, 1.0);
+	glVertex2f(-1.0f, 1);
+	glTexCoord2f(0.0, 0.0);
 	glVertex2f(-1, -1);
+	glTexCoord2f(1.0, 0.0);
 	glVertex2f(1, -1);
 	glEnd();
+	glDisable(GL_TEXTURE_2D);
 	g.resetLastSubsection();
 	g.resetLastSubsection();
 
@@ -205,6 +230,24 @@ void clickibunti()
 	glVertex2f(0.4f, 0.6f);
 	glVertex2f(0.3f, 0.4f);
 	glEnd();
+
+
+	glLoadIdentity();
+	g.drawString("test", 4, -0.5f, -0.5f, 0.2f);
+
+
+
+	float matrix[16];
+	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+	if (test == 0)
+	{
+		test = 1;
+
+		MathModel mm;
+		mm.update();
+		mm.ml.printMatrix();
+	}
+
 
 
 	pm.registerTime(4);

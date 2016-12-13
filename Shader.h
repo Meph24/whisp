@@ -2,7 +2,7 @@
 #define SHADER_H
 
 #include <string>
-#include <GL\glew.h>
+#include <GL/glew.h>
 #include "Transform.h"
 #include "Camera.h"
 

@@ -1,4 +1,3 @@
-
 #ifndef BUFFER_CPP
 #define BUFFER_CPP
 
@@ -29,12 +28,12 @@ T* Buffer<T, size>::getwrite() const
 	return data + (writePtrOffset% size);
 }
 template <typename T, int size >
-T* Buffer<T, size>:: getread() const
+T* Buffer<T, size>::getread() const
 {
-	return data + (readPtrOffset% size);
+	return data + (borderOffset% size);
 }
 template <typename T, int size >
-unsigned int Buffer<T, size>:: beginOffset() const
+unsigned int Buffer<T, size>::beginOffset() const
 {
 	return borderOffset;
 }
@@ -64,12 +63,12 @@ void Buffer<T, size>::repairOffsets()
 		// get offsets
 		unsigned int borderoff = borderOffset % size;
 		unsigned int writeoff = writePtrOffset % size;
-		
+
 
 		//get the "round count" the offset actually has
 		unsigned int borderdiv = borderOffset / size;
 		unsigned int writediv = writePtrOffset / size;
-		
+
 
 		//set the roundcount as low as possible
 		writediv -= borderdiv;
@@ -77,7 +76,7 @@ void Buffer<T, size>::repairOffsets()
 		// apply new values
 		borderOffset = borderoff;
 		writePtrOffset = writediv * size + writeoff;
-		
+
 	}
 }
 
@@ -136,8 +135,8 @@ bool Buffer<T, size>::write(T value)
 template <typename T, int size>
 bool Buffer<T, size>::read(T* container, unsigned int amount)
 {
-	if ((borderOffset+amount) > writePtrOffset) return false;
-	
+	if ((borderOffset + amount) > writePtrOffset) return false;
+
 	for (size_t i = 0; i < amount; i++)
 	{
 		container[i] = readat(borderOffset + i);

@@ -1,5 +1,6 @@
 #pragma once
-#include <GL\glew.h>
+#include <GL/glew.h>
+#include "ITexture.h"
 
 #define SNAP_SW 0
 #define SNAP_W 3
@@ -11,6 +12,7 @@
 #define SNAP_S 1
 #define SNAP_MID 4
 
+//TODO guard
 #define TAU 6.283185307179586f
 
 
@@ -45,7 +47,9 @@ class Graphics2D
 	point * curMax;
 	unsigned int stack;
 	unsigned int maxStack;
-	float emptyMat[16];
+	ITexture * font;
+	TexParamSet * tps=0;
+	float charLen = 400.0f/1024.0f;
 
 public:
 	float getMaxX();
@@ -75,11 +79,12 @@ public:
 	void feedRects(unsigned int count, float * x, float * y, float * width, float * height, float * r, float * g, float * b);
 	void feedRects(unsigned int count, float * x, float * y, float width, float height, float * r, float * g, float * b);
 	void fillOval(float xCenter, float yCenter, float xRad, float yRad);
-	void drawString(char * str,float x,float y);
+	void drawString(char * str,int len,float xll,float yll, float size);
 	void setColor(float r, float g, float b);
 	void endDraw();
 	void beginDraw();
 	Graphics2D(int circleSegments);
+	Graphics2D(int circleSegments, ITexture * myFont);
 	~Graphics2D();
 };
 

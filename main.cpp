@@ -8,7 +8,6 @@ int main()
 {
 	try
 	{
-
 		MainApp A;
 		A.run();
 	}

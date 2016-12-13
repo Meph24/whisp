@@ -1,6 +1,6 @@
 #include "SFMLHandle.h"
 
-#include <GL\glew.h>
+#include <GL/glew.h>
 #include <iostream>
 
 
@@ -27,8 +27,6 @@ window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSetting
 SFMLHandle::~SFMLHandle()
 {
 }
-
-// https://de.wikipedia.org/wiki/Sto%C3%9F_%28Physik%29
 
 void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
 {
@@ -122,6 +120,10 @@ void SFMLHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler
 	case sf::Event::EventType::JoystickButtonReleased:
 		eventBuffer.write(EH.createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId *JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 0));
 		break;
+	
+	default :
+        break;
+
 	}
 }
 

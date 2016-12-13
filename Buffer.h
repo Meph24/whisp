@@ -6,15 +6,15 @@
 //	Template class for a buffer data structure
 //	/template param T:		the Type of data the buffer stores
 //	/template param size:	the size of the buffer , determines the maximal amount of data for type T that can be stored
-//	
-//	
+//
+//
 */
 
 template <typename T, int size>
 class Buffer
 {
 	// The array of data the buffer is holding
-	T data [size];
+	T data[size];
 
 	// Offsets for pointer calculation
 	unsigned int borderOffset, writePtrOffset;
@@ -27,7 +27,7 @@ class Buffer
 
 	// returns a pointer at the begin of the unread data in the buffer
 	inline T* getread() const;
-	
+
 	// calculates the index the buffer save space begins
 	inline unsigned int beginOffset() const;
 
@@ -102,15 +102,15 @@ public:
 	//	empties the buffer completely from data
 	*/
 	void empty();
-	
+
 
 	//_test_begin
 	friend std::ostream& operator<< (std::ostream& os, const Buffer& b)
 	{
 		os << "____________________________________________" << std::endl;
-		os << "Free space : " << b.getfreespace() << endl;
-		os << "Full : " << b.isfull() << endl;
-		os << "Nodata : " << b.nodata() << endl;
+		os << "Free space : " << b.getfreespace() << std::endl;
+		os << "Full : " << b.isfull() << std::endl;
+		os << "Nodata : " << b.nodata() << std::endl;
 		os << "BorderOffset : " << b.borderOffset << " | begin / end : " << b.beginOffset() << "/" << b.endOffset() << std::endl;
 		os << "WriteOffset / ReadOffset : " << b.writePtrOffset << "/" << b.readPtrOffset << std::endl;
 		os << "Buffer:" << std::endl;

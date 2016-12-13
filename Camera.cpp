@@ -17,4 +17,5 @@ glm::mat4 Camera::GetViewProjection() const
 
 Camera::~Camera()
 {
+
 }

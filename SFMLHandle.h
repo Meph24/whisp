@@ -2,7 +2,7 @@
 
 
 #include "IMediaHandle.h"
-#include <SFML\Window.hpp>
+#include <SFML/Window.hpp>
 #include "EventHandler.h"
 #include "Buffer.h"
 #include <string>

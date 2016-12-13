@@ -1,13 +1,14 @@
 #pragma once
 
-#include "SFML\Window.hpp"
+#include "SFML/Window.hpp"
 #include <string>
 
 #define FLAG_NOW 1
-#define FLAG_AVG 2
+#define FLAG_RECENTAVG 2
 #define FLAG_SPIKES 4
 #define FLAG_ALL_TIME_MAX 8
 #define FLAG_ALL_TIME_MIN 16
+#define FLAG_TOTALAVG 32
 
 class PerformanceMeter
 {
@@ -57,7 +58,7 @@ public:
 	int getTime(int stepID);
 
 	//only works after having collected a lot of data, (time in us)
-	float getAVG(int stepID);
+	float getRecentAVG(int stepID);
 
 	//=max measured but with a half life time
 	float getSpikes(int stepID);
@@ -70,8 +71,12 @@ public:
 
 	void setMaxTolerated(int stepID, int us);
 
+	//gets inaccurate over time because of limited float precision //TODO add double option
+	float getTotalAVG(int stepID);
+	void clearTotalAVG();
+
 	//give a name to a step so this class can format a string for you
-	void PerformanceMeter::setName(std::string name, int  stepID);
+	void setName(std::string name, int  stepID);
 
 	//returns a string describing the performance of the given step, ready to print
 	std::string getInfo(int stepID,int infoFlags);
@@ -101,7 +106,9 @@ private:
 	int * maxTolerated;
 	int * maxMeasured;
 	int * minMeasured;
-	float * avg;//TODO recent avg vs total avg (sum)
+	int * runs;
+	float * avgRecent;
+	float * sum;//TODO add double option
 	float * spikes;
 
 	float spikeHalfLifeInv = 1.0f/10000000;
@@ -109,10 +116,12 @@ private:
 public:
 
 	float roundtriptime;//TODO add as another time that can be queried//TODO put back to private
-	//avg[stepID] = avg[stepID] * (1 - avgWeight) + t * avgWeight;
+	int roundtripUpdateIndex;//at which of the registerTime calls the roundtriptime averages, sipkes etc. should be updated
+
+	//avgRecent[stepID] = avgRecent[stepID] * (1 - avgWeight) + t * avgWeight;
 	float avgWeight = 0.01f;
 
-	//use a faster algorithm for applying the half life of spikes (inaccurate)
-	bool useFastApproximation = true;
+	//use faster algorithms (e.g. for applying the half life of spikes (inaccurate))
+	bool useFastApproximation = true;//TODO apply to other calculations
 };
 

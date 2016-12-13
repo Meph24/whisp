@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SFML\Window.hpp"
+#include "SFML/Window.hpp"
 #include <fstream>
-#include "SFML\Graphics.hpp"
+#include "SFML/Graphics.hpp"
 
 #include "SFMLHandle.h"
 #include "Graphics.h"
@@ -14,7 +14,7 @@ class MainApp
 	/*
 	//	Media Handle Instance, encapsulation of the Media Layer
 	*/
-	SFMLHandle SFMLHandle;
+	SFMLHandle sfmlHandle;
 
 	/*
 	//	Rendering component
