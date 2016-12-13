@@ -1,19 +1,26 @@
 
+EXEC=whisp
+
+
 csrc=$(wildcard *.c)
 cppsrc=$(wildcard *.cpp)
 obj=$(cppsrc:.cpp=.o) $(csrc:.c=.o)
 
 CXX=g++
-CXXFLAGS=-std=c++14 -Wall -pthread
-EXEC=whisp
+CXXFLAGS += -std=c++14 
+CXXFLAGS += -Wall -pthread
 
-LDFLAGS+=-lGL -lGLEW
-LDFLAGS+=-lsfml-graphics -lsfml-window -lsfml-system
+LDFLAGS+= -lGL -lGLEW
+LDFLAGS+= -lsfml-graphics -lsfml-window -lsfml-system
 
-all: $(obj)
+all: $(EXEC)
+
+$(EXEC): $(obj)
 	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $(EXEC)
 
-.PHONY: clean
-clean:
-	rm -f $(obj)
 
+clean:
+	$(RM) *.o *~
+
+
+.PHONY: all clean
