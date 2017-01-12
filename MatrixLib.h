@@ -19,6 +19,7 @@ public:
 	void pushMatrix();
 	void popMatrix();
 	void multMatrix(float * mat);
+	void getMatrix(float * targetMem);
 	void printMatrix();
 	MatrixLib(uint8_t stacksize);
 	~MatrixLib();

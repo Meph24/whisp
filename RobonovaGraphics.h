@@ -3,12 +3,13 @@
 #include "ITexture.h"
 class RobonovaGraphics
 {
+public:
 	ITexture * tex;
 	void draw();
 	void drawServo();
 	void drawFoot(bool left, foot footAngleData);
+	void drawArm(bool left, arm footAngleData);
 	MathModel * model;
-public:
 	RobonovaGraphics(MathModel * myModel);
 	~RobonovaGraphics();
 };

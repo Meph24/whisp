@@ -2,7 +2,7 @@
 
 #include "stb_image.h"
 #include <iostream>
-TextureStatic2D::TextureStatic2D(TexParamSet * texParams, const std::string& fileName) 
+TextureStatic2D::TextureStatic2D(TexParamSet * texParams, const char * fileName)
 :ITexture(texParams),
 fName(fileName)
 {
@@ -26,12 +26,12 @@ void TextureStatic2D::bind()
 void TextureStatic2D::update()
 {
 	int width=0, height=0, numComponents;
-	//unsigned char * data = stbi_load((fName).c_str(), &width, &height, &numComponents, 4);
-	unsigned char * data = stbi_load("./res/font.png", &width, &height, &numComponents, 4);
+	
+	unsigned char * data = stbi_load(fName, &width, &height, &numComponents, 4);//"./res/font.png"
 
 	if (data == NULL)
 	{
-		throw std::runtime_error("Texture " + fName + " unable to load !");
+		std::cout << "Texture " + std::string(fName) + " unable to load !";//throw std::runtime_error("Texture " + std::string(fName) + " unable to load !");
 		return;
 	}
 

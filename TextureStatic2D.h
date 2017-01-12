@@ -4,12 +4,11 @@
 class TextureStatic2D :
 	public ITexture
 {
-	const std::string& fName;
+	const char * fName;
 public:
 	void bind();
 	void update();
 	void update(TexParamSet * texParams);
-	TextureStatic2D(TexParamSet * texParams, const std::string& fileName);
+	TextureStatic2D(TexParamSet * texParams, const char * fileName);
 	~TextureStatic2D();
 };
-

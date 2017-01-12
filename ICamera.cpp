@@ -15,14 +15,14 @@ ICamera::~ICamera()
 }
 
 
-void ICamera::apply()
+void ICamera::applyAgain()
 {
 	glMultMatrixf(mat);
 }
 
 void ICamera::setPosition(float x, float y, float z)
 {
-	posX = x;
+	posX = x;//TODO update
 	posY = y;
 	posZ = z;
 	changeAngleBy(0, 0, 0);

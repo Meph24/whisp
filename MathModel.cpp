@@ -14,6 +14,12 @@ ml(2)
 	right.a2 = left.a2;
 	right.a3 = left.a3;
 	right.a4 = left.a4;
+	leftArm.a0 = 30;
+	leftArm.a1 = 15;
+	leftArm.a2 = 30;
+	rightArm.a0 = leftArm.a0;
+	rightArm.a1 = leftArm.a1;
+	rightArm.a2 = leftArm.a2;
 }
 
 
@@ -21,6 +27,8 @@ MathModel::~MathModel()
 {
 
 }
+
+
 
 void MathModel::update()
 {
@@ -53,6 +61,7 @@ void MathModel::update()
 		ml.translatef(0.0f, 0.0f, 28.25f);
 
 		//body
+		ml.getMatrix(footToBody);
 		
 		ml.translatef(0.0f, 0.0f, 28.25f);//body->right leg
 		ml.rotatef(right.a0, 1.0f, 0.0f, 0.0f);
@@ -94,6 +103,7 @@ void MathModel::update()
 		ml.translatef(0.0f, 0.0f, -28.25f);
 
 		//body
+		ml.getMatrix(footToBody);
 
 		ml.translatef(0.0f, 0.0f, -28.25f);//body->left leg
 		ml.rotatef(-left.a0, 1.0f, 0.0f, 0.0f);
@@ -117,5 +127,43 @@ void MathModel::update()
 	relX = ml.curMatrix[12];
 	relY = ml.curMatrix[13];
 	relZ = ml.curMatrix[14];
+
+	ml.loadIdentity();
+	//TODO arm calcs
+
+
 }
+
+
+void MathModel::setLeftFoot(foot f)
+{
+	left = f;
+}
+void MathModel::setRightFoot(foot f)
+{
+	right = f;
+}
+void MathModel::setLeftArm(arm a)
+{
+	leftArm = a;
+}
+void MathModel::setRightArm(arm a)
+{
+	rightArm = a;
+}
+void MathModel::setStandingFoot(bool b)
+{
+	if (b) standingFoot = 1;
+	else standingFoot = 0;
+}
+
+pos MathModel::getFootToFootPos()
+{
+	pos p;
+	p.x = relX;
+	p.y = relY;
+	p.z = relZ;
+	return p;
+}
+
 

@@ -10,6 +10,22 @@ typedef struct
 
 	float a4;
 } foot;
+
+typedef struct
+{
+	float x;
+	float y;
+	float z;
+} pos;
+
+typedef struct
+{
+	float a0;
+
+	float a1;
+	float a2;
+} arm;
+
 class MathModel
 {
 public:
@@ -17,6 +33,13 @@ public:
 	MatrixLib ml;
 	foot left;
 	foot right;
+	arm leftArm;
+	arm rightArm;
+
+	float footToBody[16];
+	float bodyToLeftArm[16];
+	float bodyToRightArm[16];
+
 
 	int standingFoot = 0;//0=more weight on left foot; 1=more weight on right foot
 
@@ -37,7 +60,13 @@ public:
 
 
 	void update();
-	void draw();
+
+	void setLeftFoot(foot f);
+	void setRightFoot(foot f);
+	void setLeftArm(arm a);
+	void setRightArm(arm a);
+	void setStandingFoot(bool b);
+	pos getFootToFootPos();
 
 	MathModel();
 	~MathModel();

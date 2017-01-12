@@ -3,8 +3,8 @@
 #include <iostream>
 
 #define MEPH_GRAPHICS_FOV 70.0f
-#define MEPH_GRAPHICS_WIDTH 960
-#define MEPH_GRAPHICS_HEIGHT 540
+#define MEPH_GRAPHICS_WIDTH 1920
+#define MEPH_GRAPHICS_HEIGHT 1080
 
 Graphics::Graphics(IMediaHandle& mediaHandle) :
 mediaHandle(mediaHandle)
@@ -38,13 +38,13 @@ void Graphics::init()
 	}
 
 	glClearDepth(1.f);
-	glClearColor(0.f, 0.f, 0.1f, 0.f);
+	glClearColor(0.f, 0.f, 0.25f, 0.f);
 
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-	//glEnable(GL_DEPTH_TEST);
-	//glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 
 
 	vertices = {

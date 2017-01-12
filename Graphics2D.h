@@ -47,9 +47,14 @@ class Graphics2D
 	point * curMax;
 	unsigned int stack;
 	unsigned int maxStack;
+	TexParamSet tps;
+	bool deleteTex;
+	float charLen = 400.0f / 1024.0f;
+
+	void initCircle();
+
+public:
 	ITexture * font;
-	TexParamSet * tps=0;
-	float charLen = 400.0f/1024.0f;
 
 public:
 	float getMaxX();

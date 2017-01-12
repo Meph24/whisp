@@ -141,3 +141,11 @@ void MatrixLib::popMatrix()
 		curMatrix[i] = stackPtr[i];
 	}
 }
+
+void MatrixLib::getMatrix(float * targetMem)
+{
+	for (int i = 0; i < 16; i++)
+	{
+		targetMem[i] = curMatrix[i];
+	}
+}

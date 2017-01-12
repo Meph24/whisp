@@ -2,11 +2,21 @@
 class ICamera
 {
 	float mat[16];
-	float posX, posY, posZ;
+
+	
+
 public:
 
+	float posX, posY, posZ;
 
-	void apply();
+	//calculates the matrix and applies it to opengl matrix
+	virtual void apply()=0;
+	//applies and saves matrix for fast reuse with applyAgain(); uses apply()
+	void applyAndStore();
+	//applies last saved matrix
+	void applyAgain();
+	//updates saved matrix without applying it for fast use with applyAgain(); basically calls applyFirst and reverts changes to opengl matrix
+	void updateStoredMatrix();
 
 	void setPosition(float x, float y, float z);
 	virtual void reset() = 0;
@@ -17,4 +27,3 @@ public:
 	ICamera();
 	~ICamera();
 };
-

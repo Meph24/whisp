@@ -32,7 +32,7 @@ graphics(sfmlHandle)
 	settings.antialiasing = 0;
 	settings.openglmajor = 3;
 	settings.openglminor = 3;
-	sfmlHandle.createWindow("Test", 960,540, settings);
+	sfmlHandle.createWindow("Test", 1920,1080, settings);
 }
 
 void MainApp::tick(int us)

@@ -4,54 +4,39 @@
 
 Graphics2D::Graphics2D(int circleSegments, ITexture * myFont) :
 font(myFont),
-segments(circleSegments)
+segments(circleSegments),
+tps(0,0),
+deleteTex(false)
 {
-	if (segments < 3) segments = 0;
-	if (segments != 0)
-	{
-		xCircle = new float[segments];
-		yCircle = new float[segments];
-		float mult = TAU / circleSegments;
-		for (int i = 0; i < circleSegments; i++)
-		{
-			xCircle[i] = sin(i*mult);
-			yCircle[i] = cos(i*mult);
-		}
-	}
+	initCircle();
 	maxi.x = 1;//TODO correct
 	maxi.y = 1;
 	maxStack = 256;//TODO add optional parameter
 	curMax = new point[maxStack];
 	curMax[0] = maxi;
 }
-Graphics2D::Graphics2D(int circleSegments) :
-segments(circleSegments)
-{
-	tps = new TexParamSet(2, 2);
-	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	tps->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	tps->addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	tps->addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+#include <iostream>
 
-	font = new TextureStatic2D(tps, "./res/font.png");
-	font->update();
-	if (segments < 3) segments = 0;
-	if (segments != 0)
-	{
-		xCircle = new float[segments];
-		yCircle = new float[segments];
-		float mult = TAU / circleSegments;
-		for (int i = 0; i < circleSegments; i++)
-		{
-			xCircle[i] = sin(i*mult);
-			yCircle[i] = cos(i*mult);
-		}
-	}
+//DO NOT CALL THIS CONSTRUCTOR BEFORE OGL IS INITIALIZED!!!
+Graphics2D::Graphics2D(int circleSegments) :
+segments(circleSegments),
+tps(2, 2),
+deleteTex(true)
+{
+	//tps = new TexParamSet(2, 2);
+	if (!tps.addI(GL_TEXTURE_WRAP_S, GL_REPEAT)) std::cout << "fuckshit" << std::endl;
+	if (!tps.addI(GL_TEXTURE_WRAP_T, GL_REPEAT)) std::cout << "fuckshit" << std::endl;
+	if (!tps.addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
+	if (!tps.addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
+
+	initCircle();
 	maxi.x = 1;//TODO correct
 	maxi.y = 1;
 	maxStack = 256;//TODO add optional parameter
 	curMax = new point[maxStack];
 	curMax[0] = maxi;
+	font = new TextureStatic2D(&tps, "./res/font.png");
+	font->update();
 }
 
 Graphics2D::~Graphics2D()
@@ -62,10 +47,26 @@ Graphics2D::~Graphics2D()
 		delete[] yCircle;
 	}
 	delete[] curMax;
-	if (tps != 0)
+	if (deleteTex)
 	{
 		delete (TextureStatic2D *)font;
-		delete tps;
+	}
+}
+
+void Graphics2D::initCircle()
+{
+
+	if (segments < 3) segments = 0;
+	if (segments != 0)
+	{
+		xCircle = new float[segments];
+		yCircle = new float[segments];
+		float mult = TAU / segments;
+		for (int i = 0; i < segments; i++)
+		{
+			xCircle[i] = sin(i*mult);
+			yCircle[i] = cos(i*mult);
+		}
 	}
 }
 
@@ -265,28 +266,38 @@ void Graphics2D::fillOval(float xCenter, float yCenter, float xRad, float yRad)
 	glEnd();
 }
 
+#include <iostream>
 void Graphics2D::drawString(char * str,int len, float xll, float yll, float size)
 {
+	if (len < 1) return;
+	font->bind();
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	//glColor3f(1.0f, 1.0f, 1.0f);
 	for (int i = 0; i < len; i++)
 	{
 		float tx = (str[i] % 16)/16.0f;
 		float ty = (str[i] / 16)/16.0f;
 		float dx = xll + i*charLen*size;
 		float dy = yll;
-		//TODO insert texture
-		//font->bind();
-		glEnable(GL_TEXTURE_2D);
-		glBegin(GL_QUADS);
-		glColor3f(1.0f, 1.0f, 0.0f);
+
 		glTexCoord2f(tx, ty + 1.0f / 16.0f);
+		//glTexCoord2f(0, 0);
 		glVertex2f(dx, dy);
+
 		glTexCoord2f(tx + 1.0f / 16.0f, ty + 1.0f / 16.0f);
+		//glTexCoord2f(1, 0);
 		glVertex2f(dx + charLen*size, dy);
+
 		glTexCoord2f(tx + 1.0f / 16.0f, ty);
+		//glTexCoord2f(1, 1);
 		glVertex2f(dx + charLen*size, dy + size);
+
 		glTexCoord2f(tx, ty);
+		//glTexCoord2f(0, 1);
 		glVertex2f(dx, dy + size);
-		glEnd();
-		glDisable(GL_TEXTURE_2D);
+		//std::cout << "tx:" << tx << " ty:" << ty<<std::endl;
 	}
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
 }
