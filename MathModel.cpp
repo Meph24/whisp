@@ -6,7 +6,7 @@ ml(2)
 {
 	left.a0 = 0;
 	left.a1 = 0;
-	left.a2 = 60;
+	left.a2 = -30;// 60;
 	left.a3 = 0;
 	left.a4 = 0;
 	right.a0 = left.a0;
@@ -14,9 +14,9 @@ ml(2)
 	right.a2 = left.a2;
 	right.a3 = left.a3;
 	right.a4 = left.a4;
-	leftArm.a0 = 30;
-	leftArm.a1 = 15;
-	leftArm.a2 = 30;
+	leftArm.a0 = 0;// 30;
+	leftArm.a1 = 0;// 15;
+	leftArm.a2 = 0;// 30;
 	rightArm.a0 = leftArm.a0;
 	rightArm.a1 = leftArm.a1;
 	rightArm.a2 = leftArm.a2;

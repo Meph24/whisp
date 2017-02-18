@@ -5,16 +5,6 @@
 #include <vector>
 
 
-/*
-// Render data ressources
-*/
-#include "Mesh.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "Transform.h"
-#include "Camera.h"
-
-
 
 /*
 //	Graphics provides renderint handled in its own thread
@@ -53,24 +43,6 @@ private:
 	//	by setting to false the render loop can be stopped
 	*/
 	bool thread_isOn;
-
-
-
-	/*
-	//	Render data
-	*/
-	std::vector<Vertex> vertices;
-	std::vector<unsigned int> indices;
-	Mesh* mesh;
-	Shader* shader;
-	Texture* texture;
-	Camera* camera;
-	Transform* transform;
-
-
-	//test_begin
-	float counter;
-	//test_begin
 
 
 	/*

@@ -1,10 +1,11 @@
 #include "CameraTP.h"
 
 
-CameraTP::CameraTP()
+CameraTP::CameraTP(): dist(4)
 {
-	reset();
+
 }
+
 
 
 CameraTP::~CameraTP()
@@ -14,30 +15,14 @@ CameraTP::~CameraTP()
 
 
 
-void CameraTP::reset()
+void CameraTP::apply()
 {
-	resetAngle();
-	resetZoom();
-}
-
-void CameraTP::resetAngle()
-{
-	alpha = 0;
-	beta = 0;
-	gamma = 0;
-}
-
-void CameraTP::changeAngleBy(float alpha, float beta, float gamma)
-{
-
-}
-
-void CameraTP::changeZoomBy(float factor)
-{
-	zoom *= factor;
-}
-
-void CameraTP::resetZoom()
-{
-
+	glMatrixMode(GL_PROJECTION);
+	glFrustum(-aspect*zoom, aspect*zoom, -zoom, zoom, minView, maxView);
+	glMatrixMode(GL_MODELVIEW);
+	glTranslatef(0, 0, -dist);
+	glRotatef(gamma, 0, 0, 1);
+	glRotatef(alpha, 1, 0, 0);
+	glRotatef(beta, 0, 1, 0);
+	glTranslatef(-posX, -posY, -posZ);
 }

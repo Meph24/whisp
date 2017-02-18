@@ -2,10 +2,6 @@
 #include <GL/glew.h>
 #include <iostream>
 
-#define MEPH_GRAPHICS_FOV 70.0f
-#define MEPH_GRAPHICS_WIDTH 1920
-#define MEPH_GRAPHICS_HEIGHT 1080
-
 Graphics::Graphics(IMediaHandle& mediaHandle) :
 mediaHandle(mediaHandle)
 {}
@@ -21,12 +17,6 @@ Graphics(mediaHandle)
 Graphics::~Graphics()
 {
 	stop();
-
-	delete mesh;
-	delete shader;
-	delete texture;
-	delete camera;
-	delete transform;
 }
 
 void Graphics::init()
@@ -45,27 +35,11 @@ void Graphics::init()
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
+	glAlphaFunc(GL_GREATER, 0.02f);
+	glEnable(GL_ALPHA_TEST);
 
 
-	vertices = {
 
-		Vertex(glm::vec3(-2.0, 0.0, 0.0), glm::vec2(0.0, 1.0)),
-		Vertex(glm::vec3(0.0, 0.0, 3.0), glm::vec2(0.5, 0.0)),
-		Vertex(glm::vec3(2.0, 0.0, 0.0), glm::vec2(1.0, 1.0))
-
-	};
-
-	indices = { 0, 1, 2 };
-
-	mesh = new Mesh(&(vertices[0]), vertices.size(), &(indices[0]), indices.size());
-
-	shader = new Shader("./res/basicShader");
-
-	texture = new Texture("./res/testTexture.jpg");
-
-	camera = new Camera(glm::vec3(0, 1, -3), MEPH_GRAPHICS_FOV, (float)MEPH_GRAPHICS_WIDTH / (float)MEPH_GRAPHICS_HEIGHT, 0.01f, 1000.0f);//replace 1 with (float)MEPH_GRAPHICS_WIDTH / (float)MEPH_GRAPHICS_HEIGHT
-
-	transform = new Transform();
 }
 
 void Graphics::start()
@@ -124,14 +98,7 @@ void Graphics::clear(float r, float g, float b, float a, float depth)
 #include "clickibunti.h"
 void Graphics::render()
 {
-	
-	//transform stuff
-	//shader->Bind();
-	//texture->bind();
-	//shader->Update(*transform, *camera);
 	clear();
-	//mesh->draw();
 	clickibunti();
 	mediaHandle.display();
-	
 }

@@ -1,12 +1,6 @@
 #include "MainApp.h"
 #include <GL/glew.h>
 
-#include "Mesh.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "Transform.h"
-#include "Camera.h"
-
 #include "EventHandler.h"
 
 #include <vector>
@@ -16,7 +10,7 @@
 // error handling
 #include <iostream>
 
-
+#include "Cfg.h"
 
 
 #define PHYSICS_MAX_TICKLENGTH 20000
@@ -30,14 +24,23 @@ graphics(sfmlHandle)
 	settings.depth = 24;
 	settings.stencil = 8;
 	settings.antialiasing = 0;
-	settings.openglmajor = 3;
-	settings.openglminor = 3;
-	sfmlHandle.createWindow("Test", 1920,1080, settings);
+	settings.openglmajor = 1;
+	settings.openglminor = 2;
+
+	Cfg cfg({ "./res/config.txt" });
+
+	int x=*cfg.getint("graphics", "resolutionX");
+	int y=*cfg.getint("graphics", "resolutionY");
+	
+
+
+	sfmlHandle.createWindow("Test", x,y, settings);
 }
 
 void MainApp::tick(int us)
 {
 	counter += us*0.000002f;
+	//do stuff
 }
 
 void MainApp::run()

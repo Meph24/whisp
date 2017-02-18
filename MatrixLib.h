@@ -1,27 +1,27 @@
-#pragma once
-#include <cstdint>
+/*
+ * MatrixLib.h
+ *
+ *  Created on:	14.02.2017
+ *      Author:	HL65536
+ *     Version:	2.0
+ */
 
-//TODO guard
-#define TAU 6.283185307179586f
+#ifndef SRC_MATRIXLIB_H_
+#define SRC_MATRIXLIB_H_
 
-class MatrixLib
-{
-	float * matStack;
-	uint8_t stack=0;
+#include "MathStuff.h"
+#include "vec3.h"
+#include "vec4.h"
+#include "quat.h"
+#include "mat3.h"
+#include "mat4.h"
 
-public:
-	float curMatrix[16];
+inline vec3 operator*(mat3 a, vec3 b);
+inline vec3 operator*(vec3 b, mat3 a){ return a*b; };
+inline vec3 operator*(mat4 a, vec3 b);
+inline vec3 operator*(vec3 b, mat4 a){ return a*b; };
 
-	void loadIdentity();
-	void rotatef(float angle,float x,float y,float z);
-	void translatef(float x,float y,float z);
-	void scalef(float x, float y, float z);
-	void pushMatrix();
-	void popMatrix();
-	void multMatrix(float * mat);
-	void getMatrix(float * targetMem);
-	void printMatrix();
-	MatrixLib(uint8_t stacksize);
-	~MatrixLib();
-};
 
+//TODO
+
+#endif /*SRC_MATRIXLIB_H*/

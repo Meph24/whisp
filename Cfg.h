@@ -4,7 +4,7 @@
 //	Planned Features:
 //	Reading of config files
 //	Provide fast and easy access to values
-//	Load and unload specific sections of configs to 
+//	Load and unload specific sections of configs to
 //	especially loading SPECIFIC sections is an optimisation task
 */
 
@@ -40,10 +40,10 @@ public:
 		map <string, int> num;
 		map <string, float> flt;
 		map <string, string> str;
-	
+
 		int setint(string key, int value);
 		int setfloat(string key, float value);
-		int setstring(string key, string value);	
+		int setstring(string key, string value);
 		int * getint(string key);
 		float * getfloat(string key);
 		string * getstring(string key);
@@ -54,7 +54,7 @@ private:
 
 
 	class Reader
-	{	
+	{
 	private:
 
 		unsigned int readBegin;
@@ -68,7 +68,7 @@ private:
 		string line;
 		unsigned int currentIndex;
 
-		struct configdea_statemashine
+		struct configdea_statemachine
 		{
 			int q;
 		};
@@ -90,12 +90,12 @@ private:
 			NUM_CONFIGDEA_STATES
 		};
 
-		void configdea_init(configdea_statemashine* M);
+		void configdea_init(configdea_statemachine* M);
 
-		void configdea_d_check(configdea_statemashine* M, char sym);
-		void configdea_d_load(configdea_statemashine* M, char sym);
+		void configdea_d_check(configdea_statemachine* M, char sym);
+		void configdea_d_load(configdea_statemachine* M, char sym);
 
-		int configdea_exit(configdea_statemashine* M);
+		int configdea_exit(configdea_statemachine* M);
 
 		enum type_sup
 		{
@@ -111,16 +111,16 @@ private:
 		type_sup gettype(string);
 
 		void markReadBegin(int add);
-		void markReadEnd(int add , string& container);
+		void markReadEnd(int add, string& container);
 
 		map<string, Cfg::section> buildmap;
 
 		void save();
 
 	public:
-		
+
 		int checkfile(string filename);
-		map <string,Cfg::section> readfile(string filename);
+		map <string, Cfg::section> readfile(string filename);
 	}r;
 
 
@@ -147,7 +147,7 @@ public:
 	int unload();
 	int unload(string sectionname);
 
-	
+
 
 	/*
 	//	Functions for extracting a unique key, value par
@@ -198,4 +198,3 @@ public:
 	friend std::ostream& operator<< (std::ostream& os, const Cfg& c);
 
 };
-

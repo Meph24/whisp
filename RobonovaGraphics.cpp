@@ -1,10 +1,15 @@
 #include "RobonovaGraphics.h"
-
+#include "CameraTP.h"
 
 RobonovaGraphics::RobonovaGraphics(MathModel * myModel):
 model(myModel)
 {
-
+	pm = new PerformanceMeter(1);
+	cam = new CameraTP();
+	cam->aspect = 1920.0f / 1080;
+	//cam->posZ = 0;
+	((CameraTP *)cam)->dist = 250;
+	pm->reset();
 }
 
 
@@ -374,12 +379,11 @@ void RobonovaGraphics::drawFoot(bool left, foot footAngleData)
 	glPopMatrix();
 	
 }
-
 void RobonovaGraphics::draw()
 {
-	//TODO camera class
+	static float rot = 0;
 
-	float aspect = 1920 / 1080.0f;
+	/*float aspect = 1920 / 1080.0f;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glFrustum(-aspect,aspect,-1,1,1,1024*1024);
@@ -388,11 +392,24 @@ void RobonovaGraphics::draw()
 
 	//glTranslatef(0, 0.3f, 0.5f);
 	//glScalef(0.003f, aspect*0.003f, 0.00001f); //cheaty almost-camera
-	static float rot = 0;
 	glTranslatef(0, 0, -180);
 	glRotatef(20, 1, 0, 0);
-	glRotatef(rot, 0, 1, 0);
-	rot += 0.3f;
+	glRotatef(rot, 0, 1, 0);*/
+
+	if (rotEn)
+	{
+		cam->alpha = 20;
+		cam->beta = rot;
+		cam->gamma = 0;
+
+		pm->registerTime(0);
+		float time = pm->getTime(0);
+		rot += 0.00006f*time;
+
+	}
+
+	cam->applyFresh();
+
 	glPushMatrix();
 
 
@@ -430,9 +447,9 @@ void RobonovaGraphics::draw()
 	glPopMatrix();
 	glEnd();
 	glPushMatrix();
-	drawArm(true, model->leftArm);
+	drawArm(false, model->leftArm);
 	glPopMatrix();
 	glPushMatrix();
-	drawArm(false, model->rightArm);
+	drawArm(true, model->rightArm);
 	glPopMatrix();
 }

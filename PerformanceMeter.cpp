@@ -281,10 +281,10 @@ void PerformanceMeter::reset()
 
 void PerformanceMeter::exceededMax(int stepID)
 {
-	//TODO insert stuff
+	//TODO listener
 }
 
-void PerformanceMeter::setName(std::string name, int  stepID)
+void PerformanceMeter::setName(std::string name, int stepID)
 {
 	names[stepID] = name;
 }

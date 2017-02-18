@@ -1,17 +1,14 @@
 #pragma once
-#include "ICamera.h"
+#include "ICamera3D.h"
 class CameraTP:
-	public ICamera
+	public ICamera3D
 {
-	float zoom;
-	float fov;
-	float alpha, beta, gamma;
 public:
-	void reset();
-	void resetAngle();
-	void changeAngleBy(float alpha, float beta, float gamma);
-	void changeZoomBy(float factor);
-	void resetZoom();
+
+	float dist;
+
+	void apply();
+
 	CameraTP();
 	~CameraTP();
 };

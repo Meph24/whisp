@@ -4,19 +4,23 @@
 #include <iostream>
 #include <exception>
 
+
+#include "mat4.h"
 int main()
 {
+	
 	try
 	{
 		MainApp A;
 		A.run();
 	}
 
-	catch (std::exception e)
+	catch (std::exception& e)
 	{
 		std::cout << e.what() << std::endl;
 	}
+	
 
-	getchar();
+	//getchar();
 	return 0;
 }

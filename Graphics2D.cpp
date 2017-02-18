@@ -283,19 +283,19 @@ void Graphics2D::drawString(char * str,int len, float xll, float yll, float size
 
 		glTexCoord2f(tx, ty + 1.0f / 16.0f);
 		//glTexCoord2f(0, 0);
-		glVertex2f(dx, dy);
+		glVertex3f(dx, dy,1);
 
 		glTexCoord2f(tx + 1.0f / 16.0f, ty + 1.0f / 16.0f);
 		//glTexCoord2f(1, 0);
-		glVertex2f(dx + charLen*size, dy);
+		glVertex3f(dx + charLen*size, dy,1);
 
 		glTexCoord2f(tx + 1.0f / 16.0f, ty);
 		//glTexCoord2f(1, 1);
-		glVertex2f(dx + charLen*size, dy + size);
+		glVertex3f(dx + charLen*size, dy + size,1);
 
 		glTexCoord2f(tx, ty);
 		//glTexCoord2f(0, 1);
-		glVertex2f(dx, dy + size);
+		glVertex3f(dx, dy + size,1);
 		//std::cout << "tx:" << tx << " ty:" << ty<<std::endl;
 	}
 	glEnd();

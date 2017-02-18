@@ -25,6 +25,7 @@ void TextureStatic2D::bind()
 
 void TextureStatic2D::update()
 {
+	//TODO use sfml to load images
 	int width=0, height=0, numComponents;
 	
 	unsigned char * data = stbi_load(fName, &width, &height, &numComponents, 4);//"./res/font.png"
@@ -37,7 +38,7 @@ void TextureStatic2D::update()
 
 	glGenTextures(1, &texID);		//1st Para: number of TextureIds generated ; 2nd Para array to store IDs
 	bind();
-	std::cout << texID << std::endl;
+	std::cout << "Texture " << fName<<" loaded with texID" << texID << std::endl;
 	params->apply();
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	stbi_image_free(data);

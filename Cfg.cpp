@@ -55,12 +55,12 @@ float * Cfg::section::getfloat(string key)
 
 //dea code
 
-void Cfg::Reader::configdea_init(configdea_statemashine* M)
+void Cfg::Reader::configdea_init(configdea_statemachine* M)
 {
 	M->q = configdea_states::q0;
 }
 
-void Cfg::Reader::configdea_d_check(configdea_statemashine* M, char sym)
+void Cfg::Reader::configdea_d_check(configdea_statemachine* M, char sym)
 {
 	switch (M->q)
 	{
@@ -271,7 +271,7 @@ void Cfg::Reader::configdea_d_check(configdea_statemashine* M, char sym)
 	}
 }
 
-void Cfg::Reader::configdea_d_load(configdea_statemashine* M, char sym)
+void Cfg::Reader::configdea_d_load(configdea_statemachine* M, char sym)
 {
 	switch (M->q)
 	{
@@ -495,7 +495,7 @@ void Cfg::Reader::configdea_d_load(configdea_statemashine* M, char sym)
 	}
 }
 
-int Cfg::Reader::configdea_exit(configdea_statemashine* M)
+int Cfg::Reader::configdea_exit(configdea_statemachine* M)
 {
 	int cs = M->q;
 	return ((M->q == q1) || (M->q == q2) || (M->q == q6) || (M->q == q7));
@@ -546,7 +546,7 @@ void Cfg::Reader::save()
 		break;
 
 	case type_sup::none:
-		
+
 		break;
 	default:
 
@@ -560,7 +560,7 @@ int Cfg::Reader::checkfile(string filename)
 {
 	std::ifstream in(filename);
 
-	configdea_statemashine M;
+	configdea_statemachine M;
 
 	configdea_init(&M);
 
@@ -584,7 +584,7 @@ map<string, Cfg::section> Cfg::Reader::readfile(string filename)
 {
 	std::ifstream in(filename);
 
-	configdea_statemashine M;
+	configdea_statemachine M;
 
 	buildmap.clear(); //clear the buildmap before filling it again
 	configdea_init(&M);
@@ -592,7 +592,7 @@ map<string, Cfg::section> Cfg::Reader::readfile(string filename)
 	while (std::getline(in, line))
 	{
 		int size = line.size();
-		
+
 		for (currentIndex = 0; currentIndex < size; currentIndex++)
 		{
 			if (line[currentIndex] == '\t') line[currentIndex] = ' ';
@@ -691,9 +691,9 @@ std::ostream& operator<< (std::ostream& os, const Cfg& c)
 		os << "#" << e.first << endl;
 
 		//fetch 1 string from each of the containers (which are sorted so its the smallest value (strings here so alphabetical))
-			i = e.second.num.begin();
-			f = e.second.flt.begin();
-			s = e.second.str.begin();
+		i = e.second.num.begin();
+		f = e.second.flt.begin();
+		s = e.second.str.begin();
 
 		use = 1;
 		akt = 0;
@@ -706,7 +706,7 @@ std::ostream& operator<< (std::ostream& os, const Cfg& c)
 			if (f == e.second.flt.end()) akt = akt | 2;
 			if (s == e.second.str.end()) akt = akt | 4;
 
-			
+
 			switch (akt)
 			{
 			case 0:
@@ -753,7 +753,7 @@ std::ostream& operator<< (std::ostream& os, const Cfg& c)
 				break;
 			}
 		}
-		
+
 	}
 
 	return os;

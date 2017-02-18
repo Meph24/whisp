@@ -1,9 +1,8 @@
 #include "ICamera.h"
 
-#include <GL/glew.h>
 
 ICamera::ICamera():
-posX(0), posY(0), posZ(0)
+posX(0), posY(0), posZ(0), zoom(1), aspect(1), minView(1.0f), maxView(8*65536.0f)
 {
 	
 }
@@ -15,15 +14,11 @@ ICamera::~ICamera()
 }
 
 
-void ICamera::applyAgain()
+void ICamera::applyFresh()
 {
-	glMultMatrixf(mat);
-}
-
-void ICamera::setPosition(float x, float y, float z)
-{
-	posX = x;//TODO update
-	posY = y;
-	posZ = z;
-	changeAngleBy(0, 0, 0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	apply();
 }

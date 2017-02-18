@@ -12,30 +12,14 @@ CameraFP::~CameraFP()
 
 }
 
-void CameraFP::reset()
+
+void CameraFP::apply()
 {
-	resetAngle();
-	resetZoom();
-}
-
-void CameraFP::resetAngle()
-{
-	//alpha = 0;
-	//beta = 0;
-	//gamma = 0;
-}
-
-void CameraFP::changeAngleBy(float alpha, float beta, float gamma)
-{
-
-}
-
-void CameraFP::changeZoomBy(float factor)
-{
-	//zoom *= factor;
-}
-
-void CameraFP::resetZoom()
-{
-
+	glMatrixMode(GL_PROJECTION);
+	glFrustum(-aspect*zoom, aspect*zoom, -zoom, zoom, minView, maxView);
+	glMatrixMode(GL_MODELVIEW);
+	glRotatef(gamma, 0, 0, 1);
+	glRotatef(alpha, 1, 0, 0);
+	glRotatef(beta, 0, 1, 0);
+	glTranslatef(-posX, -posY, -posZ);
 }

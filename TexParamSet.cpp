@@ -49,16 +49,16 @@ bool TexParamSet::addF(GLenum e, GLfloat f)
 #include <iostream>
 void TexParamSet::apply()
 {
-	std::cout << "i" << iCount<<"/"<<iMax<<std::endl;
-	std::cout << "f" << fCount<<"/"<<fMax<<std::endl;
+	//std::cout << "i" << iCount<<"/"<<iMax<<std::endl;
+	//std::cout << "f" << fCount<<"/"<<fMax<<std::endl;
 	for (int i = 0; i < iCount; i++)
 	{
 		glTexParameteri(GL_TEXTURE_2D, enumI[i], paramI[i]);
-		std::cout << "i=" << i << "  " << enumI[i] << "   " << paramI[i]<<std::endl;
+		//std::cout << "i=" << i << "  " << enumI[i] << "   " << paramI[i]<<std::endl;
 	}
 	for (int i = 0; i < fCount; i++)
 	{
 		glTexParameterf(GL_TEXTURE_2D, enumF[i], paramF[i]);
-		std::cout << "f=" << i << "  " << enumF[i] << "   " << paramF[i] << std::endl;
+		//std::cout << "f=" << i << "  " << enumF[i] << "   " << paramF[i] << std::endl;
 	}
 }

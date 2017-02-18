@@ -1,21 +1,12 @@
 #pragma once
-#include "ICamera.h"
+#include "ICamera3D.h"
 class CameraFP :
-	public ICamera
+	public ICamera3D
 {
-	//float mat[16];
-	//float posX, posY, posZ;
-	
 public:
 
-	//void apply();
-	//void setPosition(float x, float y, float z);
+	void apply();
 
-	void reset();
-	void resetAngle();
-	void changeAngleBy(float alpha, float beta, float gamma);
-	void changeZoomBy(float factor);
-	void resetZoom();
 	CameraFP();
 	~CameraFP();
 };

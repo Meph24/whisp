@@ -1,5 +1,5 @@
 #pragma once
-#include "MatrixLib.h"
+#include "MatrixLib2.h"
 typedef struct
 {
 	float a0;
@@ -30,7 +30,8 @@ class MathModel
 {
 public:
 
-	MatrixLib ml;
+	MatrixLib2 ml;
+
 	foot left;
 	foot right;
 	arm leftArm;
