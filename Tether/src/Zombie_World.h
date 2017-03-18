@@ -15,12 +15,15 @@
 
 //TEST
 #include "QuatMandel.h"
+#include "PerformanceMeter.h"
+#include "DebugScreen.h"
 
 class Zombie_World
 {
 	//TEST
 	//QuatMandel qm;
 
+	int timestep=0;
 	int zCount;//max number of zombies
 	int pCount;
 	int wCount;
@@ -30,6 +33,7 @@ class Zombie_World
 	Zombie_KeyInput * keyInp;
 	Zombie_MouseInput * mouseInp;
 	PerformanceMeter * pm;
+	DebugScreen * ds;
 	Graphics2D * g;
 
 	Zombie_Gun ** guns;
@@ -59,6 +63,7 @@ class Zombie_World
 
 	bool reset = false;
 public:
+	bool debugScreen=false;
 	float timeFactor = 1;
 	Zombie_World(sf::Window * w);
 	~Zombie_World();

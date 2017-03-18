@@ -14,7 +14,7 @@ playerHP(100)//,
 //qm(320,256)
 
 {
-	zCount = 128;
+	zCount = 2048;
 	zombies = new Zombie_Enemy *[zCount];
 	for (int i = 0; i < zCount; i++)
 	{
@@ -38,7 +38,7 @@ playerHP(100)//,
 		curSound[i]=0;
 	}
 	maxSound[0]=16;
-	guns[0] = new Zombie_Gun(120000, 40,0.2f);
+	guns[0] = new Zombie_Gun(250000, 50,0.08f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);
 	if(!(guns[0]->sBuf.loadFromFile("res/gunshot.wav"))) std::cout<<"could not load gunshot.wav"<<std::endl;
 	sounds[0]=new sf::Sound * [maxSound[0]];
 	for(int i=0;i<maxSound[0];i++)
@@ -47,7 +47,7 @@ playerHP(100)//,
 	}
 
 	maxSound[1]=1;
-	guns[1] = new Zombie_Gun(30000, 800,5.0f);
+	guns[1] = new Zombie_Gun(40000, 1000,5.0f);//new Zombie_Gun(30000, 800,5.0f);
 	if(!(guns[1]->sBuf.loadFromFile("res/mortar_shoot.wav"))) std::cout<<"could not load mortar_shoot.wav"<<std::endl;
 	sounds[1]=new sf::Sound * [1];
 	sounds[1][0]=new sf::Sound(guns[1]->sBuf);
@@ -66,7 +66,7 @@ playerHP(100)//,
 	keyInp = new Zombie_KeyInput(mouseInp, cam);
 	keyInp->speed = 3600;
 
-	pm = new PerformanceMeter(16);
+	pm = new PerformanceMeter(9);
 	pm->roundtripUpdateIndex = 0;
 
 	//dirty
@@ -77,7 +77,17 @@ playerHP(100)//,
 	physics = new Zombie_Physics(zCount * 2);
 	physics->pCount = &pCount;
 	physics->projectiles = shots;
-
+	ds=new DebugScreen(pm,&g);
+	pm->setName("       Total time",-1);
+	pm->setName("        flush etc",0);
+	pm->setName("       guns+spawn",1);
+	pm->setName("physics  register",2);
+	pm->setName("physics      push",3);
+	pm->setName("physics    hitbox",4);
+	pm->setName("physics getMotion",5);
+	pm->setName("physics     apply",6);
+	pm->setName("           render",7);
+	pm->setName("      debugScreen",8);
 }
 
 void Zombie_World::restart()
@@ -104,6 +114,7 @@ void Zombie_World::restart()
 
 Zombie_World::~Zombie_World()
 {
+	delete ds;
 	delete physics;
 	delete zombieTex;
 	delete tps;
@@ -278,7 +289,10 @@ void Zombie_World::doPhysics(float sec)
 		}
 	}
 	physics->registerObject(zCount, keyInp->speed/30, cam->posX, cam->posZ, 400);
+	pm->registerTime(timestep++);
 	physics->doPushPhysics();
+	pm->registerTime(timestep++);
+//not thread safe #pragma omp parallel for schedule(dynamic, 1)
 	for (int i = 0; i < zCount; i++)
 	{
 		if (zombies[i])
@@ -296,7 +310,21 @@ void Zombie_World::doPhysics(float sec)
 				{
 					hitmark = 1;
 				}
-				score += hp-(zombies[i]->remainingHP) ;
+				int scoreplus= hp-(zombies[i]->remainingHP) ;
+				score +=scoreplus;
+			}
+		}
+	}
+	pm->registerTime(timestep++);
+	for (int i = 0; i < zCount; i++)
+	{
+		if (zombies[i])
+		{
+			if ((zombies[i]->dead) != 0)
+			{
+			}
+			else
+			{
 				Zombie_Physics::motion m = physics->getMotion(i, sec);
 				zombies[i]->posX += m.x;
 				zombies[i]->posZ += m.z;
@@ -304,6 +332,32 @@ void Zombie_World::doPhysics(float sec)
 			}
 		}
 	}
+	//for (int i = 0; i < zCount; i++)
+	//{
+	//	if (zombies[i])
+	//	{
+	//		if ((zombies[i]->dead) != 0)
+	//		{
+	//			(zombies[i]->dead) += sec * 240;
+	//			if ((zombies[i]->dead)>90) removeZombie(i);
+	//		}
+	//		else
+	//		{
+	//			float hp = zombies[i]->remainingHP;
+	//			zombies[i]->checkHitboxes(physics);
+	//			if (hp - (zombies[i]->remainingHP))
+	//			{
+	//				hitmark = 1;
+	//			}
+	//			score += hp-(zombies[i]->remainingHP) ;
+	//			Zombie_Physics::motion m = physics->getMotion(i, sec);
+	//			zombies[i]->posX += m.x;
+	//			zombies[i]->posZ += m.z;
+	//			if ((zombies[i]->remainingHP) < 0) (zombies[i]->dead) += sec * 240;
+	//		}
+	//	}
+	//}
+	pm->registerTime(timestep++);
 	Zombie_Physics::motion m = physics->getMotion(zCount, sec);
 	cam->posX += m.x;
 	cam->posZ += m.z;
@@ -359,7 +413,7 @@ void Zombie_World::loop()
 	}
 	else
 	{
-		int timestep = 0;
+		timestep = 0;
 		pm->registerTime(timestep++);
 		float sec = pm->roundtriptime / 1000000.0f;
 		sec *= timeFactor;
@@ -372,6 +426,20 @@ void Zombie_World::loop()
 		doPhysics(sec);
 		pm->registerTime(timestep++);
 		render(sec);
+		pm->registerTime(timestep++);
+		if(debugScreen)
+		{
+			glPushMatrix();
+			glLoadIdentity();
+			glScalef(1, 1, -1.01f);
+			glColor3f(1, 0, 0);
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_TEXTURE_2D);
+			ds->draw();
+			glDisable(GL_TEXTURE_2D);
+			glEnable(GL_DEPTH_TEST);
+			glPopMatrix();
+		}
 		pm->registerTime(timestep++);
 	}
 }
@@ -423,18 +491,26 @@ void Zombie_World::trigger2(bool pulled)
 void Zombie_World::spawnZombie()
 {
 	int index = -1;
+	int z=0;
 	for (int i = 0; i < zCount; i++)
 	{
 		if (zombies[i] == 0)
 		{
 			index = i;
-			break;
+			//break;
 		}
+		else z++;
+
+
 	}
+	std::cout<<"zombie count:"<<z<<std::endl;
 	if (index == -1) return;
-	float r1 = rand();
+	float r1 = (rand()%1024)/1024.0f;
 	float r2 = (rand()%32768)*8.0f + 20000;
 	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
+	//float r1 = rand();
+	//float r2 = (rand()%32768)*8.0f + 20000;
+	//zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
 }
 
 

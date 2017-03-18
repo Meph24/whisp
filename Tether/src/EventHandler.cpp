@@ -81,6 +81,10 @@ void EventHandler::sendOn(EventHandler::event e)
 			if (mouseInput)
 				mouseInput->mouseMovedY(e.value);
 		}
+		else if ((e.ID == 1111)&&e.value)
+		{
+			world->debugScreen=!world->debugScreen;
+		}
 		else if (e.ID == 1024 + ('W' - 'A'))
 		{
 			if (keyInput)
@@ -113,7 +117,6 @@ void EventHandler::sendOn(EventHandler::event e)
 		else if (e.ID == 2053)
 		{
 			world->trigger2(e.value);
-			std::cout << e.ID << "/rechtsklick!!!!/" << e.value << std::endl;
 		}
 		else if ((e.ID == 1049) && e.value)
 		{

@@ -267,7 +267,7 @@ void Graphics2D::fillOval(float xCenter, float yCenter, float xRad, float yRad)
 }
 
 #include <iostream>
-void Graphics2D::drawString(char * str,int len, float xll, float yll, float size)
+void Graphics2D::drawString(const char * str,int len, float xll, float yll, float size)
 {
 	if (len < 1) return;
 	font->bind();

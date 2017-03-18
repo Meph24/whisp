@@ -3,6 +3,7 @@
 
 PerformanceMeter::PerformanceMeter(int stepCount)
 {
+	stepCount++;
 	n = stepCount;
 	time = new int[stepCount * 8];
 	maxTolerated = time + stepCount;
@@ -62,6 +63,7 @@ void PerformanceMeter::clear()
 //works for a maximum time <100s
 std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 {
+	if(stepID<0) stepID=n-1;
 	char format[9];
 	format[5] = '.';
 	std::string ret = names[stepID] + ':';
@@ -238,8 +240,17 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 
 bool PerformanceMeter::registerTime(int stepID) //4K/s; 500K budget
 {
-	int t = clock.restart().asMicroseconds();//TODO replace: 2k cycles
-	roundtriptime += t - time[stepID];
+	int t;
+	if(stepID!=(n-1))
+	{
+		t= clock.restart().asMicroseconds();//TODO replace: 2k cycles
+		roundtriptime += t - time[stepID];
+	}
+	else t=roundtriptime;
+	if(stepID==roundtripUpdateIndex)
+	{
+		registerTime(n-1);
+	}
 	runs[stepID]++;
 	time[stepID] = t;
 	avgRecent[stepID] = avgRecent[stepID] * (1 - avgWeight) + t * avgWeight;
@@ -286,6 +297,7 @@ void PerformanceMeter::exceededMax(int stepID)
 
 void PerformanceMeter::setName(std::string name, int stepID)
 {
+	if(stepID<0) stepID=n-1;
 	names[stepID] = name;
 }
 
@@ -314,6 +326,11 @@ float PerformanceMeter::getSpikes(int stepID)
 	return spikes[stepID];
 }
 
+
+int PerformanceMeter::getStepCount()
+{
+	return n-1;
+}
 void PerformanceMeter::setMaxTolerated(int stepID, int us)
 {
 	maxTolerated[stepID] = us;

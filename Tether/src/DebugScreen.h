@@ -11,13 +11,15 @@
 
 
 #include "Graphics2D.h"
+#include "PerformanceMeter.h"
 
 class DebugScreen
 {
-	Graphics2D g;
+	Graphics2D ** g;
+	PerformanceMeter * pm;
 public:
 	float textSize;
-	DebugScreen();
+	DebugScreen(PerformanceMeter * p,Graphics2D ** gr);
 	~DebugScreen();
 
 

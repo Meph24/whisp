@@ -84,7 +84,7 @@ public:
 	void feedRects(unsigned int count, float * x, float * y, float * width, float * height, float * r, float * g, float * b);
 	void feedRects(unsigned int count, float * x, float * y, float width, float height, float * r, float * g, float * b);
 	void fillOval(float xCenter, float yCenter, float xRad, float yRad);
-	void drawString(char * str,int len,float xll,float yll, float size);
+	void drawString(const char * str,int len,float xll,float yll, float size);
 	void setColor(float r, float g, float b);
 	void endDraw();
 	void beginDraw();

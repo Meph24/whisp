@@ -89,6 +89,7 @@ public:
 
 
 
+	int getStepCount();
 
 	void setSpikeHalfLifeTime(float seconds);
 
@@ -115,7 +116,7 @@ private:
 	float spikeMultiplier=0.00000005f;
 public:
 
-	float roundtriptime;//TODO add as another time that can be queried//TODO put back to private
+	float roundtriptime;//addes as another time that can be queried (ID=n-1)//maybe put back to private
 	int roundtripUpdateIndex;//at which of the registerTime calls the roundtriptime averages, sipkes etc. should be updated
 
 	//avgRecent[stepID] = avgRecent[stepID] * (1 - avgWeight) + t * avgWeight;
