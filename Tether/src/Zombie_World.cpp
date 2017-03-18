@@ -421,7 +421,7 @@ void Zombie_World::loop()
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
 		guns[0]->tick(sec);
 		guns[1]->tick(sec);
-		if (sec*2 > (rand() % 32768) / 32768.0f) spawnZombie();
+		if (sec*4 > (rand() % 32768) / 32768.0f) spawnZombie();
 		pm->registerTime(timestep++);
 		doPhysics(sec);
 		pm->registerTime(timestep++);
