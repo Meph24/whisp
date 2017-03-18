@@ -1,7 +1,0 @@
-#graphics
-resolutionX=1920
-resolutionY=1080
-
-#input
-sensitivityX=0.1
-sensitivityY=0.1
