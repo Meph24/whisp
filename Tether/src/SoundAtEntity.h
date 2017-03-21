@@ -19,6 +19,8 @@ class SoundAtEntity
 	entityID eID;
 	vec3 lastPos;//last calculated position
 	vec3 lastSpeed;//last fetched speed
+	float privateVolume;
+	float privatePitch;
 	int status;//0 is fresh, lsb = started, next bit = use local data
 
 	float volume,pitch;
@@ -30,7 +32,6 @@ public:
 
 	//return if wants to be destroyed
 	bool update(EntityContainer * container,float secSinceTick,float secSinceUpdate,float myVolume,float myPitch,mat4 listener);
-
 
 };
 

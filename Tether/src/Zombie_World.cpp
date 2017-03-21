@@ -14,7 +14,7 @@ playerHP(100)//,
 //qm(320,256)
 
 {
-	zCount = 2048;
+	zCount = 128;//2048;//TODO change
 	zombies = new Zombie_Enemy *[zCount];
 	for (int i = 0; i < zCount; i++)
 	{
@@ -38,7 +38,7 @@ playerHP(100)//,
 		curSound[i]=0;
 	}
 	maxSound[0]=16;
-	guns[0] = new Zombie_Gun(250000, 50,0.08f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);
+	guns[0] = new Zombie_Gun(250000, 40,0.18f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);
 	if(!(guns[0]->sBuf.loadFromFile("res/gunshot.wav"))) std::cout<<"could not load gunshot.wav"<<std::endl;
 	sounds[0]=new sf::Sound * [maxSound[0]];
 	for(int i=0;i<maxSound[0];i++)
@@ -47,7 +47,7 @@ playerHP(100)//,
 	}
 
 	maxSound[1]=1;
-	guns[1] = new Zombie_Gun(40000, 1000,5.0f);//new Zombie_Gun(30000, 800,5.0f);
+	guns[1] = new Zombie_Gun(40000, 800,5.0f);//new Zombie_Gun(30000, 800,5.0f);
 	if(!(guns[1]->sBuf.loadFromFile("res/mortar_shoot.wav"))) std::cout<<"could not load mortar_shoot.wav"<<std::endl;
 	sounds[1]=new sf::Sound * [1];
 	sounds[1][0]=new sf::Sound(guns[1]->sBuf);
@@ -421,7 +421,7 @@ void Zombie_World::loop()
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
 		guns[0]->tick(sec);
 		guns[1]->tick(sec);
-		if (sec*4 > (rand() % 32768) / 32768.0f) spawnZombie();
+		if (sec*2> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change
 		pm->registerTime(timestep++);
 		doPhysics(sec);
 		pm->registerTime(timestep++);
@@ -505,12 +505,12 @@ void Zombie_World::spawnZombie()
 	}
 	std::cout<<"zombie count:"<<z<<std::endl;
 	if (index == -1) return;
-	float r1 = (rand()%1024)/1024.0f;
-	float r2 = (rand()%32768)*8.0f + 20000;
-	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
-	//float r1 = rand();
+	//float r1 = (rand()%1024)/1024.0f;
 	//float r2 = (rand()%32768)*8.0f + 20000;
 	//zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
+	float r1 = rand();//TODO change
+	float r2 = (rand()%32768)*8.0f + 20000;
+	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
 }
 
 

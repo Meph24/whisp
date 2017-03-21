@@ -224,7 +224,7 @@ void clickibunti()
 	}
 
 	sf::Time t = sf::microseconds(2000);//TODO 1ms
-	sf::sleep(t);
+	//sf::sleep(t);
 
 	glFlush();
 }

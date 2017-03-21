@@ -33,8 +33,8 @@ SFMLHandle::~SFMLHandle()
 #include "Zombie_MouseInput.h"
 #include "CameraFP.h"
 #include "Zombie_World.h"
-extern Zombie_KeyInput * keyInput;
-extern Zombie_MouseInput * mouseInput;
+//extern Zombie_KeyInput * keyInput;
+//extern Zombie_MouseInput * mouseInput;
 extern Zombie_World * world;
 
 void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)

@@ -236,6 +236,35 @@ void Zombie_Enemy::draw(float seconds)
 
 void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 {
+
+	bool proj=false;
+	for (int i = 0; i < ph->pCount[0]; i++)
+	{
+		if (ph->projectiles[i])
+		{
+
+			vec3 max=ph->projectiles[i]->posOld;
+			vec3 min=max;
+			vec3 next=ph->projectiles[i]->posOld;
+			if(min.x>next.x) min.x=next.x;
+			else if(max.x<next.x) max.x=next.x;
+			if(min.y>next.y) min.y=next.y;
+			else if(max.y<next.y) max.y=next.y;
+			if(min.z>next.z) min.z=next.z;
+			else if(max.z<next.z) max.z=next.z;
+			flt maxSize=2000*size;
+			max+={maxSize,maxSize,maxSize};
+			min-={maxSize,maxSize,maxSize};
+			if(min.x>posX) continue;
+			if(min.y>0) continue;
+			if(min.z>posZ) continue;//lol optimization at tier 1
+			if(max.x<posX) continue;
+			if(max.y<0) continue;
+			if(max.z<posZ) continue;
+			proj=true;
+		}
+	}
+	if(!proj) return;
 	glPushMatrix();
 	glLoadIdentity();
 	glTranslatef(posX, 0, posZ);
