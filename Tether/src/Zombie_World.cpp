@@ -14,7 +14,8 @@ playerHP(100)//,
 //qm(320,256)
 
 {
-	zCount = 128;//2048;//TODO change
+	spawnZombies=true;
+	zCount = 1024;//2048+1024;//TODO change 128
 	zombies = new Zombie_Enemy *[zCount];
 	for (int i = 0; i < zCount; i++)
 	{
@@ -38,7 +39,7 @@ playerHP(100)//,
 		curSound[i]=0;
 	}
 	maxSound[0]=16;
-	guns[0] = new Zombie_Gun(250000, 40,0.18f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);
+	guns[0] = new Zombie_Gun(250000, 40,0.18f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	if(!(guns[0]->sBuf.loadFromFile("res/gunshot.wav"))) std::cout<<"could not load gunshot.wav"<<std::endl;
 	sounds[0]=new sf::Sound * [maxSound[0]];
 	for(int i=0;i<maxSound[0];i++)
@@ -54,10 +55,10 @@ playerHP(100)//,
 
 	cam = new CameraFP();
 	cam->posY = 1600;//1.6m
-	cam->aspect = (float)(w->getSize().x)/(w->getSize().y);
+	cam->width = w->getSize().x;
+	cam->height = w->getSize().y;
 
-
-	std::cout << "aspect: " << cam->aspect << std::endl;
+	std::cout << "aspect: " << ((cam->width)/(cam->height)) << std::endl;
 	mouseInp = new Zombie_MouseInput(cam, w);
 
 	Cfg cfg({ "./res/config.txt" });
@@ -92,6 +93,7 @@ playerHP(100)//,
 
 void Zombie_World::restart()
 {
+	spawnZombies=true;
 	for (int i = 0; i < zCount; i++)
 	{
 		if (zombies[i])
@@ -221,7 +223,7 @@ void Zombie_World::render(float seconds)
 	g->drawString(scoreString+5, 3, -0.2f, 0.62f, 0.1f);
 	glPopMatrix();
 	float crosshairSize = 0.005f;
-	int crosshairAmount = 4;
+	int crosshairAmount = 5;//TODO 4
 
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1, hitmark, 0);
@@ -421,7 +423,8 @@ void Zombie_World::loop()
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
 		guns[0]->tick(sec);
 		guns[1]->tick(sec);
-		if (sec*2> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change
+		for(int i=0;i<40;i++)
+			if (sec*2> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
 		pm->registerTime(timestep++);
 		doPhysics(sec);
 		pm->registerTime(timestep++);
@@ -490,6 +493,7 @@ void Zombie_World::trigger2(bool pulled)
 
 void Zombie_World::spawnZombie()
 {
+	if(!spawnZombies) return;
 	int index = -1;
 	int z=0;
 	for (int i = 0; i < zCount; i++)
@@ -504,13 +508,14 @@ void Zombie_World::spawnZombie()
 
 	}
 	std::cout<<"zombie count:"<<z<<std::endl;
+	if(z==zCount) spawnZombies=false;
 	if (index == -1) return;
-	//float r1 = (rand()%1024)/1024.0f;
+	float r1 = (rand()%1024)/2048.0f;
+	float r2 = (rand()%32768)*80.0f + 200000;
+	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
+	//float r1 = rand();//TODO change
 	//float r2 = (rand()%32768)*8.0f + 20000;
 	//zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
-	float r1 = rand();//TODO change
-	float r2 = (rand()%32768)*8.0f + 20000;
-	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
 }
 
 

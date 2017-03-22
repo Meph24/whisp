@@ -18,7 +18,7 @@ CameraTP::~CameraTP()
 void CameraTP::apply()
 {
 	glMatrixMode(GL_PROJECTION);
-	glFrustum(-aspect*zoom, aspect*zoom, -zoom, zoom, minView, maxView);
+	glFrustum(-(width/height)*zoom, (width/height)*zoom, -zoom, zoom, minView, maxView);
 	glMatrixMode(GL_MODELVIEW);
 	glTranslatef(0, 0, -dist);
 	glRotatef(gamma, 0, 0, 1);

@@ -7,7 +7,8 @@ public:
 
 	float posX, posY, posZ;
 	float zoom;// = tan(fov/2)
-	float aspect;// width/height of screen
+	float width;// width of screen in pixels
+	float height;// height of screen in pixels
 
 	float maxView, minView;//min and max view distance
 

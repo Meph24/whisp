@@ -23,15 +23,14 @@ class Zombie_World
 	//TEST
 	//QuatMandel qm;
 
+	bool spawnZombies;
 	int timestep=0;
 	int zCount;//max number of zombies
 	int pCount;
 	int wCount;
 	Zombie_Enemy ** zombies;
 	Zombie_Projectile ** shots;
-	ICamera3D * cam;
 	Zombie_KeyInput * keyInp;
-	Zombie_MouseInput * mouseInp;
 	PerformanceMeter * pm;
 	DebugScreen * ds;
 	Graphics2D * g;
@@ -63,6 +62,8 @@ class Zombie_World
 
 	bool reset = false;
 public:
+	Zombie_MouseInput * mouseInp;
+	ICamera3D * cam;
 	bool debugScreen=false;
 	float timeFactor = 1;
 	Zombie_World(sf::Window * w);

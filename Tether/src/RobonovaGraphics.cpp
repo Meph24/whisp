@@ -6,7 +6,8 @@ model(myModel)
 {
 	pm = new PerformanceMeter(1);
 	cam = new CameraTP();
-	cam->aspect = 1920.0f / 1080;
+	cam->width = 1920.0f;
+	cam->height=1080;
 	//cam->posZ = 0;
 	((CameraTP *)cam)->dist = 250;
 	pm->reset();

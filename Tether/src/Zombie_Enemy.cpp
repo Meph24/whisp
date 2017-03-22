@@ -252,7 +252,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 			else if(max.y<next.y) max.y=next.y;
 			if(min.z>next.z) min.z=next.z;
 			else if(max.z<next.z) max.z=next.z;
-			flt maxSize=2000*size;
+			flt maxSize=4000*size;
 			max+={maxSize,maxSize,maxSize};
 			min-={maxSize,maxSize,maxSize};
 			if(min.x>posX) continue;

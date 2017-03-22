@@ -114,9 +114,24 @@ void EventHandler::sendOn(EventHandler::event e)
 		{
 			world->trigger(e.value);
 		}
-		else if (e.ID == 2053)
+		else if (e.ID == 2054)
 		{
 			world->trigger2(e.value);
+		}
+		else if (e.ID == 2053)
+		{
+			if(e.value)
+			{
+				world->cam->zoom/=8;
+				world->mouseInp->sensitivityX/=8;
+				world->mouseInp->sensitivityY/=8;
+			}
+			else
+			{
+				world->cam->zoom*=8;
+				world->mouseInp->sensitivityX*=8;
+				world->mouseInp->sensitivityY*=8;
+			}
 		}
 		else if ((e.ID == 1049) && e.value)
 		{
