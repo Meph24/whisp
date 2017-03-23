@@ -591,7 +591,7 @@ map<string, Cfg::section> Cfg::Reader::readfile(string filename)
 
 	while (std::getline(in, line))
 	{
-		int size = line.size();
+		unsigned int size = line.size();
 
 		for (currentIndex = 0; currentIndex < size; currentIndex++)
 		{

@@ -6,8 +6,9 @@
 extern Zombie_KeyInput * keyInput;
 extern Zombie_MouseInput * mouseInput;
 
+
 #include <iostream>
-Zombie_World::Zombie_World(sf::Window * w) :
+Zombie_World::Zombie_World(sf::Window * w):
 playerHP(100)//,
 
 //TEST
@@ -15,7 +16,7 @@ playerHP(100)//,
 
 {
 	spawnZombies=true;
-	zCount = 1024;//2048+1024;//TODO change 128
+	zCount = 1;//024;//128;//1024;//2048+1024;//TODO change 128
 	zombies = new Zombie_Enemy *[zCount];
 	for (int i = 0; i < zCount; i++)
 	{
@@ -29,29 +30,8 @@ playerHP(100)//,
 	}
 	wCount = 16;
 	guns = new Zombie_Gun * [wCount];
-	sounds=new sf::Sound ** [wCount];
-	curSound=new int[wCount];
-	maxSound=new int[wCount];
-	for (int i = 0; i < wCount; i++)
-	{
-		guns[i] = 0;
-		sounds[i]=0;
-		curSound[i]=0;
-	}
-	maxSound[0]=16;
-	guns[0] = new Zombie_Gun(250000, 40,0.18f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	if(!(guns[0]->sBuf.loadFromFile("res/gunshot.wav"))) std::cout<<"could not load gunshot.wav"<<std::endl;
-	sounds[0]=new sf::Sound * [maxSound[0]];
-	for(int i=0;i<maxSound[0];i++)
-	{
-		sounds[0][i]=new sf::Sound(guns[0]->sBuf);
-	}
-
-	maxSound[1]=1;
-	guns[1] = new Zombie_Gun(40000, 800,5.0f);//new Zombie_Gun(30000, 800,5.0f);
-	if(!(guns[1]->sBuf.loadFromFile("res/mortar_shoot.wav"))) std::cout<<"could not load mortar_shoot.wav"<<std::endl;
-	sounds[1]=new sf::Sound * [1];
-	sounds[1][0]=new sf::Sound(guns[1]->sBuf);
+	guns[0] = new Zombie_Gun(250000, 40,0.18f,"res/gunshot.wav");//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[1] = new Zombie_Gun(40000, 800,5.0f,"res/mortar_shoot.wav");//new Zombie_Gun(30000, 800,5.0f);
 
 	cam = new CameraFP();
 	cam->posY = 1600;//1.6m
@@ -116,6 +96,7 @@ void Zombie_World::restart()
 
 Zombie_World::~Zombie_World()
 {
+	//missing deletes (one-time tier 1 code, so who cares)
 	delete ds;
 	delete physics;
 	delete zombieTex;
@@ -129,8 +110,8 @@ Zombie_World::~Zombie_World()
 }
 void Zombie_World::removeZombie(int zid)
 {
-	Zombie_Enemy * ptr;
-	if (ptr=zombies[zid])//= intended
+	Zombie_Enemy * ptr=zombies[zid];
+	if (ptr)
 	{
 		zombies[zid] = 0;
 		delete ptr;
@@ -223,7 +204,7 @@ void Zombie_World::render(float seconds)
 	g->drawString(scoreString+5, 3, -0.2f, 0.62f, 0.1f);
 	glPopMatrix();
 	float crosshairSize = 0.005f;
-	int crosshairAmount = 5;//TODO 4
+	int crosshairAmount = 4;//TODO 4
 
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1, hitmark, 0);
@@ -294,7 +275,7 @@ void Zombie_World::doPhysics(float sec)
 	pm->registerTime(timestep++);
 	physics->doPushPhysics();
 	pm->registerTime(timestep++);
-//not thread safe #pragma omp parallel for schedule(dynamic, 1)
+#pragma omp parallel for schedule(dynamic, 1)
 	for (int i = 0; i < zCount; i++)
 	{
 		if (zombies[i])
@@ -312,7 +293,7 @@ void Zombie_World::doPhysics(float sec)
 				{
 					hitmark = 1;
 				}
-				int scoreplus= hp-(zombies[i]->remainingHP) ;
+				int scoreplus= hp-(zombies[i]->remainingHP);
 				score +=scoreplus;
 			}
 		}
@@ -423,7 +404,7 @@ void Zombie_World::loop()
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
 		guns[0]->tick(sec);
 		guns[1]->tick(sec);
-		for(int i=0;i<40;i++)
+		for(int i=0;i<400;i++)
 			if (sec*2> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
 		pm->registerTime(timestep++);
 		doPhysics(sec);
@@ -452,44 +433,43 @@ void Zombie_World::loop()
 void Zombie_World::trigger(bool pulled)
 {
 	if (!pulled) return;
-	if (guns[0]->tryShoot())
+	int index = 0;
+	for (int i = 0; i < pCount; i++)
 	{
-		int index = 0;
-		for (int i = 0; i < pCount; i++)
+		if (!shots[i])
 		{
-			if (!shots[i])
-			{
-				index = i;
-				break;
-			}
+			index = i;
+			break;
 		}
-		shots[index] = new Zombie_Projectile(cam, guns[0], shot);
-		sounds[0][curSound[0]]->play();
-		sounds[0][curSound[0]]->setPitch((rand()%16)/256.0f+1);
-		curSound[0]=(curSound[0]+1)%maxSound[0];
 	}
-}
-void Zombie_World::trigger2(bool pulled)
-{
-	if (!pulled) return;
-	if (guns[1]->tryShoot())
-	{
-		int index = 0;
-		for (int i = 0; i < pCount; i++)
-		{
-			if (!shots[i])
-			{
-				index = i;
-				break;
-			}
-		}
-		shots[index] = new Zombie_Projectile(cam, guns[1], shot);
-		sounds[1][curSound[1]]->play();
-		sounds[1][curSound[1]]->setPitch((rand()%16)/256.0f+1);
-		curSound[1]=(curSound[1]+1)%maxSound[1];
-	}
+	shots[index] = guns[currentGun]->tryShoot(cam,shot);
 }
 
+void Zombie_World::switchWeapon(int dir)
+{
+	currentGun=!currentGun;//TODO
+}
+//void Zombie_World::trigger2(bool pulled)
+//{
+//	if (!pulled) return;
+//	if (guns[1]->tryShoot())
+//	{
+//		int index = 0;
+//		for (int i = 0; i < pCount; i++)
+//		{
+//			if (!shots[i])
+//			{
+//				index = i;
+//				break;
+//			}
+//		}
+//		shots[index] = new Zombie_Projectile(cam, guns[1], shot);
+//		sounds[1][curSound[1]]->play();
+//		sounds[1][curSound[1]]->setPitch((rand()%16)/256.0f+1);
+//		curSound[1]=(curSound[1]+1)%maxSound[1];
+//	}
+//}
+//
 
 void Zombie_World::spawnZombie()
 {
@@ -511,7 +491,7 @@ void Zombie_World::spawnZombie()
 	if(z==zCount) spawnZombies=false;
 	if (index == -1) return;
 	float r1 = (rand()%1024)/2048.0f;
-	float r2 = (rand()%32768)*80.0f + 200000;
+	float r2 = 100000;//(rand()%32768)*80.0f + 200000;
 	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
 	//float r1 = rand();//TODO change
 	//float r2 = (rand()%32768)*8.0f + 20000;

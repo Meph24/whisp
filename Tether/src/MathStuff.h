@@ -11,11 +11,11 @@
 
 #include <cmath>
 
-#define TAU 6.283185307179586f
 
 typedef float flt;
+#define TAU (flt)(6.283185307179586)
 
-//flt sqrt(flt f); //need to implement this and others when flt!=float && flt!=double
+//flt sqrt(flt f); //need to implement this and others if flt!=float && flt!=double
 
 //float operator "" _degrees(int deg);
 

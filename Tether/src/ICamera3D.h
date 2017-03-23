@@ -1,4 +1,7 @@
-#pragma once
+
+#ifndef SRC_ICAMERA3D_H_
+#define SRC_ICAMERA3D_H_
+
 #include "ICamera.h"
 class ICamera3D :
 	public ICamera
@@ -13,3 +16,4 @@ public:
 	ICamera3D();
 	virtual ~ICamera3D();
 };
+#endif /*SRC_ICAMERA3D_H_*/

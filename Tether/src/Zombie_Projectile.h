@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SRC_ZOMBIE_PROJECTILE_H_
+#define SRC_ZOMBIE_PROJECTILE_H_
+
 #include"ICamera3D.h"
 #include "Zombie_Gun.h"
 #include "ITexture.h"
@@ -20,4 +22,4 @@ public:
 	bool move(float seconds);//true= destroy
 	void draw();
 };
-
+#endif /*SRC_ZOMBIE_PROJECTILE_H_*/

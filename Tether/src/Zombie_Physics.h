@@ -13,7 +13,7 @@ class Zombie_Physics
 	int curMax;
 	int totalMax;
 
-	MatrixLib2 ml;
+	//MatrixLib2 ml;
 
 public:
 
@@ -36,7 +36,7 @@ public:
 	motion getMotion(int ID,float time);
 	void doPushPhysics();
 
-	hit testHitbox(float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo);
+	hit testHitbox(MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo);
 	
 };
 

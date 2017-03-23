@@ -2,7 +2,7 @@
 
 
 Zombie_Physics::Zombie_Physics(int maxObjects):
-totalMax(maxObjects), curMax(0), ml(2)
+curMax(0),totalMax(maxObjects)
 {
 	xPush = new float[totalMax * 6];
 	zPush = xPush + totalMax;
@@ -51,6 +51,8 @@ void Zombie_Physics::doPushPhysics()
 		xPush[i] = 0;
 		zPush[i] = 0;
 	}
+
+#pragma omp parallel for schedule(dynamic, 1)
 	for (int i = 0; i < curMax; i++)
 	{
 		for (int j = i+1; j < curMax; j++)
@@ -87,23 +89,21 @@ void Zombie_Physics::doPushPhysics()
 	curMax = 0;
 }
 #include "MatrixLib2.h"
-Zombie_Physics::hit Zombie_Physics::testHitbox(float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo)
+Zombie_Physics::hit Zombie_Physics::testHitbox(MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo)
 {
 	hit ret;
 	ret.projectileIndex = -1;
-	glPushMatrix();
-	glTranslatef(xFrom, yFrom, zFrom);
-	glScalef(xTo - xFrom, yTo - yFrom, zTo - zFrom);
-	float matIn[16];
-	glGetFloatv(GL_MODELVIEW_MATRIX, matIn);
-	float matOut[16];
-	ml.invertMatrix(matIn, matOut);
+	ml->pushMatrix();
+	ml->translatef(xFrom, yFrom, zFrom);
+	ml->scalef(xTo - xFrom, yTo - yFrom, zTo - zFrom);
+	mat4 matOut;
+	ml->invertMatrix(ml->curMatrix, matOut.mat);
 	for (int i = 0; i < pCount[0]; i++)
 	{
 		if (projectiles[i])
 		{
-			MatrixLib2::vec3 p1 = ml.multWith(matOut, (MatrixLib2::vec3 *)&(projectiles[i]->posOld));
-			MatrixLib2::vec3 p2 = ml.multWith(matOut,(MatrixLib2::vec3 *)&(projectiles[i]->pos));
+			vec3 p1 = matOut* (projectiles[i]->posOld);
+			vec3 p2 = matOut*(projectiles[i]->pos);
 			//projectile now relative to cube, where cube is at 0-1 on all 3 axis
 			float vx = p2.x - p1.x;//TODO check for 0
 			float vy = p2.y - p1.y;
@@ -147,6 +147,6 @@ Zombie_Physics::hit Zombie_Physics::testHitbox(float xFrom, float xTo, float yFr
 		}
 	}
 
-	glPopMatrix();
+	ml->popMatrix();
 	return ret;
 }

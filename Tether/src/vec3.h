@@ -1,4 +1,8 @@
-#pragma once
+
+#ifndef SRC_VEC3_H_
+#define SRC_VEC3_H_
+
+
 #include "MathStuff.h"
 
 class vec3
@@ -26,3 +30,6 @@ vec3 crossProduct(vec3 a, vec3 b); //inline
 
 
 //TODO
+
+
+#endif/*SRC_VEC3_H_*/

@@ -1,4 +1,6 @@
-#pragma once
+
+#ifndef SRC_ICAMERA_H_
+#define SRC_ICAMERA_H_
 
 #include <GL/glew.h>
 class ICamera
@@ -20,3 +22,5 @@ public:
 	ICamera();
 	virtual ~ICamera();
 };
+
+#endif /*SRC_ICAMERA_H_*/

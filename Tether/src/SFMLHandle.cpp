@@ -170,34 +170,34 @@ void SFMLHandle::pollEvents()
 void SFMLHandle::preHandleEvent(sf::Event& e)
 {
 
-	switch (e.type)
-	{
-		/*
-		case sf::Event::EventType::MouseMoved:
-		//hardcursorhandle.cursorMoved(e);
-		break;
-
-		case sf::Event::EventType::Resized:
-		//hardcursorhandle.updateLockPosition();
-		std::cout << SFMLHandle.window.getSize().x << "/" << SFMLHandle.window.getSize().y;
-		break;
-
-		case sf::Event::EventType::GainedFocus:
-		//hardcursorhandle.updateLockPosition();	// no way to check if window was moved
-		std::cout<< "Stuff !!";
-		break;
-
-		// _test_begin
-		case sf::Event::EventType::KeyPressed:
-		if (e.key.code == sf::Keyboard::Key::L) hardcursorhandle.setLocked(true);
-		if (e.key.code == sf::Keyboard::Key::U) hardcursorhandle.setLocked(false);
-		if (e.key.code == sf::Keyboard::Key::R) SFMLHandle.window.setSize (sf::Vector2u(400, 400));
-		break;
-
-		*/
-		// _test_end
-
-	}
+	//switch (e.type)
+	//{
+	//	/*
+	//	case sf::Event::EventType::MouseMoved:
+	//	//hardcursorhandle.cursorMoved(e);
+	//	break;
+    //
+	//	case sf::Event::EventType::Resized:
+	//	//hardcursorhandle.updateLockPosition();
+	//	std::cout << SFMLHandle.window.getSize().x << "/" << SFMLHandle.window.getSize().y;
+	//	break;
+    //
+	//	case sf::Event::EventType::GainedFocus:
+	//	//hardcursorhandle.updateLockPosition();	// no way to check if window was moved
+	//	std::cout<< "Stuff !!";
+	//	break;
+    //
+	//	// _test_begin
+	//	case sf::Event::EventType::KeyPressed:
+	//	if (e.key.code == sf::Keyboard::Key::L) hardcursorhandle.setLocked(true);
+	//	if (e.key.code == sf::Keyboard::Key::U) hardcursorhandle.setLocked(false);
+	//	if (e.key.code == sf::Keyboard::Key::R) SFMLHandle.window.setSize (sf::Vector2u(400, 400));
+	//	break;
+    //
+	//	*/
+	//	// _test_end
+    //
+	//}
 
 
 }
@@ -218,6 +218,9 @@ void SFMLHandle::postHandleEvent(sf::Event& e)
 		case sf::Event::EventType::MouseButtonPressed:
 		break;
 		
+
+		default: break;//warning suppression
+
 	}
 }
 

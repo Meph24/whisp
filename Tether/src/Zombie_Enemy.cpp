@@ -4,7 +4,7 @@
 
 
 Zombie_Enemy::Zombie_Enemy(ITexture * texture, float startX, float startZ):
-tex(texture), posX(startX), posZ(startZ),animStep(0),dead(0)//spawns a random zombie at the given location
+tex(texture),ml(4), posX(startX), posZ(startZ),animStep(0),dead(0)//spawns a random zombie at the given location
 {
 	facing = std::rand() % 360;
 	speed = 2000 +std::rand() % 5000;
@@ -265,96 +265,91 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 		}
 	}
 	if(!proj) return;
-	glPushMatrix();
-	glLoadIdentity();
-	glTranslatef(posX, 0, posZ);
-	glRotatef(facing, 0, 1, 0);
-	glScalef(size, size, size);
+	ml.loadIdentity();
+	ml.translatef(posX, 0, posZ);
+	ml.rotatef(facing, 0, 1, 0);
+	ml.scalef(size, size, size);
 
 
 
 
 
-	glPushMatrix();
+	ml.pushMatrix();
 
-	glTranslatef(0, 1200, 0);
-	glScalef(2, 2, 2);
-	glRotatef(tilted, 1, 0, 0);
+	ml.translatef(0, 1200, 0);
+	ml.scalef(2, 2, 2);
+	ml.rotatef(tilted, 1, 0, 0);
 
-	Zombie_Physics::hit h = ph->testHitbox(-100, 100, 0, 200, -100, 100);
+	Zombie_Physics::hit h = ph->testHitbox(&ml,-100, 100, 0, 200, -100, 100);
 
 	if (h.projectileIndex != -1) gotHit(h, 0,ph->projectiles);
 
 
-	glPopMatrix();
+	ml.popMatrix();
 
 
-	glPushMatrix();
-	glTranslatef(0, 600, 0);
-	glScalef(1, 3, 2);
+	ml.pushMatrix();
+	ml.translatef(0, 600, 0);
+	ml.scalef(1, 3, 2);
 
-	h = ph->testHitbox(-100, 100, 0, 200, -100, 100);
+	h = ph->testHitbox(&ml,-100, 100, 0, 200, -100, 100);
 	if (h.projectileIndex != -1) gotHit(h, 1, ph->projectiles);
 
-	glPopMatrix();
+	ml.popMatrix();
 
 
 
-	glPushMatrix();
+	ml.pushMatrix();
 	int loc = 1;
 
-	glTranslatef(0, 1100, loc * 300);
-	glRotatef(sin(loc*animStep * 2 / 1000.0f*speed) * 16 + 90, 0, 0, 1);
-	glTranslatef(0, -600, 0);
-	glScalef(1, 3, 1);
+	ml.translatef(0, 1100, loc * 300);
+	ml.rotatef(sin(loc*animStep * 2 / 1000.0f*speed) * 16 + 90, 0, 0, 1);
+	ml.translatef(0, -600, 0);
+	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(-100, 100, 0, 200, -100, 100);
+	h = ph->testHitbox(&ml,-100, 100, 0, 200, -100, 100);
 	if (h.projectileIndex != -1) gotHit(h, 2, ph->projectiles);
 
-	glPopMatrix();
+	ml.popMatrix();
 
-	glPushMatrix();
+	ml.pushMatrix();
 	loc = -1;
 
-	glTranslatef(0, 1100, loc * 300);
-	glRotatef(sin(loc*animStep * 2 / 1000.0f*speed) * 16 + 90, 0, 0, 1);
-	glTranslatef(0, -600, 0);
-	glScalef(1, 3, 1);
+	ml.translatef(0, 1100, loc * 300);
+	ml.rotatef(sin(loc*animStep * 2 / 1000.0f*speed) * 16 + 90, 0, 0, 1);
+	ml.translatef(0, -600, 0);
+	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(-100, 100, 0, 200, -100, 100);
+	h = ph->testHitbox(&ml,-100, 100, 0, 200, -100, 100);
 	if (h.projectileIndex != -1) gotHit(h, 3, ph->projectiles);
 
-	glPopMatrix();
+	ml.popMatrix();
 
 
-	glPushMatrix();
+	ml.pushMatrix();
 	loc = 1;
-	glTranslatef(0, 600, loc * 100);
-	glRotatef(sin(loc*animStep * 2 / 1000.0f*speed) * 30, 0, 0, 1);
-	glTranslatef(0, -600, 0);
-	glScalef(1, 3, 1);
+	ml.translatef(0, 600, loc * 100);
+	ml.rotatef(sin(loc*animStep * 2 / 1000.0f*speed) * 30, 0, 0, 1);
+	ml.translatef(0, -600, 0);
+	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(-100, 100, 0, 200, -100, 100);
+	h = ph->testHitbox(&ml,-100, 100, 0, 200, -100, 100);
 	if (h.projectileIndex != -1) gotHit(h, 4, ph->projectiles);
 
-	glPopMatrix();
+	ml.popMatrix();
 
 
-	glPushMatrix();
+	ml.pushMatrix();
 	loc = -1;
-	glTranslatef(0, 600, loc * 100);
-	glRotatef(sin(loc*animStep * 2 / 1000.0f*speed) * 30, 0, 0, 1);
-	glTranslatef(0, -600, 0);
-	glScalef(1, 3, 1);
+	ml.translatef(0, 600, loc * 100);
+	ml.rotatef(sin(loc*animStep * 2 / 1000.0f*speed) * 30, 0, 0, 1);
+	ml.translatef(0, -600, 0);
+	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(-100, 100, 0, 200, -100, 100);
+	h = ph->testHitbox(&ml,-100, 100, 0, 200, -100, 100);
 	if (h.projectileIndex != -1) gotHit(h, 5, ph->projectiles);
 
-	glPopMatrix();
-
-
-	glPopMatrix();
-
+	ml.popMatrix();
 }
 
 void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,Zombie_Projectile ** shots)
