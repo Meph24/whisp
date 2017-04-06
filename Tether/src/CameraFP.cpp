@@ -19,7 +19,7 @@ void CameraFP::apply()
 	float pixelOffsetX=(((int)width+1)%2);
 	float pixelOffsetY=(((int)height+1)%2);
 	//std::cout<<width<<"	"<<height<<"	"<<pixelOffsetX<<"	"<<pixelOffsetY<<"	"<<std::endl;
-	glFrustum(-((width+pixelOffsetX)/height)*zoom, ((width-pixelOffsetX)/height)*zoom, -((height+pixelOffsetX)/height)*zoom, ((height-pixelOffsetX)/height)*zoom, minView, maxView);
+	glFrustum(-((width+pixelOffsetX)/height)*zoom, ((width-pixelOffsetX)/height)*zoom, -((height+pixelOffsetY)/height)*zoom, ((height-pixelOffsetY)/height)*zoom, minView, maxView);
 	glMatrixMode(GL_MODELVIEW);
 	glRotatef(gamma, 0, 0, 1);
 	glRotatef(alpha, 1, 0, 0);

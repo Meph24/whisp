@@ -3,6 +3,7 @@
 #include "Zombie_Physics.h"
 class Zombie_Enemy
 {
+
 	typedef struct{
 		float unitSize;
 		float startX, startY;
@@ -14,6 +15,9 @@ class Zombie_Enemy
 	} texCooSet;
 
 	ITexture * tex;
+
+	MatrixLib2 ml;
+
 	float tilted=10;
 
 	void drawHead();

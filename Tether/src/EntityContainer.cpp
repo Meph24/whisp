@@ -21,7 +21,7 @@ EntityContainer::~EntityContainer()
 
 entityID EntityContainer::insertEntity(Entity * blank)
 {
-	//TODO e2[mynewfuckingID]=blank;
+	return {0,0};//TODO e2[mynewfuckingID]=blank;
 }
 
 void EntityContainer::advanceTick()

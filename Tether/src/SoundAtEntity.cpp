@@ -40,8 +40,8 @@ void SoundAtEntity::update(float myVolume,float myPitch,mat4 listener)
 	//http://sound.stackexchange.com/questions/25529/what-is-0-db-in-digital-audio
 	//http://www.sengpielaudio.com/calculator-distance.htm
 	sound.setVolume(myVolume*volume/len);
-
 }
+
 bool SoundAtEntity::update(EntityContainer * container,float secSinceTick,float secSinceUpdate,float myVolume,float myPitch,mat4 listener)
 {
 	if(status&2)

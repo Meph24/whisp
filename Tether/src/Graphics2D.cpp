@@ -3,10 +3,10 @@
 #include "TextureStatic2D.h"
 
 Graphics2D::Graphics2D(int circleSegments, ITexture * myFont) :
-font(myFont),
 segments(circleSegments),
 tps(0,0),
-deleteTex(false)
+deleteTex(false),
+font(myFont)
 {
 	initCircle();
 	maxi.x = 1;//TODO correct

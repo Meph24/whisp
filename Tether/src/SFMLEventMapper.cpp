@@ -91,6 +91,8 @@ void SFMLEventMapper::handleEvent(sf::Event& e)
 	case sf::Event::EventType::JoystickButtonReleased:
 		EH.handle(EH.createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId *JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 0));
 		break;
+	default://warning suppression
+		break;
 	}
 
 }

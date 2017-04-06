@@ -282,7 +282,7 @@ bool MatrixLib2::invertMatrix(float m[16], float invOut[16])
 }
 
 
-MatrixLib2::vec3 MatrixLib2::multWith(float * mat, vec3 * inp)
+vec3 MatrixLib2::multWith(float * mat, vec3 * inp)
 {
 	vec3 ret;
 	ret.x = mat[0] * inp->x + mat[4] * inp->y + mat[8] * inp->z + mat[12];

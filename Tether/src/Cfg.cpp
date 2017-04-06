@@ -1,9 +1,11 @@
 #include "Cfg.h"
 
 #include <regex>
+#include <string>
 #include <fstream>
 #include <list>
-
+using std::regex_match;
+using std::string;
 Cfg::Cfg(vector<string> filelist)
 {
 	for (string filename : filelist)
@@ -497,7 +499,7 @@ void Cfg::Reader::configdea_d_load(configdea_statemachine* M, char sym)
 
 int Cfg::Reader::configdea_exit(configdea_statemachine* M)
 {
-	int cs = M->q;
+	//int cs = M->q;//TODO this was unused variable: investigate
 	return ((M->q == q1) || (M->q == q2) || (M->q == q6) || (M->q == q7));
 }
 
@@ -591,7 +593,7 @@ map<string, Cfg::section> Cfg::Reader::readfile(string filename)
 
 	while (std::getline(in, line))
 	{
-		int size = line.size();
+		unsigned int size = line.size();
 
 		for (currentIndex = 0; currentIndex < size; currentIndex++)
 		{

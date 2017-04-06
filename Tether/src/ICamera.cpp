@@ -2,7 +2,7 @@
 
 
 ICamera::ICamera():
-posX(0), posY(0), posZ(0), zoom(1), minView(1.0f), maxView(8*65536.0f),width(600), height(600)
+posX(0), posY(0), posZ(0), zoom(1), width(600), height(600), maxView(8*65536.0f),minView(1.0f)
 {
 	
 }

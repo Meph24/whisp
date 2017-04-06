@@ -8,8 +8,8 @@
 
 HardCursorHandle::HardCursorHandle(sf::Window& w) 
 	:
-	w(w),
-	islocked(false)
+	islocked(false),
+	w(w)
 {
 	updateLockPosition();
 }

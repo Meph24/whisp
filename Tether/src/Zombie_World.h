@@ -36,9 +36,6 @@ class Zombie_World
 	Graphics2D * g;
 
 	Zombie_Gun ** guns;
-	int * curSound;
-	int * maxSound;
-	sf::Sound *** sounds;
 	int currentGun;
 
 	int score=0;
@@ -72,7 +69,8 @@ public:
 	void loadStandardTex();
 
 	void trigger(bool pulled);
-	void trigger2(bool pulled);
+	//void trigger2(bool pulled);
+	void switchWeapon(int dir);
 
 	void loop();
 

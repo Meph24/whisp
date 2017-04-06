@@ -27,10 +27,17 @@ graphics(sfmlHandle)
 	settings.openglmajor = 1;
 	settings.openglminor = 2;
 
+	//void * pointer=malloc(1024*1024);//This worked
+	//Cfg * cfg=new (pointer) Cfg({ "./res/config.txt" });
+    //
+	//int x=*(cfg->getint("graphics", "resolutionX"));
+	//int y=*(cfg->getint("graphics", "resolutionY"));
+	//free(pointer);
 	Cfg cfg({ "./res/config.txt" });
 
 	int x=*cfg.getint("graphics", "resolutionX");
 	int y=*cfg.getint("graphics", "resolutionY");
+
 	
 
 
@@ -39,7 +46,7 @@ graphics(sfmlHandle)
 
 void MainApp::tick(int us)
 {
-	counter += us*0.000002f;
+	counter += us*0.000001f;
 	//do stuff
 }
 

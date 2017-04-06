@@ -1,4 +1,6 @@
-#pragma once
+
+#ifndef SRC_CFG_H_
+#define SRC_CFG_H_
 
 /*
 //	Planned Features:
@@ -198,3 +200,4 @@ public:
 	friend std::ostream& operator<< (std::ostream& os, const Cfg& c);
 
 };
+#endif /*SRC_CFG_H_*/

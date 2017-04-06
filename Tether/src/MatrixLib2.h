@@ -2,8 +2,7 @@
 #include <cstdint>
 #include <cmath>
 
-//TODO guard
-#define TAU 6.283185307179586f
+#include "MatrixLib.h"
 
 class MatrixLib2
 {
@@ -12,10 +11,6 @@ class MatrixLib2
 
 public:
 
-	typedef struct
-	{
-		float x, y, z;
-	} vec3;
 
 	float curMatrix[16];
 
