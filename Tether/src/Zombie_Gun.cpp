@@ -34,7 +34,8 @@ Zombie_Projectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex)
 	sounds[curSound]->setPitch((rand()%16)/256.0f+1);
 	curSound=(curSound+1)%maxSound;
 
-	return new Zombie_Projectile(cam, this, tex);
+	Zombie_Projectile * zp= new Zombie_Projectile(cam, this, tex);
+	return zp;
 }
 
 void Zombie_Gun::tick(float sec)

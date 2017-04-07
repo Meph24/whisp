@@ -356,8 +356,8 @@ void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,Zombie_Projectile **
 {
 	if (hit.projectileIndex == -1) return;
 	float dmgMult = 0;
-	float armDmgMult = 0;
-	float legDmgMult = 0;
+	//float armDmgMult = 0;
+	//float legDmgMult = 0;
 	switch (part)
 	{
 	case 0:
@@ -368,19 +368,19 @@ void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,Zombie_Projectile **
 		break;
 	case 2:
 		dmgMult = 0.45f;
-		armDmgMult = 1;
+		//armDmgMult = 1;
 		break;
 	case 3:
 		dmgMult = 0.45f;
-		armDmgMult = 1;
+		//armDmgMult = 1;
 		break;
 	case 4:
 		dmgMult = 0.55f;
-		legDmgMult = 1;
+		//legDmgMult = 1;
 		break;
 	case 5:
 		dmgMult = 0.55f;
-		legDmgMult = 1;
+		//legDmgMult = 1;
 		break;
 	}
 	remainingHP -= shots[hit.projectileIndex]->firedFrom->baseDmg*dmgMult;

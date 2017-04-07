@@ -1,19 +1,21 @@
 /*
- * IWeapon.cpp
+ * Item.cpp
  *
- *  Created on:	12.03.2017
+ *  Created on:	02.04.2017
  *      Author:	HL65536
- *     Version:	2.-1
+ *     Version:	2.0
  */
 
-#include "IWeapon.h"
+#include "Item.h"
 
-IWeapon::IWeapon() {
+Item::Item()
+{
 	// TODO Auto-generated constructor stub
 
 }
 
-IWeapon::~IWeapon() {
+Item::~Item()
+{
 	// TODO Auto-generated destructor stub
 }
 

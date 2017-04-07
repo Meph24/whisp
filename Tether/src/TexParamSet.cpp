@@ -2,10 +2,10 @@
 
 
 TexParamSet::TexParamSet(int maxParamsI, int maxParamsF) :
-iMax(maxParamsI),
-fMax(maxParamsF),
 iCount(0),
-fCount(0)
+fCount(0),
+iMax(maxParamsI),
+fMax(maxParamsF)
 {
 	enumI = new GLenum[iMax + fMax];
 	enumF = enumI + iMax;

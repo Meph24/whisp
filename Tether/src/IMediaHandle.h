@@ -17,4 +17,5 @@ public:
 	virtual void pollEvents() = 0;
 	virtual void setContextToMyThread() = 0;
 	virtual void display() = 0;
+	virtual ~IMediaHandle();
 };

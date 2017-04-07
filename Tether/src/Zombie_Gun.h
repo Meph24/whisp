@@ -6,6 +6,7 @@
 #include "Zombie_Projectile.h"
 #include "ICamera3D.h"
 #include "ITexture.h"
+class Zombie_Projectile;
 class Zombie_Gun
 {
 	float rld;

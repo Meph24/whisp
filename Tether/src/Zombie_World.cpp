@@ -15,6 +15,7 @@ playerHP(100)//,
 //qm(320,256)
 
 {
+	currentGun=0;
 	spawnZombies=true;
 	zCount = 1;//024;//128;//1024;//2048+1024;//TODO change 128
 	zombies = new Zombie_Enemy *[zCount];

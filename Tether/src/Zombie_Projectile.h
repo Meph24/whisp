@@ -5,6 +5,7 @@
 #include "Zombie_Gun.h"
 #include "ITexture.h"
 #include "vec3.h"
+class Zombie_Gun;
 class Zombie_Projectile
 {
 	
