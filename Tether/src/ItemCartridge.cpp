@@ -6,8 +6,8 @@
  *     Version:	2.0
  */
 
+/*
 #include "ItemCartridge.h"
-
 ItemCartridge::ItemCartridge()
 {
 	// TODO Auto-generated constructor stub
@@ -36,3 +36,10 @@ Item * ItemCartridge::copyTo(void * memory)
 	return (Item *) new (memory) ItemCartridge(*this);
 }
 
+bool ItemCartridge::fits(ItemProjectileType * p)
+{
+	if(p->length+0.0001f>maxProjectileLength) return false;
+	if(p->caliber+0.0001f>caliber) return false;//TODO research actual tolerances
+	if((!allowSmallProjectiles)&&(p->caliber-0.0003f<caliber)) return false;
+	return true;
+}*/

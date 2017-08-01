@@ -1,8 +1,8 @@
 #include "Zombie_Gun.h"
 
 
-Zombie_Gun::Zombie_Gun(float spd, float dmg, float reloadTime,const std::string& filename):
-rld(reloadTime), timer(0),sBuf(), baseDmg(dmg),projectileSpeed(spd)
+Zombie_Gun::Zombie_Gun(std::string weaponName,float spd, float dmg, float reloadTime,const std::string& filename,float pitchModifier):
+rld(reloadTime), timer(0),sBuf(), baseDmg(dmg),projectileSpeed(spd*1000),name(weaponName),pitch(pitchModifier)
 {
 	sBuf.loadFromFile(filename);
 	curSound=0;
@@ -22,7 +22,7 @@ Zombie_Gun::~Zombie_Gun()
 
 Zombie_Projectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex)
 {
-	//std::cout<<timer<<std::endl;
+	std::cout<<timer<<std::endl;
 
 	if (timer <= 0)
 	{
@@ -31,7 +31,7 @@ Zombie_Projectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex)
 	else return 0;
 
 	sounds[curSound]->play();
-	sounds[curSound]->setPitch((rand()%16)/256.0f+1);
+	sounds[curSound]->setPitch(pitch*((rand()%16)/256.0f+1));
 	curSound=(curSound+1)%maxSound;
 
 	Zombie_Projectile * zp= new Zombie_Projectile(cam, this, tex);

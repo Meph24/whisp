@@ -11,5 +11,4 @@
 
 IMediaHandle::~IMediaHandle()
 {
-
 }

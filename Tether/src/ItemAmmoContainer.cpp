@@ -1,20 +1,20 @@
 /*
- * Item.cpp
+ * ItemAmmoContainer.cpp
  *
- *  Created on:	02.04.2017
+ *  Created on:	Apr 12, 2017
  *      Author:	HL65536
  *     Version:	2.0
  */
 /*
-#include "Item.h"
+#include "ItemAmmoContainer.h"
 
-Item::Item()
+ItemAmmoContainer::ItemAmmoContainer()
 {
 	// TODO Auto-generated constructor stub
 
 }
 
-Item::~Item()
+ItemAmmoContainer::~ItemAmmoContainer()
 {
 	// TODO Auto-generated destructor stub
 }

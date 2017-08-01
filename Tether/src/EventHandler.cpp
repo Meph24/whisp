@@ -114,6 +114,10 @@ void EventHandler::sendOn(EventHandler::event e)
 		{
 			world->trigger(e.value);
 		}
+		else if (e.ID == 2050)
+		{
+			world->switchWeapon(e.value);
+		}
 		else if (e.ID == 2053)
 		{
 			if(e.value)

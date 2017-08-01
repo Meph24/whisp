@@ -15,11 +15,13 @@ public:
 	sf::SoundBuffer sBuf;
 	float baseDmg;
 	float projectileSpeed;
+	std::string name;
+	float pitch;
 
 	int curSound;
 	int maxSound;
 	sf::Sound ** sounds;
-	Zombie_Gun(float ProjectileSpeed, float BaseDmg,float ReloadTime,const std::string& filename);
+	Zombie_Gun(std::string weaponName,float ProjectileSpeed, float BaseDmg,float ReloadTime,const std::string& filename,float pitchModifier);
 	~Zombie_Gun();
 	Zombie_Projectile * tryShoot(ICamera3D * cam, ITexture * tex);
 	void tick(float sec);

@@ -9,6 +9,7 @@
 #ifndef SRC_MATHSTUFF_H_
 #define SRC_MATHSTUFF_H_
 
+
 #include <cmath>
 
 
@@ -21,4 +22,5 @@ typedef float flt;
 
 //float operator "" _deg(int deg);
 
+//#include "MatrixLib.h"
 #endif /* SRC_MATHSTUFF_H_ */

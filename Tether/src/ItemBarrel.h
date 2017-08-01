@@ -5,11 +5,12 @@
  *      Author:	HL65536
  *     Version:	2.0
  */
-
+/*
 #ifndef SRC_ITEMBARREL_H_
 #define SRC_ITEMBARREL_H_
 
 #include "ItemManager.h"
+#include "ItemCartridge.h"
 
 class ItemBarrel: public Item
 {
