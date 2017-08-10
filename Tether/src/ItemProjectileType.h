@@ -5,7 +5,7 @@
  *      Author:	HL65536
  *     Version:	2.0
  */
-
+/*
 #ifndef SRC_ITEMPROJECTILETYPE_H_
 #define SRC_ITEMPROJECTILETYPE_H_
 

@@ -17,7 +17,7 @@ playerHP(100)//,
 {
 	currentGun=0;
 	spawnZombies=true;
-	zCount = 1;//024;//128;//1024;//2048+1024;//TODO change 128
+	zCount = 12;//024;//128;//1024;//2048+1024;//TODO change 128
 	zombies = new Zombie_Enemy *[zCount];
 	for (int i = 0; i < zCount; i++)
 	{
@@ -29,10 +29,12 @@ playerHP(100)//,
 	{
 		shots[i] = 0;
 	}
-	wCount = 16;
+	wCount = 4;
 	guns = new Zombie_Gun * [wCount];
-	guns[0] = new Zombie_Gun(250000, 40,0.18f,"res/gunshot.wav");//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[1] = new Zombie_Gun(40000, 800,5.0f,"res/mortar_shoot.wav");//new Zombie_Gun(30000, 800,5.0f);
+	guns[0] = new Zombie_Gun("9mm Pistol",250, 80,0.18f,"res/gunshot.wav",0.9f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[1] = new Zombie_Gun("Grenade Launcher",40, 800,5.0f,"res/mortar_shoot.wav",1);//new Zombie_Gun(30000, 800,5.0f);
+	guns[2] = new Zombie_Gun(".22 Pistol",250, 30,0.15f,"res/gunshot.wav",1.1f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 
 	cam = new CameraFP();
 	cam->posY = 1600;//1.6m
@@ -48,7 +50,7 @@ playerHP(100)//,
 	keyInp = new Zombie_KeyInput(mouseInp, cam);
 	keyInp->speed = 3600;
 
-	pm = new PerformanceMeter(9);
+	pm = new PerformanceMeter(9,1000);
 	pm->roundtripUpdateIndex = 0;
 
 	//dirty
@@ -203,6 +205,11 @@ void Zombie_World::render(float seconds)
 	}
 	g->drawString("health:", 7, -0.2f, 0.8f, 0.1f);
 	g->drawString(scoreString+5, 3, -0.2f, 0.62f, 0.1f);
+
+	glColor3f(1, 1, 0);
+	g->drawString("Weapon:", 7, 0.6f, -0.66f, 0.1f);
+	g->drawString(guns[currentGun]->name.c_str(), guns[currentGun]->name.length(), 0.6f, -0.82f, 0.1f);
+	glColor3f(0, 1, 0);
 	glPopMatrix();
 	float crosshairSize = 0.005f;
 	int crosshairAmount = 4;//TODO 4
@@ -403,8 +410,7 @@ void Zombie_World::loop()
 		sec *= timeFactor;
 		if (sec < 0) sec = 0;
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
-		guns[0]->tick(sec);
-		guns[1]->tick(sec);
+		guns[currentGun]->tick(sec);
 		for(int i=0;i<400;i++)
 			if (sec*2> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
 		pm->registerTime(timestep++);
@@ -448,7 +454,8 @@ void Zombie_World::trigger(bool pulled)
 
 void Zombie_World::switchWeapon(int dir)
 {
-	currentGun=!currentGun;//TODO
+	currentGun=(currentGun+dir+wCount*1024)%wCount;//TODO
+	std::cout<<"gun switched to"<<currentGun<<std::endl;
 }
 //void Zombie_World::trigger2(bool pulled)
 //{

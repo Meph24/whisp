@@ -5,7 +5,7 @@
  *      Author:	HL65536
  *     Version:	1.0
  */
-
+/*
 #include "ItemBarrel.h"
 
 ItemBarrel::ItemBarrel()
@@ -48,7 +48,8 @@ bool ItemBarrel::fits(ItemCartridge * c)
 	float c1=c->caliber;
 	if(c1>caliber+0.0001f) return false;
 	if(c1<caliber-0.0001f) return false;
-	if(maxLength+0.0001f)
+	if(maxLength+0.0001f<c->maxTotalLength) return false;
 	return true;
 
 }
+*/

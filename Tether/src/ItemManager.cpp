@@ -5,7 +5,7 @@
  *      Author:	HL65536
  *     Version:	2.0
  */
-
+/*
 #include "ItemManager.h"
 
 ItemManager::ItemManager()
@@ -25,3 +25,4 @@ itemID invalidID()
 {
 	return {0};
 }
+*/

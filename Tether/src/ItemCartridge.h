@@ -5,7 +5,7 @@
  *      Author:	HL65536
  *     Version:	2.0
  */
-
+/*
 #ifndef SRC_ITEMCARTRIDGE_H_
 #define SRC_ITEMCARTRIDGE_H_
 
@@ -20,7 +20,7 @@ public:
 
 	float energy;//(joules) only includes energy stored in cartridge
 
-	float caliber;//diameter of barrel
+	float caliber;//(meters) diameter of barrel
 	float maxTotalLength;
 	float maxProjectileLength;
 	unsigned int designLayout;//44 magnum and 44 special have same designLayout, but different than 357 magnum

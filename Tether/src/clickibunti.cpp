@@ -223,7 +223,7 @@ void clickibunti()
 		rob.draw();
 	}
 
-	sf::Time t = sf::microseconds(6000);//TODO 1ms
+	sf::Time t = sf::microseconds(1000);//TODO 1ms
 	sf::sleep(t);
 	glFlush();
 

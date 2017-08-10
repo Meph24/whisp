@@ -5,7 +5,7 @@
  *      Author:	HL65536
  *     Version:	2.0
  */
-
+/*
 #include "ItemProjectileType.h"
 
 ItemProjectileType::ItemProjectileType()
@@ -34,3 +34,4 @@ Item * ItemProjectileType::copyTo(void * memory)
 {
 	return (Item *) new (memory) ItemProjectileType(*this);
 }
+*/

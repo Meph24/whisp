@@ -1,7 +1,8 @@
 #include "PerformanceMeter.h"
 #include <ctgmath>
 
-PerformanceMeter::PerformanceMeter(int stepCount)
+PerformanceMeter::PerformanceMeter(int stepCount,int warmupPeriod):
+warmup(warmupPeriod),warmupCounter(0)
 {
 	stepCount++;
 	n = stepCount;
@@ -250,6 +251,21 @@ bool PerformanceMeter::registerTime(int stepID) //4K/s; 500K budget
 	if(stepID==roundtripUpdateIndex)
 	{
 		registerTime(n-1);
+		if(warmupCounter==warmup)
+		{
+			//reset certain time data
+			for (int i = 0; i < n; i++)
+			{
+				maxMeasured[i] = -1;
+				minMeasured[i] = ~(1 << 31);
+				avgRecent[i] = 0;
+				sum[i] = 0;
+				runs[i] = 0;
+				spikes[i] = 0;
+			}
+		}
+		warmupCounter++;
+
 	}
 	runs[stepID]++;
 	time[stepID] = t;
@@ -287,7 +303,7 @@ void PerformanceMeter::setSpikeHalfLifeTime(float seconds)
 
 void PerformanceMeter::reset()
 {
-	clock.restart();//TODO replace
+	clock.restart();//TODO replace, reason: bad performance
 }
 
 void PerformanceMeter::exceededMax(int stepID)
