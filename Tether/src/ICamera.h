@@ -8,7 +8,7 @@ class ICamera
 public:
 
 	float posX, posY, posZ;
-	float zoom;// = tan(fov/2)
+	float zoom;// = tan(fov/2); smaller value means things look bigger
 	float width;// width of screen in pixels
 	float height;// height of screen in pixels
 

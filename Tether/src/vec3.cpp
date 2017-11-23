@@ -53,6 +53,11 @@ vec3 vec3::operator*(flt scalar)
 	return {x*scalar,y*scalar,z*scalar};
 }
 
+vec3 vec3::operator*(vec3 other)
+{
+	return {x*other.x,y*other.y,z*other.z};
+}
+
 void vec3::normalize()
 {
 	flt lenInv=1/length();
@@ -87,6 +92,12 @@ flt vec3::lengthSq()
 vec3 operator*(flt scalar,vec3 v)
 {
 	return {v.x*scalar,v.y*scalar,v.z*scalar};
+}
+
+std::ostream& operator<<(std::ostream &out, const vec3 v)
+{
+	out<<"[ "<<v.x<<", "<<v.y<<", "<<v.z<<" ]";
+	return out;
 }
 
 
