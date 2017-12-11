@@ -20,7 +20,7 @@ public:
 	void bind();
 	void update();
 	void update(TexParamSet * texParams);
-public:
+
 	TextureDynamic2Dcpu(TexParamSet * texParams, const void * imageData,int width,int height);//TODO additional parameters for glTexImage2D
 	~TextureDynamic2Dcpu();
 };

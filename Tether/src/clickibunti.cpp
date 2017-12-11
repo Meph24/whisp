@@ -26,11 +26,16 @@ sf::UdpSocket * socket;
 Zombie_KeyInput * keyInput=0;
 Zombie_MouseInput * mouseInput=0;
 
-bool zombieEnabled = true;
+int enabledProgram = 1;
+int maxPrograms=3;
+bool zombieEnabled = true;//TODO delete
+
 
 #include "Zombie_World.h"
 Zombie_World * world;
 
+#include "POCmain.h"
+POCmain * poc;
 
 //this is a test-everything-file, chaos is normal
 
@@ -139,7 +144,9 @@ void clickibunti()
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
 	
 
-	if (zombieEnabled)
+	enabledProgram%=maxPrograms;
+
+	if (enabledProgram==1)//zombie
 	{
 		if (test1 == 0)
 		{
@@ -149,7 +156,7 @@ void clickibunti()
 		}
 		world->loop();
 	}
-	else
+	else if(enabledProgram==0)//robot
 	{
 		if (test2 == 0)
 		{
@@ -222,8 +229,12 @@ void clickibunti()
 		delete data;
 		rob.draw();
 	}
+	else if(enabledProgram==2)//POCmain
+	{
+		poc->frame();
+	}
 
-	sf::Time t = sf::microseconds(6000);//TODO 1ms
+	sf::Time t = sf::microseconds(1000);//TODO 1ms
 	sf::sleep(t);
 	glFlush();
 

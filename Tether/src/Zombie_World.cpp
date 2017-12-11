@@ -50,7 +50,7 @@ playerHP(100)//,
 	keyInp = new Zombie_KeyInput(mouseInp, cam);
 	keyInp->speed = 3600;
 
-	pm = new PerformanceMeter(9);
+	pm = new PerformanceMeter(9,1000);
 	pm->roundtripUpdateIndex = 0;
 
 	//dirty

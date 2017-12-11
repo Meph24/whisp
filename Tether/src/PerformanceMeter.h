@@ -15,7 +15,7 @@ class PerformanceMeter
 public:
 
 	//collects data about the performance of a loop with [stepCount] internal steps
-	PerformanceMeter(int stepCount);
+	PerformanceMeter(int stepCount,int warmupPeriod=-1);//resets values after warmupPeriod (-1 means no reset)
 	~PerformanceMeter();
 
 	/*
@@ -97,6 +97,9 @@ private:
 	
 	void exceededMax(int stepID);
 
+	int warmup;
+	int warmupCounter;
+
 	sf::Clock clock; //TODO replace
 
 	int n;
@@ -109,7 +112,7 @@ private:
 	int * minMeasured;
 	int * runs;
 	float * avgRecent;
-	float * sum;//TODO add double option
+	float * sum;//TODO add double option or use long longs  (int is only ~1h)
 	float * spikes;
 
 	float spikeHalfLifeInv = 1.0f/10000000;

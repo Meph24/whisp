@@ -56,20 +56,22 @@ static int on = 0;
 #include "Zombie_World.h"
 extern Zombie_KeyInput * keyInput;
 extern Zombie_MouseInput * mouseInput;
-extern bool zombieEnabled;
+extern int enabledProgram;
 extern Zombie_World * world;
+#include "POCmain.h"
+extern POCmain * poc;
 
 #include "CameraTP.h"
 void EventHandler::sendOn(EventHandler::event e)
 {
 	if ((e.ID == 1039)&&e.value)//p
 	{
-		zombieEnabled = !zombieEnabled;
+		enabledProgram++;
 		std::cout << e.ID << "/" << e.value << std::endl;
 		return;
 	}
 	std::cout << e.ID << "/" << e.value << std::endl;
-	if (zombieEnabled)
+	if (enabledProgram==1)//zombie
 	{
 		if (e.ID == 2048)
 		{
@@ -145,7 +147,7 @@ void EventHandler::sendOn(EventHandler::event e)
 		}
 		
 	}
-	else
+	else if(enabledProgram==0)//robot
 	{
 
 		int change = 0;
@@ -244,6 +246,10 @@ void EventHandler::sendOn(EventHandler::event e)
 				break;
 			}
 		}
+	}
+	else if(enabledProgram==2)
+	{
+		poc->event(e);
 	}
 	
 	
