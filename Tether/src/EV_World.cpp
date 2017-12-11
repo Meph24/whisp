@@ -10,9 +10,10 @@
 #include <iostream>
 
 EV_World::EV_World(int xSize,int ySize,int foodKinds):
-xSize(xSize),ySize(ySize),foodKinds(foodKinds),tickCounter(0),lastDraw(-1)
+tickCounter(0),lastDraw(-1),xSize(xSize),ySize(ySize),foodKinds(foodKinds)
 {
 	food=new float[xSize*ySize*foodKinds];
+	fertility=new float[xSize*ySize*foodKinds];
 	texData=new unsigned char[xSize*ySize*4];
 	tps=new TexParamSet(2,2);
 	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -27,13 +28,22 @@ EV_World::~EV_World()
 	delete foodTex;
 	delete tps;
 	delete texData;
+	delete fertility;
 	delete food;
 }
 
 void EV_World::tick()
 {
 	tickCounter++;
-	//tick
+	//TODO tick: use fertility to update food
+
+	u64 len=xSize*ySize*foodKinds;
+	float stay=1-changeRate;
+	for(u64 i = 0 ; i<len ; i++)
+	{
+		food[i]=food[i]*stay+changeRate*fertility[i];
+	}
+
 	tickCounter++;
 }
 
@@ -84,4 +94,9 @@ void EV_World::draw()
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 
+}
+
+void EV_World::randomInit()
+{
+	//perlin noise fertility
 }

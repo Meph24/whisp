@@ -21,10 +21,12 @@ class EV_World
 	u8 getColorValue(float myFood);
 public:
 
+	float changeRate=0.01f;
 	int xSize;
 	int ySize;
 	int foodKinds;
 	float * food;//[x,y,foodKind]
+	float * fertility;//[x,y,foodKind]
 	TexParamSet * tps;
 	u8 * texData;
 	TextureDynamic2Dcpu * foodTex;
@@ -37,6 +39,7 @@ public:
 	~EV_World();
 	void tick();
 	void draw();
+	void randomInit();
 };
 
 #endif /* SRC_EV_WORLD_H_ */
