@@ -1,6 +1,7 @@
 #pragma once
 #include "ITexture.h"
 #include "Zombie_Physics.h"
+#include "ChunkManager.h"
 class Zombie_Enemy
 {
 
@@ -29,7 +30,8 @@ class Zombie_Enemy
 	void gotHit(Zombie_Physics::hit hit, int part, Zombie_Projectile ** shots);
 
 public:
-	float posX, posZ;
+	float posX,posY, posZ;
+	ChunkManager * cm;
 	float facing;
 	float speed;
 	float size;
@@ -40,7 +42,7 @@ public:
 
 	float dead;
 
-	Zombie_Enemy(ITexture * texture,float startX,float startZ);
+	Zombie_Enemy(ITexture * texture,float startX,float startZ,ChunkManager * cm);
 	~Zombie_Enemy();
 
 	void draw(float seconds);

@@ -20,15 +20,21 @@ DebugScreen::~DebugScreen()
 }
 
 //#include <iostream>
-void DebugScreen::draw()
+#include <sstream>
+void DebugScreen::draw(flt x,flt y,flt z)
 {
 	if(!pm) return;
 	int num=pm->getStepCount();
-	for(int i=-1;i<(num-1);i++)
+	int i;
+	for(i=-1;i<(num-1);i++)
 	{
 		std::string s=pm->getInfo(i,FLAG_RECENTAVG+FLAG_SPIKES+FLAG_NOW);
 		g[0]->drawString(s.c_str(),s.length(),-1.4f,0.8f-i*textSize,textSize);
 		//std::cout<<s<<std::endl;
 	}
+	std::ostringstream myString;
+	myString<<"x = "<<x<<" | y = "<<y<<" | z = "<<z;
+	std::string s=myString.str();
+	g[0]->drawString(s.c_str(),s.length(),-1.4f,0.8f-i*textSize,textSize);
 }
 

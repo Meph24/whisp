@@ -24,7 +24,7 @@ public:
 
 
 
-	void draw();
+	void draw(flt x,flt y,flt z);
 };
 
 #endif /* SRC_DEBUGSCREEN_H_ */

@@ -10,24 +10,26 @@
 #include "Zombie_Projectile.h"
 #include "Graphics2D.h"
 #include "Zombie_Gun.h"
-
+#include "Zombie_AmmoType.h"
 #define MAX_TICK_TIME 0.02f
 
 //TEST
 #include "QuatMandel.h"
 #include "PerformanceMeter.h"
 #include "DebugScreen.h"
-
+#include "ChunkManager.h"
 class Zombie_World
 {
 	//TEST
 	//QuatMandel qm;
 
 	bool spawnZombies;
+	bool flatEarth;
 	int timestep=0;
 	int zCount;//max number of zombies
 	int pCount;
 	int wCount;
+	float characterHeight=1.6f;
 	Zombie_Enemy ** zombies;
 	Zombie_Projectile ** shots;
 	Zombie_KeyInput * keyInp;
@@ -45,11 +47,16 @@ class Zombie_World
 
 
 	Zombie_Physics * physics;
+	ChunkManager * cm;
 
 	ITexture * zombieTex;
 	ITexture * grass;
 	ITexture * shot;
 	TexParamSet * tps;
+
+	int chunkLoadRate;
+	int lodQuality;
+	int zombieDist;
 
 	void removeZombie(int zid);
 	void render(float seconds);

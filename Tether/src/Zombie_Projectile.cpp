@@ -1,14 +1,14 @@
 #include "Zombie_Projectile.h"
 
 #include "MatrixLib2.h"
-Zombie_Projectile::Zombie_Projectile(ICamera3D * cam, Zombie_Gun * gun, ITexture * t) :
-firedFrom(gun), tex(t)
+Zombie_Projectile::Zombie_Projectile(ICamera3D * cam, ITexture * t,Zombie_AmmoType * type):
+pType(type), tex(t)
 {
 	pos.x = cam->posX;
 	pos.y = cam->posY;
 	pos.z = cam->posZ;
 	posOld = pos;
-	float velZ = -gun->projectileSpeed;// 100000;
+	float velZ = -type->speed;
 	float velY = 0;
 	float velX = 0;
 	MatrixLib2 ml(2);
@@ -28,12 +28,18 @@ Zombie_Projectile::~Zombie_Projectile()
 
 }
 
-bool Zombie_Projectile::move(float sec)
+bool Zombie_Projectile::move(float sec,ChunkManager * cm)
 {
-	bool destroy = posOld.y < 0;
+	bool destroy = posOld.y < cm->getHeight(posOld.x,posOld.z);
 	posOld = pos;
-	pos+=v*sec;
-	v.y -= 9810 * sec;
+	vec3 vOld=v;
+	v.y -= 9.81f * sec;
+	flt spdSq=v.lengthSq();
+	flt drag=spdSq*pType->drag;
+	vec3 dragDir=v;
+	dragDir.normalize();
+	v-=dragDir*drag*sec;
+	pos+=(v+vOld)*sec*0.5f;
 	return destroy;
 }
 
@@ -48,42 +54,42 @@ void Zombie_Projectile::draw()
 
 
 	glTexCoord2f(0, 0);
-	glVertex3f(0, -100, -100);
+	glVertex3f(0, -0.1f, -0.1f);
 
 	glTexCoord2f(1, 0);
-	glVertex3f(0, 100, -100);
+	glVertex3f(0, 0.1f, -0.1f);
 
 	glTexCoord2f(1, 1);
-	glVertex3f(0, 100, 100);
+	glVertex3f(0,  0.1f,  0.1f);
 
 	glTexCoord2f(0, 1);
-	glVertex3f(0, -100, 100);
+	glVertex3f(0, -0.1f,  0.1f);
 
 
 	glTexCoord2f(0, 0);
-	glVertex3f(-100, 0, -100);
+	glVertex3f(-0.1f, 0, -0.1f);
 
 	glTexCoord2f(1, 0);
-	glVertex3f(100, 0, -100);
+	glVertex3f(0.1f, 0, -0.1f);
 
 	glTexCoord2f(1, 1);
-	glVertex3f(100, 0, 100);
+	glVertex3f(0.1f, 0, 0.1f);
 
 	glTexCoord2f(0, 1);
-	glVertex3f(-100, 0, 100);
+	glVertex3f(-0.1f, 0, 0.1f);
 
 
 	glTexCoord2f(0, 0);
-	glVertex3f(-100, -100,0);
+	glVertex3f(-0.1f, -0.1f,0);
 
 	glTexCoord2f(1, 0);
-	glVertex3f(100, -100,0);
+	glVertex3f(0.1f, -0.1f,0);
 
 	glTexCoord2f(1, 1);
-	glVertex3f(100, 100,0);
+	glVertex3f(0.1f, 0.1f,0);
 
 	glTexCoord2f(0, 1);
-	glVertex3f(-100, 100,0);
+	glVertex3f(-0.1f, 0.1f,0);
 
 
 	glEnd();

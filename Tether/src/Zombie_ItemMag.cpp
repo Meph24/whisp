@@ -1,20 +1,20 @@
 /*
- * ZombieGunType.cpp
+ * Zombie_ItemMag.cpp
  *
  *  Created on:	12.12.2017
  *      Author:	HL65536
- *     Version:	2.0
+ *     Version:	1.0
  */
 
-#include "ZombieGunType.h"
+#include "Zombie_ItemMag.h"
 
-Zombie_GunType::Zombie_GunType()
+Zombie_ItemMag::Zombie_ItemMag()
 {
 	// TODO Auto-generated constructor stub
 
 }
 
-Zombie_GunType::~Zombie_GunType()
+Zombie_ItemMag::~Zombie_ItemMag()
 {
 	// TODO Auto-generated destructor stub
 }

@@ -1,7 +1,17 @@
 #graphics
 resolutionX=1920
 resolutionY=1080
+renderDistance=64
+physicsDistance=128
+chunkLoadRate=16
+terrainQuality=2
+
+
+#test
+zombies=400
+zombieDist=60
+
 
 #input
-sensitivityX=0.1
-sensitivityY=0.1
+sensitivityX=0.05
+sensitivityY=0.05

@@ -6,24 +6,31 @@
 extern Zombie_KeyInput * keyInput;
 extern Zombie_MouseInput * mouseInput;
 
-
+#include "SpeedMod.h"
 #include <iostream>
 Zombie_World::Zombie_World(sf::Window * w):
-playerHP(100)//,
-
+playerHP(100),flatEarth(false)//,
 //TEST
 //qm(320,256)
-
 {
+	Cfg cfg({ "./res/config.txt" });
+	int physDist=*cfg.getint("graphics", "physicsDistance");
+	int renderDist=*cfg.getint("graphics", "renderDistance");
+	chunkLoadRate=*cfg.getint("graphics", "chunkLoadRate");
+	lodQuality=*cfg.getint("graphics", "terrainQuality");
+	std::cout<<"testStart"<<std::endl;
+	cm=new ChunkManager(16,physDist*2,renderDist);//16,32,6);
+	cm->setMid(0.5f,0.5f);
 	currentGun=0;
 	spawnZombies=true;
-	zCount = 12;//024;//128;//1024;//2048+1024;//TODO change 128
+	zCount = *cfg.getint("test", "zombies");//024;//128;//1024;//2048+1024;//TODO change 128
+	zombieDist = *cfg.getint("test", "zombieDist");//024;//128;//1024;//2048+1024;//TODO change 128
 	zombies = new Zombie_Enemy *[zCount];
 	for (int i = 0; i < zCount; i++)
 	{
 		zombies[i] = 0;
 	}
-	pCount = zCount * 8;
+	pCount = 1024*8;//zCount * 8;
 	shots = new Zombie_Projectile *[pCount];
 	for (int i = 0; i < pCount; i++)
 	{
@@ -31,26 +38,31 @@ playerHP(100)//,
 	}
 	wCount = 4;
 	guns = new Zombie_Gun * [wCount];
-	guns[0] = new Zombie_Gun("9mm Pistol",250, 80,0.18f,"res/gunshot.wav",0.9f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[1] = new Zombie_Gun("Grenade Launcher",40, 800,5.0f,"res/mortar_shoot.wav",1);//new Zombie_Gun(30000, 800,5.0f);
-	guns[2] = new Zombie_Gun(".22 Pistol",250, 30,0.15f,"res/gunshot.wav",1.1f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+
+	guns[0] = new Zombie_Gun("Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new Zombie_AmmoType(358, 79.5f,0.001628170585565067f));//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[1] = new Zombie_Gun("Flamethrower",0.04f,"res/mortar_shoot.wav",1,new Zombie_AmmoType(20, 75,0.005f));//new Zombie_Gun(30000, 800,5.0f);
+	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new Zombie_AmmoType(440,31.8f,0.0022272754325748604f));//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new Zombie_AmmoType(900, 3166,0.0004f));
+	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 
 	cam = new CameraFP();
-	cam->posY = 1600;//1.6m
+	cam->minView=0.25f;
+	cam->maxView=2048*8;
+	cam->posX=0.5f;
+	cam->posZ=0.5f;
+	cam->posY = characterHeight+cm->getHeight(cam->posX,cam->posZ);
 	cam->width = w->getSize().x;
 	cam->height = w->getSize().y;
 
 	std::cout << "aspect: " << ((cam->width)/(cam->height)) << std::endl;
 	mouseInp = new Zombie_MouseInput(cam, w);
 
-	Cfg cfg({ "./res/config.txt" });
 	mouseInp->sensitivityX = *cfg.getfloat("input", "sensitivityX");
 	mouseInp->sensitivityY = *cfg.getfloat("input", "sensitivityY");
 	keyInp = new Zombie_KeyInput(mouseInp, cam);
-	keyInp->speed = 3600;
+	keyInp->speed = 3.6f;
 
-	pm = new PerformanceMeter(9,1000);
+	pm = new PerformanceMeter(11,1000);
 	pm->roundtripUpdateIndex = 0;
 
 	//dirty
@@ -72,6 +84,7 @@ playerHP(100)//,
 	pm->setName("physics     apply",6);
 	pm->setName("           render",7);
 	pm->setName("      debugScreen",8);
+	pm->setName("     chunk update",9);
 }
 
 void Zombie_World::restart()
@@ -90,8 +103,8 @@ void Zombie_World::restart()
 	{
 		if (shots[i])
 		{
-			shots[i]->pos.y = -1000000;
-			shots[i]->posOld.y = -1000000;
+			shots[i]->pos.y = -1000;
+			shots[i]->posOld.y = -1000;
 		}
 	}
 }
@@ -122,7 +135,29 @@ void Zombie_World::removeZombie(int zid)
 }
 void Zombie_World::render(float seconds)
 {
+	vec3 old=vec3(cam->posX,cam->posY,cam->posZ);
 	keyInp->applyMovement(seconds);
+	cam->posY=cm->getHeight(cam->posX,cam->posZ)+characterHeight;
+	vec3 newVec=vec3(cam->posX,cam->posY,cam->posZ);
+	vec3 moved=(newVec-old);
+	if(moved.lengthSq()>0.0000000001f)
+	{
+		vec3 norm=moved;
+		norm.normalize();
+		flt speedModA=(vec3(norm.x,0,norm.z).length());
+		vec3 flat=vec3(moved.x,0,moved.z);
+		flt h=moved.y/flat.length();
+		SpeedMod sm=SpeedMod();
+		flt speedModB=sm.slowdownFromTerrain(h);
+		old+=flat*speedModA*speedModB;
+		cam->posX=old.x;
+		cam->posZ=old.z;
+		cam->posY=cm->getHeight(cam->posX,cam->posZ)+characterHeight;
+	}
+	cm->setMid(cam->posX,cam->posZ);
+
+
+
 
 	cam->applyFresh();
 
@@ -130,23 +165,30 @@ void Zombie_World::render(float seconds)
 	glColor3f(0.2f, 0.6f, 0.1f);
 
 	glPushMatrix();
-	glTranslatef((int)(cam->posX / 1000.0f)*1000, 0, (int)(cam->posZ / 1000.0f)*1000);//set middle of ground to where player is while keeping texture grid
+	//aglTranslatef((int)(cam->posX / 1000.0f)*1000, 0, (int)(cam->posZ / 1000.0f)*1000);//set middle of ground to where player is while keeping texture grid
 	glEnable(GL_TEXTURE_2D);
-	glBegin(GL_QUADS);
+	if(flatEarth)
+	{
+		glBegin(GL_QUADS);
 
-	int groundSize = 128;
-	glTexCoord2f(groundSize, groundSize);//ground
-	glVertex3f(groundSize * 1000, 0, groundSize * 1000);
+		int groundSize = 128;
+		glTexCoord2f(groundSize, groundSize);//ground
+		glVertex3f(groundSize, 0, groundSize);
 
-	glTexCoord2f(-groundSize, groundSize);
-	glVertex3f(groundSize * 1000, 0, -groundSize * 1000);
+		glTexCoord2f(-groundSize, groundSize);
+		glVertex3f(groundSize, 0, -groundSize);
 
-	glTexCoord2f(-groundSize, -groundSize);
-	glVertex3f(-groundSize * 1000, 0, -groundSize * 1000);
+		glTexCoord2f(-groundSize, -groundSize);
+		glVertex3f(-groundSize, 0, -groundSize);
 
-	glTexCoord2f(groundSize, -groundSize);
-	glVertex3f(-groundSize * 1000, 0, groundSize * 1000);
-	glEnd();
+		glTexCoord2f(groundSize, -groundSize);
+		glVertex3f(-groundSize, 0, groundSize);
+		glEnd();
+	}
+	else
+	{
+		cm->render(lodQuality);
+	}
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
@@ -265,8 +307,41 @@ void Zombie_World::doPhysics(float sec)
 	{
 		if (zombies[i])
 		{
+			vec3 old=vec3(zombies[i]->posX,zombies[i]->posY,zombies[i]->posZ);
+
 			zombies[i]->posX += (zombies[i]->speed)*cos(zombies[i]->facing *TAU/360)*sec;//Zombie walk "AI"
 			zombies[i]->posZ += -(zombies[i]->speed)*sin(zombies[i]->facing*TAU/360)*sec;
+			zombies[i]->posY =cm->getHeight(zombies[i]->posX,zombies[i]->posZ);
+
+			vec3 newVec=vec3(zombies[i]->posX,zombies[i]->posY,zombies[i]->posZ);
+			vec3 moved=(newVec-old);
+			bool chunkBorder=(old.y==defaultHeight)^(newVec.y==defaultHeight);
+			if(moved.lengthSq()>0.0000000001f)
+			{
+				vec3 norm=moved;
+				norm.normalize();
+				flt speedModA=(vec3(norm.x,0,norm.z).length());
+				vec3 flat=vec3(moved.x,0,moved.z);
+				flt h=moved.y/flat.length();
+				SpeedMod sm=SpeedMod();
+				flt speedModB=sm.slowdownFromTerrain(h);
+				if(chunkBorder)
+				{
+					speedModA=1;
+					speedModB=1;
+				}
+				old+=flat*speedModA*speedModB;
+				zombies[i]->posX=old.x;
+				zombies[i]->posZ=old.z;
+				zombies[i]->posY=cm->getHeight(zombies[i]->posX,zombies[i]->posZ);
+			}
+
+
+			//zombies[i]->posX += (zombies[i]->speed)*cos(zombies[i]->facing *TAU/360)*sec;//Zombie walk "AI"
+			//zombies[i]->posZ += -(zombies[i]->speed)*sin(zombies[i]->facing*TAU/360)*sec;
+			//zombies[i]->posY =cm->getHeight(zombies[i]->posX/1000,zombies[i]->posZ/1000)*1000;
+
+			//std::cout<<"test"<<zombies[i]->posY<<std::endl;
 			float wishAngle=atan2(zombies[i]->posX - cam->posX, zombies[i]->posZ - cam->posZ);
 			wishAngle *= 360 / TAU;
 			wishAngle += 90;
@@ -276,10 +351,10 @@ void Zombie_World::doPhysics(float sec)
 			if (difplus < dif) zombies[i]->facing += 360;
 			else if (difminus<dif) zombies[i]->facing -= 360;
 			zombies[i]->facing = zombies[i]->facing *(1 - sec) + sec*wishAngle;
-			physics->registerObject(i, zombies[i]->speed/30, zombies[i]->posX, zombies[i]->posZ,300*zombies[i]->size);
+			physics->registerObject(i, zombies[i]->speed/30, zombies[i]->posX, zombies[i]->posZ,0.3f*zombies[i]->size);
 		}
 	}
-	physics->registerObject(zCount, keyInp->speed/30, cam->posX, cam->posZ, 400);
+	physics->registerObject(zCount, keyInp->speed/30, cam->posX, cam->posZ, 0.4f);
 	pm->registerTime(timestep++);
 	physics->doPushPhysics();
 	pm->registerTime(timestep++);
@@ -352,14 +427,14 @@ void Zombie_World::doPhysics(float sec)
 	Zombie_Physics::motion m = physics->getMotion(zCount, sec);
 	cam->posX += m.x;
 	cam->posZ += m.z;
-	playerHP -= (m.x*m.x + m.z*m.z) / 64.0f;
+	playerHP -= 15625*(m.x*m.x + m.z*m.z);
 
 
 	for (int i = 0; i < pCount; i++)
 	{
 		if (shots[i])
 		{
-			if (shots[i]->move(sec))
+			if (shots[i]->move(sec,cm))
 			{
 				delete shots[i];
 				shots[i] = 0;
@@ -411,8 +486,8 @@ void Zombie_World::loop()
 		if (sec < 0) sec = 0;
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
 		guns[currentGun]->tick(sec);
-		for(int i=0;i<400;i++)
-			if (sec*2> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
+		for(int i=0;i<4;i++)
+			if (sec*4> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
 		pm->registerTime(timestep++);
 		doPhysics(sec);
 		pm->registerTime(timestep++);
@@ -426,11 +501,13 @@ void Zombie_World::loop()
 			glColor3f(1, 0, 0);
 			glDisable(GL_DEPTH_TEST);
 			glEnable(GL_TEXTURE_2D);
-			ds->draw();
+			ds->draw(cam->posX,cam->posY,cam->posZ);
 			glDisable(GL_TEXTURE_2D);
 			glEnable(GL_DEPTH_TEST);
 			glPopMatrix();
 		}
+		pm->registerTime(timestep++);
+		cm->generateMissing(chunkLoadRate);
 		pm->registerTime(timestep++);
 	}
 }
@@ -457,27 +534,6 @@ void Zombie_World::switchWeapon(int dir)
 	currentGun=(currentGun+dir+wCount*1024)%wCount;//TODO
 	std::cout<<"gun switched to"<<currentGun<<std::endl;
 }
-//void Zombie_World::trigger2(bool pulled)
-//{
-//	if (!pulled) return;
-//	if (guns[1]->tryShoot())
-//	{
-//		int index = 0;
-//		for (int i = 0; i < pCount; i++)
-//		{
-//			if (!shots[i])
-//			{
-//				index = i;
-//				break;
-//			}
-//		}
-//		shots[index] = new Zombie_Projectile(cam, guns[1], shot);
-//		sounds[1][curSound[1]]->play();
-//		sounds[1][curSound[1]]->setPitch((rand()%16)/256.0f+1);
-//		curSound[1]=(curSound[1]+1)%maxSound[1];
-//	}
-//}
-//
 
 void Zombie_World::spawnZombie()
 {
@@ -496,14 +552,15 @@ void Zombie_World::spawnZombie()
 
 	}
 	std::cout<<"zombie count:"<<z<<std::endl;
-	if(z==zCount) spawnZombies=false;
+	//if(z==zCount) spawnZombies=false;
 	if (index == -1) return;
-	float r1 = (rand()%1024)/2048.0f;
-	float r2 = 100000;//(rand()%32768)*80.0f + 200000;
-	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
-	//float r1 = rand();//TODO change
-	//float r2 = (rand()%32768)*8.0f + 20000;
-	//zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ);
+	//float r1 = (rand()%1024)/1024.0f;
+	//float r2 = zombieDist;//(rand()%32768)*80.0f + 200000;
+	//zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ,cm);
+
+	float r1 = rand();//TODO change
+	float r2 = ((rand()%32768)/2028.0f + 1)*zombieDist;
+	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ,cm);
 }
 
 

@@ -1,19 +1,21 @@
 /*
- * ZombiePlayer.cpp
+ * Zombie_ItemGun.cpp
  *
- *  Created on:	20.02.2017
+ *  Created on:	12.12.2017
  *      Author:	HL65536
  *     Version:	1.0
  */
 
-#include "ZombiePlayer.h"
+#include "Zombie_ItemGun.h"
 
-Zombie_Player::Zombie_Player() {
+Zombie_ItemGun::Zombie_ItemGun()
+{
 	// TODO Auto-generated constructor stub
 
 }
 
-Zombie_Player::~Zombie_Player() {
+Zombie_ItemGun::~Zombie_ItemGun()
+{
 	// TODO Auto-generated destructor stub
 }
 
