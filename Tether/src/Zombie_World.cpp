@@ -7,6 +7,7 @@ extern Zombie_KeyInput * keyInput;
 extern Zombie_MouseInput * mouseInput;
 
 #include "SpeedMod.h"
+#include "ZombieTree.h"
 #include <iostream>
 Zombie_World::Zombie_World(sf::Window * w):
 playerHP(100),flatEarth(false)//,
@@ -192,6 +193,9 @@ void Zombie_World::render(float seconds)
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
+	Zombie_Tree t=Zombie_Tree({5,cm->getHeight(5,5),5},tree, leaves);
+	t.draw();
+
 	for (int i = 0; i < zCount; i++)
 	{
 		if (zombies[i])
@@ -287,8 +291,20 @@ void Zombie_World::loadStandardTex()
 	zombieTex->update();
 	grass = new TextureStatic2D(tps, "./res/grass_top.png");
 	grass->update();
-	shot = new TextureStatic2D(tps, "./res/fireball.png");
+	tree = new TextureStatic2D(tps, "./res/log_oak.png");
+	tree->update();
+
+
+	tps2 = new TexParamSet(2, 2);
+	tps2->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	tps2->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	tps2->addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	tps2->addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	shot = new TextureStatic2D(tps2, "./res/fireball.png");
 	shot->update();
+	leaves = new TextureStatic2D(tps2, "./res/leaves.png");
+	leaves->update();
 
 	g = new Graphics2D(64);
 

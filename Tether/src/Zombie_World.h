@@ -52,7 +52,11 @@ class Zombie_World
 	ITexture * zombieTex;
 	ITexture * grass;
 	ITexture * shot;
+	ITexture * tree;
+	ITexture * leaves;
 	TexParamSet * tps;
+
+	TexParamSet * tps2;
 
 	int chunkLoadRate;
 	int lodQuality;

@@ -8,7 +8,7 @@ terrainQuality=2
 
 
 #test
-zombies=400
+zombies=600
 zombieDist=60
 
 
