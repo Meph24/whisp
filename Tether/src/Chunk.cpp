@@ -96,25 +96,6 @@ void Chunk::render(int lod)
 				glTexCoord2f(0.0f,0.0f);
 				glVertex3f(x+myX,getH(myX,myY),y+myY);
 				glEnd();
-				/*glBegin(GL_TRIANGLE_FAN);
-				glTexCoord2f(1,1);
-				glVertex3f(x+myX+1,getH(myX+1,myY+1),y+myY+1);
-
-				glTexCoord2f(0.0f,0.0f);
-				glVertex3f(x+myX,getH(myX,myY),y+myY);
-
-				glTexCoord2f(2,0.0f);
-				glVertex3f(x+myX+2,getH(myX+2,myY),y+myY);
-
-				glTexCoord2f(2,2);
-				glVertex3f(x+myX+2,getH(myX+2,myY+2),y+myY+2);
-
-				glTexCoord2f(0.0f,2);
-				glVertex3f(x+myX,getH(myX,myY+2),y+myY+2);
-
-				glTexCoord2f(0.0f,0.0f);
-				glVertex3f(x+myX,getH(myX,myY),y+myY);
-				glEnd();*/
 			}
 		}
 	}
