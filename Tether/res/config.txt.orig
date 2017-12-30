@@ -1,0 +1,31 @@
+#graphics
+resolutionX=1920
+resolutionY=1080
+<<<<<<< HEAD
+renderDistance=48
+physicsDistance=96
+=======
+renderDistance=64
+physicsDistance=128
+>>>>>>> 932d4feaa890b74332afdd95f668cf3df90f7df3
+chunkLoadRate=16
+terrainQuality=2
+
+
+#test
+<<<<<<< HEAD
+zombies=300
+zombieDist=100
+=======
+zombies=600
+zombieDist=60
+>>>>>>> 932d4feaa890b74332afdd95f668cf3df90f7df3
+
+
+#input
+sensitivityX=0.05
+<<<<<<< HEAD
+sensitivityY=0.05
+=======
+sensitivityY=0.05
+>>>>>>> 932d4feaa890b74332afdd95f668cf3df90f7df3
