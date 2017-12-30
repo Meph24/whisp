@@ -23,9 +23,9 @@ graphics(sfmlHandle)
 	IMediaHandle::ContextSettings settings;
 	settings.depth = 24;
 	settings.stencil = 8;
-	settings.antialiasing = 0;
-	settings.openglmajor = 1;
-	settings.openglminor = 2;
+	settings.antialiasing = 16;
+	settings.openglmajor = 2;
+	settings.openglminor = 0;
 
 	//void * pointer=malloc(1024*1024);//This worked
 	//Cfg * cfg=new (pointer) Cfg({ "./res/config.txt" });

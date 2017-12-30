@@ -15,8 +15,8 @@ PerformanceMeter pm(6);
 TexParamSet tps(2,2);
 TextureStatic2D * t2D;
 //Graphics2D * g;
-MathModel * model=new MathModel();
-RobonovaGraphics rob(model);
+MathModel * myModel=new MathModel();
+RobonovaGraphics rob(myModel);
 RobonovaGraphics * robG;
 sf::UdpSocket * socket;
 
@@ -45,52 +45,52 @@ void setAxis(int axis, float degreeValue)
 	switch (axis)
 	{
 	case 0:
-		model->left.a0 = degreeValue;
+		myModel->left.a0 = degreeValue;
 		break;
 	case 1:
-		model->left.a1 = degreeValue;
+		myModel->left.a1 = degreeValue;
 		break;
 	case 2:
-		model->left.a2 = degreeValue - 30;
+		myModel->left.a2 = degreeValue - 30;
 		break;
 	case 3:
-		model->left.a3 = degreeValue;
+		myModel->left.a3 = degreeValue;
 		break;
 	case 4:
-		model->left.a4 = -90-degreeValue;
+		myModel->left.a4 = -90-degreeValue;
 		break;
 	case 5:
-		model->right.a0 = degreeValue;
+		myModel->right.a0 = degreeValue;
 		break;
 	case 6:
-		model->right.a1 = degreeValue;
+		myModel->right.a1 = degreeValue;
 		break;
 	case 7:
-		model->right.a2 = degreeValue - 30;
+		myModel->right.a2 = degreeValue - 30;
 		break;
 	case 8:
-		model->right.a3 = degreeValue;
+		myModel->right.a3 = degreeValue;
 		break;
 	case 9:
-		model->right.a4 = -90-degreeValue;
+		myModel->right.a4 = -90-degreeValue;
 		break;
 	case 10:
-		model->leftArm.a0 = degreeValue;
+		myModel->leftArm.a0 = degreeValue;
 		break;
 	case 11:
-		model->leftArm.a1 = degreeValue;
+		myModel->leftArm.a1 = degreeValue;
 		break;
 	case 12:
-		model->leftArm.a2 = degreeValue;
+		myModel->leftArm.a2 = degreeValue;
 		break;
 	case 13:
-		model->rightArm.a0 = degreeValue-90;
+		myModel->rightArm.a0 = degreeValue-90;
 		break;
 	case 14:
-		model->rightArm.a1 = degreeValue;
+		myModel->rightArm.a1 = degreeValue;
 		break;
 	case 15:
-		model->rightArm.a2 = degreeValue;
+		myModel->rightArm.a2 = degreeValue;
 		break;
 	}
 }

@@ -39,6 +39,23 @@ void Chunk::render(int lod)
 	//glColor3f(0.2f,0.8f,0.2f);
 	int smallSize=size-1;
 
+	/*int vertices=3*4*smallSize*smallSize/4;
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, bufID);
+	glVertexAttribPointer(
+	   0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+	   vertices,                  // size
+	   GL_FLOAT,           // type
+	   GL_FALSE,           // normalized?
+	   0,                  // stride
+	   (void*)0            // array buffer offset
+	);
+	// Draw the triangle !
+	glDrawArrays(GL_TRIANGLES, 0, vertices); // Starting from vertex 0; 3 vertices total -> 1 triangle
+	glDisableVertexAttribArray(0);
+*/
+
 	if(lod==1)
 	{
 
@@ -107,21 +124,41 @@ Chunk::Chunk(int xStart, int yStart, int baseSize):
 x(xStart),y(yStart),size(baseSize+1),avgHeight(0)
 {
 	module::Perlin myModule;
-	myModule.SetSeed(42);
+	myModule.SetSeed(420);
+	myModule.SetOctaveCount(10);
+	myModule.SetFrequency(0.00125);
+	myModule.SetPersistence(0.75);
+	myModule.SetLacunarity(1.5f);
 	height=new float[size*size];
 	for(int yrun=0;yrun<size;yrun++)
 	{
 		for(int xrun=0;xrun<size;xrun++)
 		{
-			float val=(float)myModule.GetValue ((xrun+x)/200.0, (yrun+y)/200.0, 0)*10.0f;
+			float val=((float)myModule.GetValue(xrun+x, yrun+y, 0))*10.0f;
 			height[yrun*size+xrun]=val*val;
 			avgHeight+=val*val;
 		}
 	}
 	avgHeight/=size*size;
-	//glGenBuffers(1,&bufID);
-	//glBindBuffer(GL_ARRAY_BUFFER, bufID);
 
+	/*int smallSize=size-1;
+	int vertices=3*4*smallSize*smallSize;
+	glGenBuffers(1, &bufID);
+	glBindBuffer(GL_ARRAY_BUFFER, bufID);
+	GLfloat * buf=new GLfloat[vertices];
+	int i=0;
+	for(int myY = 0 ; myY<smallSize ; myY++)
+	{
+		for(int myX = 0 ; myX<smallSize; myX++)
+		{
+			buf[i]=x+myX+0.5f;
+			buf[i+1]=(getH(myX,myY)+getH(myX+1,myY)+getH(myX+1,myY+1)+getH(myX,myY+1))/4;
+			buf[i+2]=y+myY+0.5f;
+			i+=3;
+		}
+	}
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*vertices, buf, GL_STATIC_DRAW);
+*/
 	/*for(int i = 0 ; i<size*size ; i++)
 	{
 		height[i]=0;//(i%2+0.25f*(i%4))*0.5f+0.5f;//i*0.01f;

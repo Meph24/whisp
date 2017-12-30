@@ -31,7 +31,7 @@ playerHP(100),flatEarth(false)//,
 	{
 		zombies[i] = 0;
 	}
-	pCount = 1024*8;//zCount * 8;
+	pCount = 1024/8;//zCount * 8;
 	shots = new Zombie_Projectile *[pCount];
 	for (int i = 0; i < pCount; i++)
 	{
@@ -40,10 +40,10 @@ playerHP(100),flatEarth(false)//,
 	wCount = 4;
 	guns = new Zombie_Gun * [wCount];
 
-	guns[0] = new Zombie_Gun("Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new Zombie_AmmoType(358, 79.5f,0.001628170585565067f));//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[1] = new Zombie_Gun("Flamethrower",0.04f,"res/mortar_shoot.wav",1,new Zombie_AmmoType(20, 75,0.005f));//new Zombie_Gun(30000, 800,5.0f);
-	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new Zombie_AmmoType(440,31.8f,0.0022272754325748604f));//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new Zombie_AmmoType(900, 3166,0.0004f));
+	guns[0] = new Zombie_Gun("Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new Zombie_AmmoType(358, 79.5f,0.001628170585565067f),false,{2,0.05f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[1] = new Zombie_Gun("Flamethrower",0.04f,"res/mortar_shoot.wav",1,new Zombie_AmmoType(20, 75,0.005f),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
+	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new Zombie_AmmoType(440,31.8f,0.0022272754325748604f),true,{0.5f,0,0},{1,1,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new Zombie_AmmoType(900, 3166,0.0004f),false,{2,0,0},{1,1,0});
 	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 
 	cam = new CameraFP();
@@ -350,6 +350,10 @@ void Zombie_World::doPhysics(float sec)
 				zombies[i]->posX=old.x;
 				zombies[i]->posZ=old.z;
 				zombies[i]->posY=cm->getHeight(zombies[i]->posX,zombies[i]->posZ);
+				zombies[i]->maxTransition=1-(h/1.5f);
+				if(zombies[i]->maxTransition>1.7f) zombies[i]->maxTransition=1.7f;
+				if(zombies[i]->maxTransition<0) zombies[i]->maxTransition=0;
+
 			}
 
 
@@ -501,8 +505,21 @@ void Zombie_World::loop()
 		sec *= timeFactor;
 		if (sec < 0) sec = 0;
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
-		guns[currentGun]->tick(sec);
-		for(int i=0;i<4;i++)
+
+		int index = -1;
+		for (int i = 0; i < pCount; i++)
+		{
+			if (!shots[i])
+			{
+				index = i;
+				break;
+			}
+		}
+		if(index!=-1)
+		{
+			shots[index] = guns[currentGun]->tick(sec,cam,shot);
+		}
+		for(int i=0;i<400;i++)
 			if (sec*4> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
 		pm->registerTime(timestep++);
 		doPhysics(sec);
@@ -532,8 +549,12 @@ void Zombie_World::loop()
 
 void Zombie_World::trigger(bool pulled)
 {
-	if (!pulled) return;
-	int index = 0;
+	if (!pulled)
+	{
+		guns[currentGun]->stopShooting();
+		return;
+	}
+	int index = -1;
 	for (int i = 0; i < pCount; i++)
 	{
 		if (!shots[i])
@@ -542,11 +563,13 @@ void Zombie_World::trigger(bool pulled)
 			break;
 		}
 	}
+	if(index==-1) return;
 	shots[index] = guns[currentGun]->tryShoot(cam,shot);
 }
 
 void Zombie_World::switchWeapon(int dir)
 {
+	guns[currentGun]->stopShooting();
 	currentGun=(currentGun+dir+wCount*1024)%wCount;//TODO
 	std::cout<<"gun switched to"<<currentGun<<std::endl;
 }

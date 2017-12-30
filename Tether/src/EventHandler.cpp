@@ -47,7 +47,7 @@ void EventHandler::Filter::updateFilter(event e)
 //TEST
 #include "MathModel.h"
 #include "RobonovaGraphics.h"
-extern MathModel * model;
+extern MathModel * myModel;
 extern RobonovaGraphics * robG;
 static int selected = 0;
 static int on = 0;
@@ -153,12 +153,12 @@ void EventHandler::sendOn(EventHandler::event e)
 		int change = 0;
 		if (e.ID == 2048)//mouse x
 		{
-			if (on) robG->cam->beta = e.value / 2;//model->left.a1 = e.value/10;
+			if (on) robG->cam->beta = e.value / 2;//myModel->left.a1 = e.value/10;
 		}
 		else if (e.ID == 2049)//mouse y
 		{
 			if (on) robG->cam->alpha = e.value / 2;
-			//model->left.a1 = e.value/10;
+			//myModel->left.a1 = e.value/10;
 		}
 		else if ((e.ID >= 1050) && (e.ID <= 1059))//0-9
 		{
@@ -196,53 +196,53 @@ void EventHandler::sendOn(EventHandler::event e)
 			switch (selected)
 			{
 			case 0:
-				model->left.a0 += mov;
-				//if (model->left.a0 < -2) model->left.a0 = -2;
+				myModel->left.a0 += mov;
+				//if (myModel->left.a0 < -2) myModel->left.a0 = -2;
 				break;
 			case 1:
-				model->left.a1 += mov;
+				myModel->left.a1 += mov;
 				break;
 			case 2:
-				model->left.a2 += mov;
+				myModel->left.a2 += mov;
 				break;
 			case 3:
-				model->left.a3 += mov;
+				myModel->left.a3 += mov;
 				break;
 			case 4:
-				model->left.a4 += mov;
+				myModel->left.a4 += mov;
 				break;
 			case 5:
-				model->right.a0 += mov;
+				myModel->right.a0 += mov;
 				break;
 			case 6:
-				model->right.a1 += mov;
+				myModel->right.a1 += mov;
 				break;
 			case 7:
-				model->right.a2 += mov;
+				myModel->right.a2 += mov;
 				break;
 			case 8:
-				model->right.a3 += mov;
+				myModel->right.a3 += mov;
 				break;
 			case 9:
-				model->right.a4 += mov;
+				myModel->right.a4 += mov;
 				break;
 			case 10:
-				model->leftArm.a0 += mov;
+				myModel->leftArm.a0 += mov;
 				break;
 			case 11:
-				model->leftArm.a1 += mov;
+				myModel->leftArm.a1 += mov;
 				break;
 			case 12:
-				model->leftArm.a2 += mov;
+				myModel->leftArm.a2 += mov;
 				break;
 			case 13:
-				model->rightArm.a0 += mov;
+				myModel->rightArm.a0 += mov;
 				break;
 			case 14:
-				model->rightArm.a1 += mov;
+				myModel->rightArm.a1 += mov;
 				break;
 			case 15:
-				model->rightArm.a2 += mov;
+				myModel->rightArm.a2 += mov;
 				break;
 			}
 		}

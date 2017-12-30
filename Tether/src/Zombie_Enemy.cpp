@@ -4,7 +4,7 @@
 
 
 Zombie_Enemy::Zombie_Enemy(ITexture * texture, float startX, float startZ,ChunkManager * chm):
-cm(chm),tex(texture),ml(4), posX(startX), posZ(startZ),animStep(0),dead(0)//spawns a random zombie at the given location
+cm(chm),tex(texture),ml(4), posX(startX), posZ(startZ),legDmg(0),animStep(0),dead(0)//spawns a random zombie at the given location
 {
 	posY=(cm->getHeight(startX,startZ));
 	facing = std::rand() % 360;
@@ -18,6 +18,7 @@ cm(chm),tex(texture),ml(4), posX(startX), posZ(startZ),animStep(0),dead(0)//spaw
 		size *= 5;
 		remainingHP *= 40;
 	}
+	totalHP=remainingHP;
 }
 
 
@@ -37,6 +38,8 @@ void Zombie_Enemy::drawTexturedCube(texCooSet tc)
 	tc.topX *= tc.unitSize;
 	tc.topY *= tc.unitSize;
 
+
+
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(tc.startX + tc.sideWidth, tc.startY);//front
@@ -51,7 +54,7 @@ void Zombie_Enemy::drawTexturedCube(texCooSet tc)
 	glTexCoord2f(tc.startX + tc.sideWidth, tc.startY + tc.mainHeight);
 	glVertex3f(0.1, 0, 0.1);
 
-	glTexCoord2f(tc.startX+tc.sideWidth, tc.startY);//left
+	glTexCoord2f(tc.startX+tc.sideWidth, tc.startY);//left //0
 	glVertex3f(0.1, 0.2f, 0.1);
 
 	glTexCoord2f(tc.startX, tc.startY);
@@ -98,7 +101,6 @@ void Zombie_Enemy::drawTexturedCube(texCooSet tc)
 
 	glTexCoord2f(tc.topX, tc.topY);
 	glVertex3f(-0.1, 0.2f, 0.1);
-
 
 	glTexCoord2f(tc.bottomX, tc.bottomY + tc.sideWidth);//bottom
 	glVertex3f(0.1, 0, 0.1);
@@ -185,7 +187,7 @@ void Zombie_Enemy::drawArm(int loc)
 	drawTexturedCube(tc);
 	glPopMatrix();
 }
-void Zombie_Enemy::drawLeg(int loc)
+void Zombie_Enemy::drawLeg(int loc,float strength)
 {
 	texCooSet tc;
 	tc.unitSize = 1 / 16.0f;
@@ -202,7 +204,7 @@ void Zombie_Enemy::drawLeg(int loc)
 
 	glPushMatrix();
 	glTranslatef(0, 0.6f, loc * 0.1f);
-	glRotatef(sin(loc*animStep * 2 *speed/size) * 30, 0, 0, 1);
+	glRotatef(sin(loc*animStep * 2 *speed/size) * 30*strength, 0, 0, 1);
 	glTranslatef(0, -0.6f, 0);
 	glScalef(1, 3, 1);
 	drawTexturedCube(tc);
@@ -211,6 +213,15 @@ void Zombie_Enemy::drawLeg(int loc)
 void Zombie_Enemy::draw(float seconds)
 {
 	animStep += seconds;
+	if(legDmg>0.25f*totalHP)
+	{
+		transition += seconds*2;
+		if(transition>maxTransition)
+		{
+			transition-=seconds*4;
+			if(transition<maxTransition) transition=maxTransition;
+		}
+	}
 	glPushMatrix();
 	glTranslatef(posX, posY, posZ);
 	glRotatef(facing, 0, 1, 0);
@@ -221,14 +232,31 @@ void Zombie_Enemy::draw(float seconds)
 	glEnable(GL_TEXTURE_2D);
 
 	//tilted = 10;
-	drawHead();
 
+	glPushMatrix();
+	float animStrength=1;
+	if(legDmg>0.25f*totalHP)
+	{
+		glTranslatef(-0.25f*transition,0.1f*transition,0);
+		glRotatef(-90*transition, 0, 0, 1);
+		animStrength=0.15f*transition;
+	}
+	drawLeg(1,animStrength);
+	drawLeg(-1,animStrength);
+
+	glPopMatrix();
+
+	if(legDmg>0.25f*totalHP)
+	{
+		glTranslatef(0,-0.4f*transition,0);
+		glRotatef(-35*transition, 0, 0, 1);
+	}
 	drawBody();
+
+	drawHead();
 
 	drawArm(1);
 	drawArm(-1);
-	drawLeg(1);
-	drawLeg(-1);
 
 
 	glDisable(GL_TEXTURE_2D);
@@ -273,14 +301,59 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 
 
 
+	ml.pushMatrix();
+	float animStrength=1;
+	if(legDmg>0.25f*totalHP)
+	{
+		ml.translatef(-0.25f*transition,0.1f*transition,0);
+		ml.rotatef(-90*transition, 0, 0, 1);
+		animStrength=0.15f*transition;
+	}
+
+	ml.pushMatrix();	//leg
+	int loc;
+	Zombie_Physics::hit h;
+	loc = 1;
+	ml.translatef(0, 0.6f, loc * 0.1f);
+	ml.rotatef(sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
+	ml.translatef(0, -0.6f, 0);
+	ml.scalef(1, 3, 1);
+
+	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
+	if (h.projectileIndex != -1) gotHit(h, 4, ph->projectiles);
+
+	ml.popMatrix();
+
+
+	ml.pushMatrix();	//leg
+	loc = -1;
+	ml.translatef(0, 0.6f, loc * 0.1f);
+	ml.rotatef(sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
+	ml.translatef(0, -0.6f, 0);
+	ml.scalef(1, 3, 1);
+
+	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
+	if (h.projectileIndex != -1) gotHit(h, 5, ph->projectiles);
+
+	ml.popMatrix();
+	ml.popMatrix();
+
 
 	ml.pushMatrix();
+
+	if(legDmg>0.25f*totalHP)
+	{
+		ml.translatef(0,-0.4f*transition,0);
+		ml.rotatef(-35*transition, 0, 0, 1);
+	}
+
+	ml.pushMatrix();	//head
 
 	ml.translatef(0, 1.2f, 0);
 	ml.scalef(2, 2, 2);
 	ml.rotatef(tilted, 1, 0, 0);
 
-	Zombie_Physics::hit h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
+	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 
 	if (h.projectileIndex != -1) gotHit(h, 0,ph->projectiles);
 
@@ -288,7 +361,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 	ml.popMatrix();
 
 
-	ml.pushMatrix();
+	ml.pushMatrix();	//body
 	ml.translatef(0, 0.6f, 0);
 	ml.scalef(1, 3, 2);
 
@@ -299,8 +372,8 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 
 
 
-	ml.pushMatrix();
-	int loc = 1;
+	ml.pushMatrix();	//arm
+	loc = 1;
 
 	ml.translatef(0, 1.1f, loc * 0.3f);
 	ml.rotatef(sin(loc*animStep * 2 *speed/size) * 16 + 90, 0, 0, 1);
@@ -312,7 +385,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 
 	ml.popMatrix();
 
-	ml.pushMatrix();
+	ml.pushMatrix();	//arm
 	loc = -1;
 
 	ml.translatef(0, 1.1f, loc * 0.3f);
@@ -325,39 +398,17 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 
 	ml.popMatrix();
 
-
-	ml.pushMatrix();
-	loc = 1;
-	ml.translatef(0, 0.6f, loc * 0.1f);
-	ml.rotatef(sin(loc*animStep * 2 *speed/size) * 30, 0, 0, 1);
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
-
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
-	if (h.projectileIndex != -1) gotHit(h, 4, ph->projectiles);
-
 	ml.popMatrix();
 
 
-	ml.pushMatrix();
-	loc = -1;
-	ml.translatef(0, 0.6f, loc * 0.1f);
-	ml.rotatef(sin(loc*animStep * 2 *speed/size) * 30, 0, 0, 1);
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
-
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
-	if (h.projectileIndex != -1) gotHit(h, 5, ph->projectiles);
-
-	ml.popMatrix();
 }
 
 void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,Zombie_Projectile ** shots)
 {
 	if (hit.projectileIndex == -1) return;
 	float dmgMult = 0;
-	//float armDmgMult = 0;
-	//float legDmgMult = 0;
+	float armDmgMult = 0;
+	float legDmgMult = 0;
 	switch (part)
 	{
 	case 0:
@@ -376,14 +427,24 @@ void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,Zombie_Projectile **
 		break;
 	case 4:
 		dmgMult = 0.55f;
-		//legDmgMult = 1;
+		legDmgMult = 0.55f;
 		break;
 	case 5:
 		dmgMult = 0.55f;
-		//legDmgMult = 1;
+		legDmgMult = 0.55f;
 		break;
 	}
+	legDmg+=legDmgMult*shots[hit.projectileIndex]->pType->damage;
 	remainingHP -= shots[hit.projectileIndex]->pType->damage*dmgMult;
+	if(remainingHP<0)
+	{
+		remainingHP=-totalHP*dmgMult;//TODO
+	}
 	shots[hit.projectileIndex]->pos.y -= 1000;
 	shots[hit.projectileIndex]->posOld.y -= 1000;
+	if((legDmg>0.25f*totalHP)&&(tilted!=-10))
+	{
+		tilted=-10;
+		speed/=2.5f;
+	}
 }

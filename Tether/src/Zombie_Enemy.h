@@ -24,7 +24,7 @@ class Zombie_Enemy
 	void drawHead();
 	void drawBody();
 	void drawArm(int loc);
-	void drawLeg(int loc);
+	void drawLeg(int loc,float strength);
 	void drawTexturedCube(texCooSet textureCoordinates);
 
 	void gotHit(Zombie_Physics::hit hit, int part, Zombie_Projectile ** shots);
@@ -36,9 +36,13 @@ public:
 	float speed;
 	float size;
 
+	float totalHP;
 	float remainingHP;
+	float legDmg;
 
 	float animStep;
+	float transition=0;
+	float maxTransition=1;
 
 	float dead;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SFML/Window.hpp"
+#include <SFML/Window.hpp>
 #include <string>
 
 #define FLAG_NOW 1
