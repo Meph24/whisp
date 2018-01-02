@@ -21,7 +21,7 @@ Zombie_Gun::~Zombie_Gun()
 }
 
 #include <iostream>
-
+#define recoilDampeningTime 0.5f
 Zombie_Projectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex)
 {
 	trigger=true;
@@ -38,9 +38,9 @@ Zombie_Projectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex)
 	curSound=(curSound+1)%maxSound;
 
 	Zombie_Projectile * zp= new Zombie_Projectile(cam, tex,pType);
-	noiseTimer+=timer*5;
+	noiseTimer+=timer*3.2f;
 	vec3 rand={nm.GetValue(noiseTimer,0,0),nm.GetValue(noiseTimer,0,55),0};
-	vec3 recoilNow=recoil+recoilSpread*rand;
+	vec3 recoilNow=recoil*(1-recoilTimer/recoilDampeningTime)+recoilSpread*rand;
 	cam->alpha-=recoilNow.x;
 	cam->beta+=recoilNow.y;
 	return zp;
@@ -48,8 +48,22 @@ Zombie_Projectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex)
 
 Zombie_Projectile * Zombie_Gun::tick(float sec,ICamera3D * cam, ITexture * tex)
 {
-	timer -= sec;
-	if (timer < 0) timer = 0;
+	if(timer>0)
+	{
+		recoilTimer+=sec;
+		timer -= sec;
+		if (timer < 0)
+		{
+			recoilTimer+=timer;
+			timer = 0;
+		}
+		if(recoilTimer>recoilDampeningTime) recoilTimer=recoilDampeningTime;
+	}
+	else
+	{
+		recoilTimer-=sec;
+		if(recoilTimer<0) recoilTimer=0;
+	}
 	if(fullAuto)
 	{
 		if(trigger)
@@ -65,9 +79,9 @@ Zombie_Projectile * Zombie_Gun::tick(float sec,ICamera3D * cam, ITexture * tex)
 			curSound=(curSound+1)%maxSound;
 
 			Zombie_Projectile * zp= new Zombie_Projectile(cam, tex,pType);
-			noiseTimer+=timer*5;
+			noiseTimer+=timer*3.2f;
 			vec3 rand={nm.GetValue(noiseTimer,0,0),nm.GetValue(noiseTimer,0,55),0};
-			vec3 recoilNow=recoil+recoilSpread*rand;
+			vec3 recoilNow=recoil*(1-recoilTimer/recoilDampeningTime)+recoilSpread*rand;
 			cam->alpha-=recoilNow.x;
 			cam->beta+=recoilNow.y;
 			return zp;

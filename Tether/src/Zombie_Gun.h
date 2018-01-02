@@ -22,6 +22,7 @@ class Zombie_Gun
 
 	module::Perlin nm;
 	float noiseTimer=0;
+	float recoilTimer=0;
 public:
 	sf::SoundBuffer sBuf;
 	std::string name;

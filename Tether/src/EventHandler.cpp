@@ -122,17 +122,18 @@ void EventHandler::sendOn(EventHandler::event e)
 		}
 		else if (e.ID == 2053)
 		{
+			float zoomMult=8;
 			if(e.value)
 			{
-				world->cam->zoom/=8;
-				world->mouseInp->sensitivityX/=8;
-				world->mouseInp->sensitivityY/=8;
+				world->cam->zoom/=zoomMult;
+				world->mouseInp->sensitivityX/=zoomMult;
+				world->mouseInp->sensitivityY/=zoomMult;
 			}
 			else
 			{
-				world->cam->zoom*=8;
-				world->mouseInp->sensitivityX*=8;
-				world->mouseInp->sensitivityY*=8;
+				world->cam->zoom*=zoomMult;
+				world->mouseInp->sensitivityX*=zoomMult;
+				world->mouseInp->sensitivityY*=zoomMult;
 			}
 		}
 		else if ((e.ID == 1049) && e.value)
