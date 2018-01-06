@@ -40,10 +40,10 @@ playerHP(100),flatEarth(false)//,
 	wCount = 4;
 	guns = new Zombie_Gun * [wCount];
 
-	guns[0] = new Zombie_Gun("Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new Zombie_AmmoType(358, 79.5f,0.001628170585565067f),false,{2,0.05f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[0] = new Zombie_Gun("Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new Zombie_AmmoType(358, 79.5f,0.001628170585565067f),false,{2,0.15f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	guns[1] = new Zombie_Gun("Flamethrower",0.04f,"res/mortar_shoot.wav",1,new Zombie_AmmoType(20, 75,0.005f),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
-	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new Zombie_AmmoType(440,31.8f,0.0022272754325748604f),true,{1,0,0},{0.5f,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new Zombie_AmmoType(900, 3166,0.0004f),false,{2,0,0},{1,1,0});
+	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new Zombie_AmmoType(440,31.8f,0.0022272754325748604f),true,{1.5f,0,0},{1,1,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new Zombie_AmmoType(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
 	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 
 	cam = new CameraFP();
@@ -600,7 +600,7 @@ void Zombie_World::spawnZombie()
 	float r1 = rand();//TODO change
 	float r2 = ((rand()%32768)/2028.0f + 1)*zombieDist;
 	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ,cm);
-	for(int i=1;i<5000;i++)
+	for(int i=1;i<10;i++)
 	{
 		int z=0;
 			for (int i = 0; i < zCount; i++)

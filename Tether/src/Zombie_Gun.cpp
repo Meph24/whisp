@@ -2,7 +2,7 @@
 
 
 Zombie_Gun::Zombie_Gun(std::string weaponName, float reloadTime,const std::string& filename,float pitchModifier,Zombie_AmmoType * type,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread):
-rld(reloadTime), timer(0),pType(type),nm(),sBuf(),name(weaponName),pitch(pitchModifier),fullAuto(fullAutomatic),trigger(false),recoil(Recoil),recoilSpread(RecoilSpread)
+rld(reloadTime), timer(0),pType(type),nm(),recoilM({1,0,1},0.5f,reloadTime),sBuf(),name(weaponName),pitch(pitchModifier),fullAuto(fullAutomatic),trigger(false),recoil(Recoil),recoilSpread(RecoilSpread)
 {
 	sBuf.loadFromFile(filename);
 	curSound=0;
@@ -25,8 +25,6 @@ Zombie_Gun::~Zombie_Gun()
 Zombie_Projectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex)
 {
 	trigger=true;
-	std::cout<<timer<<std::endl;
-
 	if (timer <= 0)
 	{
 		timer = rld;
@@ -40,50 +38,29 @@ Zombie_Projectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex)
 	Zombie_Projectile * zp= new Zombie_Projectile(cam, tex,pType);
 	noiseTimer+=timer*3.2f;
 	vec3 rand={nm.GetValue(noiseTimer,0,0),nm.GetValue(noiseTimer,0,55),0};
-	vec3 recoilNow=recoil*(1-recoilTimer/recoilDampeningTime)+recoilSpread*rand;
-	cam->alpha-=recoilNow.x;
-	cam->beta+=recoilNow.y;
+	vec3 recoilRand=recoilSpread*rand;
+	recoilM.registerRecoil(recoil,recoilRand,{0,0,0});
 	return zp;
 }
 
 Zombie_Projectile * Zombie_Gun::tick(float sec,ICamera3D * cam, ITexture * tex)
 {
+	vec3 recoilMod=recoilM.getRecoilDiff(sec);
+	cam->alpha-=recoilMod.x;
+	cam->beta+=recoilMod.y;
 	if(timer>0)
 	{
-		recoilTimer+=sec;
 		timer -= sec;
 		if (timer < 0)
 		{
-			recoilTimer+=timer;
 			timer = 0;
 		}
-		if(recoilTimer>recoilDampeningTime) recoilTimer=recoilDampeningTime;
-	}
-	else
-	{
-		recoilTimer-=sec;
-		if(recoilTimer<0) recoilTimer=0;
 	}
 	if(fullAuto)
 	{
 		if(trigger)
 		{
-			if (timer <= 0)
-			{
-				timer = rld;
-			}
-			else return 0;
-
-			sounds[curSound]->play();
-			sounds[curSound]->setPitch(pitch*((rand()%16)/256.0f+1));
-			curSound=(curSound+1)%maxSound;
-
-			Zombie_Projectile * zp= new Zombie_Projectile(cam, tex,pType);
-			noiseTimer+=timer*3.2f;
-			vec3 rand={nm.GetValue(noiseTimer,0,0),nm.GetValue(noiseTimer,0,55),0};
-			vec3 recoilNow=recoil*(1-recoilTimer/recoilDampeningTime)+recoilSpread*rand;
-			cam->alpha-=recoilNow.x;
-			cam->beta+=recoilNow.y;
+			Zombie_Projectile * zp=tryShoot(cam,tex);
 			return zp;
 		}
 	}

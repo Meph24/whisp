@@ -7,6 +7,7 @@
 #include "ICamera3D.h"
 #include "ITexture.h"
 #include "Zombie_AmmoType.h"
+#include "RecoilReturning.h"
 
 #include "MatrixLib.h"
 
@@ -22,7 +23,7 @@ class Zombie_Gun
 
 	module::Perlin nm;
 	float noiseTimer=0;
-	float recoilTimer=0;
+	RecoilReturning recoilM;
 public:
 	sf::SoundBuffer sBuf;
 	std::string name;
