@@ -30,7 +30,7 @@ public:
 	float getHeight(flt x,flt y);//absolute x,y
 	//void vertexH(flt x,flt offsetY,flt z);
 	int getChunkCoo(flt val);//get absolute chunk coordinate from absolute coordinate
-	void render(int lodQ);
+	void render(float lodQ);
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 };

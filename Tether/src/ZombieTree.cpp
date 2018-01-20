@@ -17,7 +17,7 @@ pos(position),tex1(textureLog),tex2(textureLeaves)
 }
 
 Zombie_Tree::Zombie_Tree(vec3 position, flt diameter, flt height,  ITexture* textureLog, ITexture* textureLeaves):
-pos(position),d(diameter),h(height+8),tex1(textureLog),tex2(textureLeaves)
+d(diameter),h(height+8),pos(position),tex1(textureLog),tex2(textureLeaves)
 {
 
 }

@@ -59,7 +59,7 @@ class Zombie_World
 	TexParamSet * tps2;
 
 	int chunkLoadRate;
-	int lodQuality;
+	float lodQuality;
 	int zombieDist;
 
 	void removeZombie(int zid);
@@ -80,7 +80,7 @@ public:
 	void loadStandardTex();
 
 	void trigger(bool pulled);
-	//void trigger2(bool pulled);
+
 	void switchWeapon(int dir);
 
 	void loop();

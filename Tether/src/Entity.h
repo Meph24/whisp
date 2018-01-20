@@ -1,7 +1,7 @@
 /*
  * Entity.h
  *
- *  Created on:	12.03.2017
+ *  Created on:	18.01.2017
  *      Author:	HL65536
  *     Version:	2.0
  */
@@ -9,6 +9,20 @@
 #ifndef SRC_ENTITY_H_
 #define SRC_ENTITY_H_
 
+class Entity:public Tickable
+{
+
+public:
+	Entity();
+	virtual ~Entity();
+};
+
+
+
+
+
+//12.03.2017
+/*
 #include "vec3.h"
 #include "ID.h"
 class Entity
@@ -27,5 +41,5 @@ public:
 	Entity();
 	virtual ~Entity();
 };
-
+*/
 #endif /* SRC_ENTITY_H_ */

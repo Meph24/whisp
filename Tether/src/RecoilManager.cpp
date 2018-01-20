@@ -9,7 +9,7 @@
 #include "RecoilManager.h"
 
 RecoilManager::RecoilManager(int arraySize,float recoilLength):
-totalLength(recoilLength),size(arraySize),start(0),curLen(0),lastRecoil({0,0,0})
+size(arraySize),start(0),curLen(0),lastRecoil({0,0,0}),totalLength(recoilLength)
 {
 	timer=new float[size];
 	recoilComponents=new vec3[size*3];

@@ -96,12 +96,17 @@ fileContents FileAccess::readFile(const char * filename)
 
 	char * ret=new char[(long long int)pos];
 	ka->read(ret,(long long int)pos);
+	//TODO ?
+	return fileContents();//TODO ?
 }
 
 bool FileAccess::writeFile(const char * filename,len length, void* data)
 {
 	std::ofstream * ka=new std::ofstream(filename,std::ofstream::binary);
 	ka->write((char *)data,(long long int)length);
+	//TODO ?
+	return false;
+
 }
 
 FileAccess::~FileAccess()

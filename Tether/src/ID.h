@@ -11,6 +11,7 @@
 
 
 typedef unsigned int ID;
+//typedef unsigned int itemIdent;
 
 
 #endif /* SRC_ID_H_ */

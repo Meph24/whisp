@@ -21,9 +21,9 @@ EvSimMuscle::~EvSimMuscle()
 
 void EvSimMuscle::tick()
 {
-	vec3 dist=b->pos-a->pos;
-	flt lenSq=dist.lengthSq();
-
+	//vec3 dist=b->pos-a->pos;
+	//flt lenSq=dist.lengthSq();
+//TODO
 
 
 

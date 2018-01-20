@@ -23,7 +23,7 @@ graphics(sfmlHandle)
 	IMediaHandle::ContextSettings settings;
 	settings.depth = 24;
 	settings.stencil = 8;
-	settings.antialiasing = 16;
+	settings.antialiasing = 1;
 	settings.openglmajor = 2;
 	settings.openglminor = 0;
 

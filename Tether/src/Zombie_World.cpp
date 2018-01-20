@@ -10,7 +10,7 @@ extern Zombie_MouseInput * mouseInput;
 #include "ZombieTree.h"
 #include <iostream>
 Zombie_World::Zombie_World(sf::Window * w):
-playerHP(100),flatEarth(false)//,
+		flatEarth(false),playerHP(100)//,
 //TEST
 //qm(320,256)
 {
@@ -18,7 +18,7 @@ playerHP(100),flatEarth(false)//,
 	int physDist=*cfg.getint("graphics", "physicsDistance");
 	int renderDist=*cfg.getint("graphics", "renderDistance");
 	chunkLoadRate=*cfg.getint("graphics", "chunkLoadRate");
-	lodQuality=*cfg.getint("graphics", "terrainQuality");
+	lodQuality=*cfg.getfloat("graphics", "terrainQuality");
 	std::cout<<"testStart"<<std::endl;
 	cm=new ChunkManager(16,physDist*2,renderDist);//16,32,6);
 	cm->setMid(0.5f,0.5f);
@@ -63,7 +63,7 @@ playerHP(100),flatEarth(false)//,
 	keyInp = new Zombie_KeyInput(mouseInp, cam);
 	keyInp->speed = 30.6f;
 
-	pm = new PerformanceMeter(11,1000);
+	pm = new PerformanceMeter(12,1000);
 	pm->roundtripUpdateIndex = 0;
 
 	//dirty
@@ -77,15 +77,16 @@ playerHP(100),flatEarth(false)//,
 	ds=new DebugScreen(pm,&g);
 	pm->setName("       Total time",-1);
 	pm->setName("        flush etc",0);
-	pm->setName("       guns+spawn",1);
-	pm->setName("physics  register",2);
-	pm->setName("physics      push",3);
-	pm->setName("physics    hitbox",4);
-	pm->setName("physics getMotion",5);
-	pm->setName("physics     apply",6);
-	pm->setName("           render",7);
-	pm->setName("      debugScreen",8);
-	pm->setName("     chunk update",9);
+	pm->setName("        guns tick",1);
+	pm->setName("            spawn",2);
+	pm->setName("physics  register",3);
+	pm->setName("physics      push",4);
+	pm->setName("physics    hitbox",5);
+	pm->setName("physics getMotion",6);
+	pm->setName("physics     apply",7);
+	pm->setName("           render",8);
+	pm->setName("      debugScreen",9);
+	pm->setName("     chunk update",10);
 }
 
 void Zombie_World::restart()
@@ -519,7 +520,8 @@ void Zombie_World::loop()
 		{
 			shots[index] = guns[currentGun]->tick(sec,cam,shot);
 		}
-		for(int i=0;i<400;i++)
+		pm->registerTime(timestep++);
+		for(int i=0;i<40;i++)
 			if (sec*4> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
 		pm->registerTime(timestep++);
 		doPhysics(sec);

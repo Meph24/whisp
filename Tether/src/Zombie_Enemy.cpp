@@ -4,7 +4,7 @@
 
 
 Zombie_Enemy::Zombie_Enemy(ITexture * texture, float startX, float startZ,ChunkManager * chm):
-cm(chm),tex(texture),ml(4), posX(startX), posZ(startZ),legDmg(0),animStep(0),dead(0)//spawns a random zombie at the given location
+tex(texture),ml(4), posX(startX), posZ(startZ),cm(chm),legDmg(0),animStep(0),dead(0)//spawns a random zombie at the given location
 {
 	posY=(cm->getHeight(startX,startZ));
 	facing = std::rand() % 360;
@@ -407,7 +407,7 @@ void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,Zombie_Projectile **
 {
 	if (hit.projectileIndex == -1) return;
 	float dmgMult = 0;
-	float armDmgMult = 0;
+	//float armDmgMult = 0;
 	float legDmgMult = 0;
 	switch (part)
 	{

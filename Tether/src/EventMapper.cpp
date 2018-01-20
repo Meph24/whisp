@@ -112,6 +112,7 @@ void EventMapper::event(EventHandler::event e)
 
 float EventMapper::getTimeRef()
 {//TODO
+	return 0;
 }
 
 float EventMapper::getStatusAndReset(int indx,float resetTo)

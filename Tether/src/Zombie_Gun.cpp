@@ -37,7 +37,7 @@ Zombie_Projectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex)
 
 	Zombie_Projectile * zp= new Zombie_Projectile(cam, tex,pType);
 	noiseTimer+=timer*3.2f;
-	vec3 rand={nm.GetValue(noiseTimer,0,0),nm.GetValue(noiseTimer,0,55),0};
+	vec3 rand={(float)nm.GetValue(noiseTimer,0,0),(float)nm.GetValue(noiseTimer,0,55),0};
 	vec3 recoilRand=recoilSpread*rand;
 	recoilM.registerRecoil(recoil,recoilRand,{0,0,0});
 	return zp;

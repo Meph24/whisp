@@ -15,6 +15,7 @@ class Compatibility
 	//ID>>24 gives the size, smaller sizes fit in larger things but not the other way round
 	//ID<<8 / 256 gives the type
 public:
+	Compatibility(unsigned int typeSizeCombined);
 	Compatibility(int type,int size);
 	Compatibility();
 	~Compatibility();

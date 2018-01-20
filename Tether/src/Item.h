@@ -1,13 +1,37 @@
 /*
  * Item.h
  *
- *  Created on:	02.04.2017
+ *  Created on:	16.01.2018
  *      Author:	HL65536
- *     Version:	2.0
+ *     Version:	2.0.1
  */
-/*
+
 #ifndef SRC_ITEM_H_
 #define SRC_ITEM_H_
+#include "ItemIdent.h"
+#include "ShortNames.h"
+#include <string>
+class Item: public Tickable
+{
+	std::string name;
+
+public:
+	ItemIdent ID;
+	u32 amount;//non-unique items can be stacks of arbitrary size, stackable items must be copyable
+	float mass;//per unit
+	float volume;//per unit
+
+	float getTotalVolume();
+	float getTotalMass();
+	std::string getDisplayString();
+
+	virtual Item * newClone();
+
+	Item();
+	virtual ~Item();
+};
+
+/*02.04.2017
 #include "ID.h"
 #include <cstdlib>
 
@@ -47,5 +71,5 @@ public:
 };
 
 Item * generateItem(void * targetMemory,void * sourceCompressedMemory);
-
+*/
 #endif /* SRC_ITEM_H_ */

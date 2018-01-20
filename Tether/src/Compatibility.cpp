@@ -29,6 +29,10 @@ bool Compatibility::fitsInsideMe(Compatibility other)
 	return otherSize<=mySize;
 }
 
+Compatibility::Compatibility(unsigned int typeSizeCombined):
+ID(typeSizeCombined)
+{}
+
 bool Compatibility::doIFitInside(Compatibility other)
 {
 	return other.fitsInsideMe(*this);

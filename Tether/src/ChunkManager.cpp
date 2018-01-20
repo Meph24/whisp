@@ -22,7 +22,7 @@ float ChunkManager::getHeight(flt x, flt y)
 }
 
 #include <iostream>
-void ChunkManager::render(int lodQ)
+void ChunkManager::render(float lodQ)
 {
 	int startX=chunksPerAxis/2-renderDistanceChunks;
 	int startY=chunksPerAxis/2-renderDistanceChunks;
@@ -43,13 +43,14 @@ void ChunkManager::render(int lodQ)
 			int indx=runy*chunksPerAxis+runx;
 			if(chunks[indx])
 			{
-				int distX=(runx-midX);
+				float distX=(runx-midX);
 				if (distX<0) distX=-distX;
 				int distY=(runy-midY);
 				if (distY<0) distY=-distY;
 				int dist=distX;
 				if(distY>distX) dist=distY;
 				int lod=1;
+				if(dist==0) dist=0.5;
 				dist/=lodQ;
 				if(dist>chunkSize) dist=chunkSize;
 				for(int i=1;i<=dist;i++)
