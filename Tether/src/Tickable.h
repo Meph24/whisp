@@ -10,7 +10,6 @@
 #define SRC_TICKABLE_H_
 class TickServiceProvider;
 class Entity;
-class Tickable;
 #include "TickServiceProvider.h"
 class Tickable
 {
