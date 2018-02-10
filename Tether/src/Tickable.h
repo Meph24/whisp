@@ -9,8 +9,8 @@
 #ifndef SRC_TICKABLE_H_
 #define SRC_TICKABLE_H_
 class TickServiceProvider;
+//#include "TickServiceProvider.h"
 class Entity;
-#include "TickServiceProvider.h"
 class Tickable
 {
 public:

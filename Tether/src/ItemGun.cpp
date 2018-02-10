@@ -13,7 +13,10 @@
 #include "MatrixLib.h"
 #include <cmath>
 
-ItemGun::ItemGun()
+#include "TickServiceProvider.h"
+
+ItemGun::ItemGun():
+recoilM({0,0,0},0,0)//TODO
 {
 	ID.group=ITEM_GROUP_UNIQUE_TICK;
 }
@@ -41,7 +44,7 @@ void ItemGun::fire(ItemAmmo * ammo, TickServiceProvider* tsp)
 		float rand4=0;//TODO -1 1
 		ICamera3D * cam=tsp->getHolderCamera();
 		vec3 pos(cam->posX,cam->posY,cam->posZ);
-		vec3 vBase=(0,0,-vel);//rand3*vel*maxSpreadX,rand4*vel*maxSpreadY,-vel);//TODO spread pattern should be a circle
+		vec3 vBase={0,0,-vel};//rand3*vel*maxSpreadX,rand4*vel*maxSpreadY,-vel);//TODO spread pattern should be a circle
 		MatrixLib2 ml(2);
 		ml.loadIdentity();
 		ml.rotatef(-cam->beta, 0, 1, 0);

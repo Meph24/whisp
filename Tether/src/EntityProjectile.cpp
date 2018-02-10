@@ -7,7 +7,7 @@
  */
 
 #include "EntityProjectile.h"
-
+#include "TickServiceProvider.h"
 
 EntityProjectile::EntityProjectile(ItemAmmo * item,vec3 position,vec3 velocity):
 pos(position),v(velocity),fromItem(item),posOld(position)
