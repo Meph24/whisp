@@ -7,7 +7,8 @@
  */
 
 #include "EntityContainer.h"
-
+//TODO
+/*
 EntityContainer::EntityContainer():
 nextUID(0)
 {
@@ -46,7 +47,7 @@ entityPtr EntityContainer::getEntity(entityID id)
 	return ret;
 }
 
-/*
+
 template <typename T>
 class EntPtr
 {

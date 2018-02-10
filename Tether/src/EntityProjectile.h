@@ -10,12 +10,27 @@
 #define SRC_ENTITYPROJECTILE_H_
 
 #include "Entity.h"
+#include "ItemAmmo.h"
+#include "TextureDummy.h"
 
 class EntityProjectile: public Entity
 {
+	ItemAmmo * fromItem;
+	vec3 posOld;
+
+
+
+
+	static ITexture * tex;
 public:
-	EntityProjectile();
+	EntityProjectile(ItemAmmo * item,vec3 position,vec3 velocity);//gives item ownership to the Projectile
 	~EntityProjectile();
+	virtual void draw();
+	virtual void tick(float time,TickServiceProvider * tsp);
+
+	static void setTexture(ITexture * texture);
 };
+
+ITexture * EntityProjectile::tex=new TextureDummy();
 
 #endif /* SRC_ENTITYPROJECTILE_H_ */

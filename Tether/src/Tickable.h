@@ -8,13 +8,16 @@
 
 #ifndef SRC_TICKABLE_H_
 #define SRC_TICKABLE_H_
-
+class TickServiceProvider;
+class Entity;
+class Tickable;
+#include "TickServiceProvider.h"
 class Tickable
 {
 public:
-	virtual void tick(float time);
+	virtual void tick(float time,TickServiceProvider * tsp)=0;
 	Tickable();
-	~Tickable();
+	virtual ~Tickable();
 };
 
 #endif /* SRC_TICKABLE_H_ */

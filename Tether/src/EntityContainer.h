@@ -8,7 +8,8 @@
 
 #ifndef SRC_ENTITYCONTAINER_H_
 #define SRC_ENTITYCONTAINER_H_
-
+//TODO
+/*
 #include "Entity.h"
 
 typedef struct
@@ -55,5 +56,5 @@ public:
 	EntityContainer();
 	~EntityContainer();
 };
-
+*/
 #endif /* SRC_ENTITYCONTAINER_H_ */

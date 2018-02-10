@@ -1,22 +1,21 @@
 /*
- * MutPart.cpp
+ * GUI.cpp
  *
- *  Created on:	Aug 29, 2017
+ *  Created on:	Jan 23, 2018
  *      Author:	HL65536
  *     Version:	1.0
  */
 
-#include "MutPart.h"
-/*
-MutPart::MutPart()
+#include "GUI.h"
+
+GUI::GUI()
 {
 	// TODO Auto-generated constructor stub
 
 }
 
-MutPart::~MutPart()
+GUI::~GUI()
 {
 	// TODO Auto-generated destructor stub
 }
 
-*/

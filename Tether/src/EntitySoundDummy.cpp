@@ -7,7 +7,8 @@
  */
 
 #include "EntitySoundDummy.h"
-
+//TODO
+/*
 EntitySoundDummy::EntitySoundDummy()
 {
 	// TODO Auto-generated constructor stub
@@ -24,3 +25,4 @@ void EntitySoundDummy::tick(Entity * past,Entity * future,float sec)
 	if(attachedSounds==0) future->markDelete=true;
 	((EntitySoundDummy *)past)->attachedSounds=0;
 }
+*/

@@ -11,9 +11,6 @@
 Tickable::Tickable()
 {}
 
-void Tickable::tick(float time)
-{}
-
 Tickable::~Tickable()
 {}
 

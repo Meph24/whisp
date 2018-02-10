@@ -7,7 +7,8 @@
  */
 
 #include "SoundManager.h"
-
+//TODO
+/*
 SoundManager::SoundManager(EntityContainer * eContainer):
 container(eContainer),
 masterVolume(1),
@@ -21,3 +22,4 @@ SoundManager::~SoundManager()
 
 }
 
+*/

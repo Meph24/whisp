@@ -8,6 +8,8 @@
 
 #ifndef SRC_SOUNDMANAGER_H_
 #define SRC_SOUNDMANAGER_H_
+//TODO
+/*
 #include "EntityContainer.h"
 class SoundManager
 {
@@ -19,5 +21,5 @@ public:
 	SoundManager(EntityContainer * eContainer);
 	~SoundManager();
 };
-
+*/
 #endif /* SRC_SOUNDMANAGER_H_ */

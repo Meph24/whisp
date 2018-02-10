@@ -4,7 +4,7 @@ resolutionY=1080
 renderDistance=80
 physicsDistance=80
 chunkLoadRate=16
-terrainQuality=1
+terrainQuality=1.0
 
 
 #test

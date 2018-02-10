@@ -9,12 +9,23 @@
 #ifndef SRC_ITEMGUN_H_
 #define SRC_ITEMGUN_H_
 
-#include "Item.h"
+#include "ItemAmmo.h"
+#include "MatrixLib.h"
+#include "RecoilReturning.h"
 
 class ItemGun: public Item
 {
+	float barrelEfficiency;//longer barrels are more efficient
+	float additionalEnergy;//used in crossbow to store energy;
+
+	vec3 recoil;
+	vec3 recoilSpread;
+	RecoilReturning recoilM;
+
 public:
-	virtual void tick(float time);
+	void fire(ItemAmmo * ammo,TickServiceProvider * tsp);//this is called when the logic decided that a shot should fall, does not delete the item
+
+	virtual void tick(float time,TickServiceProvider * tsp);
 	ItemGun();
 	virtual ~ItemGun();
 };

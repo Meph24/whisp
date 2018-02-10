@@ -7,7 +7,8 @@
  */
 
 #include "SoundAtEntity.h"
-
+//TODO
+/*
 SoundAtEntity::SoundAtEntity(entityID e,sf::SoundBuffer * buf):
 sound(*buf),
 eID(e),
@@ -74,3 +75,4 @@ bool SoundAtEntity::update(EntityContainer * container,float secSinceTick,float 
 	return sound.getStatus()==sf::SoundSource::Status::Stopped;
 }
 
+*/

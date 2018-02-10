@@ -8,7 +8,8 @@
 
 #ifndef SRC_SOUNDATENTITY_H_
 #define SRC_SOUNDATENTITY_H_
-
+//TODO
+/*
 #include <SFML/Audio.hpp>
 #include "EntityContainer.h"
 #include "MatrixLib.h"
@@ -34,5 +35,5 @@ public:
 	bool update(EntityContainer * container,float secSinceTick,float secSinceUpdate,float myVolume,float myPitch,mat4 listener);
 
 };
-
+*/
 #endif /* SRC_SOUNDATENTITY_H_ */

@@ -8,11 +8,17 @@
 
 #ifndef SRC_ENTITY_H_
 #define SRC_ENTITY_H_
-
-class Entity:public Tickable
+class TickServiceProvider;
+class Entity;
+#include "Tickable.h"
+#include "MatrixLib.h"
+class Entity: public Tickable
 {
-
 public:
+	vec3 pos;
+	vec3 v;
+
+	virtual void draw()=0;
 	Entity();
 	virtual ~Entity();
 };

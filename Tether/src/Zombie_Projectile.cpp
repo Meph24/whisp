@@ -1,6 +1,8 @@
 #include "Zombie_Projectile.h"
 
 #include "MatrixLib2.h"
+#include <cstdlib>
+
 Zombie_Projectile::Zombie_Projectile(ICamera3D * cam, ITexture * t,Zombie_AmmoType * type):
 pType(type), tex(t)
 {
@@ -11,8 +13,12 @@ pType(type), tex(t)
 	float velZ = -type->speed;
 	float velY = 0;
 	float velX = 0;
+	float rand3=(rand()%1024)/512.0f-512.0f;//TODO remove
 	MatrixLib2 ml(2);
 	ml.loadIdentity();
+
+	ml.rotatef(rand3*180, 0, 0, 1);//TODO remove, test only
+
 	ml.rotatef(-cam->beta, 0, 1, 0);
 	ml.rotatef(-cam->alpha, 1, 0, 0);
 	ml.rotatef(-cam->gamma, 0, 0, 1);
