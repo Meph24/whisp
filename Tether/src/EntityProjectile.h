@@ -31,6 +31,5 @@ public:
 	static void setTexture(ITexture * texture);
 };
 
-ITexture * EntityProjectile::tex=new TextureDummy();
 
 #endif /* SRC_ENTITYPROJECTILE_H_ */

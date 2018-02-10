@@ -9,9 +9,17 @@
 #include "EntityProjectile.h"
 #include "TickServiceProvider.h"
 
+
+ITexture * EntityProjectile::tex=new TextureDummy();
+
+
 EntityProjectile::EntityProjectile(ItemAmmo * item,vec3 position,vec3 velocity):
-pos(position),v(velocity),fromItem(item),posOld(position)
-{}
+//pos(position),v(velocity),
+fromItem(item),posOld(position)
+{
+	pos=position;
+	v=velocity;
+}
 
 EntityProjectile::~EntityProjectile()
 {

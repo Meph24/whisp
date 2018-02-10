@@ -9,7 +9,6 @@
 #ifndef SRC_ENTITY_H_
 #define SRC_ENTITY_H_
 class TickServiceProvider;
-class Entity;
 #include "Tickable.h"
 #include "MatrixLib.h"
 class Entity: public Tickable
