@@ -13,15 +13,23 @@ pType(type), tex(t)
 	float velZ = -type->speed;
 	float velY = 0;
 	float velX = 0;
-	float rand3=(rand()%1024)/512.0f-512.0f;//TODO remove
+	float rand3=(rand()%1024)/512.0f-1.0f;//TODO remove
+	float rand4=(rand()%1024)/512.0f-1.0f;//TODO remove
 	MatrixLib2 ml(2);
 	ml.loadIdentity();
 
-	ml.rotatef(rand3*180, 0, 0, 1);//TODO remove, test only
+	//ml.rotatef(rand3*180, 0, 0, 1);//TODO remove, test only
 
 	ml.rotatef(-cam->beta, 0, 1, 0);
 	ml.rotatef(-cam->alpha, 1, 0, 0);
 	ml.rotatef(-cam->gamma, 0, 0, 1);
+
+	ml.scalef(10,0.5,1);
+	ml.rotatef(rand4*90, 0, 0, 1);//TODO remove, test only
+	ml.rotatef(rand3*3, 1, 0, 0);//TODO remove, test only
+
+
+
 	v.x = ml.curMatrix[0] * velX + ml.curMatrix[4] * velY + ml.curMatrix[8] * velZ;
 	v.y = ml.curMatrix[1] * velX + ml.curMatrix[5] * velY + ml.curMatrix[9] * velZ;
 	v.z = ml.curMatrix[2] * velX + ml.curMatrix[6] * velY + ml.curMatrix[10] * velZ;

@@ -31,7 +31,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	{
 		zombies[i] = 0;
 	}
-	pCount = 1024/8;//zCount * 8;
+	pCount = 1024;//zCount * 8;
 	shots = new Zombie_Projectile *[pCount];
 	for (int i = 0; i < pCount; i++)
 	{
