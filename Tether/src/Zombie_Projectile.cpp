@@ -18,17 +18,18 @@ pType(type), tex(t)
 	MatrixLib2 ml(2);
 	ml.loadIdentity();
 
-	//ml.rotatef(rand3*180, 0, 0, 1);//TODO remove, test only
 
 	ml.rotatef(-cam->beta, 0, 1, 0);
 	ml.rotatef(-cam->alpha, 1, 0, 0);
 	ml.rotatef(-cam->gamma, 0, 0, 1);
 
-	ml.scalef(10,0.5,1);
-	ml.rotatef(rand4*90, 0, 0, 1);//TODO remove, test only
-	ml.rotatef(rand3*3, 1, 0, 0);//TODO remove, test only
-
-
+	float maxSpreadX=1/60.0f;//TODO remove, test only
+	float maxSpreadY=1/60.0f;//TODO remove, test only
+	float greater=maxSpreadX>maxSpreadY?maxSpreadX:maxSpreadY;
+	if(greater!=0)
+		ml.scalef(maxSpreadX/greater,maxSpreadY/greater,1);//allow horizontal spread to be different to vertical
+	ml.rotatef(rand4*90, 0, 0, 1);//produces elliptical spread
+	ml.rotatef(rand3*greater, 1, 0, 0);//distance from center of aim is chosen by rand3
 
 	v.x = ml.curMatrix[0] * velX + ml.curMatrix[4] * velY + ml.curMatrix[8] * velZ;
 	v.y = ml.curMatrix[1] * velX + ml.curMatrix[5] * velY + ml.curMatrix[9] * velZ;

@@ -15,8 +15,15 @@
 
 class ItemGun: public Item
 {
-	float barrelEfficiency;//longer barrels are more efficient
-	float additionalEnergy;//used in crossbow to store energy;
+	float barrelEfficiency;//longer barrels are more efficient; 0-1
+	float additionalEnergy;//used in crossbow to store energy; unit: J
+
+	float rotation;//twist of the barrel,
+	//influences spread +/- depending on type of ammo,
+	//unit: rad/m
+
+
+
 
 	vec3 recoil;
 	vec3 recoilSpread;

@@ -26,7 +26,7 @@ EntityProjectile::~EntityProjectile()
 	delete fromItem;
 }
 
-void EntityProjectile::draw()
+void EntityProjectile::draw()//TODO replace
 {
 	tex->bind();
 	glColor3f(1.0f,1.0f, 0.1f);

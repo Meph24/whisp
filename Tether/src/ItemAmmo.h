@@ -24,6 +24,7 @@ public:
 	float drag;//calulated from area,Cd,mass,constants
 	float explEnergy;//energy contained in the cartridge (0 for crossbow bolt)
 	float randomEnergyDev;//as part of whole e.g. 0.02
+	float spinPenalty;//radius of barrel minus bullet radius; unit: m
 	Compatibility upC;
 	virtual Item * newClone();
 	virtual void tick(float time,TickServiceProvider * tsp);
