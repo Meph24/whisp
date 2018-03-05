@@ -26,8 +26,15 @@ void ItemGun::tick(float time,TickServiceProvider * tsp)
 
 }
 
-void ItemGun::fire(ItemAmmo * ammo, TickServiceProvider* tsp)
+#include "myAssert.h"
+void ItemGun::fire(TickServiceProvider* tsp)
 {
+	assert(chamber!=0);
+	assert(chamber->gunC.doIFitInside(ammoC));
+	assert(chamber->amount==1);
+
+	ItemAmmo * ammo=chamber;
+	chamber=0;
 	float rand1=0;//TODO -1 1
 	float rand2=0;//TODO -1 1
 	float cartridgeEnergy=ammo->explEnergy*barrelEfficiency;
@@ -66,6 +73,20 @@ void ItemGun::fire(ItemAmmo * ammo, TickServiceProvider* tsp)
 		EntityProjectile * proj=new EntityProjectile(ammo,pos,vProj);
 		tsp->spawnEntity(proj);
 	}
+}
+void ItemGun::loadChamber(ItemAmmo* ammo)
+{
+	assert(ammo!=0);
+	assert(ammo->gunC.doIFitInside(ammoC));
+	assert(ammo->amount==1);
+	assert(chamber==0);
+
+	chamber=ammo;
+}
+
+void ItemGun::trigger(bool pulled)
+{
+	triggerIsPulled(pulled);
 }
 
 ItemGun::~ItemGun()

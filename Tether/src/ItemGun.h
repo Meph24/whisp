@@ -22,15 +22,23 @@ class ItemGun: public Item
 	//influences spread +/- depending on type of ammo,
 	//unit: rad/m
 
-
+	ItemAmmo * chamber;
+	Compatibility ammoC;
+	Compatibility containerC;
 
 
 	vec3 recoil;
 	vec3 recoilSpread;
 	RecoilReturning recoilM;
 
+	bool triggerIsPulled;
+
 public:
-	void fire(ItemAmmo * ammo,TickServiceProvider * tsp);//this is called when the logic decided that a shot should fall, does not delete the item
+	void fire(TickServiceProvider * tsp);//this is called when the logic decided that a shot should fall, uses ammo in chamber and sets it to 0
+
+	void loadChamber(ItemAmmo * ammo);//this is called when the logic decided that now a shot is being loaded into the chamber
+
+	void trigger(bool pulled);//call this whenever triggerIsPulled status should change
 
 	virtual void tick(float time,TickServiceProvider * tsp);
 	ItemGun();

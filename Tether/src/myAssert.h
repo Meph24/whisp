@@ -9,6 +9,8 @@
 #define SRC_MYASSERT_H_
 
 //#define NDEBUG
+//this define deletes all asserts, making them not consume any CPU time
+//use for real releases
 
 #include <assert.h>
 

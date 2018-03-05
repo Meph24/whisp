@@ -628,3 +628,23 @@ void Zombie_World::markRestart()
 {
 	reset = true;
 }
+
+void Zombie_World::spawnEntity(Entity* e)
+{
+	//TODO
+}
+
+ICamera3D* Zombie_World::getHolderCamera()
+{
+	return cam;
+}
+
+ChunkManager* Zombie_World::getChunkManager()
+{
+	return cm;
+}
+
+void Zombie_World::requestDestroy(Entity* e)
+{
+
+}

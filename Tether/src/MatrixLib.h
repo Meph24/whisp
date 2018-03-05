@@ -25,6 +25,9 @@ vec3 operator*(mat4 a, vec3 b);
 //inline
 vec3 operator*(vec3 b, mat4 a);
 
+bool operator<(vec3 a,vec3 b);
+bool operator>(vec3 a,vec3 b);
+
 
 //TODO
 

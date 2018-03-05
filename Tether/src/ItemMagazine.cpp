@@ -15,7 +15,7 @@ ItemMagazine::ItemMagazine()
 u32 ItemMagazine::maximumAdd(Item* item)
 {
 	if(item->ID.group!=ITEM_GROUP_AMMO) return 0;
-	if(!((ItemAmmo *) item)->upC.doIFitInside(downC)) return 0;
+	if(!((ItemAmmo *) item)->containerC.doIFitInside(downC)) return 0;
 	int ret=capacity;
 	int c=items.size();
 	for(int i = 0 ; i<c ; i++)

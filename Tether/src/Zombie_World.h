@@ -18,7 +18,8 @@
 #include "PerformanceMeter.h"
 #include "DebugScreen.h"
 #include "ChunkManager.h"
-class Zombie_World
+#include "TickServiceProvider.h"
+class Zombie_World: public TickServiceProvider
 {
 	//TEST
 	//QuatMandel qm;
@@ -76,6 +77,15 @@ public:
 	float timeFactor = 1;
 	Zombie_World(sf::Window * w);
 	~Zombie_World();
+
+
+
+	void spawnEntity(Entity * e);//spawns Entity into World
+	ICamera3D * getHolderCamera();//can return 0 if currently not held
+	ChunkManager * getChunkManager();
+	void requestDestroy(Entity * e);
+
+
 
 	void loadStandardTex();
 

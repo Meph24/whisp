@@ -23,6 +23,8 @@ class EntityProjectile: public Entity
 
 	static ITexture * tex;
 public:
+
+
 	EntityProjectile(ItemAmmo * item,vec3 position,vec3 velocity);//gives item ownership to the Projectile
 	~EntityProjectile();
 	virtual void draw();

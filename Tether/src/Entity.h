@@ -16,8 +16,11 @@ class Entity: public Tickable
 public:
 	vec3 pos;
 	vec3 v;
+	vec3 aabbOlow;//AABB offset to pos on the low end
+	vec3 aabbOhigh;//AABB offset to pos on the high end//TODO best way?
 
 	virtual void draw()=0;
+	virtual void onAABBintersect(Entity * other);
 	Entity();
 	virtual ~Entity();
 };

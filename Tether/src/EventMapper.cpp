@@ -65,7 +65,7 @@ void EventMapper::event(EventHandler::event e)
 			if(myM.condition>0&&status[myM.condition]==0) evAsTrue=true;
 			else if(myM.condition<0&&status[-myM.condition]!=0) evAsTrue=true;
 			if(!evAsTrue) continue;
-			if(myM.mode==MAPPER_MODE_EMPTY) ;//do nothing
+			if(myM.mode==MAPPER_MODE_EMPTY) (void)0;//do nothing
 			else if(myM.mode==MAPPER_MODE_HOLD)
 			{
 				if(e.value>0)

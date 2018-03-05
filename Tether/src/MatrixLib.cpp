@@ -24,4 +24,18 @@ vec3 operator*(mat3 mat,vec3 b)
 //inline
 vec3 operator*(vec3 b, mat4 a){ return a*b; };
 //inline
-vec3 operator*(vec3 b, mat3 a){ return a*b; };
+vec3 operator*(vec3 b, mat3 a)
+{
+	return a * b;
+}
+;
+
+bool operator <(vec3 a, vec3 b)
+{
+	return (a.x<b.x)&&(a.y<b.y)&&(a.z<b.z);
+}
+
+bool operator >(vec3 a, vec3 b)
+{
+	return (a.x>b.x)&&(a.y>b.y)&&(a.z>b.z);
+}

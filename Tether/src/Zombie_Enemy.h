@@ -1,11 +1,14 @@
-#pragma once
+
+#ifndef SRC_ZOMBIE_ENEMY_H_
+#define SRC_ZOMBIE_ENEMY_H_
+
 #include "ITexture.h"
 #include "Zombie_Physics.h"
 #include "ChunkManager.h"
 class Zombie_Enemy
 {
 
-	typedef struct{
+	struct texCooSet{
 		float unitSize;
 		float startX, startY;
 		float mainHeight;
@@ -13,7 +16,7 @@ class Zombie_Enemy
 		float sideWidth;
 		float topX, topY;
 		float bottomX, bottomY;
-	} texCooSet;
+	};
 
 	ITexture * tex;
 
@@ -54,3 +57,4 @@ public:
 	void checkHitboxes(Zombie_Physics * ph);
 };
 
+#endif /* SRC_ZOMBIE_ENEMY_H_ */
