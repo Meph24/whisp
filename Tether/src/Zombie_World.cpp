@@ -324,13 +324,13 @@ void Zombie_World::doPhysics(float sec)
 	{
 		if (zombies[i])
 		{
-			vec3 old=vec3(zombies[i]->posX,zombies[i]->posY,zombies[i]->posZ);
+			vec3 old=zombies[i]->pos;
 
-			zombies[i]->posX += (zombies[i]->speed)*cos(zombies[i]->facing *TAU/360)*sec;//Zombie walk "AI"
-			zombies[i]->posZ += -(zombies[i]->speed)*sin(zombies[i]->facing*TAU/360)*sec;
-			zombies[i]->posY =cm->getHeight(zombies[i]->posX,zombies[i]->posZ);
+			zombies[i]->pos.x += (zombies[i]->speed)*cos(zombies[i]->facing *TAU/360)*sec;//Zombie walk "AI"
+			zombies[i]->pos.z += -(zombies[i]->speed)*sin(zombies[i]->facing*TAU/360)*sec;
+			zombies[i]->pos.y =cm->getHeight(zombies[i]->pos.x,zombies[i]->pos.z);
 
-			vec3 newVec=vec3(zombies[i]->posX,zombies[i]->posY,zombies[i]->posZ);
+			vec3 newVec=zombies[i]->pos;
 			vec3 moved=(newVec-old);
 			bool chunkBorder=(old.y==defaultHeight)^(newVec.y==defaultHeight);
 			if(moved.lengthSq()>0.0000000001f)
@@ -348,9 +348,9 @@ void Zombie_World::doPhysics(float sec)
 					speedModB=1;
 				}
 				old+=flat*speedModA*speedModB;
-				zombies[i]->posX=old.x;
-				zombies[i]->posZ=old.z;
-				zombies[i]->posY=cm->getHeight(zombies[i]->posX,zombies[i]->posZ);
+				zombies[i]->pos.x=old.x;
+				zombies[i]->pos.z=old.z;
+				zombies[i]->pos.y=cm->getHeight(zombies[i]->pos.x,zombies[i]->pos.z);
 				zombies[i]->maxTransition=1-(h/1.5f);
 				if(zombies[i]->maxTransition>1.7f) zombies[i]->maxTransition=1.7f;
 				if(zombies[i]->maxTransition<0) zombies[i]->maxTransition=0;
@@ -363,7 +363,7 @@ void Zombie_World::doPhysics(float sec)
 			//zombies[i]->posY =cm->getHeight(zombies[i]->posX/1000,zombies[i]->posZ/1000)*1000;
 
 			//std::cout<<"test"<<zombies[i]->posY<<std::endl;
-			float wishAngle=atan2(zombies[i]->posX - cam->posX, zombies[i]->posZ - cam->posZ);
+			float wishAngle=atan2(zombies[i]->pos.x - cam->posX, zombies[i]->pos.z - cam->posZ);
 			wishAngle *= 360 / TAU;
 			wishAngle += 90;
 			float dif = abs(wishAngle - zombies[i]->facing);
@@ -372,7 +372,7 @@ void Zombie_World::doPhysics(float sec)
 			if (difplus < dif) zombies[i]->facing += 360;
 			else if (difminus<dif) zombies[i]->facing -= 360;
 			zombies[i]->facing = zombies[i]->facing *(1 - sec) + sec*wishAngle;
-			physics->registerObject(i, zombies[i]->speed/30, zombies[i]->posX, zombies[i]->posZ,0.3f*zombies[i]->size);
+			physics->registerObject(i, zombies[i]->speed/30, zombies[i]->pos.x, zombies[i]->pos.z,0.3f*zombies[i]->size);
 		}
 	}
 	physics->registerObject(zCount, keyInp->speed/30, cam->posX, cam->posZ, 0.4f);
@@ -413,8 +413,8 @@ void Zombie_World::doPhysics(float sec)
 			else
 			{
 				Zombie_Physics::motion m = physics->getMotion(i, sec);
-				zombies[i]->posX += m.x;
-				zombies[i]->posZ += m.z;
+				zombies[i]->pos.x += m.x;
+				zombies[i]->pos.z += m.z;
 				if ((zombies[i]->remainingHP) < 0) (zombies[i]->dead) += sec * 240;
 			}
 		}

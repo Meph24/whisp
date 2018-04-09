@@ -8,9 +8,13 @@
 
 #ifndef SRC_CHUNKMANAGER_H_
 #define SRC_CHUNKMANAGER_H_
+
+class Chunk;
 #include "Chunk.h"
-#include "MatrixLib.h"
-class ChunkManager
+#include "Tickable.h"
+#include "Spacevec.h"
+
+class ChunkManager: public Tickable
 {
 	int chunkSize;//size of one chunk
 	int chunksPerAxis;//width and height in chunks
@@ -18,19 +22,24 @@ class ChunkManager
 	Chunk ** chunksBuf1;
 	Chunk ** chunksBuf2;
 
-	int lowX;//chunk coordinate of first chunk
-	int lowY;
+	chunkNum lowX;//chunk coordinate of first chunk
+	chunkNum lowZ;
 	int renderDistanceChunks;
-	int getIndx(int cx,int cy);//from absolute chunk coordinates
-	int getIndx(int cx,int cy,int newLowX,int newLowY);//from absolute chunk coordinates
+	int getIndx(spacevec abs);
+	int getIndx(chunkNum cx,chunkNum cz);//from absolute chunk coordinates
+	int getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ);//from absolute chunk coordinates
 public:
-	vec3 getWind(flt x,flt y);
+	void tick(float time,TickServiceProvider * tsp);
+	spacevec getWind(spacevec abs);
 	void generateMissing(int count);
-	void setMid(flt x,flt y);//absolute x,ya
-	float getHeight(flt x,flt y);//absolute x,y
-	//void vertexH(flt x,flt offsetY,flt z);
-	int getChunkCoo(flt val);//get absolute chunk coordinate from absolute coordinate
-	void render(float lodQ);
+	void setMid(spacevec abs);//absolute x,z
+	spacelen getHeight(spacevec abs);//absolute x,z
+	void render(float lodQ, spacevec camOffset);
+	flt toMeters(spacelen l);
+	vec3 toMeters(spacevec v);
+	spacelen fromMeters(flt l);
+	spacevec fromMeters(vec3 v);
+	//Chunk * getChunk(Position p);
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 };

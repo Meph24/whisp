@@ -8,47 +8,47 @@
 
 #include "ChunkManager.h"
 
-float ChunkManager::getHeight(flt x, flt y)
+spacelen ChunkManager::getHeight(spacevec abs)
 {
-	int cx=getChunkCoo(x);
-	int cy=getChunkCoo(y);
+	chunkNum cx=abs.x.intpart;
+	chunkNum cz=abs.z.intpart;
 	if(cx<lowX) return defaultHeight;
-	if(cy<lowY) return defaultHeight;
+	if(cz<lowZ) return defaultHeight;
 	if(cx>=(lowX+chunksPerAxis)) return defaultHeight;
-	if(cy>=(lowY+chunksPerAxis)) return defaultHeight;
-	if(chunks[getIndx(cx,cy)])
-		return chunks[getIndx(cx,cy)]->getHeight(x,y);
+	if(cz>=(lowZ+chunksPerAxis)) return defaultHeight;
+	if(chunks[getIndx(cx,cz)])
+		return chunks[getIndx(cx,cz)]->getHeight(abs.x.floatpart,abs.z.floatpart);
 	else return defaultHeight;
 }
 
 #include <iostream>
-void ChunkManager::render(float lodQ)
+void ChunkManager::render(float lodQ, spacevec camOffset)
 {
 	int startX=chunksPerAxis/2-renderDistanceChunks;
-	int startY=chunksPerAxis/2-renderDistanceChunks;
+	int startZ=chunksPerAxis/2-renderDistanceChunks;
 	int stopX=startX+renderDistanceChunks*2;
-	int stopY=startY+renderDistanceChunks*2;
+	int stopZ=startZ+renderDistanceChunks*2;
 	if(startX<0) startX=0;
-	if(startY<0) startY=0;
+	if(startZ<0) startZ=0;
 	if(stopX>chunksPerAxis) stopX=chunksPerAxis;
-	if(stopY>chunksPerAxis) stopY=chunksPerAxis;
+	if(stopZ>chunksPerAxis) stopZ=chunksPerAxis;
 	int midX=(startX+stopX)/2;
-	int midY=(startY+stopY)/2;
+	int midZ=(startZ+stopZ)/2;
 
 	//std::cout<<"rendering from "<<startX<<" to "<<stopX<<std::endl;
-	for(int runy = startY ; runy<stopY ; runy++)
+	for(int runz = startZ ; runz<stopZ ; runz++)
 	{
 		for(int runx = startX ; runx<stopX ; runx++)
 		{
-			int indx=runy*chunksPerAxis+runx;
+			int indx=runz*chunksPerAxis+runx;
 			if(chunks[indx])
 			{
 				float distX=(runx-midX);
 				if (distX<0) distX=-distX;
-				int distY=(runy-midY);
-				if (distY<0) distY=-distY;
+				int distZ=(runz-midZ);
+				if (distZ<0) distZ=-distZ;
 				int dist=distX;
-				if(distY>distX) dist=distY;
+				if(distZ>distX) dist=distZ;
 				int lod=1;
 				if(dist==0) dist=0.5;
 				dist/=lodQ;
@@ -57,14 +57,14 @@ void ChunkManager::render(float lodQ)
 				{
 					if((lod*2)<=i) lod*=2;
 				}
-				chunks[indx]->render(lod);
+				chunks[indx]->render(lod, camOffset);
 			}
 		}
 	}
 	//std::cout<<"rendering end"<<std::endl;
 }
 
-ChunkManager::ChunkManager(int ChunkSize, int ChunksPerAxis,int RenderDistanceChunks):
+ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks):
 chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
 	chunksBuf1=new Chunk * [chunksPerAxis*chunksPerAxis];
@@ -75,38 +75,38 @@ chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDis
 		chunksBuf2[i]=0;
 	}
 	chunks=chunksBuf1;
-	setMid(0.5f,0.5f);
+	setMid({{0,0.5f},{0,0.5f},{0,0.5f}});
 }
 
 
-void ChunkManager::setMid(flt x, flt y)
+void ChunkManager::setMid(spacevec abs)
 {
-	int midChunkCoo=chunksPerAxis/2;
-	int cx=getChunkCoo(x);
-	int cy=getChunkCoo(y);
-	int newLowX=cx-midChunkCoo;
-	int newLowY=cy-midChunkCoo;
+	chunkNum midChunkCoo=chunksPerAxis/2;
+	chunkNum cx=abs.x.intpart;
+	chunkNum cz=abs.z.intpart;
+	chunkNum newLowX=cx-midChunkCoo;
+	chunkNum newLowZ=cz-midChunkCoo;
 
-	if((newLowX!=lowX)||(newLowY!=lowY))
+	if((newLowX!=lowX)||(newLowZ!=lowZ))
 	{
 		Chunk ** other=chunks==chunksBuf1?chunksBuf2:chunksBuf1;
 		for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
 		{
 			other[i]=0;
 		}
-		int moveX=(lowX-newLowX);
-		int moveY=(lowY-newLowY);
-		for(int yrun=0;yrun<chunksPerAxis;yrun++)
+		chunkNum moveX=(lowX-newLowX);
+		chunkNum moveZ=(lowZ-newLowZ);
+		for(int zrun=0;zrun<chunksPerAxis;zrun++)
 		{
 			for(int xrun=0;xrun<chunksPerAxis;xrun++)
 			{
-				Chunk * curChunk=chunks[yrun*chunksPerAxis+xrun];
+				Chunk * curChunk=chunks[zrun*chunksPerAxis+xrun];
 				if(!curChunk) continue;
-				int ynew=yrun+moveY;
-				int xnew=xrun+moveX;
+				chunkNum znew=zrun+moveZ;
+				chunkNum xnew=xrun+moveX;
 				int result=0;
-				if(ynew<0) result++;
-				if(ynew>=chunksPerAxis) result++;
+				if(znew<0) result++;
+				if(znew>=chunksPerAxis) result++;
 				if(xnew<0) result++;
 				if(xnew>=chunksPerAxis) result++;
 				if(result)//if chunk will be outside the loaded region
@@ -115,71 +115,83 @@ void ChunkManager::setMid(flt x, flt y)
 				}
 				else
 				{
-					other[ynew*chunksPerAxis+xnew]=chunks[yrun*chunksPerAxis+xrun];
+					other[znew*chunksPerAxis+xnew]=chunks[zrun*chunksPerAxis+xrun];
 				}
 
 			}
 		}
 		chunks=other;
 		lowX=newLowX;
-		lowY=newLowY;
+		lowZ=newLowZ;
 	}
 	if(cx<lowX) return;
-	if(cy<lowY) return;
+	if(cz<lowZ) return;
 	if(cx>=(lowX+chunksPerAxis)) return;
-	if(cy>=(lowY+chunksPerAxis)) return;
+	if(cz>=(lowZ+chunksPerAxis)) return;
 
-	int myInd=getIndx(cx,cy);
+	int myInd=getIndx(cx,cz);
 	//std::cout<<"myInd = "<<myInd<<std::endl;
 	if(chunks[myInd]==0)
 	{
-		chunks[myInd]=new Chunk(cx*chunkSize,cy*chunkSize,chunkSize);
+		spacevec chunkBase;
+		chunkBase.y=fromMeters(0);
+		chunkBase.x.floatpart=0;
+		chunkBase.z.floatpart=0;
+		chunkBase.x.intpart=cx;
+		chunkBase.z.intpart=cz;
+		chunks[myInd]=new Chunk(chunkBase,chunkSize,this);
 	}
 }
 
-int ChunkManager::getChunkCoo(flt val)
-{
-	if(val>0) return (int)(val/chunkSize);
-	return (int)(val/chunkSize)-1;
-}
-
-int ChunkManager::getIndx(int cx, int cy)
+int ChunkManager::getIndx(chunkNum cx,chunkNum cz)
 {
 	cx-=lowX;
-	cy-=lowY;
-	return cy*chunksPerAxis+cx;
+	cz-=lowZ;
+	return cz*chunksPerAxis+cx;
 }
 
-int ChunkManager::getIndx(int cx, int cy, int newLowX, int newLowY)
+int ChunkManager::getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ)
 {
 	cx-=newLowX;
-	cy-=newLowY;
-	return cy*chunksPerAxis+cx;
+	cz-=newLowZ;
+	return cz*chunksPerAxis+cx;
 }
 
 void ChunkManager::generateMissing(int count)
 {
 	int dir=1;
-	int xrun=chunksPerAxis/2+lowX;
-	int yrun=chunksPerAxis/2+lowY;
+	chunkNum xrun=chunksPerAxis/2+lowX;
+	chunkNum zrun=chunksPerAxis/2+lowZ;
 	for(int j=1;j<chunksPerAxis;j++)
 	{
 		dir=-dir;
 		for(int i=0;i<j;i++)
 		{
 			xrun+=dir;
-			if(chunks[getIndx(xrun,yrun)]==0)
+			if(chunks[getIndx(xrun,zrun)]==0)
 			{
-				chunks[getIndx(xrun,yrun)]=new Chunk(xrun*chunkSize,yrun*chunkSize,chunkSize);
+				spacevec chunkBase;
+				chunkBase.y=fromMeters(0);
+				chunkBase.x.floatpart=0;
+				chunkBase.z.floatpart=0;
+				chunkBase.x.intpart=xrun;
+				chunkBase.z.intpart=zrun;
+				chunks[getIndx(xrun,zrun)]=new Chunk(chunkBase,chunkSize,this);
 				if(!(--count)) return;
 			}
 		}
 		for(int i=0;i<j;i++)
 		{
-			yrun+=dir;
-			if(chunks[getIndx(xrun,yrun)]==0)
+			zrun+=dir;
+			if(chunks[getIndx(xrun,zrun)]==0)
 			{
-				chunks[getIndx(xrun,yrun)]=new Chunk(xrun*chunkSize,yrun*chunkSize,chunkSize);
+				spacevec chunkBase;
+				chunkBase.y=fromMeters(0);
+				chunkBase.x.floatpart=0;
+				chunkBase.z.floatpart=0;
+				chunkBase.x.intpart=xrun;
+				chunkBase.z.intpart=zrun;
+				chunks[getIndx(xrun,zrun)]=new Chunk(chunkBase,chunkSize,this);
 				if(!(--count)) return;
 			}
 		}
@@ -188,28 +200,70 @@ void ChunkManager::generateMissing(int count)
 	for(int i=0;i<chunksPerAxis-1;i++)
 	{
 		xrun+=dir;
-		if(chunks[getIndx(xrun,yrun)]==0)
+		if(chunks[getIndx(xrun,zrun)]==0)
 		{
-			chunks[getIndx(xrun,yrun)]=new Chunk(xrun*chunkSize,yrun*chunkSize,chunkSize);
+			spacevec chunkBase;
+			chunkBase.y=fromMeters(0);
+			chunkBase.x.floatpart=0;
+			chunkBase.z.floatpart=0;
+			chunkBase.x.intpart=xrun;
+			chunkBase.z.intpart=zrun;
+			chunks[getIndx(xrun,zrun)]=new Chunk(chunkBase,chunkSize,this);
 			if(!(--count)) return;
 		}
 	}
-	/*for(int yrun=lowY;yrun<lowY+chunksPerAxis;yrun++)
-	{
-		for(int xrun=lowX;xrun<lowX+chunksPerAxis;xrun++)
-		{
-			if(chunks[getIndx(xrun,yrun)]==0)
-			{
-				chunks[getIndx(xrun,yrun)]=new Chunk(xrun*chunkSize,yrun*chunkSize,chunkSize);
-				//return;
-			}
-		}
-	}*/
 }
 
-vec3 ChunkManager::getWind(flt x, flt y)
+spacevec ChunkManager::getWind(spacevec abs)
 {
-	return vec3(0,0,0);//TODO
+	return {{0,0},{0,0},{0,0}};//TODO
+}
+
+void ChunkManager::tick(float time, TickServiceProvider* tsp)
+{
+	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
+	{
+		if(chunks[i]) chunks[i]->tick(time,tsp);
+	}
+}
+
+int ChunkManager::getIndx(spacevec abs)
+{
+	return getIndx(abs.x.intpart,abs.z.intpart);
+}
+
+flt ChunkManager::toMeters(spacelen l)
+{
+	flt ret=l.floatpart;
+	ret+=l.intpart;
+	ret*=chunkSize;
+	return ret;
+}
+
+vec3 ChunkManager::toMeters(spacevec v)
+{
+	vec3 ret={v.x.floatpart,v.y.floatpart,v.z.floatpart};
+	ret+={v.x.intpart,v.y.intpart,v.z.intpart};
+	ret*=chunkSize;
+	return ret;
+}
+
+spacelen ChunkManager::fromMeters(flt l)
+{
+	l*=chunkSize;
+	spacelen ret;
+	ret.intpart=(chunkNum)l;
+	ret.floatpart=l-((chunkNum)l);
+	return ret;
+}
+
+spacevec ChunkManager::fromMeters(vec3 v)
+{
+	spacevec ret;
+	ret.x=fromMeters(v.x);
+	ret.y=fromMeters(v.y);
+	ret.z=fromMeters(v.z);
+	return ret;
 }
 
 ChunkManager::~ChunkManager()
@@ -217,9 +271,13 @@ ChunkManager::~ChunkManager()
 	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
 	{
 		if(chunksBuf1[i]) delete chunksBuf1[i];
-		if(chunksBuf2[i]) delete chunksBuf2[i];
+		if(chunksBuf2[i]) delete chunksBuf2[i];//TODO correct?
 	}
 	delete chunksBuf1;
 	delete chunksBuf2;
 }
-
+/*
+Chunk* ChunkManager::getChunk(Position p)
+{
+	return 0;//TODO chunks[getIndx(p.chunkX,p.chunkZ)];
+}*/

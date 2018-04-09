@@ -10,23 +10,30 @@
 #define SRC_CHUNK_H_
 
 #define defaultHeight -1
-
+#include "Tickable.h"
 #include "MatrixLib.h"
 #include <GL/glew.h>
-class Chunk
-{
-	int x;
-	int y;
-	int size;
-	float * height;
-	float avgHeight;
-	GLuint bufID;
+class ChunkManager;
+#include "ChunkManager.h"
+#include <vector>
 
-	inline float getH(int x,int y);
+class Chunk: public Tickable
+{
+	spacevec base;
+	int size;//in meters=gridUnits
+	float * height;//TODO spacelen
+	float avgHeight;
+	//GLuint bufID;
+	ChunkManager * parent;
+	//std::vector<Entity *> coreEntities;//must be ticked by this chunk
+	//std::vector<Entity *> sideEntities;//must not be ticked by this chunk
+
+	inline float getH(int x,int y);//inside chunk grid
 public:
-	float getHeight(flt x,flt y);//absolute x,y
-	void render(int lod);
-	Chunk(int xStart,int yStart,int baseSize);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1
+	void tick(float time,TickServiceProvider * tsp);
+	spacelen getHeight(flt x,flt z);//coordinates inside chunk
+	void render(int lod,spacevec camOffset);
+	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1
 	~Chunk();
 };
 

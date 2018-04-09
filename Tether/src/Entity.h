@@ -10,17 +10,32 @@
 #define SRC_ENTITY_H_
 class TickServiceProvider;
 #include "Tickable.h"
-#include "MatrixLib.h"
-class Entity: public Tickable
+#include "Spacevec.h"
+#include "EntityIdent.h"
+#include <vector>
+#include "Chunk.h"
+
+class Entity: public Tickable, Drawable
 {
 public:
-	vec3 pos;
-	vec3 v;
-	vec3 aabbOlow;//AABB offset to pos on the low end
-	vec3 aabbOhigh;//AABB offset to pos on the high end//TODO best way?
+	EntityIdent ID;
 
-	virtual void draw()=0;
-	virtual void onAABBintersect(Entity * other);
+	spacevec pos;
+	spacevec v;
+	//vec3 aabbOlow;//AABB offset to pos on the low end
+	//vec3 aabbOhigh;//AABB offset to pos on the high end//TODO best way?
+
+	//Chunk * mainChunk;//the ticking chunk
+	//std::vector<Chunk *> chunks;
+	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp)=0;
+
+	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
+	virtual void tick(float time,TickServiceProvider * tsp)=0;
+
+	//virtual void onAABBintersect(Entity * other);
+	//bool aabbIntersects(Entity * other);
+
+	//vec3 getRelPosOf(Entity * other);//only position relative, not rotation
 	Entity();
 	virtual ~Entity();
 };

@@ -11,7 +11,6 @@
 #include "Graphics2D.h"
 #include "Zombie_Gun.h"
 #include "Zombie_AmmoType.h"
-#define MAX_TICK_TIME 0.02f
 
 //TEST
 #include "QuatMandel.h"

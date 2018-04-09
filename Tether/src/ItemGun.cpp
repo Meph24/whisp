@@ -86,7 +86,7 @@ void ItemGun::loadChamber(ItemAmmo* ammo)
 
 void ItemGun::trigger(bool pulled)
 {
-	triggerIsPulled(pulled);
+	triggerIsPulled=pulled;
 }
 
 ItemGun::~ItemGun()

@@ -5,7 +5,8 @@
 #include "ITexture.h"
 #include "Zombie_Physics.h"
 #include "ChunkManager.h"
-class Zombie_Enemy
+#include "Entity.h"
+class Zombie_Enemy: public Entity
 {
 
 	struct texCooSet{
@@ -33,7 +34,7 @@ class Zombie_Enemy
 	void gotHit(Zombie_Physics::hit hit, int part, Zombie_Projectile ** shots);
 
 public:
-	float posX,posY, posZ;
+	//float posX,posY, posZ;
 	ChunkManager * cm;
 	float facing;
 	float speed;
@@ -53,6 +54,7 @@ public:
 	~Zombie_Enemy();
 
 	void draw(float seconds);
+	virtual void tick(float seconds,TickServiceProvider * tsp);
 
 	void checkHitboxes(Zombie_Physics * ph);
 };

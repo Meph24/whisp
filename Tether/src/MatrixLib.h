@@ -16,17 +16,15 @@
 #include "mat3.h"
 #include "mat4.h"
 
-//inline
+
 vec3 operator*(mat3 a, vec3 b);
-//inline
+
 vec3 operator*(vec3 b, mat3 a);
-//inline
+
 vec3 operator*(mat4 a, vec3 b);
-//inline
+
 vec3 operator*(vec3 b, mat4 a);
 
-bool operator<(vec3 a,vec3 b);
-bool operator>(vec3 a,vec3 b);
 
 
 //TODO

@@ -15,20 +15,27 @@ public:
 	vec3(flt X,flt Y,flt Z);
 	~vec3();
 
-	vec3 operator+(vec3 other);    //inline//inline
-	vec3 operator-(vec3 other);    //inline
+	vec3 operator+(vec3 other);
+	vec3 operator-(vec3 other);
 	void operator+=(vec3 other);
-	void operator-=(vec3 other);   //inline
-	vec3 operator*(flt scalar);    //inline
+	void operator-=(vec3 other);
+	vec3 operator*(flt scalar);
 	vec3 operator*(vec3 other);
+
+	//returns bit vector of comparison lsb=x
+	unsigned int operator<(vec3 other);
+	unsigned int operator>(vec3 other);
+
 	void normalize();
-	flt normGetLen();//normalized and returns length
+	flt normGetLen();//normalize this vec3 and return length of the unnormalized version
+	vec3 normalizedCopy();//returns a normalized copy of itself
+
 	flt length();
-	flt lengthSq();
+	flt lengthSq();//return squared length
 };
-vec3 operator*(flt scalar,vec3 v); //inline
-flt dotProduct(vec3 a, vec3 b);    //inline
-vec3 crossProduct(vec3 a, vec3 b); //inline
+vec3 operator*(flt scalar,vec3 v);
+flt dotProduct(vec3 a, vec3 b);
+vec3 crossProduct(vec3 a, vec3 b);
 std::ostream& operator<<(std::ostream &out, const vec3 v);
 
 //TODO

@@ -4,9 +4,11 @@
 
 
 Zombie_Enemy::Zombie_Enemy(ITexture * texture, float startX, float startZ,ChunkManager * chm):
-tex(texture),ml(4), posX(startX), posZ(startZ),cm(chm),legDmg(0),animStep(0),dead(0)//spawns a random zombie at the given location
+tex(texture),ml(4),cm(chm),legDmg(0),animStep(0),dead(0)//posX(startX), posZ(startZ) spawns a random zombie at the given location
 {
-	posY=(cm->getHeight(startX,startZ));
+	pos.x=startX;
+	pos.z=startZ;
+	pos.y=(cm->getHeight(startX,startZ));
 	facing = std::rand() % 360;
 	speed = 2 +(std::rand() % 5000)/1000;
 	size = 0.6f + (std::rand() % 1024) / 1024.0f;
@@ -19,6 +21,9 @@ tex(texture),ml(4), posX(startX), posZ(startZ),cm(chm),legDmg(0),animStep(0),dea
 		remainingHP *= 40;
 	}
 	totalHP=remainingHP;
+
+	aabbOlow=vec3(size*2.0f,size*0.25f,size*2.0f);
+	aabbOhigh=vec3(size*2.0f,size*2.25f,size*2.0f);
 }
 
 
@@ -223,7 +228,7 @@ void Zombie_Enemy::draw(float seconds)
 		}
 	}
 	glPushMatrix();
-	glTranslatef(posX, posY, posZ);
+	glTranslatef(pos.x, pos.y, pos.z);
 	glRotatef(facing, 0, 1, 0);
 	glRotatef(dead, 1, 0, 0);
 	glScalef(size, size, size);
@@ -263,6 +268,9 @@ void Zombie_Enemy::draw(float seconds)
 	glPopMatrix();
 }
 
+void Zombie_Enemy::tick(float seconds,TickServiceProvider * tsp)
+{}
+
 void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 {
 
@@ -283,18 +291,18 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 			flt maxSize=3*size;
 			max+={maxSize,maxSize,maxSize};
 			min-={maxSize,maxSize,maxSize};
-			if(min.x>posX) continue;
-			if(min.y>posY) continue;
-			if(min.z>posZ) continue;//lol optimization at tier 1
-			if(max.x<posX) continue;
-			if(max.y<posY) continue;
-			if(max.z<posZ) continue;
+			if(min.x>pos.x) continue;
+			if(min.y>pos.y) continue;
+			if(min.z>pos.z) continue;//lol optimization at tier 1
+			if(max.x<pos.x) continue;
+			if(max.y<pos.y) continue;
+			if(max.z<pos.z) continue;
 			proj=true;
 		}
 	}
 	if(!proj) return;
 	ml.loadIdentity();
-	ml.translatef(posX, posY, posZ);
+	ml.translatef(pos.x, pos.y, pos.z);
 	ml.rotatef(facing, 0, 1, 0);
 	ml.scalef(size, size, size);
 
