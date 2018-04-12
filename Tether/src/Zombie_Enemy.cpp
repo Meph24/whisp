@@ -3,12 +3,10 @@
 #include <GL/glew.h>
 
 
-Zombie_Enemy::Zombie_Enemy(ITexture * texture, float startX, float startZ,ChunkManager * chm):
-tex(texture),ml(4),cm(chm),legDmg(0),animStep(0),dead(0)//posX(startX), posZ(startZ) spawns a random zombie at the given location
+Zombie_Enemy::Zombie_Enemy(ITexture * texture,spacevec startPos,ChunkManager * chm):
+tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),deathAnim(0.5f,0,1),dead(0)//posX(startX), posZ(startZ) spawns a random zombie at the given location
 {
-	pos.x=startX;
-	pos.z=startZ;
-	pos.y=(cm->getHeight(startX,startZ));
+	pos=cm->clip(startPos,true);
 	facing = std::rand() % 360;
 	speed = 2 +(std::rand() % 5000)/1000;
 	size = 0.6f + (std::rand() % 1024) / 1024.0f;
@@ -22,8 +20,10 @@ tex(texture),ml(4),cm(chm),legDmg(0),animStep(0),dead(0)//posX(startX), posZ(sta
 	}
 	totalHP=remainingHP;
 
-	aabbOlow=vec3(size*2.0f,size*0.25f,size*2.0f);
-	aabbOhigh=vec3(size*2.0f,size*2.25f,size*2.0f);
+	bodyAnim=AnimationCycle(3*size/speed,0);
+
+	//aabbOlow=vec3(size*2.0f,size*0.25f,size*2.0f);
+	//aabbOhigh=vec3(size*2.0f,size*2.25f,size*2.0f);
 }
 
 
@@ -215,9 +215,12 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 	drawTexturedCube(tc);
 	glPopMatrix();
 }
-void Zombie_Enemy::draw(float seconds)
+void Zombie_Enemy::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp)
 {
-	animStep += seconds;
+	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
+
+	bodyAnim.updateTemp(tickOffset);
+
 	if(legDmg>0.25f*totalHP)
 	{
 		transition += seconds*2;
@@ -269,7 +272,9 @@ void Zombie_Enemy::draw(float seconds)
 }
 
 void Zombie_Enemy::tick(float seconds,TickServiceProvider * tsp)
-{}
+{
+	bodyAnim.update(seconds);
+}
 
 void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 {

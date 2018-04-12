@@ -24,11 +24,19 @@ class ChunkManager: public Tickable
 
 	chunkNum lowX;//chunk coordinate of first chunk
 	chunkNum lowZ;
+
 	int renderDistanceChunks;
+
+	spacelen gravity;
+
 	int getIndx(spacevec abs);
 	int getIndx(chunkNum cx,chunkNum cz);//from absolute chunk coordinates
 	int getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ);//from absolute chunk coordinates
 public:
+	float getMetersPerChunk();
+	spacevec clip(spacevec pos,bool forceGround);
+	bool hitsGround(spacevec startpoint,spacevec endpoint);
+	spacelen getGravity();
 	void tick(float time,TickServiceProvider * tsp);
 	spacevec getWind(spacevec abs);
 	void generateMissing(int count);
@@ -40,7 +48,7 @@ public:
 	spacelen fromMeters(flt l);
 	spacevec fromMeters(vec3 v);
 	//Chunk * getChunk(Position p);
-	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks);//render distance should be lower than half of the total chunks per axis
+	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 };
 

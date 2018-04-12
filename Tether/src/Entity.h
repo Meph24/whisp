@@ -22,6 +22,9 @@ public:
 
 	spacevec pos;
 	spacevec v;
+
+	bool exists=true;//if exists is false, memory will be freed next tick (enough time for other threads to react)
+
 	//vec3 aabbOlow;//AABB offset to pos on the low end
 	//vec3 aabbOhigh;//AABB offset to pos on the high end//TODO best way?
 
@@ -31,6 +34,8 @@ public:
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
 	virtual void tick(float time,TickServiceProvider * tsp)=0;
+
+	void requestDestroy(TickServiceProvider * tsp);
 
 	//virtual void onAABBintersect(Entity * other);
 	//bool aabbIntersects(Entity * other);

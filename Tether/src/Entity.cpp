@@ -11,6 +11,11 @@
 Entity::Entity()
 {}
 
+void Entity::requestDestroy(TickServiceProvider* tsp)
+{
+	exists=false;
+	tsp->requestDestroy(this);
+}
 
 /*
 vec3 Entity::getRelPosOf(Entity* other)

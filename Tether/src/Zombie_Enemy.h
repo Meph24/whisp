@@ -6,6 +6,7 @@
 #include "Zombie_Physics.h"
 #include "ChunkManager.h"
 #include "Entity.h"
+#include "AnimationCycle.h"
 class Zombie_Enemy: public Entity
 {
 
@@ -34,7 +35,6 @@ class Zombie_Enemy: public Entity
 	void gotHit(Zombie_Physics::hit hit, int part, Zombie_Projectile ** shots);
 
 public:
-	//float posX,posY, posZ;
 	ChunkManager * cm;
 	float facing;
 	float speed;
@@ -44,16 +44,17 @@ public:
 	float remainingHP;
 	float legDmg;
 
-	float animStep;
+	AnimationCycle bodyAnim;
+	AnimationCycle deathAnim;
+
 	float transition=0;
-	float maxTransition=1;
 
 	float dead;
 
-	Zombie_Enemy(ITexture * texture,float startX,float startZ,ChunkManager * cm);
+	Zombie_Enemy(ITexture * texture,spacevec startPos,ChunkManager * cm);
 	~Zombie_Enemy();
 
-	void draw(float seconds);
+	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(float seconds,TickServiceProvider * tsp);
 
 	void checkHitboxes(Zombie_Physics * ph);

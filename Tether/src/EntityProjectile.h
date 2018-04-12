@@ -20,14 +20,13 @@ class EntityProjectile: public Entity
 
 
 
-
 	static ITexture * tex;
 public:
 
 
 	EntityProjectile(ItemAmmo * item,vec3 position,vec3 velocity);//gives item ownership to the Projectile
 	~EntityProjectile();
-	virtual void drawdraw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(float time,TickServiceProvider * tsp);
 
 	static void setTexture(ITexture * texture);

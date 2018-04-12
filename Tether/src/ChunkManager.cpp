@@ -64,7 +64,7 @@ void ChunkManager::render(float lodQ, spacevec camOffset)
 	//std::cout<<"rendering end"<<std::endl;
 }
 
-ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks):
+ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir):
 chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
 	chunksBuf1=new Chunk * [chunksPerAxis*chunksPerAxis];
@@ -76,6 +76,7 @@ chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDis
 	}
 	chunks=chunksBuf1;
 	setMid({{0,0.5f},{0,0.5f},{0,0.5f}});
+	gravity=fromMeters(gravityYdir);
 }
 
 
@@ -264,6 +265,52 @@ spacevec ChunkManager::fromMeters(vec3 v)
 	ret.y=fromMeters(v.y);
 	ret.z=fromMeters(v.z);
 	return ret;
+}
+
+spacelen ChunkManager::getGravity()
+{
+	return gravity;
+}
+
+spacevec ChunkManager::clip(spacevec pos, bool forceGround)
+{
+	spacevec ret;
+	ret.x=pos.x;
+	ret.z=pos.z;
+	spacelen height=getHeight(pos);
+	if(ret.y<height || forceGround)
+	{
+		ret.y=height;
+	}
+	return ret;
+}
+#define MAX_GROUNDHIT_TRIES 50
+bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
+{
+	//TODO make better
+	spacevec dif=endpoint-startpoint;
+	float len=dif.fLength(getMetersPerChunk());
+	int tries;
+	if(len>MAX_GROUNDHIT_TRIES)
+	{
+		tries=MAX_GROUNDHIT_TRIES;
+	}
+	else
+	{
+		tries=int(len);
+	}
+	float triesInv=1.0f/tries;
+	for(int i = 0 ; i<tries+1; i++)
+	{
+		spacevec testPos=startpoint+dif*triesInv;
+		if(testPos.y<getHeight(testPos)) return true;
+	}
+	return false;
+}
+
+float ChunkManager::getMetersPerChunk()
+{
+	return chunkSize;
 }
 
 ChunkManager::~ChunkManager()

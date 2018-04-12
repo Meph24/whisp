@@ -26,15 +26,15 @@ EntityProjectile::~EntityProjectile()
 	delete fromItem;
 }
 
-void EntityProjectile::draw(float tickOffset,spacevec observerPos)
+void EntityProjectile::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	spacevec interPos=pos+v*tickOffset-observerPos;
-	vec3 interPosMeters=
+	vec3 interPosMeters=cm->toMeters(interPos);
 	tex->bind();
 	glColor3f(1.0f,1.0f, 0.1f);
 
 	glPushMatrix();
-	glTranslatef(pos.x, pos.y, pos.z);
+	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
 	glBegin(GL_QUADS);
 
 
@@ -80,21 +80,19 @@ void EntityProjectile::draw(float tickOffset,spacevec observerPos)
 	glEnd();
 	glPopMatrix();
 }
-
 void EntityProjectile::tick(float time, TickServiceProvider* tsp)
 {
 	ChunkManager * cm=tsp->getChunkManager();
-	bool destroy = posOld.y < cm->getHeight(posOld.x,posOld.z);
+	spacelen gravity=cm->getGravity();
+	bool destroy = cm->hitsGround(posOld,pos);
 	posOld = pos;
-	vec3 vOld=v;
-	v.y -= 9.81f * time;
-	flt spdSq=v.lengthSq();
-	flt drag=spdSq*fromItem->drag;
-	vec3 dragDir=v;
-	dragDir.normalize();
-	v-=dragDir*drag*time;
+	spacevec vOld=v;
+	v.y -= gravity * time;
+	double spd=v.dLength(cm->getMetersPerChunk());
+	double drag=spd*fromItem->drag;
+	v*=(1-drag*time);//TODO find exact or at least time-consistent solution (current solution behaves very wrong with high resistance values and is tickrate-dependent)
 	pos+=(v+vOld)*time*0.5f;
-	if(destroy) tsp->requestDestroy(this);
+	if(destroy) requestDestroy(tsp);
 }
 
 void EntityProjectile::setTexture(ITexture* texture)
