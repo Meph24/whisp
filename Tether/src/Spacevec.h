@@ -291,10 +291,6 @@ inline void vec3if<I, F>::operator -=(intfloat<I, F> other)
 	z-=other.z;
 }
 
-typedef int chunkNum;
-typedef intfloat<chunkNum,flt> spacelen;
-typedef vec3if<chunkNum, flt> spacevec;
-
 
 template<typename I, typename F>
 inline float vec3if<I, F>::fLengthSq(float chunksPerMeter)
@@ -320,85 +316,10 @@ inline double vec3if<I, F>::dLength(double chunksPerMeter)
 	return sqrt(dLengthSq(chunksPerMeter));
 }
 
-/*template<typename I,typename F,unsigned int dim>
-struct spacevec
-{
-	intfloat<I,F> arr[dim];
-
-};*/
-
-/*
-
-//class ChunkManager;
-//#include "ChunkManager.h"
-
-#include "MatrixLib.h"
-typedef int chint;
-typedef float chflt;
-typedef long long chunkMultResult;
-
-struct exflt
-{
-	chflt in;
-	chint chunk;
-
-	exflt operator+(exflt other);
-	exflt operator-(exflt other);
-	void operator+=(exflt other);
-	void operator-=(exflt other);
-
-	bool operator<(exflt other);
-	bool operator<=(exflt other);
-	bool operator>(exflt other);
-	bool operator>=(exflt other);
-	bool operator==(exflt other);
-	bool operator!=(exflt other);
-
-	exflt operator+(chflt other);
-	exflt operator-(chflt other);
-	void operator+=(chflt other);
-	void operator-=(chflt other);
-
-	bool operator<(chflt other);
-	bool operator<=(chflt other);
-	bool operator>(chflt other);
-	bool operator>=(chflt other);
-
-	operator exflt(chflt toCast);
-	operator chflt(exflt toCast);
-
-};
-
-class Position
-{
-	exflt x;
-	exflt y;
-	exflt z;
-	ChunkManager * cm;
-public:
-	Position();//TODO
-	~Position();
-
-	Position operator+(Position other);
-	Position operator-(Position other);
-	void operator+=(Position other);
-	void operator-=(Position other);
-
-	unsigned int operator<(vec3 other);
-	unsigned int operator>(vec3 other);
+typedef int chunkNum;
+typedef intfloat<chunkNum,flt> spacelen;
+typedef vec3if<chunkNum, flt> spacevec;
 
 
-	void normalize();
-	exflt normGetLen();//normalize this vec3 and return length of the unnormalized version
-	Position normalizedCopy();//returns a normalized copy of itself
 
-	exflt length();
-	exflt lengthSq();//TODO precision?//return squared length
-};
-
-//vec3 operator*(flt scalar,vec3 v);
-//flt dotProduct(vec3 a, vec3 b);
-//vec3 crossProduct(vec3 a, vec3 b);
-std::ostream& operator<<(std::ostream &out, const Position v);
-*/
 #endif /* SRC_SPACEVEC_H_ */

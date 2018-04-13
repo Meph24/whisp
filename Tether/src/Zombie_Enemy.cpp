@@ -4,7 +4,7 @@
 
 
 Zombie_Enemy::Zombie_Enemy(ITexture * texture,spacevec startPos,ChunkManager * chm):
-tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),deathAnim(0.5f,0,1),dead(0)//posX(startX), posZ(startZ) spawns a random zombie at the given location
+tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.5f,0,1),transitionAnim(0.5f,0,1),dead(0)//posX(startX), posZ(startZ) spawns a random zombie at the given location
 {
 	pos=cm->clip(startPos,true);
 	facing = std::rand() % 360;
@@ -186,7 +186,7 @@ void Zombie_Enemy::drawArm(int loc)
 
 	glPushMatrix();
 	glTranslatef(0, 1.1f, loc *0.3f);
-	glRotatef(sin(loc*animStep * 2 *speed/size) * 16 + 90, 0, 0, 1);
+	glRotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
 	glTranslatef(0, -0.6f, 0);
 	glScalef(1, 3, 1);
 	drawTexturedCube(tc);
@@ -209,7 +209,7 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 
 	glPushMatrix();
 	glTranslatef(0, 0.6f, loc * 0.1f);
-	glRotatef(sin(loc*animStep * 2 *speed/size) * 30*strength, 0, 0, 1);
+	glRotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*strength, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 30*strength
 	glTranslatef(0, -0.6f, 0);
 	glScalef(1, 3, 1);
 	drawTexturedCube(tc);
@@ -220,18 +220,16 @@ void Zombie_Enemy::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,
 	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
 
 	bodyAnim.updateTemp(tickOffset);
-
 	if(legDmg>0.25f*totalHP)
-	{
-		transition += seconds*2;
-		if(transition>maxTransition)
-		{
-			transition-=seconds*4;
-			if(transition<maxTransition) transition=maxTransition;
-		}
-	}
+		transitionAnim.update(tickOffset);
+	if(dead) fallAnim.update(tickOffset);
+
+
+	spacevec interPos=pos+v*tickOffset-observerPos;
+	vec3 interPosMeters=cm->toMeters(interPos);
+
 	glPushMatrix();
-	glTranslatef(pos.x, pos.y, pos.z);
+	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
 	glRotatef(facing, 0, 1, 0);
 	glRotatef(dead, 1, 0, 0);
 	glScalef(size, size, size);
@@ -245,9 +243,9 @@ void Zombie_Enemy::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,
 	float animStrength=1;
 	if(legDmg>0.25f*totalHP)
 	{
-		glTranslatef(-0.25f*transition,0.1f*transition,0);
-		glRotatef(-90*transition, 0, 0, 1);
-		animStrength=0.15f*transition;
+		glTranslatef(-0.25f*transitionAnim.getCurStep(0)*maxTransition,0.1f*transitionAnim.getCurStep(0)*maxTransition,0);
+		glRotatef(-90*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
+		animStrength=0.15f*transitionAnim.getCurStep(0)*maxTransition;
 	}
 	drawLeg(1,animStrength);
 	drawLeg(-1,animStrength);
@@ -256,8 +254,8 @@ void Zombie_Enemy::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,
 
 	if(legDmg>0.25f*totalHP)
 	{
-		glTranslatef(0,-0.4f*transition,0);
-		glRotatef(-35*transition, 0, 0, 1);
+		glTranslatef(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0);
+		glRotatef(-35*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
 	}
 	drawBody();
 
@@ -274,26 +272,30 @@ void Zombie_Enemy::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,
 void Zombie_Enemy::tick(float seconds,TickServiceProvider * tsp)
 {
 	bodyAnim.update(seconds);
+	if(legDmg>0.25f*totalHP)
+		transitionAnim.update(seconds);
+	if(dead) fallAnim.update(seconds);
 }
 
-void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
+void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)
 {
-
+	spacevec relPos=pos-middleChunk;
+	vec3 relPosMeters=cm->toMeters(relPos)
 	bool proj=false;
 	for (int i = 0; i < ph->pCount[0]; i++)
 	{
 		if (ph->projectiles[i])
 		{
-			vec3 max=ph->projectiles[i]->posOld;
-			vec3 min=max;
-			vec3 next=ph->projectiles[i]->pos;
+			spacevec max=ph->projectiles[i]->posOld-middleChunk;
+			spacevec min=max;
+			spacevec next=ph->projectiles[i]->pos-middleChunk;
 			if(min.x>next.x) min.x=next.x;
 			else if(max.x<next.x) max.x=next.x;
 			if(min.y>next.y) min.y=next.y;
 			else if(max.y<next.y) max.y=next.y;
 			if(min.z>next.z) min.z=next.z;
 			else if(max.z<next.z) max.z=next.z;
-			flt maxSize=3*size;
+			spacelen maxSize=3*cm->fromMeters(size);
 			max+={maxSize,maxSize,maxSize};
 			min-={maxSize,maxSize,maxSize};
 			if(min.x>pos.x) continue;
@@ -307,7 +309,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 	}
 	if(!proj) return;
 	ml.loadIdentity();
-	ml.translatef(pos.x, pos.y, pos.z);
+	ml.translatef(relPosMeters.x, relPosMeters.y, relPosMeters.z);
 	ml.rotatef(facing, 0, 1, 0);
 	ml.scalef(size, size, size);
 
@@ -318,9 +320,9 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 	float animStrength=1;
 	if(legDmg>0.25f*totalHP)
 	{
-		ml.translatef(-0.25f*transition,0.1f*transition,0);
-		ml.rotatef(-90*transition, 0, 0, 1);
-		animStrength=0.15f*transition;
+		ml.translatef(-0.25f*transitionAnim.getCurStep(0)*maxTransition,0.1f*transitionAnim.getCurStep(0)*maxTransition,0);
+		ml.rotatef(-90*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
+		animStrength=0.15f*transitionAnim.getCurStep(0)*maxTransition;
 	}
 
 	ml.pushMatrix();	//leg
@@ -328,7 +330,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 	Zombie_Physics::hit h;
 	loc = 1;
 	ml.translatef(0, 0.6f, loc * 0.1f);
-	ml.rotatef(sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
@@ -341,7 +343,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 	ml.pushMatrix();	//leg
 	loc = -1;
 	ml.translatef(0, 0.6f, loc * 0.1f);
-	ml.rotatef(sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, 0, 0, 1);
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
@@ -356,8 +358,8 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 
 	if(legDmg>0.25f*totalHP)
 	{
-		ml.translatef(0,-0.4f*transition,0);
-		ml.rotatef(-35*transition, 0, 0, 1);
+		ml.translatef(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0);
+		ml.rotatef(-35*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
 	}
 
 	ml.pushMatrix();	//head
@@ -389,7 +391,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 	loc = 1;
 
 	ml.translatef(0, 1.1f, loc * 0.3f);
-	ml.rotatef(sin(loc*animStep * 2 *speed/size) * 16 + 90, 0, 0, 1);
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
@@ -402,7 +404,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph)
 	loc = -1;
 
 	ml.translatef(0, 1.1f, loc * 0.3f);
-	ml.rotatef(sin(loc*animStep * 2 *speed/size) * 16 + 90, 0, 0, 1);
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16, 0, 0, 1);
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 

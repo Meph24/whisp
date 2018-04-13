@@ -45,7 +45,7 @@ Zombie_Projectile::~Zombie_Projectile()
 
 bool Zombie_Projectile::move(float sec,ChunkManager * cm)
 {
-	bool destroy = posOld.y < cm->getHeight(posOld.x,posOld.z);
+	//bool destroy = posOld.y < cm->getHeight(posOld.x,posOld.z);
 	posOld = pos;
 	vec3 vOld=v;
 	v.y -= 9.81f * sec;
@@ -55,7 +55,7 @@ bool Zombie_Projectile::move(float sec,ChunkManager * cm)
 	dragDir.normalize();
 	v-=dragDir*drag*sec;
 	pos+=(v+vOld)*sec*0.5f;
-	return destroy;
+	return true;//TODO deprecated, delete this class destroy;
 }
 
 void Zombie_Projectile::draw()

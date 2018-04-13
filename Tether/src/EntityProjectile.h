@@ -8,7 +8,6 @@
 
 #ifndef SRC_ENTITYPROJECTILE_H_
 #define SRC_ENTITYPROJECTILE_H_
-
 #include "Entity.h"
 #include "ItemAmmo.h"
 #include "TextureDummy.h"
@@ -23,8 +22,7 @@ class EntityProjectile: public Entity
 	static ITexture * tex;
 public:
 
-
-	EntityProjectile(ItemAmmo * item,vec3 position,vec3 velocity);//gives item ownership to the Projectile
+	EntityProjectile(ItemAmmo * item,spacevec position,spacevec velocity);//gives item ownership to the Projectile
 	~EntityProjectile();
 	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(float time,TickServiceProvider * tsp);

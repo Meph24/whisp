@@ -8,9 +8,10 @@
 
 #ifndef SRC_ENTITY_H_
 #define SRC_ENTITY_H_
+#include "Spacevec.h"
+#include "DrawServiceProvider.h"
 class TickServiceProvider;
 #include "Tickable.h"
-#include "Spacevec.h"
 #include "EntityIdent.h"
 #include <vector>
 #include "Chunk.h"

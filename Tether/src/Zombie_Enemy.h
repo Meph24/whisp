@@ -45,9 +45,10 @@ public:
 	float legDmg;
 
 	AnimationCycle bodyAnim;
-	AnimationCycle deathAnim;
+	AnimationCycle transitionAnim;
+	AnimationCycle fallAnim;
 
-	float transition=0;
+	float maxTransition=1;
 
 	float dead;
 
@@ -57,7 +58,7 @@ public:
 	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(float seconds,TickServiceProvider * tsp);
 
-	void checkHitboxes(Zombie_Physics * ph);
+	void checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm);
 };
 
 #endif /* SRC_ZOMBIE_ENEMY_H_ */

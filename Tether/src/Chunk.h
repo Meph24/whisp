@@ -10,6 +10,7 @@
 #define SRC_CHUNK_H_
 
 #define defaultHeight -1
+#include "Spacevec.h"
 #include "Tickable.h"
 #include "MatrixLib.h"
 #include <GL/glew.h>
@@ -20,6 +21,7 @@ class ChunkManager;
 class Chunk: public Tickable
 {
 	spacevec base;
+	spacelen defaultH;
 	int size;//in meters=gridUnits
 	float * height;//TODO spacelen
 	float avgHeight;

@@ -13,7 +13,7 @@
 ITexture * EntityProjectile::tex=new TextureDummy();
 
 
-EntityProjectile::EntityProjectile(ItemAmmo * item,vec3 position,vec3 velocity):
+EntityProjectile::EntityProjectile(ItemAmmo * item,spacevec position,spacevec velocity):
 //pos(position),v(velocity),
 fromItem(item),posOld(position)
 {

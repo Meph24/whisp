@@ -9,10 +9,10 @@
 #include "Chunk.h"
 spacelen Chunk::getHeight(flt xh, flt zh)
 {
-	if(xh<0) return defaultHeight*2;
-	if(zh<0) return defaultHeight*2;
-	if(xh>1) return defaultHeight*2;
-	if(zh>1) return defaultHeight*2;
+	if(xh<0) return defaultH*2;
+	if(zh<0) return defaultH*2;
+	if(xh>1) return defaultH*2;
+	if(zh>1) return defaultH*2;
 
 	xh*=size;
 	zh*=size;
@@ -122,6 +122,7 @@ using namespace noise;
 Chunk::Chunk(spacevec basePos,int baseSize,ChunkManager * cm):
 base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 {
+	defaultH=cm->fromMeters(defaultHeight);
 	module::Perlin myModule;
 	myModule.SetSeed(420);
 	myModule.SetOctaveCount(10);

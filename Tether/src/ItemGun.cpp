@@ -50,7 +50,7 @@ void ItemGun::fire(TickServiceProvider* tsp)
 		float rand3=0;//TODO -1 1
 		float rand4=0;//TODO -1 1
 		ICamera3D * cam=tsp->getHolderCamera();
-		vec3 pos(cam->posX,cam->posY,cam->posZ);
+		spacevec pos=tsp->getChunkManager()->fromMeters(vec3(cam->posX,cam->posY,cam->posZ));
 
 		MatrixLib2 ml(2);
 		ml.loadIdentity();
@@ -65,10 +65,10 @@ void ItemGun::fire(TickServiceProvider* tsp)
 		ml.rotatef(rand4*90, 0, 0, 1);//produces elliptical spread
 		ml.rotatef(rand3*greater, 1, 0, 0);//distance from center of aim is chosen by rand3
 
-		vec3 vProj(0,0,0);//TODO fuck it why is () not working
-		vProj.x = - ml.curMatrix[8] * vel; // ml.curMatrix[0] * vBase.x + ml.curMatrix[4] * vBase.y + ml.curMatrix[8] * vBase.z;
-		vProj.y = - ml.curMatrix[9] * vel; // ml.curMatrix[1] * vBase.x + ml.curMatrix[5] * vBase.y + ml.curMatrix[9] * vBase.z;
-		vProj.z = - ml.curMatrix[10] * vel;// ml.curMatrix[2] * vBase.x + ml.curMatrix[6] * vBase.y + ml.curMatrix[10] * vBase.z;
+		spacevec vProj;
+		vProj.x = tsp->getChunkManager()->fromMeters(- ml.curMatrix[8] * vel); // ml.curMatrix[0] * vBase.x + ml.curMatrix[4] * vBase.y + ml.curMatrix[8] * vBase.z;
+		vProj.y = tsp->getChunkManager()->fromMeters(- ml.curMatrix[9] * vel); // ml.curMatrix[1] * vBase.x + ml.curMatrix[5] * vBase.y + ml.curMatrix[9] * vBase.z;
+		vProj.z = tsp->getChunkManager()->fromMeters(- ml.curMatrix[10] * vel);// ml.curMatrix[2] * vBase.x + ml.curMatrix[6] * vBase.y + ml.curMatrix[10] * vBase.z;
 
 		EntityProjectile * proj=new EntityProjectile(ammo,pos,vProj);
 		tsp->spawnEntity(proj);
