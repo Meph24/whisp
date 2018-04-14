@@ -8,6 +8,10 @@ extern Zombie_MouseInput * mouseInput;
 
 #include "SpeedMod.h"
 #include "ZombieTree.h"
+
+#include "TickServiceProvider.h"
+#include "DrawServiceProvider.h"
+
 #include <iostream>
 Zombie_World::Zombie_World(sf::Window * w):
 		flatEarth(false),playerHP(100)//,
@@ -20,8 +24,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	chunkLoadRate=*cfg.getint("graphics", "chunkLoadRate");
 	lodQuality=*cfg.getfloat("graphics", "terrainQuality");
 	std::cout<<"testStart"<<std::endl;
-	cm=new ChunkManager(16,physDist*2,renderDist);//16,32,6);
-	cm->setMid(0.5f,0.5f);
+	cm=new ChunkManager(16,physDist*2,renderDist,9.81f);
 	currentGun=0;
 	spawnZombies=true;
 	zCount = *cfg.getint("test", "zombies");//024;//128;//1024;//2048+1024;//TODO change 128
@@ -139,7 +142,7 @@ void Zombie_World::render(float seconds)
 {
 	vec3 old=vec3(cam->posX,cam->posY,cam->posZ);
 	keyInp->applyMovement(seconds);
-	cam->posY=cm->getHeight(cam->posX,cam->posZ)+characterHeight;
+	cam->posY=cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))))+characterHeight;
 	vec3 newVec=vec3(cam->posX,cam->posY,cam->posZ);
 	vec3 moved=(newVec-old);
 	if(moved.lengthSq()>0.0000000001f)
@@ -154,9 +157,9 @@ void Zombie_World::render(float seconds)
 		old+=flat*speedModA*speedModB;
 		cam->posX=old.x;
 		cam->posZ=old.z;
-		cam->posY=cm->getHeight(cam->posX,cam->posZ)+characterHeight;
+		cam->posY=cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))))+characterHeight;
 	}
-	cm->setMid(cam->posX,cam->posZ);
+	cm->setMid(cm->fromMeters(vec3(cam->posX,cam->posZ)));//TODO
 
 
 
@@ -189,19 +192,19 @@ void Zombie_World::render(float seconds)
 	}
 	else
 	{
-		cm->render(lodQuality);
+		cm->render(lodQuality,cm,this);
 	}
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
-	Zombie_Tree t=Zombie_Tree({5,cm->getHeight(5,5),5},tree, leaves);
+	Zombie_Tree t=Zombie_Tree({5,cm->toMeters(cm->getHeight(cm->fromMeters(vec3(5,0,5)))),5},tree, leaves);
 	t.draw();
 
 	for (int i = 0; i < zCount; i++)
 	{
 		if (zombies[i])
 		{
-			zombies[i]->draw(seconds);
+			zombies[i]->draw(seconds,cm,this);
 		}
 	}
 	glEnable(GL_TEXTURE_2D);
@@ -332,14 +335,14 @@ void Zombie_World::doPhysics(float sec)
 
 			spacevec newVec=zombies[i]->pos;
 			spacevec moved=(newVec-old);
-			bool chunkBorder=(old.y==defaultHeight)^(newVec.y==defaultHeight);
-			if(moved.lengthSq()>0.0000000001f)
+			bool chunkBorder=(old.y==cm->fromMeters((defaultHeight*1.0f)))^(newVec.y==cm->fromMeters((defaultHeight*1.0f)));
+			if(moved.fLengthSq(cm->getMetersPerChunk())>0.0000000001f)
 			{
-				vec3 norm=moved;
+				vec3 norm=cm->toMeters(moved);
 				norm.normalize();
 				flt speedModA=(vec3(norm.x,0,norm.z).length());
-				vec3 flat=vec3(moved.x,0,moved.z);
-				flt h=moved.y/flat.length();
+				vec3 flat=vec3(cm->toMeters(moved.x),0,cm->toMeters(moved.z));
+				flt h=cm->toMeters(moved.y)/flat.length();
 				SpeedMod sm=SpeedMod();
 				flt speedModB=sm.slowdownFromTerrain(h);
 				if(chunkBorder)
@@ -347,10 +350,10 @@ void Zombie_World::doPhysics(float sec)
 					speedModA=1;
 					speedModB=1;
 				}
-				old+=flat*speedModA*speedModB;
+				old+=cm->fromMeters(flat*speedModA*speedModB);
 				zombies[i]->pos.x=old.x;
 				zombies[i]->pos.z=old.z;
-				zombies[i]->pos.y=cm->getHeight(zombies[i]->pos.x,zombies[i]->pos.z);
+				zombies[i]->pos.y=cm->getHeight(zombies[i]->pos);
 				zombies[i]->maxTransition=1-(h/1.5f);
 				if(zombies[i]->maxTransition>1.7f) zombies[i]->maxTransition=1.7f;
 				if(zombies[i]->maxTransition<0) zombies[i]->maxTransition=0;
@@ -392,7 +395,7 @@ void Zombie_World::doPhysics(float sec)
 			else
 			{
 				float hp = zombies[i]->remainingHP;
-				zombies[i]->checkHitboxes(physics);
+				zombies[i]->checkHitboxes(physics,cm->getMiddleChunk(),cm);
 				if (hp - (zombies[i]->remainingHP))
 				{
 					hitmark = 1;
@@ -413,8 +416,8 @@ void Zombie_World::doPhysics(float sec)
 			else
 			{
 				Zombie_Physics::motion m = physics->getMotion(i, sec);
-				zombies[i]->pos.x += m.x;
-				zombies[i]->pos.z += m.z;
+				zombies[i]->pos.x += cm->fromMeters(m.x);
+				zombies[i]->pos.z += cm->fromMeters(m.z);
 				if ((zombies[i]->remainingHP) < 0) (zombies[i]->dead) += sec * 240;
 			}
 		}
@@ -601,7 +604,7 @@ void Zombie_World::spawnZombie()
 
 	float r1 = rand();//TODO change
 	float r2 = ((rand()%32768)/2028.0f + 1)*zombieDist;
-	zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX, cos(r1)*r2+cam->posZ,cm);
+	zombies[index] = new Zombie_Enemy(zombieTex, cm->fromMeters(vec3(sin(r1)*r2+cam->posX,0, cos(r1)*r2+cam->posZ)),cm);//TODO
 	for(int i=1;i<10;i++)
 	{
 		int z=0;
@@ -619,7 +622,7 @@ void Zombie_World::spawnZombie()
 			std::cout<<"zombie count:"<<z<<std::endl;
 			//if(z==zCount) spawnZombies=false;
 			if (index == -1) return;
-		zombies[index] = new Zombie_Enemy(zombieTex, sin(r1)*r2+cam->posX+sin(i)*5,5*cos(i)+cos(r1)*r2+cam->posZ,cm);
+		zombies[index] = new Zombie_Enemy(zombieTex,  cm->fromMeters(vec3(sin(r1)*r2+cam->posX+sin(i)*5,0,5*cos(i)+cos(r1)*r2+cam->posZ)),cm);//TODO
 	}
 }
 

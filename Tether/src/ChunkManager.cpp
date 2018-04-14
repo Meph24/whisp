@@ -8,6 +8,22 @@
 
 #include "ChunkManager.h"
 
+ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir):
+chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
+{
+	chunksBuf1=new Chunk * [chunksPerAxis*chunksPerAxis];
+	chunksBuf2=new Chunk * [chunksPerAxis*chunksPerAxis];
+	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
+	{
+		chunksBuf1[i]=0;
+		chunksBuf2[i]=0;
+	}
+	chunks=chunksBuf1;
+	setMid({{0,0.5f},{0,0.5f},{0,0.5f}});
+	gravity=fromMeters(gravityYdir);
+	defaultH=fromMeters(defaultHeight*1.0f);
+}
+
 spacelen ChunkManager::getHeight(spacevec abs)
 {
 	chunkNum cx=abs.x.intpart;
@@ -62,21 +78,6 @@ void ChunkManager::render(float lodQ, spacevec camOffset)
 		}
 	}
 	//std::cout<<"rendering end"<<std::endl;
-}
-
-ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir):
-chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
-{
-	chunksBuf1=new Chunk * [chunksPerAxis*chunksPerAxis];
-	chunksBuf2=new Chunk * [chunksPerAxis*chunksPerAxis];
-	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
-	{
-		chunksBuf1[i]=0;
-		chunksBuf2[i]=0;
-	}
-	chunks=chunksBuf1;
-	setMid({{0,0.5f},{0,0.5f},{0,0.5f}});
-	gravity=fromMeters(gravityYdir);
 }
 
 
@@ -322,6 +323,18 @@ ChunkManager::~ChunkManager()
 	}
 	delete chunksBuf1;
 	delete chunksBuf2;
+}
+
+spacevec ChunkManager::getMiddleChunk()
+{
+	spacevec ret;
+	ret.x.floatpart=0;
+	ret.y.floatpart=0;
+	ret.z.floatpart=0;
+	ret.x.intpart=lowX+chunksPerAxis/2;
+	ret.y.intpart=0;
+	ret.z.intpart=0+chunksPerAxis/2;
+	return ret;
 }
 /*
 Chunk* ChunkManager::getChunk(Position p)

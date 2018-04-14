@@ -280,7 +280,7 @@ void Zombie_Enemy::tick(float seconds,TickServiceProvider * tsp)
 void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)
 {
 	spacevec relPos=pos-middleChunk;
-	vec3 relPosMeters=cm->toMeters(relPos)
+	vec3 relPosMeters=cm->toMeters(relPos);
 	bool proj=false;
 	for (int i = 0; i < ph->pCount[0]; i++)
 	{
@@ -295,7 +295,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 			else if(max.y<next.y) max.y=next.y;
 			if(min.z>next.z) min.z=next.z;
 			else if(max.z<next.z) max.z=next.z;
-			spacelen maxSize=3*cm->fromMeters(size);
+			spacelen maxSize=cm->fromMeters(size)*3.0f;
 			max+={maxSize,maxSize,maxSize};
 			min-={maxSize,maxSize,maxSize};
 			if(min.x>pos.x) continue;

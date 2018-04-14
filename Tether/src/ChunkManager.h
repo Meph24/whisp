@@ -18,6 +18,8 @@ class ChunkManager: public Tickable
 {
 	int chunkSize;//size of one chunk
 	int chunksPerAxis;//width and height in chunks
+	spacelen defaultH;
+
 	Chunk ** chunks;//the currently used chunk buffer
 	Chunk ** chunksBuf1;
 	Chunk ** chunksBuf2;
@@ -47,6 +49,7 @@ public:
 	vec3 toMeters(spacevec v);
 	spacelen fromMeters(flt l);
 	spacevec fromMeters(vec3 v);
+	spacevec getMiddleChunk();
 	//Chunk * getChunk(Position p);
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();

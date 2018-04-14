@@ -242,10 +242,21 @@ struct vec3if
 	intfloat<I, F> z;
 
 
-	intfloat<I,F> operator+(intfloat<I,F> other);
-	intfloat<I,F> operator-(intfloat<I,F> other);
-	void operator+=(intfloat<I,F> other);
-	void operator-=(intfloat<I,F> other);
+	vec3if<I,F> operator+(vec3if<I,F> other);
+	vec3if<I,F> operator-(vec3if<I,F> other);
+	void operator+=(vec3if<I,F> other);
+	void operator-=(vec3if<I,F> other);
+
+	vec3if<I,F> operator*(double scalar);
+	void operator*=(double scalar);
+	vec3if<I,F> operator/(double scalar);
+	void operator/=(double scalar);
+	//TODO make better
+	vec3if<I,F> operator*(float scalar);
+	void operator*=(float scalar);
+	vec3if<I,F> operator/(float scalar);
+	void operator/=(float scalar);
+
 
 	float fLengthSq(float chunksPerMeter);
 	double dLengthSq(double chunksPerMeter);
@@ -256,9 +267,9 @@ struct vec3if
 
 
 template<typename I, typename F>
-inline intfloat<I, F> vec3if<I, F>::operator +(intfloat<I, F> other)
+inline vec3if<I, F> vec3if<I, F>::operator +(vec3if<I, F> other)
 {
-	intfloat<I, F> ret;
+	vec3if<I, F> ret;
 	ret.x=x+other.x;
 	ret.y=y+other.y;
 	ret.z=z+other.z;
@@ -266,9 +277,9 @@ inline intfloat<I, F> vec3if<I, F>::operator +(intfloat<I, F> other)
 }
 
 template<typename I, typename F>
-inline intfloat<I, F> vec3if<I, F>::operator -(intfloat<I, F> other)
+inline vec3if<I, F> vec3if<I, F>::operator -(vec3if<I, F> other)
 {
-	intfloat<I, F> ret;
+	vec3if<I, F> ret;
 	ret.x=x-other.x;
 	ret.y=y-other.y;
 	ret.z=z-other.z;
@@ -276,7 +287,7 @@ inline intfloat<I, F> vec3if<I, F>::operator -(intfloat<I, F> other)
 }
 
 template<typename I, typename F>
-inline void vec3if<I, F>::operator +=(intfloat<I, F> other)
+inline void vec3if<I, F>::operator +=(vec3if<I, F> other)
 {
 	x+=other.x;
 	y+=other.y;
@@ -284,7 +295,7 @@ inline void vec3if<I, F>::operator +=(intfloat<I, F> other)
 }
 
 template<typename I, typename F>
-inline void vec3if<I, F>::operator -=(intfloat<I, F> other)
+inline void vec3if<I, F>::operator -=(vec3if<I, F> other)
 {
 	x-=other.x;
 	y-=other.y;
@@ -308,6 +319,70 @@ template<typename I, typename F>
 inline float vec3if<I, F>::fLength(float chunksPerMeter)
 {
 	return sqrt(fLengthSq(chunksPerMeter));
+}
+
+template<typename I, typename F>
+inline vec3if<I, F> vec3if<I, F>::operator *(double scalar)
+{
+	vec3if<I, F> ret;
+	ret.x=x*scalar;
+	ret.y=y*scalar;
+	ret.z=z*scalar;
+	return ret;
+}
+
+template<typename I, typename F>
+inline void vec3if<I, F>::operator *=(double scalar)
+{
+	x*=scalar;
+	y*=scalar;
+	z*=scalar;
+}
+
+template<typename I, typename F>
+inline vec3if<I, F> vec3if<I, F>::operator /(double scalar)
+{
+	double inv=1.0;
+	return (*this)*scalar;
+}
+
+template<typename I, typename F>
+inline void vec3if<I, F>::operator /=(double scalar)
+{
+	double inv=1.0;
+	(*this)*=inv;
+}
+
+template<typename I, typename F>
+inline vec3if<I, F> vec3if<I, F>::operator *(float scalar)
+{
+	vec3if<I, F> ret;
+	ret.x=x*scalar;
+	ret.y=y*scalar;
+	ret.z=z*scalar;
+	return ret;
+}
+
+template<typename I, typename F>
+inline void vec3if<I, F>::operator *=(float scalar)
+{
+	x*=scalar;
+	y*=scalar;
+	z*=scalar;
+}
+
+template<typename I, typename F>
+inline vec3if<I, F> vec3if<I, F>::operator /(float scalar)
+{
+	float inv=1.0f;
+	return (*this)*scalar;
+}
+
+template<typename I, typename F>
+inline void vec3if<I, F>::operator /=(float scalar)
+{
+	float inv=1.0f;
+	(*this)*=inv;
 }
 
 template<typename I, typename F>

@@ -18,7 +18,7 @@
 #include "DebugScreen.h"
 #include "ChunkManager.h"
 #include "TickServiceProvider.h"
-class Zombie_World: public TickServiceProvider
+class Zombie_World: public TickServiceProvider, DrawServiceProvider
 {
 	//TEST
 	//QuatMandel qm;

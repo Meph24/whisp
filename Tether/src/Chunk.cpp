@@ -122,7 +122,7 @@ using namespace noise;
 Chunk::Chunk(spacevec basePos,int baseSize,ChunkManager * cm):
 base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 {
-	defaultH=cm->fromMeters(defaultHeight);
+	defaultH=cm->fromMeters(defaultHeight*1.0f);
 	module::Perlin myModule;
 	myModule.SetSeed(420);
 	myModule.SetOctaveCount(10);

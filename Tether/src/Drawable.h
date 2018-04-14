@@ -8,7 +8,11 @@
 
 #ifndef SRC_DRAWABLE_H_
 #define SRC_DRAWABLE_H_
-
+class DrawServiceProvider;
+#include "DrawServiceProvider.h"
+class ChunkManager;
+#include "ChunkManager.h"
+#include "Spacevec.h"
 class Drawable
 {
 public:
