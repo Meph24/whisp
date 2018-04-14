@@ -7,7 +7,7 @@
 #include "PerformanceMeter.h"
 #include "TextureStatic2D.h"
 #include "Zombie_Physics.h"
-#include "Zombie_Projectile.h"
+#include "EntityProjectile.h"
 #include "Graphics2D.h"
 #include "Zombie_Gun.h"
 #include "Zombie_AmmoType.h"
@@ -31,7 +31,8 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int wCount;
 	float characterHeight=1.6f;
 	Zombie_Enemy ** zombies;
-	Zombie_Projectile ** shots;
+	//Zombie_Projectile ** shots;
+	EntityProjectile ** shots;
 	Zombie_KeyInput * keyInp;
 	PerformanceMeter * pm;
 	DebugScreen * ds;
@@ -69,6 +70,8 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	void restart();
 
 	bool reset = false;
+
+	int entityIndex=0;//TODO
 public:
 	Zombie_MouseInput * mouseInp;
 	ICamera3D * cam;
@@ -79,10 +82,12 @@ public:
 
 
 
-	void spawnEntity(Entity * e);//spawns Entity into World
-	ICamera3D * getHolderCamera();//can return 0 if currently not held
-	ChunkManager * getChunkManager();
-	void requestDestroy(Entity * e);
+	//TickServiceProvider
+	virtual void spawnEntity(Entity * e);//spawns Entity into World
+	virtual ICamera3D * getHolderCamera();//can return 0 if currently not held
+	virtual ChunkManager * getChunkManager();
+	virtual void requestDestroy(Entity * e);//do not call yourself, call Entity.requestDestroy(tsp) instead!
+
 
 
 

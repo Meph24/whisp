@@ -102,8 +102,8 @@ Zombie_Physics::hit Zombie_Physics::testHitbox(MatrixLib2 * ml,float xFrom, floa
 	{
 		if (projectiles[i])
 		{
-			vec3 p1 = matOut* (projectiles[i]->posOld);
-			vec3 p2 = matOut*(projectiles[i]->pos);
+			vec3 p1 = matOut* (cm->toMeters(projectiles[i]->posOld));//TODO make use spatial relativity
+			vec3 p2 = matOut*(cm->toMeters(projectiles[i]->pos));
 			//projectile now relative to cube, where cube is at 0-1 on all 3 axis
 			float vx = p2.x - p1.x;//TODO check for 0
 			float vy = p2.y - p1.y;

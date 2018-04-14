@@ -28,13 +28,13 @@ spacelen ChunkManager::getHeight(spacevec abs)
 {
 	chunkNum cx=abs.x.intpart;
 	chunkNum cz=abs.z.intpart;
-	if(cx<lowX) return defaultHeight;
-	if(cz<lowZ) return defaultHeight;
-	if(cx>=(lowX+chunksPerAxis)) return defaultHeight;
-	if(cz>=(lowZ+chunksPerAxis)) return defaultHeight;
+	if(cx<lowX) return fromMeters(defaultHeight*1.0f);
+	if(cz<lowZ) return fromMeters(defaultHeight*1.0f);
+	if(cx>=(lowX+chunksPerAxis)) return fromMeters(defaultHeight*1.0f);
+	if(cz>=(lowZ+chunksPerAxis)) return fromMeters(defaultHeight*1.0f);
 	if(chunks[getIndx(cx,cz)])
 		return chunks[getIndx(cx,cz)]->getHeight(abs.x.floatpart,abs.z.floatpart);
-	else return defaultHeight;
+	else return fromMeters(defaultHeight*1.0f);
 }
 
 #include <iostream>
@@ -244,9 +244,9 @@ flt ChunkManager::toMeters(spacelen l)
 
 vec3 ChunkManager::toMeters(spacevec v)
 {
-	vec3 ret={v.x.floatpart,v.y.floatpart,v.z.floatpart};
-	ret+={v.x.intpart,v.y.intpart,v.z.intpart};
-	ret*=chunkSize;
+	vec3 ret=vec3(v.x.floatpart,v.y.floatpart,v.z.floatpart);
+	ret+=vec3(v.x.intpart,v.y.intpart,v.z.intpart);
+	ret=ret*(chunkSize*1.0f);
 	return ret;
 }
 

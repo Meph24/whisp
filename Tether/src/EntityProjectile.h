@@ -14,13 +14,10 @@
 
 class EntityProjectile: public Entity
 {
-	ItemAmmo * fromItem;
-	spacevec posOld;
-
-
-
 	static ITexture * tex;
 public:
+	ItemAmmo * fromItem;//TODO private?
+	spacevec posOld;//TODO private?
 
 	EntityProjectile(ItemAmmo * item,spacevec position,spacevec velocity);//gives item ownership to the Projectile
 	~EntityProjectile();

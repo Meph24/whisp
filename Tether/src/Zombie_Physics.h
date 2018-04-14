@@ -1,5 +1,5 @@
 #pragma once
-#include "Zombie_Projectile.h"
+#include "EntityProjectile.h"
 #include "MatrixLib2.h"
 class Zombie_Physics
 {
@@ -13,9 +13,11 @@ class Zombie_Physics
 	int curMax;
 	int totalMax;
 
+
 	//MatrixLib2 ml;
 
 public:
+	ChunkManager * cm=0;
 
 	typedef struct
 	{
@@ -23,7 +25,7 @@ public:
 		float time;//0=begin of frame 1=end of frame
 	} hit;
 
-	Zombie_Projectile ** projectiles;
+	EntityProjectile ** projectiles;
 	int* pCount;
 
 	typedef struct

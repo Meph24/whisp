@@ -35,7 +35,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 		zombies[i] = 0;
 	}
 	pCount = 1024;//zCount * 8;
-	shots = new Zombie_Projectile *[pCount];
+	shots = new EntityProjectile *[pCount];
 	for (int i = 0; i < pCount; i++)
 	{
 		shots[i] = 0;
@@ -43,10 +43,10 @@ Zombie_World::Zombie_World(sf::Window * w):
 	wCount = 4;
 	guns = new Zombie_Gun * [wCount];
 
-	guns[0] = new Zombie_Gun("Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new Zombie_AmmoType(358, 79.5f,0.001628170585565067f),false,{2,0.15f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[1] = new Zombie_Gun("Flamethrower",0.04f,"res/mortar_shoot.wav",1,new Zombie_AmmoType(20, 75,0.005f),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
-	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new Zombie_AmmoType(440,31.8f,0.0022272754325748604f),true,{1.5f,0,0},{1,1,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new Zombie_AmmoType(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
+	guns[0] = new Zombie_Gun("Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f),false,{2,0.15f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[1] = new Zombie_Gun("Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
+	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f),true,{1.5f,0,0},{1,1,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
 	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 
 	cam = new CameraFP();
@@ -54,7 +54,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	cam->maxView=2048*8;
 	cam->posX=0.5f;
 	cam->posZ=0.5f;
-	cam->posY = characterHeight+cm->getHeight(cam->posX,cam->posZ);
+	cam->posY = characterHeight+cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))));
 	cam->width = w->getSize().x;
 	cam->height = w->getSize().y;
 
@@ -75,6 +75,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	mouseInp->enable();
 
 	physics = new Zombie_Physics(zCount * 2);
+	physics->cm=cm;//TODO implement cleaner solution
 	physics->pCount = &pCount;
 	physics->projectiles = shots;
 	ds=new DebugScreen(pm,&g);
@@ -108,8 +109,8 @@ void Zombie_World::restart()
 	{
 		if (shots[i])
 		{
-			shots[i]->pos.y = -1000;
-			shots[i]->posOld.y = -1000;
+			shots[i]->pos.y = cm->fromMeters(-1000);
+			shots[i]->posOld.y =cm->fromMeters(-1000);
 		}
 	}
 }
@@ -159,7 +160,7 @@ void Zombie_World::render(float seconds)
 		cam->posZ=old.z;
 		cam->posY=cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))))+characterHeight;
 	}
-	cm->setMid(cm->fromMeters(vec3(cam->posX,cam->posZ)));//TODO
+	cm->setMid(cm->fromMeters(vec3(cam->posX,0,cam->posZ)));//TODO
 
 
 
@@ -192,7 +193,7 @@ void Zombie_World::render(float seconds)
 	}
 	else
 	{
-		cm->render(lodQuality,cm,this);
+		cm->render(lodQuality,cm->fromMeters(vec3(0,0,0)));//TODO
 	}
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
@@ -204,7 +205,8 @@ void Zombie_World::render(float seconds)
 	{
 		if (zombies[i])
 		{
-			zombies[i]->draw(seconds,cm,this);
+			zombies[i]->tick(seconds,this);
+			zombies[i]->draw(0,cm->fromMeters(vec3(0,0,0)),cm,this);//TODO
 		}
 	}
 	glEnable(GL_TEXTURE_2D);
@@ -212,7 +214,8 @@ void Zombie_World::render(float seconds)
 	{
 		if (shots[i])
 		{
-			shots[i]->draw();
+			shots[i]->tick(seconds,this);
+			shots[i]->draw(0,cm->fromMeters(vec3(0,0,0)),cm,this);//TODO
 		}
 	}
 	glDisable(GL_TEXTURE_2D);
@@ -307,14 +310,12 @@ void Zombie_World::loadStandardTex()
 
 	shot = new TextureStatic2D(tps2, "./res/fireball.png");
 	shot->update();
+	EntityProjectile::setTexture(shot);
 	leaves = new TextureStatic2D(tps2, "./res/leaves.png");
 	leaves->update();
 
 	g = new Graphics2D(64);
 
-	//TEST
-	//zombies[0] = new Zombie_Enemy(zombieTex, 0, -2000);
-	//zombies[1] = new Zombie_Enemy(zombieTex, 0, -4000);
 }
 
 void Zombie_World::doPhysics(float sec)
@@ -458,11 +459,7 @@ void Zombie_World::doPhysics(float sec)
 	{
 		if (shots[i])
 		{
-			if (shots[i]->move(sec,cm))
-			{
-				delete shots[i];
-				shots[i] = 0;
-			}
+			shots[i]->tick(sec,this);
 		}
 	}
 
@@ -521,7 +518,7 @@ void Zombie_World::loop()
 		}
 		if(index!=-1)
 		{
-			shots[index] = guns[currentGun]->tick(sec,cam,shot);
+			shots[index] = guns[currentGun]->tick(sec,cam,shot,cm);
 		}
 		pm->registerTime(timestep++);
 		for(int i=0;i<40;i++)
@@ -569,7 +566,7 @@ void Zombie_World::trigger(bool pulled)
 		}
 	}
 	if(index==-1) return;
-	shots[index] = guns[currentGun]->tryShoot(cam,shot);
+	shots[index] = guns[currentGun]->tryShoot(cam,shot,cm);
 }
 
 void Zombie_World::switchWeapon(int dir)
@@ -635,6 +632,7 @@ void Zombie_World::markRestart()
 void Zombie_World::spawnEntity(Entity* e)
 {
 	//TODO
+	std::cout<<"not implemented yet!!!"<<std::endl;
 }
 
 ICamera3D* Zombie_World::getHolderCamera()
@@ -649,5 +647,13 @@ ChunkManager* Zombie_World::getChunkManager()
 
 void Zombie_World::requestDestroy(Entity* e)
 {
-
+	if(((Entity *)shots[entityIndex])==e)
+	{
+		delete shots[entityIndex];
+		shots[entityIndex] = 0;
+	}
+	else
+	{
+		std::cout<<"requestDestroy got called with invalid entityIndex"<<std::endl;
+	}
 }

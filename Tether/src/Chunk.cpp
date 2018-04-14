@@ -9,10 +9,10 @@
 #include "Chunk.h"
 spacelen Chunk::getHeight(flt xh, flt zh)
 {
-	if(xh<0) return defaultH*2;
-	if(zh<0) return defaultH*2;
-	if(xh>1) return defaultH*2;
-	if(zh>1) return defaultH*2;
+	if(xh<0) return defaultH*2.0f;
+	if(zh<0) return defaultH*2.0f;
+	if(xh>1) return defaultH*2.0f;
+	if(zh>1) return defaultH*2.0f;
 
 	xh*=size;
 	zh*=size;

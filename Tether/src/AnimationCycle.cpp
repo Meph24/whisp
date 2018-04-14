@@ -68,7 +68,7 @@ float AnimationCycle::getCurStepTau(float phaseOffset)
 
 
 AnimationCycle::AnimationCycle(float cycleLength, float startPhase,int maxCycles):
-		cycleLenInv(1.0f/cycleLength),progress(startPhase),hiddenProgress(0),remaining(maxCycles)
+		hiddenProgress(0),remaining(maxCycles),cycleLenInv(1.0f/cycleLength),progress(startPhase)
 {
 	if(remaining>0) remaining--;
 }

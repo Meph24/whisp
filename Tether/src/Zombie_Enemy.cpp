@@ -418,7 +418,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 
 }
 
-void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,Zombie_Projectile ** shots)
+void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,EntityProjectile ** shots)
 {
 	if (hit.projectileIndex == -1) return;
 	float dmgMult = 0;
@@ -449,14 +449,14 @@ void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,Zombie_Projectile **
 		legDmgMult = 0.55f;
 		break;
 	}
-	legDmg+=legDmgMult*shots[hit.projectileIndex]->pType->damage;
-	remainingHP -= shots[hit.projectileIndex]->pType->damage*dmgMult;
+	legDmg+=legDmgMult*shots[hit.projectileIndex]->fromItem->damagePerJoule;//TODO replace with better logic once guns 2.0 work
+	remainingHP -= shots[hit.projectileIndex]->fromItem->damagePerJoule*dmgMult;
 	if(remainingHP<0)
 	{
 		remainingHP=-totalHP*dmgMult;//TODO
 	}
-	shots[hit.projectileIndex]->pos.y -= 1000;
-	shots[hit.projectileIndex]->posOld.y -= 1000;
+	shots[hit.projectileIndex]->pos.y.intpart -= 1000;
+	shots[hit.projectileIndex]->posOld.y.intpart -= 1000;
 	if((legDmg>0.25f*totalHP)&&(tilted!=-10))
 	{
 		tilted=-10;

@@ -8,7 +8,8 @@
 
 #include "ItemAmmo.h"
 
-ItemAmmo::ItemAmmo()
+ItemAmmo::ItemAmmo(float spd,float dmg,float drg):
+damagePerJoule(dmg),drag(drg),explEnergy(spd)
 {
 	ID.group=ITEM_GROUP_AMMO;
 }

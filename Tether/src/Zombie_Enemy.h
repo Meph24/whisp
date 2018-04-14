@@ -32,7 +32,7 @@ class Zombie_Enemy: public Entity
 	void drawLeg(int loc,float strength);
 	void drawTexturedCube(texCooSet textureCoordinates);
 
-	void gotHit(Zombie_Physics::hit hit, int part, Zombie_Projectile ** shots);
+	void gotHit(Zombie_Physics::hit hit, int part, EntityProjectile ** shots);
 
 public:
 	ChunkManager * cm;
@@ -45,8 +45,8 @@ public:
 	float legDmg;
 
 	AnimationCycle bodyAnim;
-	AnimationCycle transitionAnim;
 	AnimationCycle fallAnim;
+	AnimationCycle transitionAnim;
 
 	float maxTransition=1;
 
