@@ -63,8 +63,8 @@ template<typename I, typename F>
 inline intfloat<I, F> intfloat<I, F>::operator -(intfloat<I, F> other)
 {
 	intfloat<I,F> ret;
-	ret.floatpart=floatpart+other.floatpart;
-	ret.intpart=intpart+other.intpart;
+	ret.floatpart=floatpart-other.floatpart;
+	ret.intpart=intpart-other.intpart;
 	if (ret.floatpart<0)
 	{
 		ret.intpart--;
@@ -88,8 +88,8 @@ inline void intfloat<I, F>::operator +=(intfloat<I, F> other)
 template<typename I, typename F>
 inline void intfloat<I, F>::operator -=(intfloat<I, F> other)
 {
-	intpart+=other.intpart;
-	floatpart+=other.floatpart;
+	intpart-=other.intpart;
+	floatpart-=other.floatpart;
 	if(floatpart<0)
 	{
 		intpart--;

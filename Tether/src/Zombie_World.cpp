@@ -64,7 +64,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	mouseInp->sensitivityX = *cfg.getfloat("input", "sensitivityX");
 	mouseInp->sensitivityY = *cfg.getfloat("input", "sensitivityY");
 	keyInp = new Zombie_KeyInput(mouseInp, cam);
-	keyInp->speed = 30.6f;
+	keyInp->speed = 3.6f;
 
 	pm = new PerformanceMeter(12,1000);
 	pm->roundtripUpdateIndex = 0;
@@ -214,7 +214,6 @@ void Zombie_World::render(float seconds)
 	{
 		if (shots[i])
 		{
-			shots[i]->tick(seconds,this);
 			shots[i]->draw(0,cm->fromMeters(vec3(0,0,0)),cm,this);//TODO
 		}
 	}
@@ -459,6 +458,7 @@ void Zombie_World::doPhysics(float sec)
 	{
 		if (shots[i])
 		{
+			entityIndex=i;
 			shots[i]->tick(sec,this);
 		}
 	}
