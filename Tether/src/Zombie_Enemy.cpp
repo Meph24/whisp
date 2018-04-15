@@ -187,7 +187,7 @@ void Zombie_Enemy::drawArm(int loc)
 
 	glPushMatrix();
 	glTranslatef(0, 1.1f, loc *0.3f);
-	glRotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
+	glRotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
 	glTranslatef(0, -0.6f, 0);
 	glScalef(1, 3, 1);
 	drawTexturedCube(tc);
@@ -392,7 +392,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	loc = 1;
 
 	ml.translatef(0, 1.1f, loc * 0.3f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
@@ -405,7 +405,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	loc = -1;
 
 	ml.translatef(0, 1.1f, loc * 0.3f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16, 0, 0, 1);
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 

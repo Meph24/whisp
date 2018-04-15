@@ -210,21 +210,23 @@ inline float intfloat<I, F>::fSquared(float chunkSize)
 {
 	float ret=intpart;
 	ret+=floatpart;
-	ret/=chunkSize;
+	ret*=chunkSize;
 	return ret*ret;
 }
 
 template<typename I, typename F>
 inline void intfloat<I, F>::correct()
 {
-	intfloat<I, F> debugBefore=*this;
+	//intfloat<I, F> debugBefore=*this;
+
 	I change=(I)floatpart;
 	if(floatpart<0) change--;
 	intpart+=change;
 	floatpart-=change;
-	intfloat<I, F> debugAfter=*this;
-	if(debugBefore.floatpart<-1000 || debugBefore.floatpart>1000 || debugBefore.intpart<-1000 ||debugAfter.intpart<-1000)
-		std::cout<<"before: "<<debugBefore<<" after:  "<<debugAfter<<std::endl;
+
+	//intfloat<I, F> debugAfter=*this;
+	//if(debugBefore.floatpart<-10000 || debugBefore.floatpart>10000 || debugBefore.intpart<-10000 ||debugAfter.intpart<-10000)
+	//	std::cout<<"suspiciously large coordinate, before: "<<debugBefore<<" after:  "<<debugAfter<<std::endl;
 }
 
 template<typename I, typename F>
@@ -232,7 +234,7 @@ inline double intfloat<I, F>::dSquared(double chunkSize)
 {
 	double ret=intpart;
 	ret+=floatpart;
-	ret/=chunkSize;
+	ret*=chunkSize;
 	return ret*ret;
 }
 template<typename I, typename F>

@@ -335,7 +335,7 @@ void Zombie_World::doPhysics(float sec)
 			spacevec newVec=zombies[i]->pos;
 			spacevec moved=(newVec-old);
 			bool chunkBorder=(old.y==cm->fromMeters((defaultHeight*1.0f)))^(newVec.y==cm->fromMeters((defaultHeight*1.0f)));
-			if(moved.fLengthSq(cm->getChunkSizeInvF())>0.0000000001f)
+			if(moved.fLengthSq(cm->getChunkSize())>0.0000000001f)
 			{
 				vec3 norm=cm->toMeters(moved);
 				norm.normalize();
@@ -394,7 +394,7 @@ void Zombie_World::doPhysics(float sec)
 			else
 			{
 				float hp = zombies[i]->remainingHP;
-				zombies[i]->checkHitboxes(physics,cm->getMiddleChunk(),cm);
+				zombies[i]->checkHitboxes(physics,cm->fromMeters({0,0,0}),cm);//TODO cm->getMiddleChunk(),cm);
 				if (hp - (zombies[i]->remainingHP))
 				{
 					hitmark = 1;

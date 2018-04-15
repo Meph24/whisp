@@ -11,8 +11,8 @@
 ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir):
 chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
-	fChunkSizeInv=1.0f/chunkSize;
-	dChunkSizeInv=1.0/chunkSize;
+	//fChunkSizeInv=1.0f/chunkSize;
+	//dChunkSizeInv=1.0/chunkSize;
 	chunksBuf1=new Chunk * [chunksPerAxis*chunksPerAxis];
 	chunksBuf2=new Chunk * [chunksPerAxis*chunksPerAxis];
 	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
@@ -295,8 +295,8 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 {
 	//TODO make better
 	spacevec dif=endpoint-startpoint;
-	float len=dif.fLength(getChunkSizeInvF());
-	std::cout<<len<<std::endl;
+	float len=dif.fLength(getChunkSize());
+	//std::cout<<len<<std::endl;
 
 
 	int tries;
@@ -346,7 +346,7 @@ float ChunkManager::getChunkSize()
 {
 	return chunkSize;
 }
-
+/*
 float ChunkManager::getChunkSizeInvF()
 {
 	return fChunkSizeInv;
@@ -355,7 +355,7 @@ float ChunkManager::getChunkSizeInvF()
 double ChunkManager::getChunkSizeInvD()
 {
 	return dChunkSizeInv;
-}
+}*/
 /*
 Chunk* ChunkManager::getChunk(Position p)
 {
