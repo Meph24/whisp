@@ -14,8 +14,9 @@ spacelen Chunk::getHeight(flt xh, flt zh)
 	if(xh>1) return defaultH*2.0f;
 	if(zh>1) return defaultH*2.0f;
 
-	xh*=size;
-	zh*=size;
+	int smallSize=size-1;
+	xh*=smallSize;
+	zh*=smallSize;
 	float innerX=xh-(int)xh;
 	float innerY=zh-(int)zh;
 	float h00=getH((int)(xh),(int)(zh));
@@ -31,7 +32,10 @@ void Chunk::render(int lod,spacevec camOffset)
 {
 	//std::cout<<"rendering x="<<x<<" y="<<y<<std::endl;
 	vec3 relpos=parent->toMeters(base-camOffset);
-	float whiteness=avgHeight;
+	//if(relpos.y!=0)
+	//	std::cout<<"rendering relpos.x="<<relpos.x<<" relpos.y="<<relpos.y<<std::endl;
+
+	float whiteness=avgHeight;//a racist float
 	whiteness=pow(whiteness/100.0f,1.5f);
 	glColor3f(0.2f+0.8f*whiteness,0.8f+0.2f*whiteness,0.2f+0.8f*whiteness);
 
@@ -134,7 +138,7 @@ base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 	{
 		for(int xrun=0;xrun<size;xrun++)
 		{
-			float val=((float)myModule.GetValue((double)xrun+size*(double)base.x.floatpart+size*(double)base.x.intpart, (double)zrun+size*(double)base.z.floatpart+size*(double)base.z.intpart, 0))*10.0f;
+			float val=((float)myModule.GetValue((double)xrun+baseSize*(double)base.x.floatpart+baseSize*(double)base.x.intpart, (double)zrun+baseSize*(double)base.z.floatpart+baseSize*(double)base.z.intpart, 0))*10.0f;
 			height[zrun*size+xrun]=val*val;
 			avgHeight+=val*val;
 		}

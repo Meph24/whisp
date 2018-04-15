@@ -17,6 +17,8 @@ class Chunk;
 class ChunkManager: public Tickable
 {
 	int chunkSize;//size of one chunk
+	float fChunkSizeInv;
+	float dChunkSizeInv;
 	int chunksPerAxis;//width and height in chunks
 	spacelen defaultH;
 
@@ -35,7 +37,9 @@ class ChunkManager: public Tickable
 	int getIndx(chunkNum cx,chunkNum cz);//from absolute chunk coordinates
 	int getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ);//from absolute chunk coordinates
 public:
-	float getMetersPerChunk();
+	float getChunkSize();
+	float getChunkSizeInvF();
+	double getChunkSizeInvD();
 	spacevec clip(spacevec pos,bool forceGround);
 	bool hitsGround(spacevec startpoint,spacevec endpoint);
 	spacelen getGravity();

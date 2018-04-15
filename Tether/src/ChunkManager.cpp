@@ -11,6 +11,8 @@
 ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir):
 chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
+	fChunkSizeInv=1.0f/chunkSize;
+	dChunkSizeInv=1.0/chunkSize;
 	chunksBuf1=new Chunk * [chunksPerAxis*chunksPerAxis];
 	chunksBuf2=new Chunk * [chunksPerAxis*chunksPerAxis];
 	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
@@ -26,6 +28,10 @@ chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDis
 
 spacelen ChunkManager::getHeight(spacevec abs)
 {
+	if(abs.x.floatpart<0 || abs.z.floatpart<0)
+	{
+		std::cout<<abs<<std::endl;
+	}
 	chunkNum cx=abs.x.intpart;
 	chunkNum cz=abs.z.intpart;
 	if(cx<lowX) return defaultH;
@@ -254,8 +260,9 @@ spacelen ChunkManager::fromMeters(flt l)
 {
 	l/=chunkSize;
 	spacelen ret;
-	ret.intpart=(chunkNum)l;
-	ret.floatpart=l-((chunkNum)l);
+	ret.floatpart=l;
+	ret.intpart=0;
+	ret.correct();
 	return ret;
 }
 
@@ -275,9 +282,7 @@ spacelen ChunkManager::getGravity()
 
 spacevec ChunkManager::clip(spacevec pos, bool forceGround)
 {
-	spacevec ret;
-	ret.x=pos.x;
-	ret.z=pos.z;
+	spacevec ret=pos;
 	spacelen height=getHeight(pos);
 	if(ret.y<height || forceGround)
 	{
@@ -290,7 +295,10 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 {
 	//TODO make better
 	spacevec dif=endpoint-startpoint;
-	float len=dif.fLength(getMetersPerChunk());
+	float len=dif.fLength(getChunkSizeInvF());
+	std::cout<<len<<std::endl;
+
+
 	int tries;
 	if(len>MAX_GROUNDHIT_TRIES)
 	{
@@ -299,6 +307,7 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 	else
 	{
 		tries=int(len);
+		if(tries<1) tries=1;
 	}
 	float triesInv=1.0f/tries;
 	for(int i = 0 ; i<tries+1; i++)
@@ -309,10 +318,6 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 	return false;
 }
 
-float ChunkManager::getMetersPerChunk()
-{
-	return chunkSize;
-}
 
 ChunkManager::~ChunkManager()
 {
@@ -333,8 +338,23 @@ spacevec ChunkManager::getMiddleChunk()
 	ret.z.floatpart=0;
 	ret.x.intpart=lowX+chunksPerAxis/2;
 	ret.y.intpart=0;
-	ret.z.intpart=0+chunksPerAxis/2;
+	ret.z.intpart=lowZ+chunksPerAxis/2;
 	return ret;
+}
+
+float ChunkManager::getChunkSize()
+{
+	return chunkSize;
+}
+
+float ChunkManager::getChunkSizeInvF()
+{
+	return fChunkSizeInv;
+}
+
+double ChunkManager::getChunkSizeInvD()
+{
+	return dChunkSizeInv;
 }
 /*
 Chunk* ChunkManager::getChunk(Position p)

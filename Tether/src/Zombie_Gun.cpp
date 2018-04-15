@@ -61,7 +61,6 @@ EntityProjectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex,ChunkMan
 	v.y = ml.curMatrix[1] * velX + ml.curMatrix[5] * velY + ml.curMatrix[9] * velZ;
 	v.z = ml.curMatrix[2] * velX + ml.curMatrix[6] * velY + ml.curMatrix[10] * velZ;
 
-
 	EntityProjectile * zp= new EntityProjectile((ItemAmmo*)pType->newClone(),cm->fromMeters(vec3(cam->posX,cam->posY,cam->posZ)),cm->fromMeters(v));//cam, tex,pType);
 
 	noiseTimer+=timer*3.2f;

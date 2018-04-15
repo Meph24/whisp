@@ -7,6 +7,7 @@ Zombie_Enemy::Zombie_Enemy(ITexture * texture,spacevec startPos,ChunkManager * c
 tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.5f,0,1),transitionAnim(0.5f,0,1),dead(0)//posX(startX), posZ(startZ) spawns a random zombie at the given location
 {
 	pos=cm->clip(startPos,true);
+	v=cm->fromMeters({0,0,0});
 	facing = std::rand() % 360;
 	speed = 2 +(std::rand() % 5000)/1000;
 	size = 0.6f + (std::rand() % 1024) / 1024.0f;

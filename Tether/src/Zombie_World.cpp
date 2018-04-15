@@ -48,7 +48,6 @@ Zombie_World::Zombie_World(sf::Window * w):
 	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f),true,{1.5f,0,0},{1,1,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
 	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-
 	cam = new CameraFP();
 	cam->minView=0.25f;
 	cam->maxView=2048*8;
@@ -64,7 +63,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	mouseInp->sensitivityX = *cfg.getfloat("input", "sensitivityX");
 	mouseInp->sensitivityY = *cfg.getfloat("input", "sensitivityY");
 	keyInp = new Zombie_KeyInput(mouseInp, cam);
-	keyInp->speed = 3.6f;
+	keyInp->speed = 30.6f;
 
 	pm = new PerformanceMeter(12,1000);
 	pm->roundtripUpdateIndex = 0;
@@ -336,7 +335,7 @@ void Zombie_World::doPhysics(float sec)
 			spacevec newVec=zombies[i]->pos;
 			spacevec moved=(newVec-old);
 			bool chunkBorder=(old.y==cm->fromMeters((defaultHeight*1.0f)))^(newVec.y==cm->fromMeters((defaultHeight*1.0f)));
-			if(moved.fLengthSq(cm->getMetersPerChunk())>0.0000000001f)
+			if(moved.fLengthSq(cm->getChunkSizeInvF())>0.0000000001f)
 			{
 				vec3 norm=cm->toMeters(moved);
 				norm.normalize();
@@ -592,7 +591,7 @@ void Zombie_World::spawnZombie()
 
 
 	}
-	std::cout<<"zombie count:"<<z<<std::endl;
+	//std::cout<<"zombie count:"<<z<<std::endl;
 	//if(z==zCount) spawnZombies=false;
 	if (index == -1) return;
 	//float r1 = (rand()%1024)/1024.0f;
