@@ -142,9 +142,12 @@ void Zombie_World::removeZombie(int zid)
 }
 void Zombie_World::render(float seconds)
 {
+	spacevec relPos=cm->getMiddleChunk();
+
+
 	spacevec oldPos=player->pos;
 	keyInp->applyMovement(seconds);
-	player->pos=cm->clip(player->pos,true);//cam->posY=cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))))+characterHeight;
+	player->pos=cm->clip(player->pos,true);
 	spacevec newPos=player->pos;
 	vec3 moved=cm->toMeters(newPos-oldPos);
 	if(moved.lengthSq()>0.0000000001f)
@@ -163,7 +166,7 @@ void Zombie_World::render(float seconds)
 	cm->setMid(player->pos);
 
 
-	spacevec pelPos=player->applyPerspective(true,cm);
+	player->applyPerspective(true,cm);
 
 	grass->bind();
 	glColor3f(0.2f, 0.6f, 0.1f);
@@ -191,13 +194,14 @@ void Zombie_World::render(float seconds)
 	}
 	else
 	{
-		cm->render(lodQuality,pelPos);
+		cm->render(lodQuality,relPos);
 	}
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
-	//spacevec treePos=
-	Zombie_Tree t=Zombie_Tree({5,cm->toMeters(cm->getHeight(cm->fromMeters(vec3(5,0,5)))),5},tree, leaves);
+	spacevec treePos=cm->clip(cm->fromMeters(vec3(5,0,5)),true);
+	spacevec relTree=treePos-relPos;
+	Zombie_Tree t=Zombie_Tree(cm->toMeters(relTree),tree, leaves);
 	t.draw();
 
 	for (int i = 0; i < zCount; i++)
@@ -205,7 +209,7 @@ void Zombie_World::render(float seconds)
 		if (zombies[i])
 		{
 			zombies[i]->tick(seconds,this);
-			zombies[i]->draw(0,pelPos,cm,this);//TODO
+			zombies[i]->draw(0,relPos,cm,this);//TODO
 		}
 	}
 	glEnable(GL_TEXTURE_2D);
@@ -213,7 +217,7 @@ void Zombie_World::render(float seconds)
 	{
 		if (shots[i])
 		{
-			shots[i]->draw(0,cm->fromMeters(vec3(0,0,0)),cm,this);//TODO
+			shots[i]->draw(0,relPos,cm,this);//TODO
 		}
 	}
 	glDisable(GL_TEXTURE_2D);
@@ -475,12 +479,15 @@ void Zombie_World::loop()
 	}
 	else
 	{
+
 		timestep = 0;
 		pm->registerTime(timestep++);
 		float sec = pm->roundtriptime / 1000000.0f;
 		sec *= timeFactor;
 		if (sec < 0) sec = 0;
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
+
+
 
 		int index = -1;
 		for (int i = 0; i < pCount; i++)
@@ -493,7 +500,7 @@ void Zombie_World::loop()
 		}
 		if(index!=-1)
 		{
-			shots[index] = guns[currentGun]->tick(sec,player->cam,shot,cm);
+			shots[index] = guns[currentGun]->tick(sec,player->cam,player,shot,cm);
 		}
 		pm->registerTime(timestep++);
 		for(int i=0;i<40;i++)
@@ -542,7 +549,7 @@ void Zombie_World::trigger(bool pulled)
 		}
 	}
 	if(index==-1) return;
-	shots[index] = guns[currentGun]->tryShoot(player->cam,shot,cm);
+	shots[index] = guns[currentGun]->tryShoot(player->cam,player,shot,cm);
 }
 
 void Zombie_World::switchWeapon(int dir)

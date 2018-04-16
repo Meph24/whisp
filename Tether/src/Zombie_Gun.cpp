@@ -23,7 +23,7 @@ Zombie_Gun::~Zombie_Gun()
 #include <iostream>
 #include "MatrixLib2.h"
 #define recoilDampeningTime 0.5f
-EntityProjectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex,ChunkManager * cm)
+EntityProjectile * Zombie_Gun::tryShoot(ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
 {
 	trigger=true;
 	if (timer <= 0)
@@ -61,7 +61,7 @@ EntityProjectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex,ChunkMan
 	v.y = ml.curMatrix[1] * velX + ml.curMatrix[5] * velY + ml.curMatrix[9] * velZ;
 	v.z = ml.curMatrix[2] * velX + ml.curMatrix[6] * velY + ml.curMatrix[10] * velZ;
 
-	EntityProjectile * zp= new EntityProjectile((ItemAmmo*)pType->newClone(),cm->fromMeters(vec3(cam->posX,cam->posY,cam->posZ)),cm->fromMeters(v));//cam, tex,pType);
+	EntityProjectile * zp= new EntityProjectile((ItemAmmo*)pType->newClone(),player->getCamPos(),cm->fromMeters(v));//cam, tex,pType);
 
 	noiseTimer+=timer*3.2f;
 	vec3 rand={(float)nm.GetValue(noiseTimer,0,0),(float)nm.GetValue(noiseTimer,0,55),0};
@@ -70,7 +70,7 @@ EntityProjectile * Zombie_Gun::tryShoot(ICamera3D * cam, ITexture * tex,ChunkMan
 	return zp;
 }
 
-EntityProjectile * Zombie_Gun::tick(float sec,ICamera3D * cam, ITexture * tex,ChunkManager * cm)
+EntityProjectile * Zombie_Gun::tick(float sec,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
 {
 	vec3 recoilMod=recoilM.getRecoilDiff(sec);
 	cam->alpha-=recoilMod.x;
@@ -87,7 +87,7 @@ EntityProjectile * Zombie_Gun::tick(float sec,ICamera3D * cam, ITexture * tex,Ch
 	{
 		if(trigger)
 		{
-			EntityProjectile * zp=tryShoot(cam,tex, cm);
+			EntityProjectile * zp=tryShoot(cam,player,tex, cm);
 			return zp;
 		}
 	}

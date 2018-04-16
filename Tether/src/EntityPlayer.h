@@ -22,6 +22,7 @@ public:
 	float maxTPdist=20;
 
 	float characterHeight=1.6f;
+	spacelen characterHeightConv;
 
 	float HP=0;
 	float maxHP=100;
@@ -31,7 +32,9 @@ public:
 
 	void changeTPdist(float amount);
 
-	spacevec applyPerspective(bool fresh,ChunkManager * cm);//returns position that must be used for relative draws
+	spacevec getCamPos();
+
+	void applyPerspective(bool fresh,ChunkManager * cm);//returns position that must be used for relative draws
 
 	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp);
 

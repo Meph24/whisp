@@ -4,6 +4,8 @@
 #include <SFML/Audio.hpp>
 
 #include "EntityProjectile.h"
+class EntityPlayer;
+#include "EntityPlayer.h"
 #include "ICamera3D.h"
 #include "ITexture.h"
 #include "ItemAmmo.h"
@@ -39,8 +41,8 @@ public:
 
 	Zombie_Gun(std::string weaponName,float ReloadTime,const std::string& filename,float pitchModifier,ItemAmmo * pType,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread);
 	~Zombie_Gun();
-	EntityProjectile * tryShoot(ICamera3D * cam, ITexture * tex,ChunkManager * cm);
-	EntityProjectile * tick(float sec,ICamera3D * cam, ITexture * tex,ChunkManager * cm);//TODO tsp
+	EntityProjectile * tryShoot(ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm);
+	EntityProjectile * tick(float sec,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm);//TODO tsp
 	void stopShooting();
 };
 

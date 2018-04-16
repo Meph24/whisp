@@ -37,19 +37,17 @@ void EntityPlayer::draw(float tickOffset, spacevec observerPos,ChunkManager* cm,
 	}
 }
 
-spacevec EntityPlayer::applyPerspective(bool fresh,ChunkManager * cm)
+void EntityPlayer::applyPerspective(bool fresh,ChunkManager * cm)
 {
-	cam->posX=cm->toMeters(spacelen({0,pos.x.floatpart}));
-	cam->posY=cm->toMeters(spacelen({0,pos.y.floatpart}))+characterHeight;
-	cam->posZ=cm->toMeters(spacelen({0,pos.z.floatpart}));
+	spacevec relPos=pos-cm->getMiddleChunk();
+	characterHeightConv=cm->fromMeters(characterHeight);
+	relPos.y+=characterHeightConv;
+	cam->posX=cm->toMeters(relPos.x);
+	cam->posY=cm->toMeters(relPos.y);
+	cam->posZ=cm->toMeters(relPos.z);
 	if(fresh) cam->applyFresh();
 	else cam->apply();
 	isPerspective=true;
-	spacevec ret=pos;
-	ret.x.floatpart=0;
-	ret.y.floatpart=0;
-	ret.z.floatpart=0;
-	return ret;
 }
 
 void EntityPlayer::setTP(bool on)
@@ -74,6 +72,13 @@ void EntityPlayer::changeTPdist(float amount)
 	cam->dist+=amount;
 	setTP(cam->dist>=minTPdist);
 	if(cam->dist>maxTPdist) cam->dist=maxTPdist;
+}
+
+spacevec EntityPlayer::getCamPos()
+{
+	spacevec ret=pos;
+	ret.y+=characterHeightConv;
+	return ret;
 }
 
 void EntityPlayer::tick(float time, TickServiceProvider* tsp)
