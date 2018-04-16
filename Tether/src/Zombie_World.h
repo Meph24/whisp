@@ -8,12 +8,14 @@
 #include "TextureStatic2D.h"
 #include "Zombie_Physics.h"
 #include "EntityProjectile.h"
+#include "EntityPlayer.h"
 #include "Graphics2D.h"
 #include "Zombie_Gun.h"
 #include "Zombie_AmmoType.h"
 
 //TEST
 #include "QuatMandel.h"
+
 #include "PerformanceMeter.h"
 #include "DebugScreen.h"
 #include "ChunkManager.h"
@@ -46,6 +48,7 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	
 	float playerHP;
 
+	EntityPlayer player;
 
 	Zombie_Physics * physics;
 	ChunkManager * cm;
