@@ -49,6 +49,8 @@ Zombie_World::Zombie_World(sf::Window * w):
 	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
 	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	player=new EntityPlayer(cm->fromMeters({0.5f,0.5f,0.5f}),w->getSize().y,w->getSize().x);
+	player->HP = 100;
+	player->cam->zoom = 1/8.0f;
 	//cam = new CameraFP();
 	//cam->minView=0.25f;
 	//cam->maxView=2048*8;
@@ -125,7 +127,7 @@ Zombie_World::~Zombie_World()
 	delete pm;
 	delete keyInp;
 	delete mouseInp;
-	delete cam;
+	delete player;
 	delete[] zombies;
 	delete[] shots;
 }
@@ -160,7 +162,8 @@ void Zombie_World::render(float seconds)
 	}
 	cm->setMid(player->pos);
 
-	player->applyPerspective(true,cm);
+
+	spacevec pelPos=player->applyPerspective(true,cm);
 
 	grass->bind();
 	glColor3f(0.2f, 0.6f, 0.1f);
@@ -188,11 +191,12 @@ void Zombie_World::render(float seconds)
 	}
 	else
 	{
-		cm->render(lodQuality,cm->fromMeters(vec3(0,0,0)));//TODO
+		cm->render(lodQuality,pelPos);
 	}
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
+	//spacevec treePos=
 	Zombie_Tree t=Zombie_Tree({5,cm->toMeters(cm->getHeight(cm->fromMeters(vec3(5,0,5)))),5},tree, leaves);
 	t.draw();
 
@@ -201,7 +205,7 @@ void Zombie_World::render(float seconds)
 		if (zombies[i])
 		{
 			zombies[i]->tick(seconds,this);
-			zombies[i]->draw(0,cm->fromMeters(vec3(0,0,0)),cm,this);//TODO
+			zombies[i]->draw(0,pelPos,cm,this);//TODO
 		}
 	}
 	glEnable(GL_TEXTURE_2D);
@@ -361,7 +365,8 @@ void Zombie_World::doPhysics(float sec)
 			//zombies[i]->posY =cm->getHeight(zombies[i]->posX/1000,zombies[i]->posZ/1000)*1000;
 
 			//std::cout<<"test"<<zombies[i]->posY<<std::endl;
-			float wishAngle=atan2(cm->toMeters(zombies[i]->pos.x) - cam->posX, cm->toMeters(zombies[i]->pos.z) - cam->posZ);
+			vec3 relPos=cm->toMeters(zombies[i]->pos-player->pos);
+			float wishAngle=atan2(relPos.x, relPos.z);
 			wishAngle *= 360 / TAU;
 			wishAngle += 90;
 			float dif = abs(wishAngle - zombies[i]->facing);
@@ -373,7 +378,7 @@ void Zombie_World::doPhysics(float sec)
 			physics->registerObject(i, zombies[i]->speed/30, cm->toMeters(zombies[i]->pos.x), cm->toMeters(zombies[i]->pos.z),0.3f*zombies[i]->size);//TODO replace zombie physics
 		}
 	}
-	physics->registerObject(zCount, keyInp->speed/30, cam->posX, cam->posZ, 0.4f);
+	physics->registerObject(zCount, keyInp->speed/30, cm->toMeters(player->pos.x), cm->toMeters(player->pos.z), 0.4f);
 	pm->registerTime(timestep++);
 	physics->doPushPhysics();
 	pm->registerTime(timestep++);
@@ -420,8 +425,7 @@ void Zombie_World::doPhysics(float sec)
 
 	pm->registerTime(timestep++);
 	Zombie_Physics::motion m = physics->getMotion(zCount, sec);
-	cam->posX += m.x;
-	cam->posZ += m.z;
+	player->pos+=cm->fromMeters({m.x,0,m.z});
 	player->HP -= 15625*(m.x*m.x + m.z*m.z);
 
 
@@ -489,7 +493,7 @@ void Zombie_World::loop()
 		}
 		if(index!=-1)
 		{
-			shots[index] = guns[currentGun]->tick(sec,cam,shot,cm);
+			shots[index] = guns[currentGun]->tick(sec,player->cam,shot,cm);
 		}
 		pm->registerTime(timestep++);
 		for(int i=0;i<40;i++)
@@ -507,7 +511,8 @@ void Zombie_World::loop()
 			glColor3f(1, 0, 0);
 			glDisable(GL_DEPTH_TEST);
 			glEnable(GL_TEXTURE_2D);
-			ds->draw(cam->posX,cam->posY,cam->posZ);
+			vec3 ppos=cm->toMeters(player->pos);
+			ds->draw(ppos.x,ppos.y,ppos.z);
 			glDisable(GL_TEXTURE_2D);
 			glEnable(GL_DEPTH_TEST);
 			glPopMatrix();
@@ -537,7 +542,7 @@ void Zombie_World::trigger(bool pulled)
 		}
 	}
 	if(index==-1) return;
-	shots[index] = guns[currentGun]->tryShoot(cam,shot,cm);
+	shots[index] = guns[currentGun]->tryShoot(player->cam,shot,cm);
 }
 
 void Zombie_World::switchWeapon(int dir)
@@ -572,7 +577,7 @@ void Zombie_World::spawnZombie()
 
 	float r1 = rand();//TODO change
 	float r2 = ((rand()%32768)/2028.0f + 1)*zombieDist;
-	zombies[index] = new Zombie_Enemy(zombieTex, cm->fromMeters(vec3(sin(r1)*r2+cam->posX,0, cos(r1)*r2+cam->posZ)),cm);//TODO
+	zombies[index] = new Zombie_Enemy(zombieTex, cm->fromMeters(vec3(sin(r1)*r2+player->cam->posX,0, cos(r1)*r2+player->cam->posZ)),cm);//TODO
 	for(int i=1;i<10;i++)
 	{
 		int z=0;
@@ -590,7 +595,7 @@ void Zombie_World::spawnZombie()
 			std::cout<<"zombie count:"<<z<<std::endl;
 			//if(z==zCount) spawnZombies=false;
 			if (index == -1) return;
-		zombies[index] = new Zombie_Enemy(zombieTex,  cm->fromMeters(vec3(sin(r1)*r2+cam->posX+sin(i)*5,0,5*cos(i)+cos(r1)*r2+cam->posZ)),cm);//TODO
+		zombies[index] = new Zombie_Enemy(zombieTex,  cm->fromMeters(vec3(sin(r1)*r2+player->cam->posX+sin(i)*5,0,5*cos(i)+cos(r1)*r2+player->cam->posZ)),cm);//TODO
 	}
 }
 
@@ -608,7 +613,7 @@ void Zombie_World::spawnEntity(Entity* e)
 
 ICamera3D* Zombie_World::getHolderCamera()
 {
-	return cam;
+	return player->cam;
 }
 
 ChunkManager* Zombie_World::getChunkManager()

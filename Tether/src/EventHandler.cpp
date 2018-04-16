@@ -125,13 +125,13 @@ void EventHandler::sendOn(EventHandler::event e)
 			float zoomMult=8;
 			if(e.value)
 			{
-				world->cam->zoom/=zoomMult;
+				world->player->cam->zoom/=zoomMult;
 				world->mouseInp->sensitivityX/=zoomMult;
 				world->mouseInp->sensitivityY/=zoomMult;
 			}
 			else
 			{
-				world->cam->zoom*=zoomMult;
+				world->player->cam->zoom*=zoomMult;
 				world->mouseInp->sensitivityX*=zoomMult;
 				world->mouseInp->sensitivityY*=zoomMult;
 			}

@@ -46,7 +46,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	float hitmark = 0;
 	
 
-	EntityPlayer * player;
 
 	Zombie_Physics * physics;
 	ChunkManager * cm;
@@ -74,8 +73,8 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 
 	int entityIndex=0;//TODO
 public:
+	EntityPlayer * player;
 	Zombie_MouseInput * mouseInp;
-	ICamera3D * cam;
 	bool debugScreen=false;
 	float timeFactor = 1;
 	Zombie_World(sf::Window * w);
