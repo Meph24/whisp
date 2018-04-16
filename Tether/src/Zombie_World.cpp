@@ -14,7 +14,7 @@ extern Zombie_MouseInput * mouseInput;
 
 #include <iostream>
 Zombie_World::Zombie_World(sf::Window * w):
-		flatEarth(false),playerHP(100)//,
+		flatEarth(false)
 //TEST
 //qm(320,256)
 {
@@ -48,21 +48,21 @@ Zombie_World::Zombie_World(sf::Window * w):
 	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f),true,{1.5f,0,0},{1,1,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
 	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	cam = new CameraFP();
-	cam->minView=0.25f;
-	cam->maxView=2048*8;
-	cam->posX=0.5f;
-	cam->posZ=0.5f;
-	cam->posY = characterHeight+cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))));
-	cam->width = w->getSize().x;
-	cam->height = w->getSize().y;
+	player=new EntityPlayer(cm->fromMeters({0.5f,0.5f,0.5f}),w->getSize().y,w->getSize().x);
+	//cam = new CameraFP();
+	//cam->minView=0.25f;
+	//cam->maxView=2048*8;
+	//cam->posX=0.5f;
+	//cam->posZ=0.5f;
+	//cam->posY = characterHeight+cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))));
+	//cam->width = w->getSize().x;
+	//cam->height = w->getSize().y;
 
-	std::cout << "aspect: " << ((cam->width)/(cam->height)) << std::endl;
-	mouseInp = new Zombie_MouseInput(cam, w);
+	mouseInp = new Zombie_MouseInput(player, w);
 
 	mouseInp->sensitivityX = *cfg.getfloat("input", "sensitivityX");
 	mouseInp->sensitivityY = *cfg.getfloat("input", "sensitivityY");
-	keyInp = new Zombie_KeyInput(mouseInp, cam);
+	keyInp = new Zombie_KeyInput(mouseInp, player,cm);
 	keyInp->speed = 30.6f;
 
 	pm = new PerformanceMeter(12,1000);
@@ -102,7 +102,7 @@ void Zombie_World::restart()
 			removeZombie(i);
 		}
 	}
-	playerHP = 100;
+	player->HP = 100;
 	score = 0;
 	for (int i = 0; i < pCount; i++)
 	{
@@ -140,11 +140,11 @@ void Zombie_World::removeZombie(int zid)
 }
 void Zombie_World::render(float seconds)
 {
-	vec3 old=vec3(cam->posX,cam->posY,cam->posZ);
+	spacevec oldPos=player->pos;
 	keyInp->applyMovement(seconds);
-	cam->posY=cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))))+characterHeight;
-	vec3 newVec=vec3(cam->posX,cam->posY,cam->posZ);
-	vec3 moved=(newVec-old);
+	player->pos=cm->clip(player->pos,true);//cam->posY=cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))))+characterHeight;
+	spacevec newPos=player->pos;
+	vec3 moved=cm->toMeters(newPos-oldPos);
 	if(moved.lengthSq()>0.0000000001f)
 	{
 		vec3 norm=moved;
@@ -154,17 +154,13 @@ void Zombie_World::render(float seconds)
 		flt h=moved.y/flat.length();
 		SpeedMod sm=SpeedMod();
 		flt speedModB=sm.slowdownFromTerrain(h);
-		old+=flat*speedModA*speedModB;
-		cam->posX=old.x;
-		cam->posZ=old.z;
-		cam->posY=cm->toMeters(cm->getHeight(cm->fromMeters(vec3(cam->posX,0,cam->posZ))))+characterHeight;
+		player->pos=cm->clip(oldPos+cm->fromMeters(flat*speedModA*speedModB),true);
+		if(seconds>0.0000000001f)
+			player->v=(player->pos-oldPos)/seconds;
 	}
-	cm->setMid(cm->fromMeters(vec3(cam->posX,0,cam->posZ)));//TODO
+	cm->setMid(player->pos);
 
-
-
-
-	cam->applyFresh();
+	player->applyPerspective(true,cm);
 
 	grass->bind();
 	glColor3f(0.2f, 0.6f, 0.1f);
@@ -247,7 +243,7 @@ void Zombie_World::render(float seconds)
 	g->drawString("score:", 6, -0.8f, 0.8f, 0.1f);
 	g->drawString(scoreString, 8, -0.8f, 0.62f, 0.1f);
 
-	scoreTemp = playerHP;
+	scoreTemp = player->HP;
 	for (int i = 0; i < 3; i++)
 	{
 
@@ -318,8 +314,8 @@ void Zombie_World::loadStandardTex()
 
 void Zombie_World::doPhysics(float sec)
 {
-	playerHP += sec / 2;
-	if (playerHP > 100) playerHP = 100;
+	player->HP += sec / 2;
+	if (player->HP > 100) player->HP = 100;
 	hitmark -= sec * 10;
 	if (hitmark < 0) hitmark = 0;
 	for (int i = 0; i < zCount; i++)
@@ -421,36 +417,12 @@ void Zombie_World::doPhysics(float sec)
 			}
 		}
 	}
-	//for (int i = 0; i < zCount; i++)
-	//{
-	//	if (zombies[i])
-	//	{
-	//		if ((zombies[i]->dead) != 0)
-	//		{
-	//			(zombies[i]->dead) += sec * 240;
-	//			if ((zombies[i]->dead)>90) removeZombie(i);
-	//		}
-	//		else
-	//		{
-	//			float hp = zombies[i]->remainingHP;
-	//			zombies[i]->checkHitboxes(physics);
-	//			if (hp - (zombies[i]->remainingHP))
-	//			{
-	//				hitmark = 1;
-	//			}
-	//			score += hp-(zombies[i]->remainingHP) ;
-	//			Zombie_Physics::motion m = physics->getMotion(i, sec);
-	//			zombies[i]->posX += m.x;
-	//			zombies[i]->posZ += m.z;
-	//			if ((zombies[i]->remainingHP) < 0) (zombies[i]->dead) += sec * 240;
-	//		}
-	//	}
-	//}
+
 	pm->registerTime(timestep++);
 	Zombie_Physics::motion m = physics->getMotion(zCount, sec);
 	cam->posX += m.x;
 	cam->posZ += m.z;
-	playerHP -= 15625*(m.x*m.x + m.z*m.z);
+	player->HP -= 15625*(m.x*m.x + m.z*m.z);
 
 
 	for (int i = 0; i < pCount; i++)
@@ -472,7 +444,7 @@ void Zombie_World::loop()
 		reset = false;
 		restart();
 	}
-	if (playerHP < 0)
+	if (player->HP < 0)
 	{
 		glPushMatrix();
 		glColor3f(1, 0, 0);

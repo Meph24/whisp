@@ -8,6 +8,7 @@
 
 #ifndef SRC_ENTITYPLAYER_H_
 #define SRC_ENTITYPLAYER_H_
+#include "Entity.h"
 #include "CameraTP.h"
 
 class EntityPlayer: public Entity

@@ -355,14 +355,14 @@ inline void vec3if<I, F>::operator *=(double scalar)
 template<typename I, typename F>
 inline vec3if<I, F> vec3if<I, F>::operator /(double scalar)
 {
-	double inv=1.0;
+	double inv=1.0/scalar;
 	return (*this)*scalar;
 }
 
 template<typename I, typename F>
 inline void vec3if<I, F>::operator /=(double scalar)
 {
-	double inv=1.0;
+	double inv=1.0/scalar;
 	(*this)*=inv;
 }
 
@@ -387,14 +387,14 @@ inline void vec3if<I, F>::operator *=(float scalar)
 template<typename I, typename F>
 inline vec3if<I, F> vec3if<I, F>::operator /(float scalar)
 {
-	float inv=1.0f;
-	return (*this)*scalar;
+	float inv=1.0f/scalar;
+	return (*this)*inv;
 }
 
 template<typename I, typename F>
 inline void vec3if<I, F>::operator /=(float scalar)
 {
-	float inv=1.0f;
+	float inv=1.0f/scalar;
 	(*this)*=inv;
 }
 

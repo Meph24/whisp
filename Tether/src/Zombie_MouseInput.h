@@ -1,9 +1,9 @@
 #pragma once
-#include "ICamera3D.h"
 #include "SFML/Window.hpp"
+#include "EntityPlayer.h"
 class Zombie_MouseInput
 {
-	ICamera3D * cam;
+	EntityPlayer * player;
 	sf::Window * w;
 	bool active;
 public:
@@ -11,7 +11,7 @@ public:
 	float sensitivityX;
 	float sensitivityY;
 
-	Zombie_MouseInput(ICamera3D * camera, sf::Window * window);
+	Zombie_MouseInput(EntityPlayer * playerToSteer, sf::Window * window);
 	~Zombie_MouseInput();
 	void enable();
 	void disable();

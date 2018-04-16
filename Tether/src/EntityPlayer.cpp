@@ -8,13 +8,14 @@
 
 #include "EntityPlayer.h"
 
-EntityPlayer::EntityPlayer(spacevec startPos,float screenH,float screenW):
-pos(startPos)
+EntityPlayer::EntityPlayer(spacevec startPos,float screenH,float screenW)
 {
+	pos=startPos;
+	v={{0,0},{0,0},{0,0}};
 	cam=new CameraTP();
-	cam->alpha=0;
-	cam->beta=0;
-	cam->gamma=0;
+	cam->alpha=0.0001f;
+	cam->beta=0.0001f;
+	cam->gamma=0.0001f;
 	cam->height=screenH;
 	cam->width=screenW;
 	cam->maxView=1024*8;
@@ -38,9 +39,9 @@ void EntityPlayer::draw(float tickOffset, spacevec observerPos,ChunkManager* cm,
 
 spacevec EntityPlayer::applyPerspective(bool fresh,ChunkManager * cm)
 {
-	cam->posX=cm->toMeters({0,pos.x.floatpart});
-	cam->posY=cm->toMeters({0,pos.y.floatpart});
-	cam->posZ=cm->toMeters({0,pos.z.floatpart});
+	cam->posX=cm->toMeters(spacelen({0,pos.x.floatpart}));
+	cam->posY=cm->toMeters(spacelen({0,pos.y.floatpart}))+characterHeight;
+	cam->posZ=cm->toMeters(spacelen({0,pos.z.floatpart}));
 	if(fresh) cam->applyFresh();
 	else cam->apply();
 	isPerspective=true;
@@ -48,7 +49,7 @@ spacevec EntityPlayer::applyPerspective(bool fresh,ChunkManager * cm)
 	ret.x.floatpart=0;
 	ret.y.floatpart=0;
 	ret.z.floatpart=0;
-	return pos;
+	return ret;
 }
 
 void EntityPlayer::setTP(bool on)

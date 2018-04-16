@@ -31,9 +31,8 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int zCount;//max number of zombies
 	int pCount;
 	int wCount;
-	float characterHeight=1.6f;
+
 	Zombie_Enemy ** zombies;
-	//Zombie_Projectile ** shots;
 	EntityProjectile ** shots;
 	Zombie_KeyInput * keyInp;
 	PerformanceMeter * pm;
@@ -46,9 +45,8 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int score=0;
 	float hitmark = 0;
 	
-	float playerHP;
 
-	EntityPlayer player;
+	EntityPlayer * player;
 
 	Zombie_Physics * physics;
 	ChunkManager * cm;
