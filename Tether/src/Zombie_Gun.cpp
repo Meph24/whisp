@@ -61,7 +61,7 @@ EntityProjectile * Zombie_Gun::tryShoot(ICamera3D * cam,EntityPlayer * player, I
 	v.y = ml.curMatrix[1] * velX + ml.curMatrix[5] * velY + ml.curMatrix[9] * velZ;
 	v.z = ml.curMatrix[2] * velX + ml.curMatrix[6] * velY + ml.curMatrix[10] * velZ;
 
-	EntityProjectile * zp= new EntityProjectile((ItemAmmo*)pType->newClone(),player->getCamPos(),cm->fromMeters(v));//cam, tex,pType);
+	EntityProjectile * zp= new EntityProjectile((ItemAmmo*)pType->newClone(),player->getCamPos(),cm->fromMeters(v)+player->v);//cam, tex,pType);
 
 	noiseTimer+=timer*3.2f;
 	vec3 rand={(float)nm.GetValue(noiseTimer,0,0),(float)nm.GetValue(noiseTimer,0,55),0};

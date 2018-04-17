@@ -160,10 +160,9 @@ void Zombie_World::render(float seconds)
 		SpeedMod sm=SpeedMod();
 		flt speedModB=sm.slowdownFromTerrain(h);
 		player->pos=cm->clip(oldPos+cm->fromMeters(flat*speedModA*speedModB),true);
-		if(seconds>0.0000000001f)
-			player->v=(player->pos-oldPos)/seconds;
 	}
-	cm->setMid(player->pos);
+	if(seconds>0.0000000001f)
+		player->v=(player->pos-oldPos)/seconds;
 
 
 	player->applyPerspective(true,cm);
@@ -479,7 +478,6 @@ void Zombie_World::loop()
 	}
 	else
 	{
-
 		timestep = 0;
 		pm->registerTime(timestep++);
 		float sec = pm->roundtriptime / 1000000.0f;
@@ -487,6 +485,7 @@ void Zombie_World::loop()
 		if (sec < 0) sec = 0;
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
 
+		cm->setMid(player->pos);
 
 
 		int index = -1;
