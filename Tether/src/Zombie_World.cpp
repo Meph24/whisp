@@ -49,7 +49,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
 	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	float characterSpeed=30.6f;
-	player=new EntityPlayer({{32000000,0},{0,0},{32000000,0}},w->getSize().y,w->getSize().x,characterSpeed);
+	player=new EntityPlayer({{128000000,0},{0,0},{128000000,0}},w->getSize().y,w->getSize().x,characterSpeed);
 	player->HP = 100;
 	player->cam->zoom = 1/8.0f;
 	//cam = new CameraFP();
@@ -323,6 +323,7 @@ void Zombie_World::loadStandardTex()
 
 void Zombie_World::doPhysics(float sec)
 {
+	spacevec mid=cm->getMiddleChunk();
 	player->HP += sec / 2;
 	if (player->HP > 100) player->HP = 100;
 	hitmark -= sec * 10;
@@ -335,7 +336,7 @@ void Zombie_World::doPhysics(float sec)
 
 			zombies[i]->pos.x += cm->fromMeters((zombies[i]->speed)*cos(zombies[i]->facing *TAU/360)*sec);//Zombie walk "AI"
 			zombies[i]->pos.z += cm->fromMeters(-(zombies[i]->speed)*sin(zombies[i]->facing*TAU/360)*sec);
-			zombies[i]->pos.y =cm->getHeight(zombies[i]->pos);
+			zombies[i]->pos=cm->clip(zombies[i]->pos,true);
 
 			spacevec newVec=zombies[i]->pos;
 			spacevec moved=(newVec-old);
@@ -357,7 +358,7 @@ void Zombie_World::doPhysics(float sec)
 				old+=cm->fromMeters(flat*speedModA*speedModB);
 				zombies[i]->pos.x=old.x;
 				zombies[i]->pos.z=old.z;
-				zombies[i]->pos.y=cm->getHeight(zombies[i]->pos);
+				zombies[i]->pos=cm->clip(zombies[i]->pos,true);
 				zombies[i]->maxTransition=1-(h/1.5f);
 				if(zombies[i]->maxTransition>1.7f) zombies[i]->maxTransition=1.7f;
 				if(zombies[i]->maxTransition<0) zombies[i]->maxTransition=0;
@@ -380,10 +381,10 @@ void Zombie_World::doPhysics(float sec)
 			if (difplus < dif) zombies[i]->facing += 360;
 			else if (difminus<dif) zombies[i]->facing -= 360;
 			zombies[i]->facing = zombies[i]->facing *(1 - sec) + sec*wishAngle;
-			physics->registerObject(i, zombies[i]->speed/30, cm->toMeters(zombies[i]->pos.x), cm->toMeters(zombies[i]->pos.z),0.3f*zombies[i]->size);//TODO replace zombie physics
+			physics->registerObject(i, zombies[i]->speed/30, cm->toMeters(zombies[i]->pos.x-mid.x), cm->toMeters(zombies[i]->pos.z-mid.z),0.3f*zombies[i]->size);//TODO replace zombie physics
 		}
 	}
-	physics->registerObject(zCount, player->speed/30, cm->toMeters(player->pos.x), cm->toMeters(player->pos.z), 0.4f);
+	physics->registerObject(zCount, player->speed/30, cm->toMeters(player->pos.x-mid.x), cm->toMeters(player->pos.z-mid.z), 0.4f);
 	pm->registerTime(timestep++);
 	physics->doPushPhysics();
 	pm->registerTime(timestep++);
@@ -400,7 +401,7 @@ void Zombie_World::doPhysics(float sec)
 			else
 			{
 				float hp = zombies[i]->remainingHP;
-				zombies[i]->checkHitboxes(physics,cm->fromMeters({0,0,0}),cm);//TODO cm->getMiddleChunk(),cm);
+				zombies[i]->checkHitboxes(physics,mid,cm);
 				if (hp - (zombies[i]->remainingHP))
 				{
 					hitmark = 1;

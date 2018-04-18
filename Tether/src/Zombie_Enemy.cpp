@@ -299,16 +299,17 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 			spacelen maxSize=cm->fromMeters(size)*3.0f;
 			max+={maxSize,maxSize,maxSize};
 			min-={maxSize,maxSize,maxSize};
-			if(min.x>pos.x) continue;
-			if(min.y>pos.y) continue;
-			if(min.z>pos.z) continue;//lol optimization at tier 1
-			if(max.x<pos.x) continue;
-			if(max.y<pos.y) continue;
-			if(max.z<pos.z) continue;
+			if(min.x>relPos.x) continue;
+			if(min.y>relPos.y) continue;
+			if(min.z>relPos.z) continue;//lol optimization at tier 1
+			if(max.x<relPos.x) continue;
+			if(max.y<relPos.y) continue;
+			if(max.z<relPos.z) continue;
 			proj=true;
 		}
 	}
 	if(!proj) return;
+	std::cout<<"phase 2"<<std::endl;
 	ml.loadIdentity();
 	ml.translatef(relPosMeters.x, relPosMeters.y, relPosMeters.z);
 	ml.rotatef(facing, 0, 1, 0);
@@ -326,7 +327,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 		animStrength=0.15f*transitionAnim.getCurStep(0)*maxTransition;
 	}
 
-	ml.pushMatrix();	//leg
+	ml.pushMatrix();//leg
 	int loc;
 	Zombie_Physics::hit h;
 	loc = 1;
@@ -335,7 +336,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
+	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if (h.projectileIndex != -1) gotHit(h, 4, ph->projectiles);
 
 	ml.popMatrix();
@@ -348,7 +349,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
+	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if (h.projectileIndex != -1) gotHit(h, 5, ph->projectiles);
 
 	ml.popMatrix();
@@ -369,7 +370,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.scalef(2, 2, 2);
 	ml.rotatef(tilted, 1, 0, 0);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
+	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 
 	if (h.projectileIndex != -1) gotHit(h, 0,ph->projectiles);
 
@@ -381,7 +382,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.translatef(0, 0.6f, 0);
 	ml.scalef(1, 3, 2);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
+	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if (h.projectileIndex != -1) gotHit(h, 1, ph->projectiles);
 
 	ml.popMatrix();
@@ -396,7 +397,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
+	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if (h.projectileIndex != -1) gotHit(h, 2, ph->projectiles);
 
 	ml.popMatrix();
@@ -409,7 +410,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
+	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if (h.projectileIndex != -1) gotHit(h, 3, ph->projectiles);
 
 	ml.popMatrix();
