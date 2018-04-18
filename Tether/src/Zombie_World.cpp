@@ -48,7 +48,8 @@ Zombie_World::Zombie_World(sf::Window * w):
 	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f),true,{1.5f,0,0},{1,1,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
 	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	player=new EntityPlayer(cm->fromMeters({0.5f,0.5f,0.5f}),w->getSize().y,w->getSize().x);
+	float characterSpeed=30.6f;
+	player=new EntityPlayer({{32000000,0},{0,0},{32000000,0}},w->getSize().y,w->getSize().x,characterSpeed);
 	player->HP = 100;
 	player->cam->zoom = 1/8.0f;
 	//cam = new CameraFP();
@@ -64,8 +65,8 @@ Zombie_World::Zombie_World(sf::Window * w):
 
 	mouseInp->sensitivityX = *cfg.getfloat("input", "sensitivityX");
 	mouseInp->sensitivityY = *cfg.getfloat("input", "sensitivityY");
-	keyInp = new Zombie_KeyInput(mouseInp, player,cm);
-	keyInp->speed = 30.6f;
+	keyInp = new Zombie_KeyInput(mouseInp,player->cam);
+
 
 	pm = new PerformanceMeter(12,1000);
 	pm->roundtripUpdateIndex = 0;
@@ -146,7 +147,8 @@ void Zombie_World::render(float seconds)
 
 
 	spacevec oldPos=player->pos;
-	keyInp->applyMovement(seconds);
+	vec3 wantedV=keyInp->getVelocity()*player->speed;
+	player->pos+=cm->fromMeters(wantedV)*seconds;
 	player->pos=cm->clip(player->pos,true);
 	spacevec newPos=player->pos;
 	vec3 moved=cm->toMeters(newPos-oldPos);
@@ -381,7 +383,7 @@ void Zombie_World::doPhysics(float sec)
 			physics->registerObject(i, zombies[i]->speed/30, cm->toMeters(zombies[i]->pos.x), cm->toMeters(zombies[i]->pos.z),0.3f*zombies[i]->size);//TODO replace zombie physics
 		}
 	}
-	physics->registerObject(zCount, keyInp->speed/30, cm->toMeters(player->pos.x), cm->toMeters(player->pos.z), 0.4f);
+	physics->registerObject(zCount, player->speed/30, cm->toMeters(player->pos.x), cm->toMeters(player->pos.z), 0.4f);
 	pm->registerTime(timestep++);
 	physics->doPushPhysics();
 	pm->registerTime(timestep++);
@@ -583,7 +585,7 @@ void Zombie_World::spawnZombie()
 
 	float r1 = rand();//TODO change
 	float r2 = ((rand()%32768)/2028.0f + 1)*zombieDist;
-	zombies[index] = new Zombie_Enemy(zombieTex, cm->fromMeters(vec3(sin(r1)*r2+player->cam->posX,0, cos(r1)*r2+player->cam->posZ)),cm);//TODO
+	zombies[index] = new Zombie_Enemy(zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm);//TODO
 	for(int i=1;i<10;i++)
 	{
 		int z=0;
@@ -601,7 +603,7 @@ void Zombie_World::spawnZombie()
 			std::cout<<"zombie count:"<<z<<std::endl;
 			//if(z==zCount) spawnZombies=false;
 			if (index == -1) return;
-		zombies[index] = new Zombie_Enemy(zombieTex,  cm->fromMeters(vec3(sin(r1)*r2+player->cam->posX+sin(i)*5,0,5*cos(i)+cos(r1)*r2+player->cam->posZ)),cm);//TODO
+		zombies[index] = new Zombie_Enemy(zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm);//TODO
 	}
 }
 

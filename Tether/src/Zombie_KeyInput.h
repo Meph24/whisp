@@ -2,8 +2,7 @@
 #include "Zombie_MouseInput.h"
 class Zombie_KeyInput
 {
-	EntityPlayer * player;
-	ChunkManager * cm;
+	ICamera3D * cam;
 
 	Zombie_MouseInput * mouseInput;
 	float frontVec;
@@ -13,11 +12,9 @@ class Zombie_KeyInput
 
 	void clampMovVec();
 public:
-	Zombie_KeyInput(Zombie_MouseInput * toToggle,EntityPlayer * playerToSteer,ChunkManager * c);
+	Zombie_KeyInput(Zombie_MouseInput * toToggle,ICamera3D * referenceCam);
 	~Zombie_KeyInput();
 
-
-	float speed=20;// reference speed
 
 
 	void menuButton();
@@ -26,6 +23,6 @@ public:
 	void walkRight(bool enable);
 	void walkLeft(bool enable);
 
-	void applyMovement(float seconds);
+	vec3 getVelocity();
 };
 

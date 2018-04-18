@@ -8,7 +8,8 @@
 
 #include "EntityPlayer.h"
 
-EntityPlayer::EntityPlayer(spacevec startPos,float screenH,float screenW)
+EntityPlayer::EntityPlayer(spacevec startPos,float screenH,float screenW,float characterSpeed):
+speed(characterSpeed)
 {
 	pos=startPos;
 	v={{0,0},{0,0},{0,0}};

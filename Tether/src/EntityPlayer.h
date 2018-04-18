@@ -26,8 +26,9 @@ public:
 
 	float HP=0;
 	float maxHP=100;
+	float speed=0;
 
-	EntityPlayer(spacevec startPos,float screenH,float screenW);
+	EntityPlayer(spacevec startPos,float screenH,float screenW,float characterSpeed);
 	~EntityPlayer();
 
 	void changeTPdist(float amount);
