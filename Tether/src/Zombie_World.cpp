@@ -49,7 +49,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
 	//guns[3] = new Zombie_Gun(".50AE Desert Eagle",250, 120,0.30f,"res/gunshot.wav",0.7f);//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	float characterSpeed=30.6f;
-	player=new EntityPlayer({{128000000,0},{0,0},{128000000,0}},w->getSize().y,w->getSize().x,characterSpeed);
+	player=new EntityPlayer({{2147483647,0},{0,0},{2147483647,0}},w->getSize().y,w->getSize().x,characterSpeed);
 	player->HP = 100;
 	player->cam->zoom = 1/8.0f;
 	//cam = new CameraFP();

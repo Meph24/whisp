@@ -28,16 +28,14 @@ chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDis
 
 spacelen ChunkManager::getHeight(spacevec abs)
 {
-	if(abs.x.floatpart<0 || abs.z.floatpart<0)
-	{
-		std::cout<<abs<<std::endl;
-	}
 	chunkNum cx=abs.x.intpart;
 	chunkNum cz=abs.z.intpart;
-	if(cx<lowX) return defaultH;
-	if(cz<lowZ) return defaultH;
-	if(cx>=(lowX+chunksPerAxis)) return defaultH;
-	if(cz>=(lowZ+chunksPerAxis)) return defaultH;
+	chunkNum relLowX=cx-lowX;
+	chunkNum relLowZ=cz-lowZ;
+	if(relLowX<0) return defaultH;
+	if(relLowZ<0) return defaultH;
+	if(relLowX>=chunksPerAxis) return defaultH;
+	if(relLowZ>=chunksPerAxis) return defaultH;
 	if(chunks[getIndx(cx,cz)])
 		return chunks[getIndx(cx,cz)]->getHeight(abs.x.floatpart,abs.z.floatpart);
 	else return fromMeters(defaultHeight*1.0f);
