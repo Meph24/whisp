@@ -21,15 +21,14 @@ class Tickable;
 class Entity: public Tickable, Drawable
 {
 public:
+	AABB bb;
+
 	EntityIdent ID;
 
 	spacevec pos;
 	spacevec v;
 
 	bool exists=true;//if exists is false, memory will be freed next tick (enough time for other threads to react)
-
-	//vec3 aabbOlow;//AABB offset to pos on the low end
-	//vec3 aabbOhigh;//AABB offset to pos on the high end//TODO best way?
 
 	//Chunk * mainChunk;//the ticking chunk
 	//std::vector<Chunk *> chunks;
@@ -41,36 +40,9 @@ public:
 	void requestDestroy(TickServiceProvider * tsp);
 
 	//virtual void onAABBintersect(Entity * other);
-	//bool aabbIntersects(Entity * other);
-
-	//vec3 getRelPosOf(Entity * other);//only position relative, not rotation
-	Entity();
-	virtual ~Entity();
-};
-
-
-
-
-
-//12.03.2017
-/*
-#include "vec3.h"
-#include "ID.h"
-class Entity
-{
-public:
-
-	ID UID;
-
-	vec3 pos;
-	vec3 speed;
-
-	bool markDelete;
-
-	virtual void tick(Entity * past,Entity * future,float sec)=0;
 
 	Entity();
 	virtual ~Entity();
 };
-*/
+
 #endif /* SRC_ENTITY_H_ */

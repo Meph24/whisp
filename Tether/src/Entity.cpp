@@ -17,12 +17,6 @@ void Entity::requestDestroy(TickServiceProvider* tsp)
 	tsp->requestDestroy(this);
 }
 
-/*
-vec3 Entity::getRelPosOf(Entity* other)
-{
-	return other->pos-pos;//can change if pos gets relative to current chunk
-}
-*/
 
 Entity::~Entity()
 {}
@@ -30,13 +24,4 @@ Entity::~Entity()
 void Entity::onAABBintersect(Entity* other)
 {}
 
-bool Entity::aabbIntersects(Entity* other)
-{
-	vec3 myAbsLow=pos+aabbOlow;
-	vec3 myAbsHigh=pos+aabbOhigh;
-	vec3 otherAbsLow=other->pos+other->aabbOlow;
-	vec3 otherAbsHigh=other->pos+other->aabbOhigh;
-	unsigned int otherIsLower=myAbsLow>otherAbsHigh;
-	unsigned int otherIsHigher=myAbsHigh<otherAbsLow;
-	return !(otherIsLower||otherIsHigher);
-}*/
+*/

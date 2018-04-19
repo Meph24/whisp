@@ -434,6 +434,7 @@ void Zombie_World::doPhysics(float sec)
 	player->pos+=cm->fromMeters({m.x,0,m.z});
 	player->HP -= 15625*(m.x*m.x + m.z*m.z);
 
+	cm->tick(sec,this);
 
 	for (int i = 0; i < pCount; i++)
 	{
@@ -466,7 +467,7 @@ void Zombie_World::loop()
 		g->drawString("R=restart", 9, -0.8f, -0.6f, 0.3f);
 
 		char scoreString[8];
-		//score = 52;
+
 		int scoreTemp = score;
 		for (int i = 0; i < 8; i++)
 		{

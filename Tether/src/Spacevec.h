@@ -267,6 +267,10 @@ struct vec3if
 	vec3if<I,F> operator/(float scalar);
 	void operator/=(float scalar);
 
+	//returns bit vector of comparison lsb=x
+	unsigned int operator<(vec3if<I,F> other);
+	unsigned int operator>(vec3if<I,F> other);
+
 
 	float fLengthSq(float chunkSize);
 	double dLengthSq(double chunkSize);
@@ -396,6 +400,18 @@ inline void vec3if<I, F>::operator /=(float scalar)
 {
 	float inv=1.0f/scalar;
 	(*this)*=inv;
+}
+
+template<typename I, typename F>
+inline unsigned int vec3if<I, F>::operator <(vec3if<I, F> other)
+{
+	return (x<other.x)*1+(y<other.y)*2+(z<other.z)*4;
+}
+
+template<typename I, typename F>
+inline unsigned int vec3if<I, F>::operator >(vec3if<I, F> other)
+{
+	return (x>other.x)*1+(y>other.y)*2+(z>other.z)*4;
 }
 
 template<typename I, typename F>

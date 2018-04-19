@@ -8,16 +8,6 @@
 
 #include "AABB.h"
 
-AABB::AABB()
-{
-	// TODO Auto-generated constructor stub
-
-}
-
-void AABB::addSpeed(vec3 displacement)
-{
-
-}
 
 bool AABB::doesIntersect(AABB other)
 {
@@ -31,30 +21,30 @@ bool AABB::doesIntersect(AABB * other)
 	return doesIntersect(other[0]);
 }
 
-void AABB::operator +=(AABB other)
+AABB::AABB(spacevec pos):
+low(pos),high(pos)
 {
-	(*this)+=other.high;
-	(*this)+=other.low;
 }
 
-void AABB::operator +=(AABB* other)
+AABB::AABB(spacevec pos, spacevec sizeFromMid):
+low(pos-sizeFromMid),high(pos+sizeFromMid)
 {
-	(*this)+=other[0].high;
-	(*this)+=other[0].low;
 }
 
-void AABB::operator +=(vec3 point)
+AABB::AABB(spacevec pos, spacevec sizeFromMid, spacevec movement):
+low(pos-sizeFromMid),high(pos+sizeFromMid)
 {
-	//TODO if point.x
-}
-
-void AABB::operator +=(vec3* point)
-{
-	(*this)+=point[0];
+	bool xbig=movement.x>spacelen(0,0);
+	bool ybig=movement.y>spacelen(0,0);
+	bool zbig=movement.z>spacelen(0,0);
+	if(xbig) high.x+=movement.x;
+	else low.x+=movement.x;
+	if(ybig) high.y+=movement.y;
+	else low.y+=movement.y;
+	if(zbig) high.z+=movement.z;
+	else low.z+=movement.z;
 }
 
 AABB::~AABB()
-{
-	// TODO Auto-generated destructor stub
-}
+{}
 

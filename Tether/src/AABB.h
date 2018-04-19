@@ -9,25 +9,20 @@
 #ifndef SRC_AABB_H_
 #define SRC_AABB_H_
 
-#include "MatrixLib.h"
+#include "Spacevec.h"
 
 class AABB
 {
-	vec3 low;
-	vec3 high;
+	spacevec low;
+	spacevec high;
 public:
 
-	void addSpeed(vec3 displacement);//displacement=speed*time
 	bool doesIntersect(AABB other);
 	bool doesIntersect(AABB * other);
 
-	void operator+=(AABB other);
-	void operator+=(AABB * other);
-	void operator+=(vec3 point);
-	void operator+=(vec3 * point);
-
-
-	AABB();
+	AABB(spacevec pos);//point-like stationary object
+	AABB(spacevec pos,spacevec sizeFromMid);//stationary object
+	AABB(spacevec pos,spacevec sizeFromMid,spacevec movement);
 	~AABB();
 };
 
