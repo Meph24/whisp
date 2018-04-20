@@ -9,10 +9,7 @@
 #include "SpeedMod.h"
 
 SpeedMod::SpeedMod()
-{
-	// TODO Auto-generated constructor stub
-
-}
+{}
 
 flt SpeedMod::slowdownFromTerrain(flt h)
 {
@@ -25,7 +22,5 @@ flt SpeedMod::slowdownFromTerrain(flt h)
 }
 
 SpeedMod::~SpeedMod()
-{
-	// TODO Auto-generated destructor stub
-}
+{}
 

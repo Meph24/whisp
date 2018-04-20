@@ -27,15 +27,11 @@ Zombie_KeyInput * keyInput=0;
 Zombie_MouseInput * mouseInput=0;
 
 int enabledProgram = 1;
-int maxPrograms=3;
-bool zombieEnabled = true;//TODO delete
+int maxPrograms=2;
 
 
 #include "Zombie_World.h"
 Zombie_World * world;
-
-#include "POCmain.h"
-POCmain * poc;
 
 //this is a test-everything-file, chaos is normal
 
@@ -228,10 +224,6 @@ void clickibunti()
 
 		delete data;
 		rob.draw();
-	}
-	else if(enabledProgram==2)//POCmain
-	{
-		poc->frame();
 	}
 
 	sf::Time t = sf::microseconds(1000);//TODO 1ms

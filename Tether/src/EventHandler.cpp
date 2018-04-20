@@ -58,8 +58,6 @@ extern Zombie_KeyInput * keyInput;
 extern Zombie_MouseInput * mouseInput;
 extern int enabledProgram;
 extern Zombie_World * world;
-#include "POCmain.h"
-extern POCmain * poc;
 
 #include "CameraTP.h"
 void EventHandler::sendOn(EventHandler::event e)
@@ -247,10 +245,6 @@ void EventHandler::sendOn(EventHandler::event e)
 				break;
 			}
 		}
-	}
-	else if(enabledProgram==2)
-	{
-		poc->event(e);
 	}
 	
 	

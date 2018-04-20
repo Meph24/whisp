@@ -11,6 +11,7 @@
 
 #include "ITexture.h"
 
+//Use for uninitialized Textures, will print error instead of crashing
 class TextureDummy: public ITexture
 {
 public:

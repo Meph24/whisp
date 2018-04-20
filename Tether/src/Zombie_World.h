@@ -11,10 +11,7 @@
 #include "EntityPlayer.h"
 #include "Graphics2D.h"
 #include "Zombie_Gun.h"
-#include "Zombie_AmmoType.h"
 
-//TEST
-#include "QuatMandel.h"
 
 #include "PerformanceMeter.h"
 #include "DebugScreen.h"
@@ -22,11 +19,7 @@
 #include "TickServiceProvider.h"
 class Zombie_World: public TickServiceProvider, DrawServiceProvider
 {
-	//TEST
-	//QuatMandel qm;
-
 	bool spawnZombies;
-	bool flatEarth;
 	int timestep=0;
 	int zCount;//max number of zombies
 	int pCount;

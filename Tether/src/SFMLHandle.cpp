@@ -29,15 +29,9 @@ SFMLHandle::~SFMLHandle()
 }
 
 //TEST
-#include "Zombie_KeyInput.h"
-#include "Zombie_MouseInput.h"
-#include "CameraFP.h"
 #include "Zombie_World.h"
-//extern Zombie_KeyInput * keyInput;
-//extern Zombie_MouseInput * mouseInput;
-#include "POCmain.h"
+
 extern Zombie_World * world;
-extern POCmain * poc;
 void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
 {
 	contextSettings.depthBits = settings.depth;
@@ -53,10 +47,6 @@ void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMe
 	window.setActive(false);
 
 	world = new Zombie_World(&window);
-	poc=new POCmain(reswidth, resheight);
-	//ICamera3D * cam = new CameraFP();
-	//mouseInput = new Zombie_MouseInput(cam,&window);
-	//keyInput = new Zombie_KeyInput(mouseInput,cam);
 }
 
 void SFMLHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
