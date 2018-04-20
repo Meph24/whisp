@@ -276,6 +276,12 @@ void Zombie_Enemy::tick(float seconds,TickServiceProvider * tsp)
 	if(legDmg>0.25f*totalHP)
 		transitionAnim.update(seconds);
 	if(dead) fallAnim.update(seconds);
+	spacelen characterHeightConv=tsp->getChunkManager()->fromMeters(size*2);
+	spacevec sizeBB;
+	sizeBB.x=characterHeightConv;
+	sizeBB.y=characterHeightConv*1.5f;
+	sizeBB.z=sizeBB.x;
+	bb=AABB(pos,sizeBB);
 }
 
 void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)
@@ -287,6 +293,7 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	{
 		if (ph->projectiles[i])
 		{
+			/*
 			spacevec max=ph->projectiles[i]->posOld-middleChunk;
 			spacevec min=max;
 			spacevec next=ph->projectiles[i]->pos-middleChunk;
@@ -304,7 +311,8 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 			if(min.z>relPos.z) continue;//lol optimization at tier 1
 			if(max.x<relPos.x) continue;
 			if(max.y<relPos.y) continue;
-			if(max.z<relPos.z) continue;
+			if(max.z<relPos.z) continue;*/
+			if(!ph->projectiles[i]->bb.doesIntersect(bb)) continue;
 			proj=true;
 		}
 	}

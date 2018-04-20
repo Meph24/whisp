@@ -37,16 +37,17 @@ Zombie_World::Zombie_World(sf::Window * w)
 	{
 		shots[i] = 0;
 	}
-	wCount = 4;
+	wCount = 5;
 	guns = new Zombie_Gun * [wCount];
 
 	guns[0] = new Zombie_Gun("Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f),false,{2,0.15f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	guns[1] = new Zombie_Gun("Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
-	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f),true,{1.5f,0,0},{1,1,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[2] = new Zombie_Gun("American 180 .22 full auto",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f),true,{0.5f,0,0},{0.5f,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f),false,{5,0,0},{2,2,0});
+	guns[4] = new Zombie_Gun("G3A3 .308",0.12f,"res/gunshot.wav",0.75f,new ItemAmmo(800, 200,0.0008f),true,{3,0,0},{1.5f,1.5f,0});
 
-	float characterSpeed=30.6f;
-	player=new EntityPlayer({{2147483647,0},{0,0},{2147483647,0}},w->getSize().y,w->getSize().x,characterSpeed);
+	float characterSpeed=3.6f;
+	player=new EntityPlayer({{0,0},{0,0},{0,0}},w->getSize().y,w->getSize().x,characterSpeed);
 	player->HP = 100;
 	player->cam->zoom = 1/8.0f;
 
