@@ -17,6 +17,7 @@ class Tickable;
 #include "EntityIdent.h"
 #include <vector>
 #include "Chunk.h"
+#include "AABB.h"
 
 class Entity: public Tickable, Drawable
 {

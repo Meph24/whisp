@@ -9,7 +9,7 @@
 #include "EntityPlayer.h"
 
 EntityPlayer::EntityPlayer(spacevec startPos,float screenH,float screenW,float characterSpeed):
-speed(characterSpeed),bb(startPos)
+speed(characterSpeed)
 {
 	pos=startPos;
 	v={{0,0},{0,0},{0,0}};
@@ -87,6 +87,6 @@ void EntityPlayer::tick(float time, TickServiceProvider* tsp)
 	spacevec size;
 	size.x=characterHeightConv*0.5f;
 	size.y=characterHeightConv*1.5f;
-	size.z=characterHeightConv*0.5f;
-	bb=AABB(pos,)
+	size.z=size.x;
+	bb=AABB(pos,size,v*(-time));
 }
