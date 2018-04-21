@@ -29,7 +29,7 @@ EntityPlayer::~EntityPlayer()
 	delete cam;
 }
 
-void EntityPlayer::draw(float tickOffset, spacevec observerPos,ChunkManager* cm, DrawServiceProvider* dsp)
+void EntityPlayer::draw(float tickOffset,Frustum * viewFrustum,ChunkManager* cm, DrawServiceProvider* dsp)
 {
 	if(isPerspective || cam->dist>minTPdist)
 	{
@@ -40,6 +40,7 @@ void EntityPlayer::draw(float tickOffset, spacevec observerPos,ChunkManager* cm,
 
 void EntityPlayer::applyPerspective(bool fresh,ChunkManager * cm)
 {
+	std::cout<<cam->alpha<<" "<<cam->beta<<std::endl;
 	spacevec relPos=pos-cm->getMiddleChunk();
 	characterHeightConv=cm->fromMeters(characterHeight);
 	relPos.y+=characterHeightConv;
@@ -79,6 +80,27 @@ spacevec EntityPlayer::getCamPos()
 {
 	spacevec ret=pos;
 	ret.y+=characterHeightConv;
+	return ret;
+}
+
+Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
+{
+	Frustum * ret=new Frustum();
+	ret->observerPos=cm->getMiddleChunk();
+	bool lookingUp=cam->alpha<0;
+	if(lookingUp)
+	{
+		ret->planes[0]=cam->getUpperPlane();
+		ret->planes[3]=cam->getLowerPlane();
+	}
+	else
+	{
+		ret->planes[0]=cam->getLowerPlane();
+		ret->planes[3]=cam->getUpperPlane();
+	}
+	ret->planes[1]=cam->getLeftPlane();
+	ret->planes[2]=cam->getRightPlane();
+	ret->planes[4]=cam->getFarPlane();
 	return ret;
 }
 

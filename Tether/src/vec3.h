@@ -32,6 +32,7 @@ public:
 
 	flt length();
 	flt lengthSq();//return squared length
+
 };
 vec3 operator*(flt scalar,vec3 v);
 flt dotProduct(vec3 a, vec3 b);

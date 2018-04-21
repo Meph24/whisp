@@ -52,10 +52,11 @@ public:
 
 	float dead;
 
+	//spawns a random zombie at the given location
 	Zombie_Enemy(ITexture * texture,spacevec startPos,ChunkManager * cm);
 	~Zombie_Enemy();
 
-	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(float seconds,TickServiceProvider * tsp);
 
 	void checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm);

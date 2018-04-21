@@ -25,9 +25,9 @@ EntityProjectile::~EntityProjectile()
 	delete fromItem;
 }
 
-void EntityProjectile::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp)
+void EntityProjectile::draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
-	spacevec interPos=pos+v*tickOffset-observerPos;
+	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;//TODO frustum culling?
 	vec3 interPosMeters=cm->toMeters(interPos);
 	tex->bind();
 	glColor3f(1.0f,1.0f, 0.1f);

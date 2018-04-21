@@ -13,12 +13,13 @@ class DrawServiceProvider;
 class ChunkManager;
 #include "ChunkManager.h"
 #include "Spacevec.h"
+#include "Frustum.h"
 class Drawable
 {
 public:
 	Drawable();
 	virtual ~Drawable();
-	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
+	virtual void draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
 };
 
 #endif /* SRC_DRAWABLE_H_ */

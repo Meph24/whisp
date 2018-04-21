@@ -1,11 +1,16 @@
 #pragma once
 #include "ICamera3D.h"
-class CameraFP :
-	public ICamera3D
+class CameraFP: public ICamera3D
 {
 public:
 
 	void apply();
+	virtual DivisionPlane getNearPlane();
+	virtual DivisionPlane getFarPlane();
+	virtual DivisionPlane getRightPlane();
+	virtual DivisionPlane getLeftPlane();
+	virtual DivisionPlane getUpperPlane();
+	virtual DivisionPlane getLowerPlane();
 
 	CameraFP();
 	~CameraFP();

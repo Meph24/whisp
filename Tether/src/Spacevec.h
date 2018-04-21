@@ -277,6 +277,8 @@ struct vec3if
 	float fLength(float chunkSize);
 	double dLength(double chunkSize);
 
+	flt dot(vec3 v);//use only if already relativized, otherwise precision problems
+
 };
 
 template<typename I,typename F>
@@ -431,5 +433,16 @@ typedef int chunkNum;
 typedef intfloat<chunkNum,flt> spacelen;
 typedef vec3if<chunkNum, flt> spacevec;
 
+template<typename I, typename F>
+inline flt vec3if<I, F>::dot(vec3 v)
+{
+	flt ret=v.x*x.floatpart;
+	ret+=v.x*x.intpart;
+	ret+=v.y*y.floatpart;
+	ret+=v.y*y.intpart;
+	ret+=v.z*z.floatpart;
+	ret+=v.z*z.intpart;
+	return ret;
+}
 
 #endif /* SRC_SPACEVEC_H_ */

@@ -10,6 +10,7 @@
 #define SRC_ENTITYPLAYER_H_
 #include "Entity.h"
 #include "CameraTP.h"
+#include "Frustum.h"
 
 class EntityPlayer: public Entity
 {
@@ -34,10 +35,11 @@ public:
 	void changeTPdist(float amount);
 
 	spacevec getCamPos();
+	Frustum * getViewFrustum(ChunkManager * cm);
 
 	void applyPerspective(bool fresh,ChunkManager * cm);//returns position that must be used for relative draws
 
-	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 
 	virtual void tick(float time,TickServiceProvider * tsp);
 };

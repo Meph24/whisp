@@ -8,8 +8,8 @@ terrainQuality=1.0
 
 
 #test
-zombies=100
-zombieDist=30
+zombies=5000
+zombieDist=100
 
 
 #input

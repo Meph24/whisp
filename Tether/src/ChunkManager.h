@@ -13,12 +13,11 @@ class Chunk;
 #include "Chunk.h"
 #include "Tickable.h"
 #include "Spacevec.h"
+#include "Frustum.h"
 
 class ChunkManager: public Tickable
 {
 	int chunkSize;//size of one chunk
-	//float fChunkSizeInv;
-	//float dChunkSizeInv;
 	int chunksPerAxis;//width and height in chunks
 	spacelen defaultH;
 
@@ -48,13 +47,12 @@ public:
 	void generateMissing(int count);
 	void setMid(spacevec abs);//absolute x,z
 	spacelen getHeight(spacevec abs);//absolute x,z
-	void render(float lodQ, spacevec camOffset);
+	void render(float lodQ,Frustum * viewFrustum, spacevec camOffset);
 	flt toMeters(spacelen l);
 	vec3 toMeters(spacevec v);
 	spacelen fromMeters(flt l);
 	spacevec fromMeters(vec3 v);
 	spacevec getMiddleChunk();
-	//Chunk * getChunk(Position p);
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 };

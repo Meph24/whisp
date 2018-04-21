@@ -33,7 +33,7 @@ public:
 
 	//Chunk * mainChunk;//the ticking chunk
 	//std::vector<Chunk *> chunks;
-	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp)=0;
+	virtual void draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
 	virtual void tick(float time,TickServiceProvider * tsp)=0;

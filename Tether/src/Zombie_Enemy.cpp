@@ -4,7 +4,7 @@
 
 
 Zombie_Enemy::Zombie_Enemy(ITexture * texture,spacevec startPos,ChunkManager * chm):
-tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.5f,0,1),transitionAnim(0.5f,0,1),dead(0)//posX(startX), posZ(startZ) spawns a random zombie at the given location
+tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.5f,0,1),transitionAnim(0.5f,0,1),dead(0)
 {
 	pos=cm->clip(startPos,true);
 	v=cm->fromMeters({0,0,0});
@@ -22,9 +22,6 @@ tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.5f,0,1),transition
 	totalHP=remainingHP;
 
 	bodyAnim=AnimationCycle(3*size/speed,0);
-
-	//aabbOlow=vec3(size*2.0f,size*0.25f,size*2.0f);
-	//aabbOhigh=vec3(size*2.0f,size*2.25f,size*2.0f);
 }
 
 
@@ -216,9 +213,10 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 	drawTexturedCube(tc);
 	glPopMatrix();
 }
-void Zombie_Enemy::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp)
+void Zombie_Enemy::draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
+	if(!viewFrustum->inside(bb)) return;
 
 	bodyAnim.updateTemp(tickOffset);
 	if(legDmg>0.25f*totalHP)
@@ -226,7 +224,7 @@ void Zombie_Enemy::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,
 	if(dead) fallAnim.update(tickOffset);
 
 
-	spacevec interPos=pos+v*tickOffset-observerPos;
+	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
 	vec3 interPosMeters=cm->toMeters(interPos);
 
 	glPushMatrix();
@@ -238,7 +236,6 @@ void Zombie_Enemy::draw(float tickOffset,spacevec observerPos,ChunkManager * cm,
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
 
-	//tilted = 10;
 
 	glPushMatrix();
 	float animStrength=1;
@@ -293,25 +290,6 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	{
 		if (ph->projectiles[i])
 		{
-			/*
-			spacevec max=ph->projectiles[i]->posOld-middleChunk;
-			spacevec min=max;
-			spacevec next=ph->projectiles[i]->pos-middleChunk;
-			if(min.x>next.x) min.x=next.x;
-			else if(max.x<next.x) max.x=next.x;
-			if(min.y>next.y) min.y=next.y;
-			else if(max.y<next.y) max.y=next.y;
-			if(min.z>next.z) min.z=next.z;
-			else if(max.z<next.z) max.z=next.z;
-			spacelen maxSize=cm->fromMeters(size)*3.0f;
-			max+={maxSize,maxSize,maxSize};
-			min-={maxSize,maxSize,maxSize};
-			if(min.x>relPos.x) continue;
-			if(min.y>relPos.y) continue;
-			if(min.z>relPos.z) continue;//lol optimization at tier 1
-			if(max.x<relPos.x) continue;
-			if(max.y<relPos.y) continue;
-			if(max.z<relPos.z) continue;*/
 			if(!ph->projectiles[i]->bb.doesIntersect(bb)) continue;
 			proj=true;
 		}

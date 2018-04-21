@@ -126,6 +126,9 @@ using namespace noise;
 Chunk::Chunk(spacevec basePos,int baseSize,ChunkManager * cm):
 base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 {
+	float maxH=0;
+	float minH=0;
+	bool first=true;
 	defaultH=cm->fromMeters(defaultHeight*1.0f);
 	module::Perlin myModule;
 	myModule.SetSeed(420);
@@ -139,11 +142,36 @@ base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 		for(int xrun=0;xrun<size;xrun++)
 		{
 			float val=((float)myModule.GetValue((double)xrun+baseSize*(double)base.x.floatpart+baseSize*(double)base.x.intpart, (double)zrun+baseSize*(double)base.z.floatpart+baseSize*(double)base.z.intpart, 0))*10.0f;
-			height[zrun*size+xrun]=val*val;
-			avgHeight+=val*val;
+			val=val*val;
+			if(first)
+			{
+				first=false;
+				maxH=val;
+				minH=val;
+			}
+			else
+			{
+				if(val>maxH) maxH=val;
+				else if(val<minH) minH=val;
+			}
+			height[zrun*size+xrun]=val;
+			avgHeight+=val;
 		}
 	}
 	avgHeight/=size*size;
+	spacelen minConv=cm->fromMeters(minH);
+	spacelen maxConv=cm->fromMeters(maxH);
+	spacevec middle=base;
+	middle.x.floatpart=0.5f;
+	middle.z.floatpart=0.5f;
+	middle.y=minConv*0.5f+maxConv*0.5f;
+	spacevec size;
+	size.x.floatpart=0;
+	size.x.intpart=0;
+	size.z.floatpart=0;
+	size.z.intpart=0;
+	size.y=maxConv-minConv;
+	bb=AABB(middle,size);
 
 	/*int smallSize=size-1;
 	int vertices=3*4*smallSize*smallSize;

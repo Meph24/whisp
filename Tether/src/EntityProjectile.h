@@ -21,7 +21,7 @@ public:
 
 	EntityProjectile(ItemAmmo * item,spacevec position,spacevec velocity);//gives item ownership to the Projectile
 	~EntityProjectile();
-	virtual void draw(float tickOffset,spacevec observerPos,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(float time,TickServiceProvider * tsp);
 
 	static void setTexture(ITexture * texture);

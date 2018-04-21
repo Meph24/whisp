@@ -42,7 +42,7 @@ spacelen ChunkManager::getHeight(spacevec abs)
 }
 
 #include <iostream>
-void ChunkManager::render(float lodQ, spacevec camOffset)
+void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 {
 	int startX=chunksPerAxis/2-renderDistanceChunks;
 	int startZ=chunksPerAxis/2-renderDistanceChunks;
@@ -61,7 +61,7 @@ void ChunkManager::render(float lodQ, spacevec camOffset)
 		for(int runx = startX ; runx<stopX ; runx++)
 		{
 			int indx=runz*chunksPerAxis+runx;
-			if(chunks[indx])
+			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb))
 			{
 				float distX=(runx-midX);
 				if (distX<0) distX=-distX;
@@ -344,18 +344,3 @@ float ChunkManager::getChunkSize()
 {
 	return chunkSize;
 }
-/*
-float ChunkManager::getChunkSizeInvF()
-{
-	return fChunkSizeInv;
-}
-
-double ChunkManager::getChunkSizeInvD()
-{
-	return dChunkSizeInv;
-}*/
-/*
-Chunk* ChunkManager::getChunk(Position p)
-{
-	return 0;//TODO chunks[getIndx(p.chunkX,p.chunkZ)];
-}*/

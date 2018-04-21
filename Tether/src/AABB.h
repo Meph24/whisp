@@ -13,9 +13,9 @@
 
 class AABB
 {
+public:
 	spacevec low;
 	spacevec high;
-public:
 
 	bool doesIntersect(AABB other);
 	bool doesIntersect(AABB * other);

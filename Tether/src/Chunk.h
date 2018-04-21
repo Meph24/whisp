@@ -17,8 +17,9 @@
 class ChunkManager;
 #include "ChunkManager.h"
 #include <vector>
+#include "AABB.h"
 
-class Chunk: public Tickable
+class Chunk: public Tickable //TODO Drawable?
 {
 	spacevec base;
 	spacelen defaultH;
@@ -32,6 +33,7 @@ class Chunk: public Tickable
 
 	inline float getH(int x,int y);//inside chunk grid
 public:
+	AABB bb;
 	void tick(float time,TickServiceProvider * tsp);
 	spacelen getHeight(flt x,flt z);//coordinates inside chunk
 	void render(int lod,spacevec camOffset);
