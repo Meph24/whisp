@@ -166,11 +166,11 @@ base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 	middle.z.floatpart=0.5f;
 	middle.y=minConv*0.5f+maxConv*0.5f;
 	spacevec size;
-	size.x.floatpart=0;
+	size.x.floatpart=0.5f;
 	size.x.intpart=0;
-	size.z.floatpart=0;
+	size.z.floatpart=0.5f;
 	size.z.intpart=0;
-	size.y=maxConv-minConv;
+	size.y=(maxConv-minConv)*0.5f;
 	bb=AABB(middle,size);
 
 	/*int smallSize=size-1;

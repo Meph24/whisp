@@ -13,6 +13,7 @@ class Chunk;
 #include "Chunk.h"
 #include "Tickable.h"
 #include "Spacevec.h"
+class Frustum;
 #include "Frustum.h"
 
 class ChunkManager: public Tickable

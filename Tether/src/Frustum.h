@@ -11,6 +11,8 @@
 #define FRUSTUM_PLANE_COUNT 5
 #include "DivisionPlane.h"
 #include "AABB.h"
+#include "ITexture.h"
+#include "ChunkManager.h"
 class Frustum
 {
 public:
@@ -22,6 +24,7 @@ public:
 	//4th: upper plane if player looks down, lower plane otherwise
 	//5th: distance plane
 
+	void debugDraw(ITexture * tex,ChunkManager * cm);
 
 	bool inside(spacelen * bb);
 	bool inside(AABB bb);

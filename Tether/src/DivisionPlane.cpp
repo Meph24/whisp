@@ -13,7 +13,7 @@ normal(Normal),distanceInChunks(Dist)
 {
 	AABB test;
 	spacelen * ref=&(test.low.x);
-	if(normal.x>0)
+	if(normal.x<0)
 	{
 		xPtr=&(test.high.x)-ref;
 	}
@@ -21,21 +21,21 @@ normal(Normal),distanceInChunks(Dist)
 	{
 		xPtr=&(test.low.x)-ref;
 	}
-	if(normal.y>0)
+	if(normal.y<0)
 	{
-		xPtr=&(test.high.y)-ref;
+		yPtr=&(test.high.y)-ref;
 	}
 	else
 	{
-		xPtr=&(test.low.y)-ref;
+		yPtr=&(test.low.y)-ref;
 	}
-	if(normal.z>0)
+	if(normal.z<0)
 	{
-		xPtr=&(test.high.z)-ref;
+		zPtr=&(test.high.z)-ref;
 	}
 	else
 	{
-		xPtr=&(test.low.z)-ref;
+		zPtr=&(test.low.z)-ref;
 	}
 }
 

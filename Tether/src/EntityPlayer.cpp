@@ -40,7 +40,6 @@ void EntityPlayer::draw(float tickOffset,Frustum * viewFrustum,ChunkManager* cm,
 
 void EntityPlayer::applyPerspective(bool fresh,ChunkManager * cm)
 {
-	std::cout<<cam->alpha<<" "<<cam->beta<<std::endl;
 	spacevec relPos=pos-cm->getMiddleChunk();
 	characterHeightConv=cm->fromMeters(characterHeight);
 	relPos.y+=characterHeightConv;
@@ -101,6 +100,11 @@ Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
 	ret->planes[1]=cam->getLeftPlane();
 	ret->planes[2]=cam->getRightPlane();
 	ret->planes[4]=cam->getFarPlane();
+	for(int i=0;i<5;i++)//TODO do not hard-code
+	{
+		ret->planes[i]=cam->getNearPlane();//TODO remove after debugging
+		ret->planes[i].distanceInChunks/=cm->getChunkSize();
+	}
 	return ret;
 }
 

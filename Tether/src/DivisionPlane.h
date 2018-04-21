@@ -17,9 +17,9 @@ class DivisionPlane
 	int xPtr;
 	int yPtr;
 	int zPtr;
+public:
 	vec3 normal;
 	flt distanceInChunks;
-public:
 	DivisionPlane();
 	DivisionPlane(vec3 Normal,flt Dist);
 	~DivisionPlane();

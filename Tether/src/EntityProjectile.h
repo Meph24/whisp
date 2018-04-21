@@ -14,8 +14,8 @@
 
 class EntityProjectile: public Entity
 {
-	static ITexture * tex;
 public:
+	static ITexture * tex;
 	ItemAmmo * fromItem;//TODO private?
 	spacevec posOld;//TODO private?
 
