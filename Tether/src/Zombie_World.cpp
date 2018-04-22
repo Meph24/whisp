@@ -158,7 +158,7 @@ void Zombie_World::render(float seconds)
 
 	player->applyPerspective(true,cm);
 	Frustum * viewFrustum=player->getViewFrustum(cm);
-	viewFrustum->debugDraw(EntityProjectile::tex,cm);
+	//viewFrustum->debugDraw(EntityProjectile::tex,cm);
 
 	grass->bind();
 	glColor3f(0.2f, 0.6f, 0.1f);

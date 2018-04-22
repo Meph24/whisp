@@ -13,7 +13,7 @@ Frustum::Frustum()
 
 bool Frustum::inside(spacelen* bb)
 {
-	for(int i=0;i<1;i++)//TODO FRUSTUM_PLANE_COUNT;i++)
+	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{
 		if(!planes[i].inside(bb,observerPos)) return false;
 	}
