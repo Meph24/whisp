@@ -11,6 +11,13 @@
 #include "Entity.h"
 #include "CameraTP.h"
 #include "Frustum.h"
+class Zombie_MouseInput;
+#include "Zombie_MouseInput.h"
+class Zombie_KeyInput;
+#include "Zombie_KeyInput.h"
+#include "Zombie_Physics.h"
+#include <SFML/Window.hpp>
+#include "SpeedMod.h"
 
 class EntityPlayer: public Entity
 {
@@ -18,6 +25,9 @@ class EntityPlayer: public Entity
 
 	bool isPerspective=false;
 public:
+	Zombie_MouseInput * mouseInp;
+	Zombie_KeyInput * keyInp;
+
 	CameraTP * cam;
 	float minTPdist=2;
 	float maxTPdist=20;
@@ -29,7 +39,7 @@ public:
 	float maxHP=100;
 	float speed=0;
 
-	EntityPlayer(spacevec startPos,float screenH,float screenW,float characterSpeed);
+	EntityPlayer(spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
 	~EntityPlayer();
 
 	void changeTPdist(float amount);

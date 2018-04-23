@@ -29,7 +29,7 @@ public:
 	spacevec pos;
 	spacevec v;
 
-	bool exists=true;//if exists is false, memory will be freed next tick (enough time for other threads to react)
+	bool exists=true;//if exists is false, memory will be freed soon [prev description: next tick (enough time for other threads to react)]
 
 	//Chunk * mainChunk;//the ticking chunk
 	//std::vector<Chunk *> chunks;
@@ -40,7 +40,7 @@ public:
 
 	void requestDestroy(TickServiceProvider * tsp);
 
-	//virtual void onAABBintersect(Entity * other);
+	virtual void onAABBintersect(Entity * other);
 
 	Entity();
 	virtual ~Entity();

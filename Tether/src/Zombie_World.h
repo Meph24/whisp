@@ -2,8 +2,6 @@
 #include "Zombie_Enemy.h"
 #include "CameraFP.h"
 #include <SFML/Window.hpp>
-#include "Zombie_MouseInput.h"
-#include "Zombie_KeyInput.h"
 #include "PerformanceMeter.h"
 #include "TextureStatic2D.h"
 #include "Zombie_Physics.h"
@@ -27,7 +25,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 
 	Zombie_Enemy ** zombies;
 	EntityProjectile ** shots;
-	Zombie_KeyInput * keyInp;
 	PerformanceMeter * pm;
 	DebugScreen * ds;
 	Graphics2D * g;
@@ -67,7 +64,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int entityIndex=0;//TODO
 public:
 	EntityPlayer * player;
-	Zombie_MouseInput * mouseInp;
 	bool debugScreen=false;
 	float timeFactor = 1;
 	Zombie_World(sf::Window * w);

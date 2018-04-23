@@ -1,5 +1,6 @@
 #pragma once
 #include "SFML/Window.hpp"
+class EntityPlayer;
 #include "EntityPlayer.h"
 class Zombie_MouseInput
 {

@@ -124,14 +124,14 @@ void EventHandler::sendOn(EventHandler::event e)
 			if(e.value)
 			{
 				world->player->cam->zoom/=zoomMult;
-				world->mouseInp->sensitivityX/=zoomMult;
-				world->mouseInp->sensitivityY/=zoomMult;
+				world->player->mouseInp->sensitivityX/=zoomMult;//TODO find better way
+				world->player->mouseInp->sensitivityY/=zoomMult;
 			}
 			else
 			{
 				world->player->cam->zoom*=zoomMult;
-				world->mouseInp->sensitivityX*=zoomMult;
-				world->mouseInp->sensitivityY*=zoomMult;
+				world->player->mouseInp->sensitivityX*=zoomMult;
+				world->player->mouseInp->sensitivityY*=zoomMult;
 			}
 		}
 		else if ((e.ID == 1049) && e.value)

@@ -11,8 +11,6 @@
 ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir):
 chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
-	//fChunkSizeInv=1.0f/chunkSize;
-	//dChunkSizeInv=1.0/chunkSize;
 	chunksBuf1=new Chunk * [chunksPerAxis*chunksPerAxis];
 	chunksBuf2=new Chunk * [chunksPerAxis*chunksPerAxis];
 	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
@@ -55,7 +53,6 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 	int midX=(startX+stopX)/2;
 	int midZ=(startZ+stopZ)/2;
 
-	//std::cout<<"rendering from "<<startX<<" to "<<stopX<<std::endl;
 	for(int runz = startZ ; runz<stopZ ; runz++)
 	{
 		for(int runx = startX ; runx<stopX ; runx++)
@@ -81,7 +78,6 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 			}
 		}
 	}
-	//std::cout<<"rendering end"<<std::endl;
 }
 
 
@@ -136,7 +132,6 @@ void ChunkManager::setMid(spacevec abs)
 	if(cz>=(lowZ+chunksPerAxis)) return;
 
 	int myInd=getIndx(cx,cz);
-	//std::cout<<"myInd = "<<myInd<<std::endl;
 	if(chunks[myInd]==0)
 	{
 		spacevec chunkBase;

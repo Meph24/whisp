@@ -49,20 +49,20 @@ vec3 ICamera3D::getFarNormal()
 
 vec3 ICamera3D::getRightNormal()
 {
-	return getNormal({0,0,1});//TODO correct
+	return getNormal({1,0,rightPart});
 }
 
 vec3 ICamera3D::getLeftNormal()
 {
-	return getNormal({0,0,1});//TODO correct
+	return getNormal({-1,0,-leftPart});
 }
 
 vec3 ICamera3D::getUpperNormal()
 {
-	return getNormal({0,0,1});//TODO correct
+	return getNormal({0,1,upPart});
 }
 
 vec3 ICamera3D::getLowerNormal()
 {
-	return getNormal({0,0,1});//TODO correct
+	return getNormal({0,-1,-downPart});
 }

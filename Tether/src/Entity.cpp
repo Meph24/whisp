@@ -20,8 +20,8 @@ void Entity::requestDestroy(TickServiceProvider* tsp)
 
 Entity::~Entity()
 {}
-/*
+
 void Entity::onAABBintersect(Entity* other)
 {}
 
-*/
+

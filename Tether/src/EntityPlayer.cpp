@@ -8,7 +8,7 @@
 
 #include "EntityPlayer.h"
 
-EntityPlayer::EntityPlayer(spacevec startPos,float screenH,float screenW,float characterSpeed):
+EntityPlayer::EntityPlayer(spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
 speed(characterSpeed)
 {
 	pos=startPos;
@@ -17,16 +17,23 @@ speed(characterSpeed)
 	cam->alpha=0.0001f;
 	cam->beta=0.0001f;
 	cam->gamma=0.0001f;
-	cam->height=screenH;
-	cam->width=screenW;
+	cam->height=w->getSize().y;
+	cam->width=w->getSize().x;
 	cam->maxView=1024*8;
 	setTP(false);
 	cam->zoom=1;//TODO provide interface
+	mouseInp = new Zombie_MouseInput(this, w);
+	mouseInp->sensitivityX=sensX;
+	mouseInp->sensitivityY=sensY;
+	keyInp = new Zombie_KeyInput(mouseInp,cam);
+	mouseInp->enable();
 }
 
 EntityPlayer::~EntityPlayer()
 {
 	delete cam;
+	delete keyInp;
+	delete mouseInp;
 }
 
 void EntityPlayer::draw(float tickOffset,Frustum * viewFrustum,ChunkManager* cm, DrawServiceProvider* dsp)
@@ -102,7 +109,6 @@ Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
 	ret->planes[4]=cam->getFarPlane();
 	for(int i=0;i<5;i++)//TODO do not hard-code
 	{
-		ret->planes[i]=cam->getNearPlane();//TODO remove after debugging
 		ret->planes[i].distanceInChunks/=cm->getChunkSize();
 	}
 	return ret;
@@ -110,6 +116,30 @@ Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
 
 void EntityPlayer::tick(float time, TickServiceProvider* tsp)
 {
+	ChunkManager * cm=tsp->getChunkManager();
+
+	spacevec oldPos=pos;
+	vec3 wantedV=keyInp->getVelocity()*speed;
+	pos+=cm->fromMeters(wantedV)*time;
+	pos=cm->clip(pos,true);
+	spacevec newPos=pos;
+	vec3 moved=cm->toMeters(newPos-oldPos);
+	if(moved.lengthSq()>0.0000000001f)
+	{
+		vec3 norm=moved;
+		norm.normalize();
+		flt speedModA=(vec3(norm.x,0,norm.z).length());
+		vec3 flat=vec3(moved.x,0,moved.z);
+		flt h=moved.y/flat.length();
+		SpeedMod sm=SpeedMod();
+		flt speedModB=sm.slowdownFromTerrain(h);
+		pos=cm->clip(oldPos+cm->fromMeters(flat*speedModA*speedModB),true);
+	}
+	if(time>0.0000000001f)
+		v=(pos-oldPos)/time;
+
+
+
 	spacevec size;
 	size.x=characterHeightConv*0.5f;
 	size.y=characterHeightConv*1.5f;

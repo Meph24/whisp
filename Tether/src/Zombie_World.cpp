@@ -47,24 +47,23 @@ Zombie_World::Zombie_World(sf::Window * w)
 	guns[4] = new Zombie_Gun("G3A3 .308",0.12f,"res/gunshot.wav",0.75f,new ItemAmmo(800, 200,0.0008f),true,{3,0,0},{1.5f,1.5f,0});
 
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
-	player=new EntityPlayer({{0,0},{0,0},{0,0}},w->getSize().y,w->getSize().x,characterSpeed);
+
+	float sensX = *cfg.getfloat("input", "sensitivityX");
+	float sensY = *cfg.getfloat("input", "sensitivityY");
+
+	player=new EntityPlayer({{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
 	player->HP = 100;
 	player->cam->zoom = 1;//TODO better zoom
 
-	mouseInp = new Zombie_MouseInput(player, w);
 
-	mouseInp->sensitivityX = *cfg.getfloat("input", "sensitivityX");
-	mouseInp->sensitivityY = *cfg.getfloat("input", "sensitivityY");
-	keyInp = new Zombie_KeyInput(mouseInp,player->cam);
 
 
 	pm = new PerformanceMeter(12,1000);
 	pm->roundtripUpdateIndex = 0;
 
 	//dirty
-	keyInput = keyInp;
-	mouseInput = mouseInp;
-	mouseInp->enable();
+	keyInput = player->keyInp;
+	mouseInput = player->mouseInp;
 
 	physics = new Zombie_Physics(zCount * 2);
 	physics->cm=cm;//TODO implement cleaner solution
@@ -116,8 +115,6 @@ Zombie_World::~Zombie_World()
 	delete zombieTex;
 	delete tps;
 	delete pm;
-	delete keyInp;
-	delete mouseInp;
 	delete player;
 	delete[] zombies;
 	delete[] shots;
@@ -133,32 +130,10 @@ void Zombie_World::removeZombie(int zid)
 }
 void Zombie_World::render(float seconds)
 {
-	spacevec relPos=cm->getMiddleChunk();
-
-	spacevec oldPos=player->pos;
-	vec3 wantedV=keyInp->getVelocity()*player->speed;
-	player->pos+=cm->fromMeters(wantedV)*seconds;
-	player->pos=cm->clip(player->pos,true);
-	spacevec newPos=player->pos;
-	vec3 moved=cm->toMeters(newPos-oldPos);
-	if(moved.lengthSq()>0.0000000001f)
-	{
-		vec3 norm=moved;
-		norm.normalize();
-		flt speedModA=(vec3(norm.x,0,norm.z).length());
-		vec3 flat=vec3(moved.x,0,moved.z);
-		flt h=moved.y/flat.length();
-		SpeedMod sm=SpeedMod();
-		flt speedModB=sm.slowdownFromTerrain(h);
-		player->pos=cm->clip(oldPos+cm->fromMeters(flat*speedModA*speedModB),true);
-	}
-	if(seconds>0.0000000001f)
-		player->v=(player->pos-oldPos)/seconds;
-
 
 	player->applyPerspective(true,cm);
+	spacevec relPos=cm->getMiddleChunk();
 	Frustum * viewFrustum=player->getViewFrustum(cm);
-	//viewFrustum->debugDraw(EntityProjectile::tex,cm);
 
 	grass->bind();
 	glColor3f(0.2f, 0.6f, 0.1f);
@@ -282,6 +257,7 @@ void Zombie_World::loadStandardTex()
 void Zombie_World::doPhysics(float sec)
 {
 	spacevec mid=cm->getMiddleChunk();
+	player->tick(sec,this);
 	player->HP += sec / 2;
 	if (player->HP > 100) player->HP = 100;
 	hitmark -= sec * 10;
