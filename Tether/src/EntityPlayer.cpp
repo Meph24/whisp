@@ -117,6 +117,8 @@ Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
 void EntityPlayer::tick(float time, TickServiceProvider* tsp)
 {
 	ChunkManager * cm=tsp->getChunkManager();
+	HP += time / 2;
+	if (HP > 100) HP = 100;
 
 	spacevec oldPos=pos;
 	vec3 wantedV=keyInp->getVelocity()*speed;
@@ -137,8 +139,6 @@ void EntityPlayer::tick(float time, TickServiceProvider* tsp)
 	}
 	if(time>0.0000000001f)
 		v=(pos-oldPos)/time;
-
-
 
 	spacevec size;
 	size.x=characterHeightConv*0.5f;

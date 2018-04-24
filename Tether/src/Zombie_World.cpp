@@ -52,7 +52,6 @@ Zombie_World::Zombie_World(sf::Window * w)
 	float sensY = *cfg.getfloat("input", "sensitivityY");
 
 	player=new EntityPlayer({{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
-	player->HP = 100;
 	player->cam->zoom = 1;//TODO better zoom
 
 
@@ -94,7 +93,7 @@ void Zombie_World::restart()
 			removeZombie(i);
 		}
 	}
-	player->HP = 100;
+	player->HP = 10000000;
 	score = 0;
 	for (int i = 0; i < pCount; i++)
 	{
@@ -258,8 +257,6 @@ void Zombie_World::doPhysics(float sec)
 {
 	spacevec mid=cm->getMiddleChunk();
 	player->tick(sec,this);
-	player->HP += sec / 2;
-	if (player->HP > 100) player->HP = 100;
 	hitmark -= sec * 10;
 	if (hitmark < 0) hitmark = 0;
 	for (int i = 0; i < zCount; i++)
@@ -352,6 +349,7 @@ void Zombie_World::doPhysics(float sec)
 				Zombie_Physics::motion m = physics->getMotion(i, sec);
 				zombies[i]->pos.x += cm->fromMeters(m.x);
 				zombies[i]->pos.z += cm->fromMeters(m.z);
+				zombies[i]->pos=cm->clip(zombies[i]->pos,true);
 				if ((zombies[i]->remainingHP) < 0) (zombies[i]->dead) += sec * 240;
 			}
 		}

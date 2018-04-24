@@ -43,6 +43,7 @@ public:
 	float totalHP;
 	float remainingHP;
 	float legDmg;
+	float maxHP;
 
 	AnimationCycle bodyAnim;
 	AnimationCycle fallAnim;

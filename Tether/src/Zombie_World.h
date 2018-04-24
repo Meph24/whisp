@@ -17,6 +17,7 @@
 #include "TickServiceProvider.h"
 class Zombie_World: public TickServiceProvider, DrawServiceProvider
 {
+
 	bool spawnZombies;
 	int timestep=0;
 	int zCount;//max number of zombies
