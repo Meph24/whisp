@@ -27,6 +27,7 @@ speed(characterSpeed)
 	mouseInp->sensitivityY=sensY;
 	keyInp = new Zombie_KeyInput(mouseInp,cam);
 	mouseInp->enable();
+	HP=maxHP;
 }
 
 EntityPlayer::~EntityPlayer()
@@ -117,8 +118,8 @@ Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
 void EntityPlayer::tick(float time, TickServiceProvider* tsp)
 {
 	ChunkManager * cm=tsp->getChunkManager();
-	HP += time / 2;
-	if (HP > 100) HP = 100;
+	HP += maxHP*time / 200;
+	if (HP > maxHP) HP = maxHP;
 
 	spacevec oldPos=pos;
 	vec3 wantedV=keyInp->getVelocity()*speed;

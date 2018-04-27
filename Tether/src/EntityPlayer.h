@@ -35,7 +35,7 @@ public:
 	float characterHeight=1.6f;
 	spacelen characterHeightConv;
 
-	float HP=0;
+	float HP=-1;
 	float maxHP=100;
 	float speed=0;
 

@@ -93,7 +93,7 @@ void Zombie_World::restart()
 			removeZombie(i);
 		}
 	}
-	player->HP = 10000000;
+	player->HP = player->maxHP;
 	score = 0;
 	for (int i = 0; i < pCount; i++)
 	{

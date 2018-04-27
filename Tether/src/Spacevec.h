@@ -19,6 +19,7 @@ struct intfloat
 	F floatpart;
 
 	void correct();
+	void correctPos();
 
 	intfloat<I,F> operator+(intfloat<I,F> other);
 	intfloat<I,F> operator-(intfloat<I,F> other);
@@ -54,7 +55,7 @@ inline intfloat<I, F> intfloat<I, F>::operator +(intfloat<I, F> other)
 	intfloat<I,F> ret;
 	ret.floatpart=floatpart+other.floatpart;
 	ret.intpart=intpart+other.intpart;
-	ret.correct();
+	ret.correctPos();
 	return ret;
 }
 
@@ -73,7 +74,7 @@ inline void intfloat<I, F>::operator +=(intfloat<I, F> other)
 {
 	intpart+=other.intpart;
 	floatpart+=other.floatpart;
-	correct();
+	correctPos();
 }
 
 template<typename I, typename F>
@@ -87,44 +88,49 @@ inline void intfloat<I, F>::operator -=(intfloat<I, F> other)
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator <(intfloat<I, F> other)
 {
-	if(intpart<other.intpart) return true;
-	if(intpart==other.intpart)
-		if(floatpart<other.floatpart) return true;
-	return false;
+	return (intpart<other.intpart)||((intpart==other.intpart)&&(floatpart<other.floatpart));
+	//if(intpart<other.intpart) return true;
+	//if(intpart==other.intpart)
+	//	if(floatpart<other.floatpart) return true;
+	//return false;
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator <=(intfloat<I, F> other)
 {
-	if(intpart<other.intpart) return true;
-	if(intpart==other.intpart)
-		if(floatpart<=other.floatpart) return true;
-	return false;
+	return (intpart<other.intpart)||((intpart==other.intpart)&&(floatpart<=other.floatpart));
+	//if(intpart<other.intpart) return true;
+	//if(intpart==other.intpart)
+	//	if(floatpart<=other.floatpart) return true;
+	//return false;
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator >(intfloat<I, F> other)
 {
-	if(intpart>other.intpart) return true;
-	if(intpart==other.intpart)
-		if(floatpart>other.floatpart) return true;
-	return false;
+	return (intpart>other.intpart)||((intpart==other.intpart)&&(floatpart>other.floatpart));
+	//if(intpart>other.intpart) return true;
+	//if(intpart==other.intpart)
+	//	if(floatpart>other.floatpart) return true;
+	//return false;
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator >=(intfloat<I, F> other)
 {
-	if(intpart>other.intpart) return true;
-	if(intpart==other.intpart)
-		if(floatpart>=other.floatpart) return true;
-	return false;
+	return (intpart>other.intpart)||((intpart==other.intpart)&&(floatpart>=other.floatpart));
+	//if(intpart>other.intpart) return true;
+	//if(intpart==other.intpart)
+	//	if(floatpart>=other.floatpart) return true;
+	//return false;
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator !=(intfloat<I, F> other)
 {
-	if(intpart!=other.intpart) return true;
-	return floatpart!=other.floatpart;
+	return (intpart!=other.intpart)||(floatpart!=other.floatpart);
+	//if(intpart!=other.intpart) return true;
+	//return floatpart!=other.floatpart;
 }
 
 template<typename I, typename F>
@@ -200,8 +206,9 @@ inline void intfloat<I, F>::operator /=(double scalar)
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator ==(intfloat<I, F> other)
 {
-	if(intpart!=other.intpart) return false;
-	return floatpart==other.floatpart;
+	return (intpart==other.intpart)&&(floatpart==other.floatpart);
+	//if(intpart!=other.intpart) return false;
+	//return floatpart==other.floatpart;
 }
 
 
@@ -220,13 +227,22 @@ inline void intfloat<I, F>::correct()
 	//intfloat<I, F> debugBefore=*this;
 
 	I change=(I)floatpart;
-	if(floatpart<0) change--;
+	change-=(floatpart<0);
+	//if(floatpart<0) change--;
 	intpart+=change;
 	floatpart-=change;
 
 	//intfloat<I, F> debugAfter=*this;
 	//if(debugBefore.floatpart<-10000 || debugBefore.floatpart>10000 || debugBefore.intpart<-10000 ||debugAfter.intpart<-10000)
 	//	std::cout<<"suspiciously large coordinate, before: "<<debugBefore<<" after:  "<<debugAfter<<std::endl;
+}
+
+template<typename I, typename F>
+inline void intfloat<I, F>::correctPos()
+{
+	I change=(I)floatpart;
+	intpart+=change;
+	floatpart-=change;
 }
 
 template<typename I, typename F>
