@@ -8,9 +8,10 @@
 
 #include "EntityPlayer.h"
 
-EntityPlayer::EntityPlayer(spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
+EntityPlayer::EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
 speed(characterSpeed)
 {
+	lastTick=spawnTime;
 	pos=startPos;
 	v={{0,0},{0,0},{0,0}};
 	cam=new CameraTP();
@@ -37,8 +38,9 @@ EntityPlayer::~EntityPlayer()
 	delete mouseInp;
 }
 
-void EntityPlayer::draw(float tickOffset,Frustum * viewFrustum,ChunkManager* cm, DrawServiceProvider* dsp)
+void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, DrawServiceProvider* dsp)
 {
+	//float tickOffset=t-lastTick;
 	if(isPerspective || cam->dist>minTPdist)
 	{
 		//TODO draw yourself
@@ -107,7 +109,8 @@ Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
 	}
 	ret->planes[1]=cam->getLeftPlane();
 	ret->planes[2]=cam->getRightPlane();
-	ret->planes[4]=cam->getFarPlane();
+	ret->planes[4]=cam->getFarPlane();//TODO evaluate usefulness
+	//   planes[5] would be the near plane, gain from it would be 0 most of the time, so not included here
 	for(int i=0;i<5;i++)//TODO do not hard-code
 	{
 		ret->planes[i].distanceInChunks/=cm->getChunkSize();
@@ -115,8 +118,10 @@ Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
 	return ret;
 }
 
-void EntityPlayer::tick(float time, TickServiceProvider* tsp)
+void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 {
+	float time=t-lastTick;
+	lastTick=t;
 	ChunkManager * cm=tsp->getChunkManager();
 	HP += maxHP*time / 200;
 	if (HP > maxHP) HP = maxHP;

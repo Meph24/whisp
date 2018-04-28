@@ -41,12 +41,12 @@ public:
 	spacevec clip(spacevec pos,bool forceGround);
 	bool hitsGround(spacevec startpoint,spacevec endpoint);
 	spacelen getGravity();
-	void tick(float time,TickServiceProvider * tsp);
+	void tick(Timestamp t,TickServiceProvider * tsp);
 	spacevec getWind(spacevec abs);
 	void generateMissing(int count);
 	void setMid(spacevec abs);//absolute x,z
 	spacelen getHeight(spacevec abs);//absolute x,z
-	void render(float lodQ,Frustum * viewFrustum, spacevec camOffset);
+	void render(float lodQ,Frustum * viewFrustum, spacevec camOffset);//TODO drawable
 	flt toMeters(spacelen l);
 	vec3 toMeters(spacevec v);
 	spacelen fromMeters(flt l);

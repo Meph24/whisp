@@ -220,11 +220,11 @@ spacevec ChunkManager::getWind(spacevec abs)
 	return {{0,0},{0,0},{0,0}};//TODO
 }
 
-void ChunkManager::tick(float time, TickServiceProvider* tsp)
+void ChunkManager::tick(Timestamp t, TickServiceProvider* tsp)
 {
 	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
 	{
-		if(chunks[i]) chunks[i]->tick(time,tsp);
+		if(chunks[i]) chunks[i]->tick(t,tsp);
 	}
 }
 

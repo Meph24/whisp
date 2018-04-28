@@ -34,7 +34,7 @@ class Chunk: public Tickable //TODO Drawable?
 	inline float getH(int x,int y);//inside chunk grid
 public:
 	AABB bb;
-	void tick(float time,TickServiceProvider * tsp);
+	void tick(Timestamp t,TickServiceProvider * tsp);
 	spacelen getHeight(flt x,flt z);//coordinates inside chunk
 	void render(int lod,spacevec camOffset);
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1

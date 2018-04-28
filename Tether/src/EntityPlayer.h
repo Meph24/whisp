@@ -39,7 +39,7 @@ public:
 	float maxHP=100;
 	float speed=0;
 
-	EntityPlayer(spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
+	EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
 	~EntityPlayer();
 
 	void changeTPdist(float amount);
@@ -49,9 +49,9 @@ public:
 
 	void applyPerspective(bool fresh,ChunkManager * cm);//returns position that must be used for relative draws
 
-	virtual void draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 
-	virtual void tick(float time,TickServiceProvider * tsp);
+	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */

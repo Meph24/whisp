@@ -3,11 +3,13 @@
  *
  *  Created on:	Jan 17, 2018
  *      Author:	HL65536
- *     Version:	1.0
+ *     Version:	2.0
  */
 
 #ifndef SRC_TICKABLE_H_
 #define SRC_TICKABLE_H_
+
+#include "Timestamp.h"
 
 #define MAX_TICK_TIME 0.02f
 
@@ -18,8 +20,8 @@ class Entity;
 class Tickable
 {
 public:
-	//time is guaranteed to be between 0 and MAX_TICK_TIME
-	virtual void tick(float time,TickServiceProvider * tsp)=0;
+	//difference to last timestamp is guaranteed to be between 0 and MAX_TICK_TIME
+	virtual void tick(Timestamp t,TickServiceProvider * tsp)=0;
 
 	Tickable();
 	virtual ~Tickable();

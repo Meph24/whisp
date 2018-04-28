@@ -17,7 +17,7 @@
 #include "TickServiceProvider.h"
 class Zombie_World: public TickServiceProvider, DrawServiceProvider
 {
-
+	Timestamp replaceThisTimestamp;//TODO replace with TimestampManager
 	bool spawnZombies;
 	int timestep=0;
 	int zCount;//max number of zombies
@@ -55,8 +55,8 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int zombieDist;
 
 	void removeZombie(int zid);
-	void render(float seconds);
-	void doPhysics(float seconds);
+	void render(float sec,Timestamp t);
+	void doPhysics(float sec,Timestamp t);
 	void spawnZombie();
 	void restart();
 

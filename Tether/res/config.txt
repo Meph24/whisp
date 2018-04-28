@@ -13,5 +13,5 @@ zombieDist=100
 
 
 #input
-sensitivityX=0.05
-sensitivityY=0.05
+sensitivityX=0.0431654676
+sensitivityY=0.0431654676

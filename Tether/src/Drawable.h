@@ -8,6 +8,7 @@
 
 #ifndef SRC_DRAWABLE_H_
 #define SRC_DRAWABLE_H_
+
 class DrawServiceProvider;
 #include "DrawServiceProvider.h"
 class ChunkManager;
@@ -19,7 +20,7 @@ class Drawable
 public:
 	Drawable();
 	virtual ~Drawable();
-	virtual void draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
+	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
 };
 
 #endif /* SRC_DRAWABLE_H_ */

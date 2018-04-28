@@ -201,7 +201,7 @@ inline float Chunk::getH(int xh, int yh)
 	return height[yh*size+xh];
 }
 
-void Chunk::tick(float time, TickServiceProvider* tsp)
+void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 {
 	//TODO tick all entities
 }

@@ -19,10 +19,10 @@ public:
 	ItemAmmo * fromItem;//TODO private?
 	spacevec posOld;//TODO private?
 
-	EntityProjectile(ItemAmmo * item,spacevec position,spacevec velocity);//gives item ownership to the Projectile
+	EntityProjectile(Timestamp spawnTime,ItemAmmo * item,spacevec position,spacevec velocity);//gives item ownership to the Projectile
 	~EntityProjectile();
-	virtual void draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
-	virtual void tick(float time,TickServiceProvider * tsp);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
 	static void setTexture(ITexture * texture);
 };

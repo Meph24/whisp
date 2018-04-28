@@ -40,7 +40,7 @@ public:
 
 	void trigger(bool pulled);//call this whenever triggerIsPulled status should change
 
-	virtual void tick(float time,TickServiceProvider * tsp);
+	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 	ItemGun();
 	virtual ~ItemGun();
 };

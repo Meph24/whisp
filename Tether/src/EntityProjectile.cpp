@@ -13,9 +13,10 @@
 ITexture * EntityProjectile::tex=new TextureDummy();
 
 
-EntityProjectile::EntityProjectile(ItemAmmo * item,spacevec position,spacevec velocity):
+EntityProjectile::EntityProjectile(Timestamp spawnTime,ItemAmmo * item,spacevec position,spacevec velocity):
 fromItem(item),posOld(position)
 {
+	lastTick=spawnTime;
 	pos=position;
 	v=velocity;
 }
@@ -25,8 +26,9 @@ EntityProjectile::~EntityProjectile()
 	delete fromItem;
 }
 
-void EntityProjectile::draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
+void EntityProjectile::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
+	float tickOffset=t-lastTick;
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;//TODO frustum culling?
 	vec3 interPosMeters=cm->toMeters(interPos);
 	tex->bind();
@@ -79,8 +81,10 @@ void EntityProjectile::draw(float tickOffset,Frustum * viewFrustum,ChunkManager 
 	glEnd();
 	glPopMatrix();
 }
-void EntityProjectile::tick(float time, TickServiceProvider* tsp)
+void EntityProjectile::tick(Timestamp t, TickServiceProvider* tsp)
 {
+	float time=t-lastTick;
+	lastTick=t;
 
 	ChunkManager * cm=tsp->getChunkManager();
 	spacelen gravity=cm->getGravity();

@@ -24,5 +24,5 @@ Item* ItemAmmo::newClone()
 	return new ItemAmmo(*this);
 }
 
-void ItemAmmo::tick(float time,TickServiceProvider * tsp)
+void ItemAmmo::tick(Timestamp t,TickServiceProvider * tsp)
 {}

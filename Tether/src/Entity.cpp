@@ -21,6 +21,7 @@ void Entity::requestDestroy(TickServiceProvider* tsp)
 Entity::~Entity()
 {}
 
+/*
 void Entity::onAABBintersect(Entity* other)
 {
 }
@@ -48,3 +49,4 @@ void Entity::move(float time, ChunkManager* cm)
 {
 	standardMove(time,cm);
 }
+*/

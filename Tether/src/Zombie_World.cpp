@@ -13,7 +13,8 @@ extern Zombie_MouseInput * mouseInput;
 #include "DrawServiceProvider.h"
 
 #include <iostream>
-Zombie_World::Zombie_World(sf::Window * w)
+Zombie_World::Zombie_World(sf::Window * w):
+		replaceThisTimestamp(0)
 {
 	Cfg cfg({ "./res/config.txt" });
 	int physDist=*cfg.getint("graphics", "physicsDistance");
@@ -51,7 +52,7 @@ Zombie_World::Zombie_World(sf::Window * w)
 	float sensX = *cfg.getfloat("input", "sensitivityX");
 	float sensY = *cfg.getfloat("input", "sensitivityY");
 
-	player=new EntityPlayer({{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
+	player=new EntityPlayer(replaceThisTimestamp,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
 	player->cam->zoom = 1;//TODO better zoom
 
 
@@ -127,7 +128,7 @@ void Zombie_World::removeZombie(int zid)
 		delete ptr;
 	}
 }
-void Zombie_World::render(float seconds)
+void Zombie_World::render(float seconds,Timestamp t)
 {
 
 	player->applyPerspective(true,cm);
@@ -146,15 +147,15 @@ void Zombie_World::render(float seconds)
 
 	spacevec treePos=cm->clip(cm->fromMeters(vec3(5,0,5)),true);
 	spacevec relTree=treePos-relPos;
-	Zombie_Tree t=Zombie_Tree(cm->toMeters(relTree),tree, leaves);
-	t.draw();
+	Zombie_Tree tr=Zombie_Tree(cm->toMeters(relTree),tree, leaves);
+	tr.draw();
 
 	for (int i = 0; i < zCount; i++)
 	{
 		if (zombies[i])
 		{
-			zombies[i]->tick(seconds,this);
-			zombies[i]->draw(0,viewFrustum,cm,this);//TODO
+			zombies[i]->tick(t,this);
+			zombies[i]->draw(t,viewFrustum,cm,this);//TODO
 		}
 	}
 	glEnable(GL_TEXTURE_2D);
@@ -162,7 +163,7 @@ void Zombie_World::render(float seconds)
 	{
 		if (shots[i])
 		{
-			shots[i]->draw(0,viewFrustum,cm,this);//TODO
+			shots[i]->draw(t,viewFrustum,cm,this);//TODO
 		}
 	}
 	glDisable(GL_TEXTURE_2D);
@@ -253,10 +254,10 @@ void Zombie_World::loadStandardTex()
 
 }
 
-void Zombie_World::doPhysics(float sec)
+void Zombie_World::doPhysics(float sec,Timestamp t)
 {
 	spacevec mid=cm->getMiddleChunk();
-	player->tick(sec,this);
+	player->tick(t,this);
 	hitmark -= sec * 10;
 	if (hitmark < 0) hitmark = 0;
 	for (int i = 0; i < zCount; i++)
@@ -360,14 +361,14 @@ void Zombie_World::doPhysics(float sec)
 	player->pos+=cm->fromMeters({m.x,0,m.z});
 	player->HP -= 15625*(m.x*m.x + m.z*m.z);
 
-	cm->tick(sec,this);
+	cm->tick(t,this);
 
 	for (int i = 0; i < pCount; i++)
 	{
 		if (shots[i])
 		{
 			entityIndex=i;
-			shots[i]->tick(sec,this);
+			shots[i]->tick(t,this);
 		}
 	}
 
@@ -414,6 +415,10 @@ void Zombie_World::loop()
 		sec *= timeFactor;
 		if (sec < 0) sec = 0;
 		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
+		//TODO replace with TimestampManager
+		int addTime=(int)(sec*1000000);
+		replaceThisTimestamp.time+=addTime;
+
 
 		cm->setMid(player->pos);
 
@@ -429,15 +434,15 @@ void Zombie_World::loop()
 		}
 		if(index!=-1)
 		{
-			shots[index] = guns[currentGun]->tick(sec,player->cam,player,shot,cm);
+			shots[index] = guns[currentGun]->tick(replaceThisTimestamp,sec,player->cam,player,shot,cm);
 		}
 		pm->registerTime(timestep++);
 		for(int i=0;i<40;i++)
 			if (sec*4> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
 		pm->registerTime(timestep++);
-		doPhysics(sec);
+		doPhysics(sec,replaceThisTimestamp);
 		pm->registerTime(timestep++);
-		render(sec);
+		render(sec,replaceThisTimestamp);
 		pm->registerTime(timestep++);
 		if(debugScreen)
 		{
@@ -478,7 +483,7 @@ void Zombie_World::trigger(bool pulled)
 		}
 	}
 	if(index==-1) return;
-	shots[index] = guns[currentGun]->tryShoot(player->cam,player,shot,cm);
+	shots[index] = guns[currentGun]->tryShoot(replaceThisTimestamp,player->cam,player,shot,cm);
 }
 
 void Zombie_World::switchWeapon(int dir)
@@ -508,7 +513,7 @@ void Zombie_World::spawnZombie()
 	float r1 = rand();//TODO change
 	float maxDistMultiplier=1.2f;
 	float r2 = (((rand()%32768)/32768.0f)*(maxDistMultiplier-1)+ 1)*zombieDist;
-	zombies[index] = new Zombie_Enemy(zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm);//TODO
+	zombies[index] = new Zombie_Enemy(replaceThisTimestamp,zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm);//TODO
 	for(int i=1;i<32;i++)
 	{
 		int z=0;
@@ -526,7 +531,7 @@ void Zombie_World::spawnZombie()
 			std::cout<<"zombie spawned, new zombie count:"<<z<<std::endl;
 			//if(z==zCount) spawnZombies=false;
 			if (index == -1) return;
-		zombies[index] = new Zombie_Enemy(zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm);//TODO
+		zombies[index] = new Zombie_Enemy(replaceThisTimestamp,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm);//TODO
 	}
 }
 

@@ -28,7 +28,7 @@ public:
 	Compatibility containerC;
 	Compatibility gunC;
 	virtual Item * newClone();
-	virtual void tick(float time,TickServiceProvider * tsp);
+	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 	ItemAmmo(float spd,float dmg,float drg);//TODO new constructor when used together with guns 2.0
 	virtual ~ItemAmmo();
 };

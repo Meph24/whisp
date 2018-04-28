@@ -3,9 +3,10 @@
 #include <GL/glew.h>
 
 
-Zombie_Enemy::Zombie_Enemy(ITexture * texture,spacevec startPos,ChunkManager * chm):
+Zombie_Enemy::Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,ChunkManager * chm):
 tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.5f,0,1),transitionAnim(0.5f,0,1),dead(0)
 {
+	lastTick=spawnTime;
 	pos=cm->clip(startPos,true);
 	v=cm->fromMeters({0,0,0});
 	facing = std::rand() % 360;
@@ -213,8 +214,9 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 	drawTexturedCube(tc);
 	glPopMatrix();
 }
-void Zombie_Enemy::draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
+void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
+	float tickOffset=t-lastTick;
 	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
 	if(!viewFrustum->inside(bb)) return;
 
@@ -267,8 +269,10 @@ void Zombie_Enemy::draw(float tickOffset,Frustum * viewFrustum,ChunkManager * cm
 	glPopMatrix();
 }
 
-void Zombie_Enemy::tick(float seconds,TickServiceProvider * tsp)
+void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 {
+	float seconds=t-lastTick;
+	lastTick=t;
 	bodyAnim.update(seconds);
 	if(legDmg>0.25f*totalHP)
 		transitionAnim.update(seconds);

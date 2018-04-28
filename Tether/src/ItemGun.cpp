@@ -21,7 +21,7 @@ recoilM({0,0,0},0,0)//TODO
 	ID.group=ITEM_GROUP_UNIQUE_TICK;
 }
 
-void ItemGun::tick(float time,TickServiceProvider * tsp)
+void ItemGun::tick(Timestamp t,TickServiceProvider * tsp)
 {
 
 }
@@ -70,8 +70,8 @@ void ItemGun::fire(TickServiceProvider* tsp)
 		vProj.y = tsp->getChunkManager()->fromMeters(- ml.curMatrix[9] * vel); // ml.curMatrix[1] * vBase.x + ml.curMatrix[5] * vBase.y + ml.curMatrix[9] * vBase.z;
 		vProj.z = tsp->getChunkManager()->fromMeters(- ml.curMatrix[10] * vel);// ml.curMatrix[2] * vBase.x + ml.curMatrix[6] * vBase.y + ml.curMatrix[10] * vBase.z;
 
-		EntityProjectile * proj=new EntityProjectile(ammo,pos,vProj);
-		tsp->spawnEntity(proj);
+		//TODO timestampEntityProjectile * proj=new EntityProjectile(replaceThisTimestamp,ammo,pos,vProj);
+		//TODO tsp->spawnEntity(proj);
 	}
 }
 void ItemGun::loadChamber(ItemAmmo* ammo)
