@@ -49,7 +49,7 @@ public:
 
 	void requestDestroy(TickServiceProvider * tsp);
 
-	//virtual void onAABBintersect(Entity * other);
+	virtual void onAABBintersect(Entity * other);
 
 	Entity();
 	virtual ~Entity();

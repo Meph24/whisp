@@ -21,11 +21,11 @@ void Entity::requestDestroy(TickServiceProvider* tsp)
 Entity::~Entity()
 {}
 
-/*
+
 void Entity::onAABBintersect(Entity* other)
 {
 }
-
+/*
 void Entity::standardMove(float time,ChunkManager * cm)
 {
 	if(isInAir)
