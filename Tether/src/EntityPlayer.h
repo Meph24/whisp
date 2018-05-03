@@ -9,6 +9,7 @@
 #ifndef SRC_ENTITYPLAYER_H_
 #define SRC_ENTITYPLAYER_H_
 #include "Entity.h"
+#include "Pushable.h"
 #include "CameraTP.h"
 #include "Frustum.h"
 class Zombie_MouseInput;
@@ -19,7 +20,7 @@ class Zombie_KeyInput;
 #include <SFML/Window.hpp>
 #include "SpeedMod.h"
 
-class EntityPlayer: public Entity
+class EntityPlayer: public Entity, Pushable
 {
 	void setTP(bool on);
 

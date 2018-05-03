@@ -46,6 +46,13 @@ public:
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
 	virtual void tick(Timestamp t,TickServiceProvider * tsp)=0;
+	/*
+	 * movement stages:
+	 * 1. apply movement vector + calculate own Parameters like AABBs
+	 * 2. AABB intersection + collision detection
+	 * 3. physics apply forces, damage, ...
+	 * 4. delete / spawn
+	 */
 
 	void requestDestroy(TickServiceProvider * tsp);
 

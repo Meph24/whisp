@@ -6,8 +6,9 @@
 #include "Zombie_Physics.h"
 #include "ChunkManager.h"
 #include "Entity.h"
+#include "Pushable.h"
 #include "AnimationCycle.h"
-class Zombie_Enemy: public Entity
+class Zombie_Enemy: public Entity, Pushable
 {
 
 	struct texCooSet{
@@ -59,6 +60,7 @@ public:
 
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
+	virtual void push(spacevec amount);
 
 	void checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm);
 };

@@ -150,3 +150,37 @@ Zombie_Physics::hit Zombie_Physics::testHitbox(MatrixLib2 * ml,float xFrom, floa
 	ml->popMatrix();
 	return ret;
 }
+
+void Zombie_Physics::pushEntities(Pushable* a, Pushable* b, float time,ChunkManager * cm)
+{
+	spacevec dif=a->getPos()-b->getPos();
+	float difX = cm->toMeters(dif.x);
+	float difZ = cm->toMeters(dif.z);
+	float dist;
+
+	float totRad =  a->pushRadius + b->pushRadius;
+	float totForce= a->pushForce + b->pushForce;
+
+	if ((dist = (difX*difX + difZ*difZ)) < totRad*totRad)
+	{
+		float minR = a->pushRadius < b->pushRadius ?  a->pushRadius : b->pushRadius;
+		dist = sqrt(dist);
+
+		float f;
+		if (dist < (totRad - minR*0.975f)) f = 40 * totForce;
+		else f = minR / (dist - (totRad - minR))*totForce;
+		//std::cout << "f: " << f << std::endl;
+		if (dist < (totRad / 1024.0f))
+		{
+			difX = (totRad / 1024.0f);
+			dist = (totRad / 1024.0f);
+		}
+		f/=dist;
+		float xP = f*difX;
+		float zP = f*difZ;
+
+		spacevec move=cm->fromMeters(vec3(xP,0,zP)*(time*1));//amplification factor here
+		a->push(move);
+		b->push(-move);
+	}
+}

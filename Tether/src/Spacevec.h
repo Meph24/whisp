@@ -270,6 +270,7 @@ struct vec3if
 
 	vec3if<I,F> operator+(vec3if<I,F> other);
 	vec3if<I,F> operator-(vec3if<I,F> other);
+	vec3if<I,F> operator-();
 	void operator+=(vec3if<I,F> other);
 	void operator-=(vec3if<I,F> other);
 
@@ -448,6 +449,19 @@ inline std::ostream& operator <<(std::ostream& out, const struct vec3if<I, F> v)
 typedef int chunkNum;
 typedef intfloat<chunkNum,flt> spacelen;
 typedef vec3if<chunkNum, flt> spacevec;
+
+template<typename I, typename F>
+inline vec3if<I, F> vec3if<I, F>::operator -()
+{
+	vec3if<I, F> zero;
+	zero.x.floatpart=0;
+	zero.x.intpart=0;
+	zero.y.floatpart=0;
+	zero.y.intpart=0;
+	zero.z.floatpart=0;
+	zero.z.intpart=0;
+	return zero-*this;
+}
 
 template<typename I, typename F>
 inline flt vec3if<I, F>::dot(vec3 v)
