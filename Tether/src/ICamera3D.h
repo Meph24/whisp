@@ -32,7 +32,7 @@ public:
 
 	//these give the DivisionPlanes from the last applyFrustum() or apply() call
 	virtual DivisionPlane getNearPlane()=0;
-	virtual DivisionPlane getFarPlane()=0;
+	virtual DivisionPlane getFarPlane(float overrideViewDist=-1)=0;
 	virtual DivisionPlane getRightPlane()=0;
 	virtual DivisionPlane getLeftPlane()=0;
 	virtual DivisionPlane getUpperPlane()=0;

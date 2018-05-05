@@ -60,9 +60,12 @@ public:
 
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
-	virtual void push(spacevec amount);
 
 	void checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm);
+
+
+	virtual void push(spacevec amount);
+	virtual spacevec getPos();
 };
 
 #endif /* SRC_ZOMBIE_ENEMY_H_ */

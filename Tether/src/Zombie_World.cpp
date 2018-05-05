@@ -54,7 +54,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 
 	player=new EntityPlayer(replaceThisTimestamp,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
 	player->cam->zoom = 1;//TODO better zoom
-
+	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getfloat("graphics","maxRenderTime")));//TODO not hard code
 
 
 
@@ -115,6 +115,7 @@ Zombie_World::~Zombie_World()
 	delete zombieTex;
 	delete tps;
 	delete pm;
+	delete adQ;
 	delete player;
 	delete[] zombies;
 	delete[] shots;
@@ -133,7 +134,9 @@ void Zombie_World::render(float seconds,Timestamp t)
 
 	player->applyPerspective(true,cm);
 	spacevec relPos=cm->getMiddleChunk();
-	Frustum * viewFrustum=player->getViewFrustum(cm);
+	float renderTime=(pm->getTime(8)+pm->getTime(0))/1000000.0f;
+	float quality=adQ->getQuality(renderTime);
+	Frustum * viewFrustum=player->newGetViewFrustum(cm,quality);
 
 	grass->bind();
 	glColor3f(0.2f, 0.6f, 0.1f);
@@ -358,8 +361,7 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 
 	pm->registerTime(timestep++);
 	Zombie_Physics::motion m = physics->getMotion(zCount, sec);
-	player->pos+=cm->fromMeters({m.x,0,m.z});
-	player->HP -= 15625*(m.x*m.x + m.z*m.z);
+	player->push(cm->fromMeters({m.x,0,m.z}));
 
 	cm->tick(t,this);
 
@@ -510,7 +512,7 @@ void Zombie_World::spawnZombie()
 
 	}
 	if (index == -1) return;
-	float r1 = rand();//TODO change
+	float r1 = (rand()%1024)/500.0f;//TODO change
 	float maxDistMultiplier=1.2f;
 	float r2 = (((rand()%32768)/32768.0f)*(maxDistMultiplier-1)+ 1)*zombieDist;
 	zombies[index] = new Zombie_Enemy(replaceThisTimestamp,zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm);//TODO

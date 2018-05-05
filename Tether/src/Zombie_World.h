@@ -9,6 +9,7 @@
 #include "EntityPlayer.h"
 #include "Graphics2D.h"
 #include "Zombie_Gun.h"
+#include "AdaptiveQuality.h"
 
 
 #include "PerformanceMeter.h"
@@ -53,6 +54,7 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int chunkLoadRate;
 	float lodQuality;
 	int zombieDist;
+	AdaptiveQuality * adQ;
 
 	void removeZombie(int zid);
 	void render(float sec,Timestamp t);

@@ -92,7 +92,7 @@ spacevec EntityPlayer::getCamPos()
 	return ret;
 }
 
-Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
+Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestriction)
 {
 	Frustum * ret=new Frustum();
 	ret->observerPos=cm->getMiddleChunk();
@@ -109,7 +109,7 @@ Frustum * EntityPlayer::getViewFrustum(ChunkManager * cm)
 	}
 	ret->planes[1]=cam->getLeftPlane();
 	ret->planes[2]=cam->getRightPlane();
-	ret->planes[4]=cam->getFarPlane();//TODO evaluate usefulness
+	ret->planes[4]=cam->getFarPlane(viewDistRestriction);//TODO evaluate usefulness
 	//   planes[5] would be the near plane, gain from it would be 0 most of the time, so not included here
 	for(int i=0;i<5;i++)//TODO do not hard-code
 	{
@@ -151,4 +151,15 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	size.y=characterHeightConv*1.5f;
 	size.z=size.x;
 	bb=AABB(pos,size,v*(-time));
+}
+
+void EntityPlayer::push(spacevec amount)
+{
+	pos+=amount;//TODO?
+	HP -= 15625*(amount.fLengthSq(16));//TODO not hard code chunk size
+}
+
+spacevec EntityPlayer::getPos()
+{
+	return pos;
 }

@@ -9,7 +9,7 @@ public:
 	void apply();
 
 	virtual DivisionPlane getNearPlane();
-	virtual DivisionPlane getFarPlane();
+	virtual DivisionPlane getFarPlane(float overrideViewDist=-1);
 	virtual DivisionPlane getRightPlane();
 	virtual DivisionPlane getLeftPlane();
 	virtual DivisionPlane getUpperPlane();

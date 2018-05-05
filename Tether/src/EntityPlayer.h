@@ -46,13 +46,16 @@ public:
 	void changeTPdist(float amount);
 
 	spacevec getCamPos();
-	Frustum * getViewFrustum(ChunkManager * cm);
+	Frustum * newGetViewFrustum(ChunkManager * cm,float viewDistRestriction=-1);
 
 	void applyPerspective(bool fresh,ChunkManager * cm);//returns position that must be used for relative draws
 
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
+
+	virtual void push(spacevec amount);
+	virtual spacevec getPos();
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */

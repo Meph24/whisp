@@ -13,10 +13,12 @@ DivisionPlane CameraFP::getNearPlane()
 	return ret;
 }
 
-DivisionPlane CameraFP::getFarPlane()
+DivisionPlane CameraFP::getFarPlane(float overrideViewDist)
 {
+	float dist=maxView;
+	if(overrideViewDist!=-1) dist=overrideViewDist;
 	vec3 normal=getFarNormal();
-	DivisionPlane ret(normal,maxView+dotProduct(normal,vec3(posX,posY,posZ)));
+	DivisionPlane ret(normal,dist+dotProduct(normal,vec3(posX,posY,posZ)));
 	return ret;
 }
 

@@ -1,10 +1,11 @@
 #graphics
 resolutionX=1920
 resolutionY=1080
-renderDistance=16
-physicsDistance=16
-chunkLoadRate=16
+renderDistance=64
+physicsDistance=64
+chunkLoadRate=4
 terrainQuality=0.5
+maxRenderTime=10.0
 
 
 #test

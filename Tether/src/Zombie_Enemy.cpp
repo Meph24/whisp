@@ -455,3 +455,13 @@ void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,EntityProjectile ** 
 		speed/=2.5f;
 	}
 }
+
+void Zombie_Enemy::push(spacevec amount)
+{
+	pos+=amount;//TODO?
+}
+
+spacevec Zombie_Enemy::getPos()
+{
+	return pos;
+}
