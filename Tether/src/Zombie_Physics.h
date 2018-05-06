@@ -41,6 +41,6 @@ public:
 
 	hit testHitbox(MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo,spacevec relPos);
 	
-	void pushEntities(Pushable * a,Pushable * b,float time,ChunkManager * cm);
 };
+void pushEntities(Pushable * a,Pushable * b,float time,ChunkManager * cm);//TODO
 

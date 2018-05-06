@@ -20,6 +20,8 @@ public:
 	bool doesIntersect(AABB other);
 	bool doesIntersect(AABB * other);
 
+	bool isMultichunk();
+
 	AABB();//uninitialized
 	AABB(spacevec pos);//point-like stationary object
 	AABB(spacevec pos,spacevec sizeFromMid);//stationary object

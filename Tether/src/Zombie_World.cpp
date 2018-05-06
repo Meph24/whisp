@@ -310,12 +310,21 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 			if (difplus < dif) zombies[i]->facing += 360;
 			else if (difminus<dif) zombies[i]->facing -= 360;
 			zombies[i]->facing = zombies[i]->facing *(1 - sec) + sec*wishAngle;
-			physics->registerObject(i, zombies[i]->speed/30, cm->toMeters(zombies[i]->pos.x-mid.x), cm->toMeters(zombies[i]->pos.z-mid.z),0.3f*zombies[i]->size);//TODO replace zombie physics
+//			physics->registerObject(i, zombies[i]->speed/30, cm->toMeters(zombies[i]->pos.x-mid.x), cm->toMeters(zombies[i]->pos.z-mid.z),0.3f*zombies[i]->size);//TODO replace zombie physics
 		}
 	}
-	physics->registerObject(zCount, player->speed/30, cm->toMeters(player->pos.x-mid.x), cm->toMeters(player->pos.z-mid.z), 0.4f);
+//	physics->registerObject(zCount, player->speed/30, cm->toMeters(player->pos.x-mid.x), cm->toMeters(player->pos.z-mid.z), 0.4f);
 	pm->registerTime(timestep++);
-	physics->doPushPhysics();
+
+	for (int i = 0; i < zCount; i++)
+	{
+		if (zombies[i])
+		{
+			cm->registerCollisionCheck(zombies[i],sec,this);
+		}
+	}
+	cm->registerCollisionCheck(player,sec,this);
+//	physics->doPushPhysics();
 	pm->registerTime(timestep++);
 #pragma omp parallel for schedule(dynamic, 1)
 	for (int i = 0; i < zCount; i++)
@@ -350,18 +359,22 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 			}
 			else
 			{
-				Zombie_Physics::motion m = physics->getMotion(i, sec);
-				zombies[i]->pos.x += cm->fromMeters(m.x);
-				zombies[i]->pos.z += cm->fromMeters(m.z);
-				zombies[i]->pos=cm->clip(zombies[i]->pos,true);
+//				Zombie_Physics::motion m = physics->getMotion(i, sec);
+//				if(m.x>0||m.z>0)
+//				{
+//					zombies[i]->push(cm->fromMeters(vec3(m.x,0,m.z)));
+//					zombies[i]->pos.x += cm->fromMeters(m.x);
+//					zombies[i]->pos.z += cm->fromMeters(m.z);
+//					zombies[i]->pos=cm->clip(zombies[i]->pos,true);
+//				}
 				if ((zombies[i]->remainingHP) < 0) (zombies[i]->dead) += sec * 240;
 			}
 		}
 	}
 
 	pm->registerTime(timestep++);
-	Zombie_Physics::motion m = physics->getMotion(zCount, sec);
-	player->push(cm->fromMeters({m.x,0,m.z}));
+//	Zombie_Physics::motion m = physics->getMotion(zCount, sec);
+//	player->push(cm->fromMeters({m.x,0,m.z}));
 
 	cm->tick(t,this);
 

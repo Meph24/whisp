@@ -29,6 +29,9 @@ speed(characterSpeed)
 	keyInp = new Zombie_KeyInput(mouseInp,cam);
 	mouseInp->enable();
 	HP=maxHP;
+
+	pushRadius=0.4f;
+	pushForce=speed/30;
 }
 
 EntityPlayer::~EntityPlayer()
@@ -151,6 +154,8 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	size.y=characterHeightConv*1.5f;
 	size.z=size.x;
 	bb=AABB(pos,size,v*(-time));
+	if(multichunk) alreadyChecked.clear();
+	multichunk=bb.isMultichunk();
 }
 
 void EntityPlayer::push(spacevec amount)

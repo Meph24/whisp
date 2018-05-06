@@ -23,6 +23,8 @@ tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.5f,0,1),transition
 	totalHP=remainingHP;
 
 	bodyAnim=AnimationCycle(3*size/speed,0);
+	pushRadius=0.3f*size;
+	pushForce=speed/30;
 }
 
 
@@ -283,6 +285,8 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	sizeBB.y=characterHeightConv*1.5f;
 	sizeBB.z=sizeBB.x;
 	bb=AABB(pos,sizeBB);
+	if(multichunk) alreadyChecked.clear();
+	multichunk=bb.isMultichunk();
 }
 
 void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)
@@ -464,4 +468,14 @@ void Zombie_Enemy::push(spacevec amount)
 spacevec Zombie_Enemy::getPos()
 {
 	return pos;
+}
+#include "Zombie_Physics.h"
+void Zombie_Enemy::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
+{
+
+	Pushable * push=dynamic_cast<Pushable *>(other);
+	if(push)
+	{
+		 pushEntities(this,push,time,tsp->getChunkManager());
+	}
 }

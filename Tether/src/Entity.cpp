@@ -17,14 +17,31 @@ void Entity::requestDestroy(TickServiceProvider* tsp)
 	tsp->requestDestroy(this);
 }
 
+void Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)
+{
+	if(!bb.doesIntersect(other->bb)) return;
+	if(multichunk&&other->multichunk)
+	{
+		int size=alreadyChecked.size();
+		for(int i=0;i<size;i++)
+		{
+			if(other==alreadyChecked[i]) return;
+		}
+		alreadyChecked.push_back(other);
+		other->alreadyChecked.push_back(this);
+	}
+	onAABBintersect(other,time,tsp);
+	//TODO empty vector when calculating new aabb and aabb is multichunk
+}
+
+void Entity::onAABBintersect(Entity* other, float time,TickServiceProvider* tsp)
+{
+}
 
 Entity::~Entity()
 {}
 
 
-void Entity::onAABBintersect(Entity* other)
-{
-}
 /*
 void Entity::standardMove(float time,ChunkManager * cm)
 {

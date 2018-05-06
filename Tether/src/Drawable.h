@@ -8,12 +8,13 @@
 
 #ifndef SRC_DRAWABLE_H_
 #define SRC_DRAWABLE_H_
-
+#include "Timestamp.h"
 class DrawServiceProvider;
 #include "DrawServiceProvider.h"
 class ChunkManager;
 #include "ChunkManager.h"
 #include "Spacevec.h"
+class Frustum;
 #include "Frustum.h"
 class Drawable
 {

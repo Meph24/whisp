@@ -37,6 +37,7 @@ class ChunkManager: public Tickable
 	int getIndx(chunkNum cx,chunkNum cz);//from absolute chunk coordinates
 	int getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ);//from absolute chunk coordinates
 public:
+	bool isValid(chunkNum cx,chunkNum cz);
 	float getChunkSize();
 	spacevec clip(spacevec pos,bool forceGround);
 	bool hitsGround(spacevec startpoint,spacevec endpoint);
@@ -52,6 +53,9 @@ public:
 	spacelen fromMeters(flt l);
 	spacevec fromMeters(vec3 v);
 	spacevec getMiddleChunk();
+
+	void registerCollisionCheck(Entity * e, float time,TickServiceProvider* tsp);
+
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 };

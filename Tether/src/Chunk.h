@@ -10,6 +10,8 @@
 #define SRC_CHUNK_H_
 
 #define defaultHeight -1
+class CollisionGroup;
+#include "CollisionGroup.h"
 #include "Spacevec.h"
 #include "Tickable.h"
 #include "MatrixLib.h"
@@ -28,6 +30,9 @@ class Chunk: public Tickable //TODO Drawable?
 	float avgHeight;
 	//GLuint bufID;
 	ChunkManager * parent;
+
+	CollisionGroup * group;
+
 	//std::vector<Entity *> coreEntities;//must be ticked by this chunk
 	//std::vector<Entity *> sideEntities;//must not be ticked by this chunk
 
@@ -37,6 +42,9 @@ public:
 	void tick(Timestamp t,TickServiceProvider * tsp);
 	spacelen getHeight(flt x,flt z);//coordinates inside chunk
 	void render(int lod,spacevec camOffset);
+
+	void registerCollisionCheck(Entity * e, float time,TickServiceProvider* tsp);
+
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1
 	~Chunk();
 };

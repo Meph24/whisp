@@ -151,7 +151,7 @@ Zombie_Physics::hit Zombie_Physics::testHitbox(MatrixLib2 * ml,float xFrom, floa
 	return ret;
 }
 
-void Zombie_Physics::pushEntities(Pushable* a, Pushable* b, float time,ChunkManager * cm)
+void pushEntities(Pushable* a, Pushable* b, float time,ChunkManager * cm)
 {
 	spacevec dif=a->getPos()-b->getPos();
 	float difX = cm->toMeters(dif.x);

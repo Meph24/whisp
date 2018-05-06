@@ -49,6 +49,10 @@ low(pos-sizeFromMid),high(pos+sizeFromMid)
 	else low.z+=movement.z;
 }
 
+bool AABB::isMultichunk()
+{
+	return (low.x.intpart!=high.x.intpart)||(low.z.intpart!=high.z.intpart);
+}
 
 AABB::~AABB()
 {}

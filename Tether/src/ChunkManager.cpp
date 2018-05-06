@@ -28,12 +28,7 @@ spacelen ChunkManager::getHeight(spacevec abs)
 {
 	chunkNum cx=abs.x.intpart;
 	chunkNum cz=abs.z.intpart;
-	chunkNum relLowX=cx-lowX;
-	chunkNum relLowZ=cz-lowZ;
-	if(relLowX<0) return defaultH;
-	if(relLowZ<0) return defaultH;
-	if(relLowX>=chunksPerAxis) return defaultH;
-	if(relLowZ>=chunksPerAxis) return defaultH;
+	if(!isValid(cx,cz)) return defaultH;
 	if(chunks[getIndx(cx,cz)])
 		return chunks[getIndx(cx,cz)]->getHeight(abs.x.floatpart,abs.z.floatpart);
 	else return fromMeters(defaultHeight*1.0f);
@@ -338,4 +333,34 @@ spacevec ChunkManager::getMiddleChunk()
 float ChunkManager::getChunkSize()
 {
 	return chunkSize;
+}
+
+void ChunkManager::registerCollisionCheck(Entity* e, float time,TickServiceProvider* tsp)
+{
+	int minx=e->bb.low.x.intpart;
+	int maxx=e->bb.high.x.intpart;
+	int minz=e->bb.low.z.intpart;
+	int maxz=e->bb.high.z.intpart;
+	for(int xrun=minx;xrun<maxx;xrun++)
+	{
+		for(int zrun=minz;zrun<maxz;zrun++)
+		{
+			if(isValid(xrun,zrun))
+			{
+				chunks[getIndx(xrun,zrun)]->registerCollisionCheck(e,time,tsp);
+			}
+		}
+
+	}
+}
+
+bool ChunkManager::isValid(chunkNum cx, chunkNum cz)
+{
+	chunkNum relLowX=cx-lowX;
+	chunkNum relLowZ=cz-lowZ;
+	if(relLowX<0) return false;
+	if(relLowZ<0) return false;
+	if(relLowX>=chunksPerAxis) return false;
+	if(relLowZ>=chunksPerAxis) return false;
+	return true;
 }
