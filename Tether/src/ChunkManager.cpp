@@ -337,17 +337,19 @@ float ChunkManager::getChunkSize()
 
 void ChunkManager::registerCollisionCheck(Entity* e, float time,TickServiceProvider* tsp)
 {
-	int minx=e->bb.low.x.intpart;
-	int maxx=e->bb.high.x.intpart;
-	int minz=e->bb.low.z.intpart;
-	int maxz=e->bb.high.z.intpart;
-	for(int xrun=minx;xrun<maxx;xrun++)
+	chunkNum minx=e->bb.low.x.intpart;
+	chunkNum maxx=e->bb.high.x.intpart;
+	chunkNum minz=e->bb.low.z.intpart;
+	chunkNum maxz=e->bb.high.z.intpart;
+	for(chunkNum xrun=minx;xrun<=maxx;xrun++)
 	{
-		for(int zrun=minz;zrun<maxz;zrun++)
+		for(chunkNum zrun=minz;zrun<=maxz;zrun++)
 		{
 			if(isValid(xrun,zrun))
 			{
-				chunks[getIndx(xrun,zrun)]->registerCollisionCheck(e,time,tsp);
+				int indx=getIndx(xrun,zrun);
+				if(chunks[indx])
+					chunks[indx]->registerCollisionCheck(e,time,tsp);
 			}
 		}
 

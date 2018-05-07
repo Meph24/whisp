@@ -5,7 +5,7 @@
  *      Author:	HL65536
  *     Version:	2.0
  */
-
+#include "Entity.h"
 #include "Drawable.h"
 
 Drawable::Drawable()

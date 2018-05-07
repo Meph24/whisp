@@ -9,8 +9,8 @@ maxRenderTime=40.0
 
 
 #test
-zombies=5000
-zombieDist=100
+zombies=1
+zombieDist=10
 
 
 #input
