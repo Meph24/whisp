@@ -20,7 +20,7 @@ class Zombie_KeyInput;
 #include <SFML/Window.hpp>
 #include "SpeedMod.h"
 
-class EntityPlayer: public Entity, Pushable
+class EntityPlayer: public Entity,public Pushable
 {
 	void setTP(bool on);
 
@@ -56,6 +56,8 @@ public:
 
 	virtual void push(spacevec amount);
 	virtual spacevec getPos();
+
+	virtual void onAABBintersect(Entity* other,float time,TickServiceProvider * tsp);
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */

@@ -16,7 +16,7 @@ target(targetTime),max(maxQuality),min(minQuality),lastQuality(maxQuality)
 AdaptiveQuality::~AdaptiveQuality()
 {}
 
-#include <iostream>
+//#include <iostream>
 #define LIFT_RESTRICTION_VALUE 2.0f
 
 float AdaptiveQuality::getQuality(float curTime)
@@ -35,7 +35,7 @@ float AdaptiveQuality::getQuality(float curTime)
 	if(newQ>max) newQ=max;
 	else if(newQ<min) newQ=min;
 	lastQuality=newQ;
-	std::cout<<"renderTime="<<curTime<<std::endl;
-	std::cout<<"newQ="<<newQ<<std::endl;
+//	std::cout<<"renderTime="<<curTime<<std::endl;
+//	std::cout<<"newQ="<<newQ<<std::endl;
 	return newQ;
 }

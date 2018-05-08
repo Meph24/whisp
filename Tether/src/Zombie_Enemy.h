@@ -8,7 +8,7 @@
 #include "Entity.h"
 #include "Pushable.h"
 #include "AnimationCycle.h"
-class Zombie_Enemy: public Entity, Pushable
+class Zombie_Enemy: public Entity,public Pushable
 {
 
 	struct texCooSet{

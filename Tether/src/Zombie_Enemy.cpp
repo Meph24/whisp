@@ -470,12 +470,20 @@ spacevec Zombie_Enemy::getPos()
 	return pos;
 }
 #include "Zombie_Physics.h"
+#include "EntityPlayer.h"
 void Zombie_Enemy::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
 {
-
+//	std::cout<<"inside onAABBintersect"<<std::endl;
 	Pushable * push=dynamic_cast<Pushable *>(other);
 	if(push)
 	{
-		 pushEntities(this,push,time,tsp->getChunkManager());
+		pushEntities(this,push,time,tsp->getChunkManager());
+		std::cout<<"inside 	push=dynamic_cast<Pushable *>(other);"<<std::endl;
 	}
+//	push=dynamic_cast<Pushable *>(dynamic_cast<EntityPlayer *>(other));
+//	if(push)
+//	{
+//		pushEntities(this,push,time,tsp->getChunkManager());
+//		std::cout<<"inside 	push=dynamic_cast<Pushable *>((EntityPlayer *)other);"<<std::endl;
+//	}
 }

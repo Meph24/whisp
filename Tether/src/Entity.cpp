@@ -33,9 +33,10 @@ void Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)
 	onAABBintersect(other,time,tsp);
 	//TODO empty vector when calculating new aabb and aabb is multichunk
 }
-
+#include <iostream>
 void Entity::onAABBintersect(Entity* other, float time,TickServiceProvider* tsp)
 {
+	std::cout<<"warning: onAABBintersect not overridden"<<std::endl;
 }
 
 Entity::~Entity()

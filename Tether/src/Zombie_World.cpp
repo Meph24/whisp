@@ -324,7 +324,7 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 		}
 	}
 	cm->registerCollisionCheck(player,sec,this);
-//	physics->doPushPhysics();
+	physics->doPushPhysics();
 	pm->registerTime(timestep++);
 #pragma omp parallel for schedule(dynamic, 1)
 	for (int i = 0; i < zCount; i++)

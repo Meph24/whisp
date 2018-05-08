@@ -3,7 +3,7 @@
  *
  *  Created on:	22.12.2017
  *      Author:	HL65536
- *     Version:	1.0
+ *     Version:	2.0
  */
 
 #ifndef SRC_CHUNK_H_

@@ -348,9 +348,14 @@ void ChunkManager::registerCollisionCheck(Entity* e, float time,TickServiceProvi
 			if(isValid(xrun,zrun))
 			{
 				int indx=getIndx(xrun,zrun);
+
+				if(indx<0 || indx>chunksPerAxis*chunksPerAxis)
+					std::cout<<"fail: wrong index: "<<indx<<std::endl;
+				else
 				if(chunks[indx])
 					chunks[indx]->registerCollisionCheck(e,time,tsp);
 			}
+
 		}
 
 	}

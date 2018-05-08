@@ -3,7 +3,7 @@
  *
  *  Created on:	22.12.2017
  *      Author:	HL65536
- *     Version:	1.0
+ *     Version:	2.0
  */
 
 #include "Chunk.h"
@@ -204,7 +204,7 @@ inline float Chunk::getH(int xh, int yh)
 
 void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 {
-	//TODO tick all entities
+	group->registered.clear();
 }
 
 void Chunk::registerCollisionCheck(Entity* e, float time,TickServiceProvider* tsp)
