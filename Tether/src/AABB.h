@@ -10,12 +10,16 @@
 #define SRC_AABB_H_
 
 #include "Spacevec.h"
+#include "ShortNames.h"
 
 class AABB
 {
 public:
 	spacevec low;
 	spacevec high;
+
+
+	static u64 collisionCounter;
 
 	bool doesIntersect(AABB other);
 	bool doesIntersect(AABB * other);

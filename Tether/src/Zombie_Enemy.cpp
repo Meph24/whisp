@@ -25,6 +25,8 @@ tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.5f,0,1),transition
 	bodyAnim=AnimationCycle(3*size/speed,0);
 	pushRadius=0.3f*size;
 	pushForce=speed/30;
+
+	bb=AABB(pos);
 }
 
 
@@ -281,9 +283,19 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	if(dead) fallAnim.update(seconds);
 	spacelen characterHeightConv=tsp->getChunkManager()->fromMeters(size*2);
 	spacevec sizeBB;
-	sizeBB.x=characterHeightConv;
+
+	if(legDmg>0.25f*totalHP)
+	{
+		sizeBB.x=characterHeightConv;
+	}
+	else
+	{
+		sizeBB.x=characterHeightConv*0.3f;
+	}
 	sizeBB.y=characterHeightConv*1.5f;
 	sizeBB.z=sizeBB.x;
+
+
 	bb=AABB(pos,sizeBB);
 	if(multichunk) alreadyChecked.clear();
 	multichunk=bb.isMultichunk();
@@ -473,17 +485,14 @@ spacevec Zombie_Enemy::getPos()
 #include "EntityPlayer.h"
 void Zombie_Enemy::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
 {
-//	std::cout<<"inside onAABBintersect"<<std::endl;
-	Pushable * push=dynamic_cast<Pushable *>(other);
+	Pushable * push=other->toPushable();//dynamic_cast<Pushable *>(other);
 	if(push)
 	{
 		pushEntities(this,push,time,tsp->getChunkManager());
-		std::cout<<"inside 	push=dynamic_cast<Pushable *>(other);"<<std::endl;
 	}
-//	push=dynamic_cast<Pushable *>(dynamic_cast<EntityPlayer *>(other));
-//	if(push)
-//	{
-//		pushEntities(this,push,time,tsp->getChunkManager());
-//		std::cout<<"inside 	push=dynamic_cast<Pushable *>((EntityPlayer *)other);"<<std::endl;
-//	}
+}
+
+Pushable* Zombie_Enemy::toPushable()
+{
+	return this;
 }

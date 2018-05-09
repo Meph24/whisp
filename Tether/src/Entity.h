@@ -20,6 +20,7 @@ class Tickable;
 #include "AABB.h"
 class Frustum;
 #include "Frustum.h"
+class Pushable;
 
 class Entity: public Tickable, Drawable
 {
@@ -66,6 +67,8 @@ public:
 
 	virtual void onAABBintersect(Entity * other,float time,TickServiceProvider * tsp);
 	void doAABBcheck(Entity * other, float time,TickServiceProvider* tsp);
+
+	virtual Pushable * toPushable();
 
 	Entity();
 	virtual ~Entity();

@@ -32,6 +32,8 @@ speed(characterSpeed)
 
 	pushRadius=0.4f;
 	pushForce=speed/30;
+
+	bb=AABB(pos);
 }
 
 EntityPlayer::~EntityPlayer()
@@ -173,17 +175,15 @@ spacevec EntityPlayer::getPos()
 #include "Zombie_Enemy.h"
 void EntityPlayer::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
 {
-//	std::cout<<"inside onAABBintersect"<<std::endl;
-	Pushable * push=dynamic_cast<Pushable *>(other);
+	Pushable * push=other->toPushable();//dynamic_cast<Pushable *>(other);
 	if(push)
 	{
 		pushEntities(this,push,time,tsp->getChunkManager());
-		std::cout<<"inside 	push=dynamic_cast<Pushable *>(other);"<<std::endl;
 	}
-//	push=dynamic_cast<Pushable *>(dynamic_cast<Zombie_Enemy *>(other));
-//	if(push)
-//	{
-//		pushEntities(this,push,time,tsp->getChunkManager());
-//		std::cout<<"inside 	push=dynamic_cast<Pushable *>((Zombie_Enemy *)other);"<<std::endl;
-//	}
+
+}
+
+Pushable* EntityPlayer::toPushable()
+{
+	return this;
 }

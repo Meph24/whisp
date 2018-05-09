@@ -58,6 +58,8 @@ public:
 	virtual spacevec getPos();
 
 	virtual void onAABBintersect(Entity* other,float time,TickServiceProvider * tsp);
+
+	virtual Pushable * toPushable();
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */

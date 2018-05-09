@@ -20,6 +20,7 @@ void Entity::requestDestroy(TickServiceProvider* tsp)
 void Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)
 {
 	if(!bb.doesIntersect(other->bb)) return;
+	AABB::collisionCounter++;
 	if(multichunk&&other->multichunk)
 	{
 		int size=alreadyChecked.size();
@@ -40,9 +41,13 @@ void Entity::onAABBintersect(Entity* other, float time,TickServiceProvider* tsp)
 }
 
 Entity::~Entity()
-{}
+{
+}
 
-
+Pushable* Entity::toPushable()
+{
+	return 0;
+}
 /*
 void Entity::standardMove(float time,ChunkManager * cm)
 {

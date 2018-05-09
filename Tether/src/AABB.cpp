@@ -8,6 +8,7 @@
 
 #include "AABB.h"
 
+u64 AABB::collisionCounter=0;
 
 bool AABB::doesIntersect(AABB other)
 {

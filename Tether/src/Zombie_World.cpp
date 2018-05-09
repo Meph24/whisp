@@ -315,6 +315,7 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 	}
 //	physics->registerObject(zCount, player->speed/30, cm->toMeters(player->pos.x-mid.x), cm->toMeters(player->pos.z-mid.z), 0.4f);
 	pm->registerTime(timestep++);
+	AABB::collisionCounter=0;
 
 	for (int i = 0; i < zCount; i++)
 	{
@@ -323,8 +324,9 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 			cm->registerCollisionCheck(zombies[i],sec,this);
 		}
 	}
+	std::cout<<"collision counter: "<<AABB::collisionCounter<<std::endl;
 	cm->registerCollisionCheck(player,sec,this);
-	physics->doPushPhysics();
+//	physics->doPushPhysics();
 	pm->registerTime(timestep++);
 #pragma omp parallel for schedule(dynamic, 1)
 	for (int i = 0; i < zCount; i++)
@@ -525,7 +527,7 @@ void Zombie_World::spawnZombie()
 
 	}
 	if (index == -1) return;
-	float r1 = (rand()%1024)/500.0f;//TODO change
+	float r1 = (rand()%1024);///500.0f;//TODO change
 	float maxDistMultiplier=1.2f;
 	float r2 = (((rand()%32768)/32768.0f)*(maxDistMultiplier-1)+ 1)*zombieDist;
 	zombies[index] = new Zombie_Enemy(replaceThisTimestamp,zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm);//TODO

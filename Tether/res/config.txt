@@ -5,12 +5,12 @@ renderDistance=64
 physicsDistance=64
 chunkLoadRate=4
 terrainQuality=0.5
-maxRenderTime=40.0
+maxRenderTime=400.0
 
 
 #test
-zombies=3
-zombieDist=12
+zombies=5000
+zombieDist=120
 
 
 #input

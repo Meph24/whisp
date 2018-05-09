@@ -169,7 +169,6 @@ void pushEntities(Pushable* a, Pushable* b, float time,ChunkManager * cm)
 		float f;
 		if (dist < (totRad - minR*0.975f)) f = 40 * totForce;
 		else f = minR / (dist - (totRad - minR))*totForce;
-		//std::cout << "f: " << f << std::endl;
 		if (dist < (totRad / 1024.0f))
 		{
 			difX = (totRad / 1024.0f);

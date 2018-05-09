@@ -335,12 +335,20 @@ float ChunkManager::getChunkSize()
 	return chunkSize;
 }
 
+#include "myAssert.h"
 void ChunkManager::registerCollisionCheck(Entity* e, float time,TickServiceProvider* tsp)
 {
 	chunkNum minx=e->bb.low.x.intpart;
 	chunkNum maxx=e->bb.high.x.intpart;
 	chunkNum minz=e->bb.low.z.intpart;
 	chunkNum maxz=e->bb.high.z.intpart;
+
+	if((maxx-minx)>=10)
+	{
+		std::cout<<"fail: wrong bb; x:"<<minx<<"-"<<maxx<<"z:"<<minz<<"-"<<maxz<<std::endl;
+	}
+	assert((maxx-minx)<10);
+	assert((maxz-minz)<10);
 	for(chunkNum xrun=minx;xrun<=maxx;xrun++)
 	{
 		for(chunkNum zrun=minz;zrun<=maxz;zrun++)
