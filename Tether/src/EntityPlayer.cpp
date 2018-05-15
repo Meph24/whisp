@@ -56,7 +56,7 @@ void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, Draw
 void EntityPlayer::applyPerspective(bool fresh,ChunkManager * cm)
 {
 	spacevec relPos=pos-cm->getMiddleChunk();
-	characterHeightConv=cm->fromMeters(characterHeight);
+	characterHeightConv=cm->fromMeters(characterHeight);//TODO only in one spot
 	relPos.y+=characterHeightConv;
 	cam->posX=cm->toMeters(relPos.x);
 	cam->posY=cm->toMeters(relPos.y);
@@ -125,6 +125,7 @@ Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestri
 
 void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 {
+	characterHeightConv=tsp->getChunkManager()->fromMeters(characterHeight);//TODO only in one spot
 	float time=t-lastTick;
 	lastTick=t;
 	ChunkManager * cm=tsp->getChunkManager();

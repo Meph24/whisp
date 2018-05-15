@@ -2,15 +2,15 @@
 resolutionX=1920
 resolutionY=1080
 renderDistance=64
-physicsDistance=64
-chunkLoadRate=4
+physicsDistance=128
+chunkLoadRate=400000
 terrainQuality=0.5
 maxRenderTime=400.0
 
 
 #test
-zombies=5000
-zombieDist=120
+zombies=10000
+zombieDist=250
 
 
 #input

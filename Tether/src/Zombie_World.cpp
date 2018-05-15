@@ -74,11 +74,11 @@ Zombie_World::Zombie_World(sf::Window * w):
 	pm->setName("        flush etc",0);
 	pm->setName("        guns tick",1);
 	pm->setName("            spawn",2);
-	pm->setName("physics  register",3);
-	pm->setName("physics      push",4);
-	pm->setName("physics    hitbox",5);
-	pm->setName("physics getMotion",6);
-	pm->setName("physics     apply",7);
+	pm->setName("      zombie tick",3);
+	pm->setName("  collision check",4);
+	pm->setName("   physics hitbox",5);
+	pm->setName("         cm->tick",6);
+	pm->setName("   shots[i]->tick",7);
 	pm->setName("           render",8);
 	pm->setName("      debugScreen",9);
 	pm->setName("     chunk update",10);
@@ -157,7 +157,6 @@ void Zombie_World::render(float seconds,Timestamp t)
 	{
 		if (zombies[i])
 		{
-			zombies[i]->tick(t,this);
 			zombies[i]->draw(t,viewFrustum,cm,this);//TODO
 		}
 	}
@@ -259,63 +258,22 @@ void Zombie_World::loadStandardTex()
 
 void Zombie_World::doPhysics(float sec,Timestamp t)
 {
+	AABB::intersectionCounter=0;
+	AABB::checkCounter=0;
 	spacevec mid=cm->getMiddleChunk();
 	player->tick(t,this);
 	hitmark -= sec * 10;
 	if (hitmark < 0) hitmark = 0;
+
 	for (int i = 0; i < zCount; i++)
 	{
 		if (zombies[i])
 		{
-			spacevec old=zombies[i]->pos;
-
-			zombies[i]->pos.x += cm->fromMeters((zombies[i]->speed)*cos(zombies[i]->facing *TAU/360)*sec);//Zombie walk "AI"
-			zombies[i]->pos.z += cm->fromMeters(-(zombies[i]->speed)*sin(zombies[i]->facing*TAU/360)*sec);
-			zombies[i]->pos=cm->clip(zombies[i]->pos,true);
-
-			spacevec newVec=zombies[i]->pos;
-			spacevec moved=(newVec-old);
-			bool chunkBorder=(old.y==cm->fromMeters((defaultHeight*1.0f)))^(newVec.y==cm->fromMeters((defaultHeight*1.0f)));
-			if(moved.fLengthSq(cm->getChunkSize())>0.0000000001f)
-			{
-				vec3 norm=cm->toMeters(moved);
-				norm.normalize();
-				flt speedModA=(vec3(norm.x,0,norm.z).length());
-				vec3 flat=vec3(cm->toMeters(moved.x),0,cm->toMeters(moved.z));
-				flt h=cm->toMeters(moved.y)/flat.length();
-				SpeedMod sm=SpeedMod();
-				flt speedModB=sm.slowdownFromTerrain(h);
-				if(chunkBorder)
-				{
-					speedModA=1;
-					speedModB=1;
-				}
-				old+=cm->fromMeters(flat*speedModA*speedModB);
-				zombies[i]->pos.x=old.x;
-				zombies[i]->pos.z=old.z;
-				zombies[i]->pos=cm->clip(zombies[i]->pos,true);
-				zombies[i]->maxTransition=1-(h/1.5f);
-				if(zombies[i]->maxTransition>1.7f) zombies[i]->maxTransition=1.7f;
-				if(zombies[i]->maxTransition<0) zombies[i]->maxTransition=0;
-
-			}
-
-			vec3 relPos=cm->toMeters(zombies[i]->pos-player->pos);
-			float wishAngle=atan2(relPos.x, relPos.z);
-			wishAngle *= 360 / TAU;
-			wishAngle += 90;
-			float dif = abs(wishAngle - zombies[i]->facing);
-			float difplus = abs(wishAngle - (zombies[i]->facing+360));
-			float difminus = abs(wishAngle - (zombies[i]->facing-360));
-			if (difplus < dif) zombies[i]->facing += 360;
-			else if (difminus<dif) zombies[i]->facing -= 360;
-			zombies[i]->facing = zombies[i]->facing *(1 - sec) + sec*wishAngle;
-//			physics->registerObject(i, zombies[i]->speed/30, cm->toMeters(zombies[i]->pos.x-mid.x), cm->toMeters(zombies[i]->pos.z-mid.z),0.3f*zombies[i]->size);//TODO replace zombie physics
+			zombies[i]->tick(t,this);
+			if (!zombies[i]->exists) removeZombie(i);
 		}
 	}
-//	physics->registerObject(zCount, player->speed/30, cm->toMeters(player->pos.x-mid.x), cm->toMeters(player->pos.z-mid.z), 0.4f);
 	pm->registerTime(timestep++);
-	AABB::collisionCounter=0;
 
 	for (int i = 0; i < zCount; i++)
 	{
@@ -324,21 +282,16 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 			cm->registerCollisionCheck(zombies[i],sec,this);
 		}
 	}
-	std::cout<<"collision counter: "<<AABB::collisionCounter<<std::endl;
+//	std::cout<<"collision counter: "<<AABB::intersectionCounter<<std::endl;
+//	std::cout<<"check counter: "<<AABB::checkCounter<<std::endl;
 	cm->registerCollisionCheck(player,sec,this);
-//	physics->doPushPhysics();
 	pm->registerTime(timestep++);
 #pragma omp parallel for schedule(dynamic, 1)
 	for (int i = 0; i < zCount; i++)
 	{
 		if (zombies[i])
 		{
-			if ((zombies[i]->dead) != 0)
-			{
-				(zombies[i]->dead) += sec * 240;
-				if ((zombies[i]->dead)>90) removeZombie(i);
-			}
-			else
+			if (zombies[i]->remainingHP>0)
 			{
 				float hp = zombies[i]->remainingHP;
 				zombies[i]->checkHitboxes(physics,mid,cm);
@@ -352,33 +305,11 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 		}
 	}
 	pm->registerTime(timestep++);
-	for (int i = 0; i < zCount; i++)
-	{
-		if (zombies[i])
-		{
-			if ((zombies[i]->dead) != 0)
-			{
-			}
-			else
-			{
-//				Zombie_Physics::motion m = physics->getMotion(i, sec);
-//				if(m.x>0||m.z>0)
-//				{
-//					zombies[i]->push(cm->fromMeters(vec3(m.x,0,m.z)));
-//					zombies[i]->pos.x += cm->fromMeters(m.x);
-//					zombies[i]->pos.z += cm->fromMeters(m.z);
-//					zombies[i]->pos=cm->clip(zombies[i]->pos,true);
-//				}
-				if ((zombies[i]->remainingHP) < 0) (zombies[i]->dead) += sec * 240;
-			}
-		}
-	}
 
-	pm->registerTime(timestep++);
-//	Zombie_Physics::motion m = physics->getMotion(zCount, sec);
-//	player->push(cm->fromMeters({m.x,0,m.z}));
+
 
 	cm->tick(t,this);
+	pm->registerTime(timestep++);
 
 	for (int i = 0; i < pCount; i++)
 	{
@@ -552,6 +483,10 @@ void Zombie_World::spawnZombie()
 	}
 }
 
+Entity* Zombie_World::getTarget(Entity* me)
+{
+	return (Entity *)player;
+}
 
 void Zombie_World::markRestart()
 {

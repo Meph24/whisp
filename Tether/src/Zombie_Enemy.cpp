@@ -4,7 +4,7 @@
 
 
 Zombie_Enemy::Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,ChunkManager * chm):
-tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.5f,0,1),transitionAnim(0.5f,0,1),dead(0)
+tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitionAnim(0.5f,0,1)
 {
 	lastTick=spawnTime;
 	pos=cm->clip(startPos,true);
@@ -227,7 +227,7 @@ void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,Draw
 	bodyAnim.updateTemp(tickOffset);
 	if(legDmg>0.25f*totalHP)
 		transitionAnim.update(tickOffset);
-	if(dead) fallAnim.update(tickOffset);
+	if(remainingHP<=0) fallAnim.update(tickOffset);
 
 
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
@@ -236,7 +236,7 @@ void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,Draw
 	glPushMatrix();
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
 	glRotatef(facing, 0, 1, 0);
-	glRotatef(dead, 1, 0, 0);
+	glRotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
 	glScalef(size, size, size);
 	tex->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -280,8 +280,55 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	bodyAnim.update(seconds);
 	if(legDmg>0.25f*totalHP)
 		transitionAnim.update(seconds);
-	if(dead) fallAnim.update(seconds);
-	spacelen characterHeightConv=tsp->getChunkManager()->fromMeters(size*2);
+	if(remainingHP<=0) fallAnim.update(seconds);
+	if(fallAnim.getCurStep(0)>=1) this->requestDestroy(tsp);
+	ChunkManager * cm=tsp->getChunkManager();
+	spacelen characterHeightConv=cm->fromMeters(size*2);
+
+	spacevec old=pos;
+
+	pos.x += cm->fromMeters((speed)*cos(facing *TAU/360)*seconds);//Zombie walk "AI"
+	pos.z += cm->fromMeters(-(speed)*sin(facing*TAU/360)*seconds);
+	pos=cm->clip(pos,true);
+
+	spacevec newVec=pos;
+	spacevec moved=(newVec-old);
+	bool chunkBorder=(old.y==cm->fromMeters((defaultHeight*1.0f)))^(newVec.y==cm->fromMeters((defaultHeight*1.0f)));
+	if(moved.fLengthSq(cm->getChunkSize())>0.0000000001f)
+	{
+		vec3 norm=cm->toMeters(moved);
+		norm.normalize();
+		flt speedModA=(vec3(norm.x,0,norm.z).length());
+		vec3 flat=vec3(cm->toMeters(moved.x),0,cm->toMeters(moved.z));
+		flt h=cm->toMeters(moved.y)/flat.length();
+		SpeedMod sm=SpeedMod();
+		flt speedModB=sm.slowdownFromTerrain(h);
+		if(chunkBorder)
+		{
+			speedModA=1;
+			speedModB=1;
+		}
+		old+=cm->fromMeters(flat*speedModA*speedModB);
+		pos.x=old.x;
+		pos.z=old.z;
+		pos=cm->clip(pos,true);
+		maxTransition=1-(h/1.5f);
+		if(maxTransition>1.7f) maxTransition=1.7f;
+		if(maxTransition<0) maxTransition=0;
+
+	}
+
+	vec3 relPos=cm->toMeters(pos-tsp->getTarget(this)->pos);
+	float wishAngle=atan2(relPos.x, relPos.z);
+	wishAngle *= 360 / TAU;
+	wishAngle += 90;
+	float dif = abs(wishAngle - facing);
+	float difplus = abs(wishAngle - (facing+360));
+	float difminus = abs(wishAngle - (facing-360));
+	if (difplus < dif) facing += 360;
+	else if (difminus<dif) facing -= 360;
+	facing = facing *(1 - seconds) + seconds*wishAngle;
+
 	spacevec sizeBB;
 
 	if(legDmg>0.25f*totalHP)
@@ -465,9 +512,8 @@ void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,EntityProjectile ** 
 	}
 	shots[hit.projectileIndex]->pos.y.intpart -= 1000;
 	shots[hit.projectileIndex]->posOld.y.intpart -= 1000;
-	if((legDmg>0.25f*totalHP)&&(tilted!=-10))
+	if(legDmg>0.25f*totalHP)
 	{
-		tilted=-10;
 		speed/=2.5f;
 	}
 }

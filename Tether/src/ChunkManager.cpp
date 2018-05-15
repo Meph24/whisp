@@ -343,7 +343,7 @@ void ChunkManager::registerCollisionCheck(Entity* e, float time,TickServiceProvi
 	chunkNum minz=e->bb.low.z.intpart;
 	chunkNum maxz=e->bb.high.z.intpart;
 
-	if((maxx-minx)>=10)
+	if((maxx-minx)>=10 )
 	{
 		std::cout<<"fail: wrong bb; x:"<<minx<<"-"<<maxx<<"z:"<<minz<<"-"<<maxz<<std::endl;
 	}

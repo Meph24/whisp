@@ -8,7 +8,8 @@
 
 #include "AABB.h"
 
-u64 AABB::collisionCounter=0;
+u64 AABB::intersectionCounter=0;
+u64 AABB::checkCounter=0;
 
 bool AABB::doesIntersect(AABB other)
 {
@@ -29,13 +30,21 @@ AABB::AABB(spacevec pos):
 low(pos),high(pos)
 {}
 
+#include "myAssert.h"
 AABB::AABB(spacevec pos, spacevec sizeFromMid):
 low(pos-sizeFromMid),high(pos+sizeFromMid)
-{}
+{
+	assert(sizeFromMid.x.intpart<10);
+	assert(sizeFromMid.z.intpart<10);
+}
 
 AABB::AABB(spacevec pos, spacevec sizeFromMid, spacevec movement):
 low(pos-sizeFromMid),high(pos+sizeFromMid)
 {
+	assert(sizeFromMid.x.intpart<10);
+	assert(movement.z.intpart<10);
+	assert(movement.x.intpart<20);
+	assert(movement.z.intpart<20);
 	spacelen zero;
 	zero.floatpart=0;
 	zero.intpart=0;

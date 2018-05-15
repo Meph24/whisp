@@ -33,7 +33,8 @@ class Chunk: public Tickable //TODO Drawable?
 
 	CollisionGroup * group;
 
-	//std::vector<Entity *> coreEntities;//must be ticked by this chunk
+
+	std::vector<Entity *> coreEntities;//must be ticked by this chunk
 	//std::vector<Entity *> sideEntities;//must not be ticked by this chunk
 
 	inline float getH(int x,int y);//inside chunk grid

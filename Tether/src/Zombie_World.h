@@ -80,7 +80,7 @@ public:
 	virtual ChunkManager * getChunkManager();
 	virtual void requestDestroy(Entity * e);//do not call yourself, call Entity.requestDestroy(tsp) instead!
 
-
+	virtual Entity * getTarget(Entity * me);
 
 
 	void loadStandardTex();

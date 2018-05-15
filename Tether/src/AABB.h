@@ -19,7 +19,8 @@ public:
 	spacevec high;
 
 
-	static u64 collisionCounter;
+	static u64 intersectionCounter;
+	static u64 checkCounter;
 
 	bool doesIntersect(AABB other);
 	bool doesIntersect(AABB * other);

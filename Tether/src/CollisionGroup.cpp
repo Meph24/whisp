@@ -7,6 +7,7 @@
  */
 
 #include "CollisionGroup.h"
+#include "AABB.h"
 
 CollisionGroup::CollisionGroup()
 {}
@@ -17,6 +18,7 @@ void CollisionGroup::registerCollisionCheck(Entity* e, float time,TickServicePro
 	for(int i=0;i<size;i++)
 	{
 		check(e,registered[i],time,tsp);
+		AABB::checkCounter++;
 	}
 	registered.push_back(e);
 }

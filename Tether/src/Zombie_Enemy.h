@@ -2,12 +2,14 @@
 #ifndef SRC_ZOMBIE_ENEMY_H_
 #define SRC_ZOMBIE_ENEMY_H_
 
+#include "SpeedMod.h"
 #include "ITexture.h"
 #include "Zombie_Physics.h"
 #include "ChunkManager.h"
 #include "Entity.h"
 #include "Pushable.h"
 #include "AnimationCycle.h"
+
 class Zombie_Enemy: public Entity,public Pushable
 {
 
@@ -52,7 +54,6 @@ public:
 
 	float maxTransition=1;
 
-	float dead;
 
 	//spawns a random zombie at the given location
 	Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,ChunkManager * cm);

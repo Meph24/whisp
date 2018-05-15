@@ -20,7 +20,7 @@ void Entity::requestDestroy(TickServiceProvider* tsp)
 void Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)
 {
 	if(!bb.doesIntersect(other->bb)) return;
-	AABB::collisionCounter++;
+	AABB::intersectionCounter++;
 	if(multichunk&&other->multichunk)
 	{
 		int size=alreadyChecked.size();
