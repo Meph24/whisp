@@ -172,7 +172,7 @@ base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 	size.z.intpart=0;
 	size.y=(maxConv-minConv)*0.5f;
 	bb=AABB(middle,size);
-	group=new CollisionGroup();
+	group=new InteractionGroup1<Pushable>();
 
 	/*int smallSize=size-1;
 	int vertices=3*4*smallSize*smallSize;
@@ -207,7 +207,7 @@ void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 	group->registered.clear();
 }
 
-void Chunk::registerCollisionCheck(Entity* e, float time,TickServiceProvider* tsp)
+void Chunk::registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp)
 {
 	group->registerCollisionCheck(e, time, tsp);
 }

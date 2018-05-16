@@ -336,12 +336,12 @@ float ChunkManager::getChunkSize()
 }
 
 #include "myAssert.h"
-void ChunkManager::registerCollisionCheck(Entity* e, float time,TickServiceProvider* tsp)
+void ChunkManager::registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp)
 {
-	chunkNum minx=e->bb.low.x.intpart;
-	chunkNum maxx=e->bb.high.x.intpart;
-	chunkNum minz=e->bb.low.z.intpart;
-	chunkNum maxz=e->bb.high.z.intpart;
+	chunkNum minx=e.e->bb.low.x.intpart;
+	chunkNum maxx=e.e->bb.high.x.intpart;
+	chunkNum minz=e.e->bb.low.z.intpart;
+	chunkNum maxz=e.e->bb.high.z.intpart;
 
 	if((maxx-minx)>=10 )
 	{

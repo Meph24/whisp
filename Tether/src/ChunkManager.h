@@ -11,6 +11,8 @@
 
 class Chunk;
 #include "Chunk.h"
+#include "Pushable.h"
+#include "DualPointer.h"
 #include "Tickable.h"
 #include "Spacevec.h"
 class Frustum;
@@ -54,7 +56,7 @@ public:
 	spacevec fromMeters(vec3 v);
 	spacevec getMiddleChunk();
 
-	void registerCollisionCheck(Entity * e, float time,TickServiceProvider* tsp);
+	void registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp);
 
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();

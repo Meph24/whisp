@@ -47,7 +47,7 @@ void clickibunti()
 	}
 
 
-	sf::Time t = sf::microseconds(1000);//TODO 1ms
+	sf::Time t = sf::microseconds(1000);//TODO enable/disable depending on framerate
 	sf::sleep(t);
 	glFlush();
 

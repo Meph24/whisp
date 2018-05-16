@@ -11,6 +11,8 @@
 #include "Zombie_Gun.h"
 #include "AdaptiveQuality.h"
 
+#include "Pushable.h"
+#include "DualPointer.h"
 
 #include "PerformanceMeter.h"
 #include "DebugScreen.h"

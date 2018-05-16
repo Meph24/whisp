@@ -279,12 +279,12 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 	{
 		if (zombies[i])
 		{
-			cm->registerCollisionCheck(zombies[i],sec,this);
+			cm->registerCollisionCheck(DualPointer<Pushable>(zombies[i],zombies[i]),sec,this);
 		}
 	}
 //	std::cout<<"collision counter: "<<AABB::intersectionCounter<<std::endl;
 //	std::cout<<"check counter: "<<AABB::checkCounter<<std::endl;
-	cm->registerCollisionCheck(player,sec,this);
+	cm->registerCollisionCheck(DualPointer<Pushable>(player,player),sec,this);
 	pm->registerTime(timestep++);
 #pragma omp parallel for schedule(dynamic, 1)
 	for (int i = 0; i < zCount; i++)

@@ -19,6 +19,7 @@ AdaptiveQuality::~AdaptiveQuality()
 //#include <iostream>
 #define LIFT_RESTRICTION_VALUE 2.0f
 
+//TODO make it work with externally limited framerate
 float AdaptiveQuality::getQuality(float curTime)
 {
 	float correctionDir=target/curTime;
