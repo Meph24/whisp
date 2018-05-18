@@ -534,7 +534,7 @@ void Zombie_Enemy::onAABBintersect(Entity* other,float time,TickServiceProvider 
 	Pushable * push=other->toPushable();//dynamic_cast<Pushable *>(other);
 	if(push)
 	{
-		pushEntities(this,push,time,tsp->getChunkManager());
+//		pushEntities(this,push,time,tsp->getChunkManager());
 	}
 }
 

@@ -2,20 +2,8 @@
 #include "EntityProjectile.h"
 #include "Pushable.h"
 #include "MatrixLib2.h"
-class Zombie_Physics
+class Zombie_Physics//TODO replace and remove
 {
-	float * xPush;
-	float * zPush;
-	float * xObj;
-	float * zObj;
-	float * force;
-	float * radius;
-	int * pos;
-	int curMax;
-	int totalMax;
-
-
-	//MatrixLib2 ml;
 
 public:
 	ChunkManager * cm=0;
@@ -29,18 +17,10 @@ public:
 	EntityProjectile ** projectiles;
 	int* pCount;
 
-	typedef struct
-	{
-		float x, z;
-	} motion;
 	Zombie_Physics(int maxObjects);
 	~Zombie_Physics();
-	bool registerObject(int ID, float force, float xObj, float zObj, float radius);
-	motion getMotion(int ID,float time);
-	void doPushPhysics();
 
 	hit testHitbox(MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo,spacevec relPos);
 	
 };
-void pushEntities(Pushable * a,Pushable * b,float time,ChunkManager * cm);//TODO
 

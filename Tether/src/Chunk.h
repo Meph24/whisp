@@ -10,10 +10,8 @@
 #define SRC_CHUNK_H_
 
 #define defaultHeight -1
-//class CollisionGroup;
-//#include "CollisionGroup.h"
-#include "InteractionGroup1.h"
 #include "Pushable.h"
+#include "InteractionGroup1.h"
 #include "DualPointer.h"
 #include "Spacevec.h"
 #include "Tickable.h"

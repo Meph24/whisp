@@ -209,7 +209,7 @@ void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 
 void Chunk::registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp)
 {
-	group->registerCollisionCheck(e, time, tsp);
+	group->registerInteractionCheck(e, time, tsp);
 }
 
 Chunk::~Chunk()

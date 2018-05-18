@@ -20,8 +20,8 @@ class InteractionGroup1
 {
 public:
 	std::vector<DualPointer<PhysicsIF>> registered;
-	void registerCollisionCheck(PhysicsIF * pIF,Entity * e, float time,TickServiceProvider* tsp);
-	void registerCollisionCheck(DualPointer<PhysicsIF>, float time,TickServiceProvider* tsp);
+	void registerInteractionCheck(PhysicsIF * pIF,Entity * e, float time,TickServiceProvider* tsp);
+	void registerInteractionCheck(DualPointer<PhysicsIF>, float time,TickServiceProvider* tsp);
 	void check(DualPointer<PhysicsIF> e,DualPointer<PhysicsIF> r,float time,TickServiceProvider* tsp);
 	void reset();
 
@@ -30,7 +30,7 @@ public:
 };
 
 template<typename PhysicsIF>
-inline void InteractionGroup1<PhysicsIF>::registerCollisionCheck(DualPointer<PhysicsIF> e, float time, TickServiceProvider* tsp)
+inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(DualPointer<PhysicsIF> e, float time, TickServiceProvider* tsp)
 {
 	int size=registered.size();
 	for(int i=0;i<size;i++)
@@ -44,9 +44,9 @@ inline void InteractionGroup1<PhysicsIF>::registerCollisionCheck(DualPointer<Phy
 template<typename PhysicsIF>
 inline void InteractionGroup1<PhysicsIF>::check(DualPointer<PhysicsIF> e,DualPointer<PhysicsIF> r, float time, TickServiceProvider* tsp)
 {
-	if(e.e->bb.doesIntersect(r.e->bb))//doAABBcheck(r.e,time,tsp);
+	if(e.e->bb.doesIntersect(r.e->bb))
 	{
-		e.pIF->interact(r.pIF);
+		e.pIF->interact(e.e,r,time,tsp);
 	}
 }
 
@@ -61,9 +61,9 @@ inline InteractionGroup1<PhysicsIF>::InteractionGroup1()
 {}
 
 template<typename PhysicsIF>
-inline void InteractionGroup1<PhysicsIF>::registerCollisionCheck(PhysicsIF* pIF,Entity* e, float time, TickServiceProvider* tsp)
+inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(PhysicsIF* pIF,Entity* e, float time, TickServiceProvider* tsp)
 {
-	registerCollisionCheck(DualPointer<PhysicsIF>(pIF,e),time,tsp);
+	registerInteractionCheck(DualPointer<PhysicsIF>(pIF,e),time,tsp);
 }
 
 template<typename PhysicsIF>
