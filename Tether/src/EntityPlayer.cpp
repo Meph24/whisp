@@ -157,8 +157,6 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	size.y=characterHeightConv*1.5f;
 	size.z=size.x;
 	bb=AABB(pos,size,v*(-time));
-	if(multichunk) alreadyChecked.clear();
-	multichunk=bb.isMultichunk();
 }
 
 void EntityPlayer::push(spacevec amount)
@@ -167,24 +165,24 @@ void EntityPlayer::push(spacevec amount)
 	HP -= 15625*(amount.fLengthSq(16));//TODO not hard code chunk size
 }
 
-spacevec EntityPlayer::getPos()
-{
-	return pos;
-}
+//spacevec EntityPlayer::getPos()
+//{
+//	return pos;
+//}
 
-#include "Zombie_Physics.h"
-#include "Zombie_Enemy.h"
-void EntityPlayer::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
-{
-	Pushable * push=other->toPushable();//dynamic_cast<Pushable *>(other);
-	if(push)
-	{
-//		pushEntities(this,push,time,tsp->getChunkManager());
-	}
-
-}
-
-Pushable* EntityPlayer::toPushable()
-{
-	return this;
-}
+//#include "Zombie_Physics.h"
+//#include "Zombie_Enemy.h"
+//void EntityPlayer::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
+//{
+//	Pushable * push=other->toPushable();//dynamic_cast<Pushable *>(other);
+//	if(push)
+//	{
+////		pushEntities(this,push,time,tsp->getChunkManager());
+//	}
+//
+//}
+//
+//Pushable* EntityPlayer::toPushable()
+//{
+//	return this;
+//}

@@ -172,7 +172,7 @@ base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 	size.z.intpart=0;
 	size.y=(maxConv-minConv)*0.5f;
 	bb=AABB(middle,size);
-	group=new InteractionGroup1<Pushable>();
+	interMan=new InteractionManager();
 
 	/*int smallSize=size-1;
 	int vertices=3*4*smallSize*smallSize;
@@ -204,17 +204,19 @@ inline float Chunk::getH(int xh, int yh)
 
 void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 {
-	group->registered.clear();
+	interMan->resetAll();//TODO move
+//	group->registered.clear();
 }
 
 void Chunk::registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp)
 {
-	group->registerInteractionCheck(e, time, tsp);
+//	group->registerInteractionCheck(e, time, tsp);
 }
 
 Chunk::~Chunk()
 {
 	delete height;
-	delete group;
+	delete interMan;
+//	delete group;
 }
 

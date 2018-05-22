@@ -19,3 +19,7 @@ TickServiceProvider::~TickServiceProvider()
 	// TODO Auto-generated destructor stub
 }
 
+void TickServiceProvider::initNextTick()
+{
+	tickID++;
+}

@@ -344,8 +344,6 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 
 
 	bb=AABB(pos,sizeBB);
-	if(multichunk) alreadyChecked.clear();
-	multichunk=bb.isMultichunk();
 }
 
 void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)
@@ -523,22 +521,22 @@ void Zombie_Enemy::push(spacevec amount)
 	pos+=amount;//TODO?
 }
 
-spacevec Zombie_Enemy::getPos()
-{
-	return pos;
-}
-#include "Zombie_Physics.h"
-#include "EntityPlayer.h"
-void Zombie_Enemy::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
-{
-	Pushable * push=other->toPushable();//dynamic_cast<Pushable *>(other);
-	if(push)
-	{
-//		pushEntities(this,push,time,tsp->getChunkManager());
-	}
-}
-
-Pushable* Zombie_Enemy::toPushable()
-{
-	return this;
-}
+//spacevec Zombie_Enemy::getPos()
+//{
+//	return pos;
+//}
+//#include "Zombie_Physics.h"
+//#include "EntityPlayer.h"
+//void Zombie_Enemy::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
+//{
+//	Pushable * push=other->toPushable();//dynamic_cast<Pushable *>(other);
+//	if(push)
+//	{
+////		pushEntities(this,push,time,tsp->getChunkManager());
+//	}
+//}
+//
+//Pushable* Zombie_Enemy::toPushable()
+//{
+//	return this;
+//}

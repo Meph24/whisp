@@ -32,9 +32,11 @@ public:
 	spacevec pos;
 	spacevec v;
 
-	Timestamp lastTick;
+	Timestamp lastTick;//used for timing
+	int lastTickID=0;//used for resets
 
 	std::vector<Entity *> alreadyChecked;
+
 
 	bool exists=true;//if exists is false, memory will be freed soon [prev description: next tick (enough time for other threads to react)]
 
@@ -64,11 +66,11 @@ public:
 	 */
 
 	void requestDestroy(TickServiceProvider * tsp);
+	void reset();
 
-	virtual void onAABBintersect(Entity * other,float time,TickServiceProvider * tsp);
-	void doAABBcheck(Entity * other, float time,TickServiceProvider* tsp);
+//	virtual void onAABBintersect(Entity * other,float time,TickServiceProvider * tsp);
+	bool doAABBcheck(Entity * other, float time,TickServiceProvider* tsp);
 
-	virtual Pushable * toPushable();
 
 	Entity();
 	virtual ~Entity();

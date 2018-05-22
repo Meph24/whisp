@@ -17,37 +17,45 @@ void Entity::requestDestroy(TickServiceProvider* tsp)
 	tsp->requestDestroy(this);
 }
 
-void Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)
+bool Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)
 {
-	if(!bb.doesIntersect(other->bb)) return;
+	if(tsp->tickID!=lastTickID)
+	{
+		reset();
+		lastTickID=tsp->tickID;
+	}
+	if(!bb.doesIntersect(other->bb)) return false;
 	AABB::intersectionCounter++;
 	if(multichunk&&other->multichunk)
 	{
 		int size=alreadyChecked.size();
 		for(int i=0;i<size;i++)
 		{
-			if(other==alreadyChecked[i]) return;
+			if(other==alreadyChecked[i]) return false;
 		}
 		alreadyChecked.push_back(other);
 		other->alreadyChecked.push_back(this);
 	}
-	onAABBintersect(other,time,tsp);
-	//TODO empty vector when calculating new aabb and aabb is multichunk
+//	onAABBintersect(other,time,tsp);//TODO
+	return true;
 }
-#include <iostream>
-void Entity::onAABBintersect(Entity* other, float time,TickServiceProvider* tsp)
+
+void Entity::reset()
 {
-	std::cout<<"warning: onAABBintersect not overridden"<<std::endl;
+	if(multichunk) alreadyChecked.clear();
+	multichunk=bb.isMultichunk();
 }
+
+//#include <iostream>
+//void Entity::onAABBintersect(Entity* other, float time,TickServiceProvider* tsp)
+//{
+//	std::cout<<"warning: onAABBintersect not overridden"<<std::endl;
+//}
 
 Entity::~Entity()
 {
 }
 
-Pushable* Entity::toPushable()
-{
-	return 0;
-}
 /*
 void Entity::standardMove(float time,ChunkManager * cm)
 {

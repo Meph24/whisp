@@ -55,11 +55,11 @@ public:
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
 	virtual void push(spacevec amount);
-	virtual spacevec getPos();
+//	virtual spacevec getPos();
 
-	virtual void onAABBintersect(Entity* other,float time,TickServiceProvider * tsp);
+//	virtual void onAABBintersect(Entity* other,float time,TickServiceProvider * tsp);
 
-	virtual Pushable * toPushable();
+//	virtual Pushable * toPushable();
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */

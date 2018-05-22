@@ -31,8 +31,10 @@ class Chunk: public Tickable //TODO Drawable?
 	float avgHeight;
 	//GLuint bufID;
 	ChunkManager * parent;
+	int lastTickID=0;
 
-	InteractionGroup1<Pushable> * group;//CollisionGroup * group;
+//	InteractionGroup1<Pushable> * group;
+	InteractionManager * interMan;
 
 
 	std::vector<Entity *> coreEntities;//must be ticked by this chunk//TODO

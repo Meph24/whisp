@@ -56,7 +56,9 @@ public:
 	spacevec fromMeters(vec3 v);
 	spacevec getMiddleChunk();
 
-	void registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp);
+	void giveInteractionManagers(Entity * e,std::vector<InteractionManager *> * managers,TickServiceProvider * tsp);
+
+//	void registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp);
 
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();

@@ -66,10 +66,10 @@ public:
 
 
 	virtual void push(spacevec amount);
-	virtual spacevec getPos();
-	virtual void onAABBintersect(Entity * other,float time,TickServiceProvider * tsp);
-
-	virtual Pushable * toPushable();
+//	virtual spacevec getPos();
+//	virtual void onAABBintersect(Entity * other,float time,TickServiceProvider * tsp);
+//
+//	virtual Pushable * toPushable();
 };
 
 #endif /* SRC_ZOMBIE_ENEMY_H_ */

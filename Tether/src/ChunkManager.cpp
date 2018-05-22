@@ -306,6 +306,44 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 	return false;
 }
 
+#include "myAssert.h"
+void ChunkManager::giveInteractionManagers(Entity* e,std::vector<InteractionManager*> * managers,TickServiceProvider * tsp)
+{
+	chunkNum minx=e->bb.low.x.intpart;
+	chunkNum maxx=e->bb.high.x.intpart;
+	chunkNum minz=e->bb.low.z.intpart;
+	chunkNum maxz=e->bb.high.z.intpart;
+
+	if((maxx-minx)>=10 )
+	{
+		std::cout<<"fail: wrong bb; x:"<<minx<<"-"<<maxx<<"z:"<<minz<<"-"<<maxz<<std::endl;
+	}
+	assert((maxx-minx)<10);
+	assert((maxz-minz)<10);
+	int tickID=tsp->tickID;
+	for(chunkNum xrun=minx;xrun<=maxx;xrun++)
+	{
+		for(chunkNum zrun=minz;zrun<=maxz;zrun++)
+		{
+			if(isValid(xrun,zrun))
+			{
+				int indx=getIndx(xrun,zrun);
+				if(indx<0 || indx>chunksPerAxis*chunksPerAxis)
+					std::cout<<"fail: wrong index: "<<indx<<std::endl;
+				else
+				if(chunks[indx])
+				{
+					if(chunks[indx]->lastTickID!=tickID)
+					{
+						chunks[indx]->interMan->resetAll();
+						chunks[indx]->lastTickID=tickID;
+					}
+					managers->push_back(chunks[indx]->interMan);
+				}
+			}
+		}
+	}
+}
 
 ChunkManager::~ChunkManager()
 {
@@ -335,39 +373,38 @@ float ChunkManager::getChunkSize()
 	return chunkSize;
 }
 
-#include "myAssert.h"
-void ChunkManager::registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp)
-{
-	chunkNum minx=e.e->bb.low.x.intpart;
-	chunkNum maxx=e.e->bb.high.x.intpart;
-	chunkNum minz=e.e->bb.low.z.intpart;
-	chunkNum maxz=e.e->bb.high.z.intpart;
-
-	if((maxx-minx)>=10 )
-	{
-		std::cout<<"fail: wrong bb; x:"<<minx<<"-"<<maxx<<"z:"<<minz<<"-"<<maxz<<std::endl;
-	}
-	assert((maxx-minx)<10);
-	assert((maxz-minz)<10);
-	for(chunkNum xrun=minx;xrun<=maxx;xrun++)
-	{
-		for(chunkNum zrun=minz;zrun<=maxz;zrun++)
-		{
-			if(isValid(xrun,zrun))
-			{
-				int indx=getIndx(xrun,zrun);
-
-				if(indx<0 || indx>chunksPerAxis*chunksPerAxis)
-					std::cout<<"fail: wrong index: "<<indx<<std::endl;
-				else
-				if(chunks[indx])
-					chunks[indx]->registerCollisionCheck(e,time,tsp);
-			}
-
-		}
-
-	}
-}
+//void ChunkManager::registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp)
+//{
+//	chunkNum minx=e.e->bb.low.x.intpart;
+//	chunkNum maxx=e.e->bb.high.x.intpart;
+//	chunkNum minz=e.e->bb.low.z.intpart;
+//	chunkNum maxz=e.e->bb.high.z.intpart;
+//
+//	if((maxx-minx)>=10 )
+//	{
+//		std::cout<<"fail: wrong bb; x:"<<minx<<"-"<<maxx<<"z:"<<minz<<"-"<<maxz<<std::endl;
+//	}
+//	assert((maxx-minx)<10);
+//	assert((maxz-minz)<10);
+//	for(chunkNum xrun=minx;xrun<=maxx;xrun++)
+//	{
+//		for(chunkNum zrun=minz;zrun<=maxz;zrun++)
+//		{
+//			if(isValid(xrun,zrun))
+//			{
+//				int indx=getIndx(xrun,zrun);
+//
+//				if(indx<0 || indx>chunksPerAxis*chunksPerAxis)
+//					std::cout<<"fail: wrong index: "<<indx<<std::endl;
+//				else
+//				if(chunks[indx])
+//					chunks[indx]->registerCollisionCheck(e,time,tsp);
+//			}
+//
+//		}
+//
+//	}
+//}
 
 bool ChunkManager::isValid(chunkNum cx, chunkNum cz)
 {
