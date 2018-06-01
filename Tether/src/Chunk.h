@@ -11,7 +11,7 @@
 
 #define defaultHeight -1
 #include "Pushable.h"
-#include "InteractionGroup1.h"
+//#include "InteractionGroup1.h"
 #include "DualPointer.h"
 #include "Spacevec.h"
 #include "Tickable.h"
@@ -21,6 +21,7 @@ class ChunkManager;
 #include "ChunkManager.h"
 #include <vector>
 #include "AABB.h"
+class InteractionManager;
 
 class Chunk: public Tickable //TODO Drawable?
 {
@@ -31,16 +32,16 @@ class Chunk: public Tickable //TODO Drawable?
 	float avgHeight;
 	//GLuint bufID;
 	ChunkManager * parent;
-	int lastTickID=0;
 
 //	InteractionGroup1<Pushable> * group;
-	InteractionManager * interMan;
 
 
 	std::vector<Entity *> coreEntities;//must be ticked by this chunk//TODO
 
 	inline float getH(int x,int y);//inside chunk grid
 public:
+	int lastTickID=0;
+	InteractionManager * interMan;
 	AABB bb;
 	void tick(Timestamp t,TickServiceProvider * tsp);
 	spacelen getHeight(flt x,flt z);//coordinates inside chunk
@@ -51,5 +52,6 @@ public:
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1
 	~Chunk();
 };
+#include "InteractionManager.h"
 
 #endif /* SRC_CHUNK_H_ */

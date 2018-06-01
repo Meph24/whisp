@@ -17,6 +17,8 @@ class Chunk;
 #include "Spacevec.h"
 class Frustum;
 #include "Frustum.h"
+#include <vector>
+#include "InteractionManager.h"
 
 class ChunkManager: public Tickable
 {
