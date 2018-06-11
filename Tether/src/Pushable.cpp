@@ -41,6 +41,18 @@ void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, T
 		other.pIF->push(-move);
 	}
 }
+
+void Pushable::registerPushCheck(Entity* e, TickServiceProvider* tsp)
+{
+	std::vector<InteractionManager *> * vec = tsp->getInterManVector();
+	tsp->getChunkManager()->giveInteractionManagers(e,vec,tsp);
+	int size=vec->size();
+	for(int i=0;i<size;i++)
+	{
+		(*vec)[i]->push.check()
+	}
+}
+
 Pushable::~Pushable()
 {
 }

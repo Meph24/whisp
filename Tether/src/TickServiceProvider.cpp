@@ -23,3 +23,9 @@ void TickServiceProvider::initNextTick()
 {
 	tickID++;
 }
+
+std::vector<InteractionManager*>* TickServiceProvider::getInterManVector()
+{
+	interManVec.clear();
+	return &interManVec;
+}

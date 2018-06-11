@@ -17,6 +17,7 @@ class Pushable
 public:
 	float pushRadius=0;
 	float pushForce=0;
+	void registerPushCheck(Entity * e,TickServiceProvider * tsp);
 	void interact(Entity * self,DualPointer<Pushable> other, float time, TickServiceProvider* tsp);
 	virtual void push(spacevec amount)=0;
 	virtual ~Pushable();
