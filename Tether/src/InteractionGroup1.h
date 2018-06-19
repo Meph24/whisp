@@ -59,7 +59,7 @@ inline void InteractionGroup1<PhysicsIF>::reset()
 template<typename PhysicsIF>
 inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(PhysicsIF* pIF,Entity* e, float time, TickServiceProvider* tsp)
 {
-	registerInteractionCheck(DualPointer<PhysicsIF>(pIF,e),time,tsp);
+	registerInteractionCheck(DualPointer<PhysicsIF>(e,pIF),time,tsp);
 }
 
 template<typename PhysicsIF>

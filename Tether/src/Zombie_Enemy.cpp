@@ -344,6 +344,7 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 
 
 	bb=AABB(pos,sizeBB);
+	registerPushCheck((Entity *)this,seconds,tsp);
 }
 
 void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)

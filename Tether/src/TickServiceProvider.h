@@ -14,6 +14,8 @@ class TickServiceProvider;
 #include "Entity.h"
 #include "ICamera3D.h"
 #include "ChunkManager.h"
+class InteractionManager;
+#include "InteractionManager.h"
 
 //provides services for tickable items
 class TickServiceProvider

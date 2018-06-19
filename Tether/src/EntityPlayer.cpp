@@ -157,6 +157,7 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	size.y=characterHeightConv*1.5f;
 	size.z=size.x;
 	bb=AABB(pos,size,v*(-time));
+	registerPushCheck((Entity *)this,time,tsp);
 }
 
 void EntityPlayer::push(spacevec amount)
