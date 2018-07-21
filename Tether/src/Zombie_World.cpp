@@ -57,7 +57,6 @@ Zombie_World::Zombie_World(sf::Window * w):
 	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getfloat("graphics","maxRenderTime")));//TODO not hard code
 
 
-
 	pm = new PerformanceMeter(12,1000);
 	pm->roundtripUpdateIndex = 0;
 
@@ -75,10 +74,10 @@ Zombie_World::Zombie_World(sf::Window * w):
 	pm->setName("        guns tick",1);
 	pm->setName("            spawn",2);
 	pm->setName("      zombie tick",3);
-	pm->setName("  collision check",4);
-	pm->setName("   physics hitbox",5);
-	pm->setName("         cm->tick",6);
-	pm->setName("   shots[i]->tick",7);
+	pm->setName("       chunk tick",4);
+	pm->setName("      bullet tick",5);
+	pm->setName("           retick",6);
+	pm->setName("           delete",7);
 	pm->setName("           render",8);
 	pm->setName("      debugScreen",9);
 	pm->setName("     chunk update",10);
@@ -255,7 +254,7 @@ void Zombie_World::loadStandardTex()
 	g = new Graphics2D(64);
 
 }
-
+#include "WarnErrReporter.h"
 void Zombie_World::doPhysics(float sec,Timestamp t)
 {
 	initNextTick();
@@ -269,7 +268,6 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 		if (zombies[i])
 		{
 			zombies[i]->tick(t,this);
-			if (!zombies[i]->exists) removeZombie(i);
 		}
 	}
 	pm->registerTime(timestep++);
@@ -284,7 +282,7 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 //	std::cout<<"collision counter: "<<AABB::intersectionCounter<<std::endl;
 //	std::cout<<"check counter: "<<AABB::checkCounter<<std::endl;
 //	cm->registerCollisionCheck(DualPointer<Pushable>(player,player),sec,this);
-	pm->registerTime(timestep++);
+//	pm->registerTime(timestep++);
 //#pragma omp parallel for schedule(dynamic, 1)
 //	for (int i = 0; i < zCount; i++)
 //	{
@@ -303,7 +301,7 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 //			}
 //		}
 //	}
-	pm->registerTime(timestep++);
+//	pm->registerTime(timestep++);
 
 
 
@@ -314,12 +312,25 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 	{
 		if (shots[i])
 		{
-			entityIndex=i;
+//			entityIndex=i;
 			shots[i]->tick(t,this);
 		}
 	}
+	pm->registerTime(timestep++);
 	doReticks();
-
+	pm->registerTime(timestep++);
+	int size=toDelete.size();
+	for(int i=0;i<size;i++)
+	{
+		int count=0;
+		for(int j=0;j<size;j++)
+		{
+			if(toDelete[i]==toDelete[j]) count++;
+		}
+		if(count>1) WarnErrReporter::doubleErr("found more than one request to delete specific entity");
+		destroy(toDelete[i]);
+	}
+	toDelete.clear();
 }
 
 void Zombie_World::loop()
@@ -487,6 +498,34 @@ Entity* Zombie_World::getTarget(Entity* me)
 	return (Entity *)player;
 }
 
+void Zombie_World::destroy(Entity* e)
+{
+	bool found=false;
+	for (int i = 0; i < pCount; i++)
+	{
+		if ((Entity *)shots[i] == e)
+		{
+			delete shots[i];
+			shots[i] = 0;
+			found=true;
+			break;
+		}
+	}
+	if(!found)
+	for (int i = 0; i < zCount; i++)
+	{
+		if ((Entity *)zombies[i] == e)
+		{
+			delete zombies[i];
+			zombies[i] = 0;
+			found=true;
+			break;
+		}
+	}
+	if(!found)
+		std::cout<<"requestDestroy got called with invalid entity pointer:"<<e<<std::endl;
+}
+
 void Zombie_World::markRestart()
 {
 	reset = true;
@@ -510,38 +549,39 @@ ChunkManager* Zombie_World::getChunkManager()
 
 void Zombie_World::requestDestroy(Entity* e)
 {
-	if(((Entity *)shots[entityIndex])==e)
-	{
-		delete shots[entityIndex];
-		shots[entityIndex] = 0;
-	}
-	else
-	{
-		bool found=false;
-		for (int i = 0; i < pCount; i++)
-		{
-			if ((Entity *)shots[i] == e)
-			{
-				delete shots[i];
-				shots[i] = 0;
-				found=true;
-				break;
-			}
-		}
-		if(!found)
-		for (int i = 0; i < zCount; i++)
-		{
-			if ((Entity *)zombies[i] == e)
-			{
-				delete zombies[i];
-				zombies[i] = 0;
-				found=true;
-				break;
-			}
-		}
-		if(found)
-			std::cout<<"requestDestroy got called with other entity pointer, was found later"<<std::endl;
-		else
-			std::cout<<"requestDestroy got called with invalid entity pointer:"<<std::endl;
-	}
+	toDelete.push_back(e);
+//	if(((Entity *)shots[entityIndex])==e)
+//	{
+//		delete shots[entityIndex];
+//		shots[entityIndex] = 0;
+//	}
+//	else
+//	{
+//		bool found=false;
+//		for (int i = 0; i < pCount; i++)
+//		{
+//			if ((Entity *)shots[i] == e)
+//			{
+//				delete shots[i];
+//				shots[i] = 0;
+//				found=true;
+//				break;
+//			}
+//		}
+//		if(!found)
+//		for (int i = 0; i < zCount; i++)
+//		{
+//			if ((Entity *)zombies[i] == e)
+//			{
+//				delete zombies[i];
+//				zombies[i] = 0;
+//				found=true;
+//				break;
+//			}
+//		}
+//		if(found)
+//			std::cout<<"requestDestroy got called with other entity pointer, was found later"<<std::endl;
+//		else
+//			std::cout<<"requestDestroy got called with invalid entity pointer:"<<std::endl;
+//	}
 }

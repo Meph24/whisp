@@ -346,18 +346,20 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 
 	bb=AABB(pos,sizeBB);
 	registerPushCheck((Entity *)this,seconds,tsp);
-	registerHitCheck((Entity *)this,seconds,tsp);
+	if(remainingHP>=0) registerHitCheck((Entity *)this,seconds,tsp);
 }
 
-
+#include "WarnErrReporter.h"
 void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,ChunkManager* cm)
 {
+	float before=this->remainingHP;
 	DualPointer<Projectile> projConv=DualPointer<Projectile>((Entity *)projectile,(Projectile *)projectile);
 
 	spacevec middleChunk=cm->getMiddleChunk();
 	ml.loadIdentity();
 	ml.translatef(relPosMeters.x, relPosMeters.y, relPosMeters.z);
 	ml.rotatef(facing, 0, 1, 0);
+	ml.rotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
 	ml.scalef(size, size, size);
 
 
@@ -460,6 +462,13 @@ void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMete
 	ml.popMatrix();
 
 	ml.popMatrix();
+	float after=this->remainingHP;
+	if(before==after)
+	{
+		WarnErrReporter::noEffectErr("expected hp change when hit, but no hp change detected");
+	}
+	std::cout<<"Entity ptr="<<(Entity *)this<<"; remainingHP="<<remainingHP<<std::endl;
+
 }
 
 
@@ -467,19 +476,19 @@ void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMete
 //TODO remove comment: old system
 void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)
 {
-	spacevec relPos=pos-middleChunk;
-	vec3 relPosMeters=cm->toMeters(relPos);
-
-	for (int i = 0; i < ph->pCount[0]; i++)
-	{
-		if (ph->projectiles[i])
-		{
-			if(ph->projectiles[i]->bb.doesIntersect(bb))
-			{
-				checkProjectile(ph->projectiles[i],relPosMeters,cm);
-			}
-		}
-	}
+//	spacevec relPos=pos-middleChunk;
+//	vec3 relPosMeters=cm->toMeters(relPos);
+//
+//	for (int i = 0; i < ph->pCount[0]; i++)
+//	{
+//		if (ph->projectiles[i])
+//		{
+//			if(ph->projectiles[i]->bb.doesIntersect(bb))
+//			{
+//				checkProjectile(ph->projectiles[i],relPosMeters,cm);
+//			}
+//		}
+//	}
 }
 
 float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, float xFrom, float xTo, float yFrom,float yTo, float zFrom, float zTo, spacevec relPos)
@@ -566,10 +575,7 @@ void Zombie_Enemy::gotHit(float time, int part, EntityProjectile * projectile)
 	}
 	legDmg+=legDmgMult*projectile->fromItem->damagePerJoule;//TODO replace with better logic once guns 2.0 work
 	remainingHP -= projectile->fromItem->damagePerJoule*dmgMult;
-	if(remainingHP<0)
-	{
-		remainingHP=-totalHP*dmgMult;//TODO
-	}
+
 	projectile->pos.y.intpart -= 1000;
 	projectile->posOld.y.intpart -= 1000;
 	if(legDmg>0.25f*totalHP)
@@ -587,6 +593,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPoi
 	ml.loadIdentity();
 	ml.translatef(relPosMeters.x, relPosMeters.y, relPosMeters.z);
 	ml.rotatef(facing, 0, 1, 0);
+	ml.rotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
 	ml.scalef(size, size, size);
 
 

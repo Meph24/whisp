@@ -31,3 +31,23 @@ void WarnErrReporter::noOverrideErr(std::string text)
 	std::cout<<std::endl;
 	std::cout<<std::endl;
 }
+
+void WarnErrReporter::doubleErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"soft error (doubleErr): no crash, but this should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}
+
+void WarnErrReporter::noEffectErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"soft error (noEffectErr): no crash, but this should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}

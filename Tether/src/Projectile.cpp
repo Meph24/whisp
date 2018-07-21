@@ -42,13 +42,13 @@ void Projectile::retick(TickServiceProvider* tsp)
 	std::cout<<"before:"<<std::endl;
 	for(int i=0;i<size;i++)
 	{
-		std::cout<<collisions[i].location<<"  "<<collisions[i].originChunk.x.intpart<<";"<<collisions[i].originChunk.z.intpart<<std::endl;
+		std::cout<<collisions[i].location<<"  "<<collisions[i].originChunk.x.intpart<<";"<<collisions[i].originChunk.z.intpart<<"    "<<collisions[i].hitVictim.e<<std::endl;
 	}
 	std::stable_sort(collisions.begin(), collisions.end());
 	std::cout<<"after:"<<std::endl;
 	for(int i=0;i<size;i++)
 	{
-		std::cout<<collisions[i].location<<"  "<<collisions[i].originChunk.x.intpart<<";"<<collisions[i].originChunk.z.intpart<<std::endl;
+		std::cout<<collisions[i].location<<"  "<<collisions[i].originChunk.x.intpart<<";"<<collisions[i].originChunk.z.intpart<<"    "<<collisions[i].hitVictim.e<<std::endl;
 	}
 	for(int i=0;i<size;i++)
 	{

@@ -66,7 +66,9 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 
 	bool reset = false;
 
-	int entityIndex=0;//TODO
+	void destroy(Entity * e);
+
+//	int entityIndex=0;//TODO
 public:
 	EntityPlayer * player;
 	bool debugScreen=false;
@@ -74,7 +76,7 @@ public:
 	Zombie_World(sf::Window * w);
 	~Zombie_World();
 
-
+	std::vector<Entity *> toDelete;
 
 	//TickServiceProvider
 	virtual void spawnEntity(Entity * e);//spawns Entity into World
