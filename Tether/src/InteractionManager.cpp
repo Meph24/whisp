@@ -8,15 +8,15 @@
 
 #include "InteractionManager.h"
 
-InteractionManager::InteractionManager()
+InteractionManager::InteractionManager(spacevec myChunk):
+chunk(myChunk)
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 void InteractionManager::resetAll()
 {
 	push.reset();
+	collide.reset();
 }
 
 InteractionManager::~InteractionManager()

@@ -44,10 +44,26 @@ inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(DualPointer<P
 template<typename PhysicsIF>
 inline void InteractionGroup1<PhysicsIF>::check(DualPointer<PhysicsIF> e,DualPointer<PhysicsIF> r, float time, TickServiceProvider* tsp)
 {
-	if(e.e->bb.doesIntersect(r.e->bb))
+	//double code starts here, see InteractionGroup2
+	if(tsp->tickID!=e.e->lastTickID)
 	{
-		e.pIF->interact(e.e,r,time,tsp);
+		reset();
+		e.e->lastTickID=tsp->tickID;
 	}
+	if(!e.e->bb.doesIntersect(r.e->bb)) return;
+	AABB::intersectionCounter++;
+	if(e.e->multichunk&&r.e->multichunk)
+	{
+		int size=e.e->alreadyChecked.size();
+		for(int i=0;i<size;i++)
+		{
+			if((void *)r.pIF==e.e->alreadyChecked[i]) return;
+		}
+		e.e->alreadyChecked.push_back((void *)r.pIF);
+		r.pIF->alreadyChecked.push_back((void *)e.pIF);
+	}
+	//double code ends here
+	e.pIF->interact(e.e,r,time,tsp);
 }
 
 template<typename PhysicsIF>

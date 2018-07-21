@@ -41,6 +41,9 @@ class ChunkManager: public Tickable
 	int getIndx(chunkNum cx,chunkNum cz);//from absolute chunk coordinates
 	int getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ);//from absolute chunk coordinates
 public:
+
+	spacevec activeChunk;//TODO debug only, remove after debugging
+
 	bool isValid(chunkNum cx,chunkNum cz);
 	float getChunkSize();
 	spacevec clip(spacevec pos,bool forceGround);

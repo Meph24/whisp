@@ -36,7 +36,7 @@ class Chunk: public Tickable //TODO Drawable?
 //	InteractionGroup1<Pushable> * group;
 
 
-	std::vector<Entity *> coreEntities;//must be ticked by this chunk//TODO
+	std::vector<Entity *> managedEntities;//must be ticked by this chunk, usually entities that are located in this chunk (with a few exceptions)
 
 	inline float getH(int x,int y);//inside chunk grid
 public:

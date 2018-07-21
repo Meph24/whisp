@@ -17,28 +17,27 @@ void Entity::requestDestroy(TickServiceProvider* tsp)
 	tsp->requestDestroy(this);
 }
 
-bool Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)
-{
-	if(tsp->tickID!=lastTickID)
-	{
-		reset();
-		lastTickID=tsp->tickID;
-	}
-	if(!bb.doesIntersect(other->bb)) return false;
-	AABB::intersectionCounter++;
-	if(multichunk&&other->multichunk)
-	{
-		int size=alreadyChecked.size();
-		for(int i=0;i<size;i++)
-		{
-			if(other==alreadyChecked[i]) return false;
-		}
-		alreadyChecked.push_back(other);
-		other->alreadyChecked.push_back(this);
-	}
-//	onAABBintersect(other,time,tsp);//TODO
-	return true;
-}
+//bool Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)
+//{
+//	if(tsp->tickID!=lastTickID)
+//	{
+//		reset();
+//		lastTickID=tsp->tickID;
+//	}
+//	if(!bb.doesIntersect(other->bb)) return false;
+//	AABB::intersectionCounter++;
+//	if(multichunk&&other->multichunk)
+//	{
+//		int size=alreadyChecked.size();
+//		for(int i=0;i<size;i++)
+//		{
+//			if(other==alreadyChecked[i]) return false;
+//		}
+//		alreadyChecked.push_back(other);
+//		other->alreadyChecked.push_back(this);
+//	}
+//	return true;
+//}
 
 void Entity::reset()
 {
@@ -46,11 +45,9 @@ void Entity::reset()
 	multichunk=bb.isMultichunk();
 }
 
-//#include <iostream>
-//void Entity::onAABBintersect(Entity* other, float time,TickServiceProvider* tsp)
-//{
-//	std::cout<<"warning: onAABBintersect not overridden"<<std::endl;
-//}
+#include "WarnErrReporter.h"
+
+
 
 Entity::~Entity()
 {

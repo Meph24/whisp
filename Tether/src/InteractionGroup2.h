@@ -34,7 +34,7 @@ public:
 template<typename MasterIF, typename SlaveIF>
 inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(MasterIF* pIF, Entity* e, float time, TickServiceProvider* tsp)
 {
-	registerInteractionCheck(DualPointer<MasterIF>(pIF,e),time,tsp);
+	registerInteractionCheck(DualPointer<MasterIF>(e,pIF),time,tsp);
 }
 
 template<typename MasterIF, typename SlaveIF>
@@ -52,7 +52,7 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualP
 template<typename MasterIF, typename SlaveIF>
 inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(SlaveIF* pIF, Entity* e, float time, TickServiceProvider* tsp)
 {
-	registerInteractionCheck(DualPointer<SlaveIF>(pIF,e),time,tsp);
+	registerInteractionCheck(DualPointer<SlaveIF>(e,pIF),time,tsp);
 }
 
 template<typename MasterIF, typename SlaveIF>
@@ -70,11 +70,27 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualP
 template<typename MasterIF, typename SlaveIF>
 inline void InteractionGroup2<MasterIF, SlaveIF>::check(DualPointer<MasterIF> f, DualPointer<SlaveIF> s, float time,TickServiceProvider* tsp)
 {
-	if(f.e->bb.doesIntersect(s.e->bb))
+	//double code starts here, see InteractionGroup1
+	if(tsp->tickID!=f.e->lastTickID)
 	{
-		f.pIF->interact(f.e,s,time,tsp);
-		//s.pIF->interact(s.e,f,time,tsp);
+		reset();
+		f.e->lastTickID=tsp->tickID;
 	}
+	if(!f.e->bb.doesIntersect(s.e->bb)) return;
+	AABB::intersectionCounter++;
+	if(f.e->multichunk&&s.e->multichunk)
+	{
+		int size=f.e->alreadyChecked.size();
+		for(int i=0;i<size;i++)
+		{
+			if((void *)s.pIF==f.e->alreadyChecked[i]) return;
+		}
+		f.e->alreadyChecked.push_back((void *)s.pIF);
+		s.pIF->alreadyChecked.push_back((void *)f.pIF);
+	}
+	//double code ends here
+	f.pIF->interact(f.e,s,time,tsp);
+	//s.pIF->interact(s.e,f,time,tsp);
 }
 
 template<typename MasterIF, typename SlaveIF>

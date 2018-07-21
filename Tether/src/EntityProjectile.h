@@ -12,12 +12,11 @@
 #include "ItemAmmo.h"
 #include "TextureDummy.h"
 
-class EntityProjectile: public Entity
+class EntityProjectile: public Entity, public Projectile
 {
 public:
 	static ITexture * tex;
 	ItemAmmo * fromItem;//TODO private?
-	spacevec posOld;//TODO private?
 
 	EntityProjectile(Timestamp spawnTime,ItemAmmo * item,spacevec position,spacevec velocity);//gives item ownership to the Projectile
 	~EntityProjectile();

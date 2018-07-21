@@ -9,8 +9,9 @@
 #include "Entity.h"
 #include "Pushable.h"
 #include "AnimationCycle.h"
+#include "Hittable.h"
 
-class Zombie_Enemy: public Entity,public Pushable
+class Zombie_Enemy: public Entity,public Pushable,public Hittable
 {
 
 	struct texCooSet{
@@ -35,7 +36,7 @@ class Zombie_Enemy: public Entity,public Pushable
 	void drawLeg(int loc,float strength);
 	void drawTexturedCube(texCooSet textureCoordinates);
 
-	void gotHit(Zombie_Physics::hit hit, int part, EntityProjectile ** shots);
+	void gotHit(float time, int part, EntityProjectile * projectile);
 
 public:
 	ChunkManager * cm;
@@ -62,8 +63,11 @@ public:
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
+	void checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,ChunkManager * cm);
+	float checkBox(DualPointer<Projectile> projectile,MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo,spacevec relPos);//valid hit from 0 to 1, otherwise -1
 	void checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm);
 
+	virtual void testHit(std::vector<ProjectileCollision> * collisions,DualPointer<Projectile> projectile,ChunkManager * cm);
 
 	virtual void push(spacevec amount);
 //	virtual spacevec getPos();

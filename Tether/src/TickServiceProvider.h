@@ -16,11 +16,13 @@ class TickServiceProvider;
 #include "ChunkManager.h"
 class InteractionManager;
 #include "InteractionManager.h"
+#include "Retickable.h"
 
 //provides services for tickable items
 class TickServiceProvider
 {
 	std::vector<InteractionManager *> interManVec;
+	std::vector<Retickable *> retickRequests;
 public:
 	int tickID=0;
 	virtual void spawnEntity(Entity * e)=0;//spawns Entity into World
@@ -32,6 +34,8 @@ public:
 
 	//initializes the next tick, call once before ticking everyone
 	void initNextTick();
+	void doReticks();
+	void requestRetick(Retickable * e);
 
 	TickServiceProvider();
 	virtual ~TickServiceProvider();

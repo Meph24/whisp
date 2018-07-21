@@ -19,8 +19,8 @@ public:
 	spacevec high;
 
 
-	static u64 intersectionCounter;
-	static u64 checkCounter;
+	static u64 intersectionCounter;//count number of intersections for debug/performance measurement purposes
+	static u64 checkCounter;//count number of checks for debug/performance measurement purposes
 
 	bool doesIntersect(AABB other);
 	bool doesIntersect(AABB * other);

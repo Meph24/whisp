@@ -23,7 +23,7 @@ public:
 	virtual ~Pushable();
 };
 
-#include "Entity.h"
 #include "TickServiceProvider.h"
+#include "Entity.h"
 
 #endif /* SRC_PUSHABLE_H_ */

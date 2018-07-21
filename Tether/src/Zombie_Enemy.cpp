@@ -6,6 +6,7 @@
 Zombie_Enemy::Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,ChunkManager * chm):
 tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitionAnim(0.5f,0,1)
 {
+	acceptedConversions=FLAG_HIT_TYPE_BULLET;
 	lastTick=spawnTime;
 	pos=cm->clip(startPos,true);
 	v=cm->fromMeters({0,0,0});
@@ -345,23 +346,15 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 
 	bb=AABB(pos,sizeBB);
 	registerPushCheck((Entity *)this,seconds,tsp);
+	registerHitCheck((Entity *)this,seconds,tsp);
 }
 
-void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)
+
+void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,ChunkManager* cm)
 {
-	spacevec relPos=pos-middleChunk;
-	vec3 relPosMeters=cm->toMeters(relPos);
-	bool proj=false;
-	for (int i = 0; i < ph->pCount[0]; i++)
-	{
-		if (ph->projectiles[i])
-		{
-			if(!ph->projectiles[i]->bb.doesIntersect(bb)) continue;
-			proj=true;
-		}
-	}
-	if(!proj) return;
-	std::cout<<"phase 2"<<std::endl;
+	DualPointer<Projectile> projConv=DualPointer<Projectile>((Entity *)projectile,(Projectile *)projectile);
+
+	spacevec middleChunk=cm->getMiddleChunk();
 	ml.loadIdentity();
 	ml.translatef(relPosMeters.x, relPosMeters.y, relPosMeters.z);
 	ml.rotatef(facing, 0, 1, 0);
@@ -381,15 +374,15 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 
 	ml.pushMatrix();//leg
 	int loc;
-	Zombie_Physics::hit h;
+	float hitTime;
 	loc = 1;
 	ml.translatef(0, 0.6f, loc * 0.1f);
 	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
-	if (h.projectileIndex != -1) gotHit(h, 4, ph->projectiles);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	gotHit(hitTime, 4, projectile);
 
 	ml.popMatrix();
 
@@ -401,8 +394,8 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
-	if (h.projectileIndex != -1) gotHit(h, 5, ph->projectiles);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	gotHit(hitTime, 5, projectile);
 
 	ml.popMatrix();
 	ml.popMatrix();
@@ -422,9 +415,8 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.scalef(2, 2, 2);
 	ml.rotatef(tilted, 1, 0, 0);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
-
-	if (h.projectileIndex != -1) gotHit(h, 0,ph->projectiles);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	gotHit(hitTime, 0, projectile);
 
 
 	ml.popMatrix();
@@ -434,8 +426,8 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.translatef(0, 0.6f, 0);
 	ml.scalef(1, 3, 2);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
-	if (h.projectileIndex != -1) gotHit(h, 1, ph->projectiles);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	gotHit(hitTime, 1, projectile);
 
 	ml.popMatrix();
 
@@ -449,8 +441,8 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
-	if (h.projectileIndex != -1) gotHit(h, 2, ph->projectiles);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	gotHit(hitTime, 2, projectile);
 
 	ml.popMatrix();
 
@@ -462,19 +454,88 @@ void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkM
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	h = ph->testHitbox(&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
-	if (h.projectileIndex != -1) gotHit(h, 3, ph->projectiles);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	gotHit(hitTime, 3, projectile);
 
 	ml.popMatrix();
 
 	ml.popMatrix();
-
-
 }
 
-void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,EntityProjectile ** shots)
+
+
+//TODO remove comment: old system
+void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)
 {
-	if (hit.projectileIndex == -1) return;
+	spacevec relPos=pos-middleChunk;
+	vec3 relPosMeters=cm->toMeters(relPos);
+
+	for (int i = 0; i < ph->pCount[0]; i++)
+	{
+		if (ph->projectiles[i])
+		{
+			if(ph->projectiles[i]->bb.doesIntersect(bb))
+			{
+				checkProjectile(ph->projectiles[i],relPosMeters,cm);
+			}
+		}
+	}
+}
+
+float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, float xFrom, float xTo, float yFrom,float yTo, float zFrom, float zTo, spacevec relPos)
+{
+	float ret=-1;
+	ml->pushMatrix();
+	ml->translatef(xFrom, yFrom, zFrom);
+	ml->scalef(xTo - xFrom, yTo - yFrom, zTo - zFrom);
+	mat4 matOut;
+	ml->invertMatrix(ml->curMatrix, matOut.mat);
+
+	vec3 p1 = matOut* (cm->toMeters(projectile.pIF->posOld-relPos));
+	vec3 p2 = matOut*(cm->toMeters(projectile.e->pos-relPos));
+	//projectile now relative to cube, where cube is at 0-1 on all 3 axis
+	float vx = p2.x - p1.x;//TODO check for 0
+	float vy = p2.y - p1.y;
+	float vz = p2.z - p1.z;
+	float x0 = -p1.x / vx;
+	float x1 = (1 - p1.x) / vx;
+	if (x1 < x0)
+	{
+		float temp = x0;
+		x0 = x1;
+		x1 = temp;
+	}
+	float y0 = -p1.y / vy;
+	float y1 = (1 - p1.y) / vy;
+	if (y1 < y0)
+	{
+		float temp = y0;
+		y0 = y1;
+		y1 = temp;
+	}
+	float z0 = -p1.z / vz;
+	float z1 = (1 - p1.z) / vz;
+	if (z1 < z0)
+	{
+		float temp = z0;
+		z0 = z1;
+		z1 = temp;
+	}
+	float minC = x0 > y0 ? x0 : y0;
+	minC = minC > z0 ? minC : z0;// max(x0, y0, z0);
+	float maxC = x1 < y1 ? x1 : y1;
+	maxC = maxC < z1 ? maxC : z1;// min(x1, y1, z1);
+	if ((minC<1)&&(maxC>0)&&(minC < maxC))
+	{
+		ret = minC;
+	}
+	ml->popMatrix();
+	return ret;
+}
+
+void Zombie_Enemy::gotHit(float time, int part, EntityProjectile * projectile)
+{
+	if(time==-1) return;//no hit
 	float dmgMult = 0;
 	//float armDmgMult = 0;
 	float legDmgMult = 0;
@@ -503,18 +564,147 @@ void Zombie_Enemy::gotHit(Zombie_Physics::hit hit, int part,EntityProjectile ** 
 		legDmgMult = 0.55f;
 		break;
 	}
-	legDmg+=legDmgMult*shots[hit.projectileIndex]->fromItem->damagePerJoule;//TODO replace with better logic once guns 2.0 work
-	remainingHP -= shots[hit.projectileIndex]->fromItem->damagePerJoule*dmgMult;
+	legDmg+=legDmgMult*projectile->fromItem->damagePerJoule;//TODO replace with better logic once guns 2.0 work
+	remainingHP -= projectile->fromItem->damagePerJoule*dmgMult;
 	if(remainingHP<0)
 	{
 		remainingHP=-totalHP*dmgMult;//TODO
 	}
-	shots[hit.projectileIndex]->pos.y.intpart -= 1000;
-	shots[hit.projectileIndex]->posOld.y.intpart -= 1000;
+	projectile->pos.y.intpart -= 1000;
+	projectile->posOld.y.intpart -= 1000;
 	if(legDmg>0.25f*totalHP)
 	{
 		speed/=2.5f;
 	}
+}
+
+//TODO remove comment: new system
+void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPointer<Projectile> projectile,ChunkManager * cm)
+{
+	spacevec middleChunk=cm->getMiddleChunk();
+	spacevec relPos=pos-middleChunk;
+	vec3 relPosMeters=cm->toMeters(relPos);
+	ml.loadIdentity();
+	ml.translatef(relPosMeters.x, relPosMeters.y, relPosMeters.z);
+	ml.rotatef(facing, 0, 1, 0);
+	ml.scalef(size, size, size);
+
+
+	ml.pushMatrix();
+	float animStrength=1;
+	if(legDmg>0.25f*totalHP)
+	{
+		ml.translatef(-0.25f*transitionAnim.getCurStep(0)*maxTransition,0.1f*transitionAnim.getCurStep(0)*maxTransition,0);
+		ml.rotatef(-90*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
+		animStrength=0.15f*transitionAnim.getCurStep(0)*maxTransition;
+	}
+
+	ml.pushMatrix();//leg
+	int loc;
+	float hitTime;
+	loc = 1;
+	ml.translatef(0, 0.6f, loc * 0.1f);
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
+	ml.translatef(0, -0.6f, 0);
+	ml.scalef(1, 3, 1);
+
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	if((hitTime>=0)&&(hitTime<=1))
+	{
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+	}
+
+	ml.popMatrix();
+
+
+	ml.pushMatrix();	//leg
+	loc = -1;
+	ml.translatef(0, 0.6f, loc * 0.1f);
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, 0, 0, 1);
+	ml.translatef(0, -0.6f, 0);
+	ml.scalef(1, 3, 1);
+
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	if((hitTime>=0)&&(hitTime<=1))
+	{
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+	}
+
+	ml.popMatrix();
+	ml.popMatrix();
+
+
+	ml.pushMatrix();
+
+	if(legDmg>0.25f*totalHP)
+	{
+		ml.translatef(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0);
+		ml.rotatef(-35*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
+	}
+
+	ml.pushMatrix();	//head
+
+	ml.translatef(0, 1.2f, 0);
+	ml.scalef(2, 2, 2);
+	ml.rotatef(tilted, 1, 0, 0);
+
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	if((hitTime>=0)&&(hitTime<=1))
+	{
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+	}
+
+
+	ml.popMatrix();
+
+
+	ml.pushMatrix();	//body
+	ml.translatef(0, 0.6f, 0);
+	ml.scalef(1, 3, 2);
+
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	if((hitTime>=0)&&(hitTime<=1))
+	{
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+	}
+
+	ml.popMatrix();
+
+
+
+	ml.pushMatrix();	//arm
+	loc = 1;
+
+	ml.translatef(0, 1.1f, loc * 0.3f);
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
+	ml.translatef(0, -0.6f, 0);
+	ml.scalef(1, 3, 1);
+
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	if((hitTime>=0)&&(hitTime<=1))
+	{
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+	}
+
+	ml.popMatrix();
+
+	ml.pushMatrix();	//arm
+	loc = -1;
+
+	ml.translatef(0, 1.1f, loc * 0.3f);
+	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);
+	ml.translatef(0, -0.6f, 0);
+	ml.scalef(1, 3, 1);
+
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	if((hitTime>=0)&&(hitTime<=1))
+	{
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+	}
+
+	ml.popMatrix();
+
+	ml.popMatrix();
 }
 
 void Zombie_Enemy::push(spacevec amount)

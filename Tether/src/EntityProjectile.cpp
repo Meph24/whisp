@@ -14,8 +14,10 @@ ITexture * EntityProjectile::tex=new TextureDummy();
 
 
 EntityProjectile::EntityProjectile(Timestamp spawnTime,ItemAmmo * item,spacevec position,spacevec velocity):
-fromItem(item),posOld(position)
+fromItem(item)
 {
+	type=FLAG_HIT_TYPE_BULLET;
+	posOld=position;
 	lastTick=spawnTime;
 	pos=position;
 	v=velocity;
@@ -109,7 +111,7 @@ void EntityProjectile::tick(Timestamp t, TickServiceProvider* tsp)
 		size.z.intpart=0;
 		bb=AABB(posOld,size,pos-posOld);
 	}
-
+	registerHitCheck((Entity *)this,time,tsp);
 }
 
 void EntityProjectile::setTexture(ITexture* texture)

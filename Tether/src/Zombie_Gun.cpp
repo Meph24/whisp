@@ -49,8 +49,8 @@ EntityProjectile * Zombie_Gun::tryShoot(Timestamp replaceThisTimestamp,ICamera3D
 	ml.rotatef(-cam->alpha, 1, 0, 0);
 	ml.rotatef(-cam->gamma, 0, 0, 1);
 
-	float maxSpreadX=1/60.0f;//TODO remove, test only
-	float maxSpreadY=1/60.0f;//TODO remove, test only
+	float maxSpreadX=0.5f/60.0f;//9.5f;//1/60.0f;//TODO properly implement
+	float maxSpreadY=0.5f/60.0f;//9.5f;//1/60.0f;//TODO remove, test only
 	float greater=maxSpreadX>maxSpreadY?maxSpreadX:maxSpreadY;
 	if(greater!=0)
 		ml.scalef(maxSpreadX/greater,maxSpreadY/greater,1);//allow horizontal spread to be different to vertical

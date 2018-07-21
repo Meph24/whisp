@@ -258,9 +258,8 @@ void Zombie_World::loadStandardTex()
 
 void Zombie_World::doPhysics(float sec,Timestamp t)
 {
-	AABB::intersectionCounter=0;
-	AABB::checkCounter=0;
-	spacevec mid=cm->getMiddleChunk();
+	initNextTick();
+//	spacevec mid=cm->getMiddleChunk();
 	player->tick(t,this);
 	hitmark -= sec * 10;
 	if (hitmark < 0) hitmark = 0;
@@ -286,24 +285,24 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 //	std::cout<<"check counter: "<<AABB::checkCounter<<std::endl;
 //	cm->registerCollisionCheck(DualPointer<Pushable>(player,player),sec,this);
 	pm->registerTime(timestep++);
-#pragma omp parallel for schedule(dynamic, 1)
-	for (int i = 0; i < zCount; i++)
-	{
-		if (zombies[i])
-		{
-			if (zombies[i]->remainingHP>0)
-			{
-				float hp = zombies[i]->remainingHP;
-				zombies[i]->checkHitboxes(physics,mid,cm);
-				if (hp - (zombies[i]->remainingHP))
-				{
-					hitmark = 1;
-				}
-				int scoreplus= hp-(zombies[i]->remainingHP);
-				score +=scoreplus;
-			}
-		}
-	}
+//#pragma omp parallel for schedule(dynamic, 1)
+//	for (int i = 0; i < zCount; i++)
+//	{
+//		if (zombies[i])
+//		{
+//			if (zombies[i]->remainingHP>0)
+//			{
+//				float hp = zombies[i]->remainingHP;
+//				zombies[i]->checkHitboxes(physics,mid,cm);
+//				if (hp - (zombies[i]->remainingHP))
+//				{
+//					hitmark = 1;
+//				}
+//				int scoreplus= hp-(zombies[i]->remainingHP);
+//				score +=scoreplus;
+//			}
+//		}
+//	}
 	pm->registerTime(timestep++);
 
 
@@ -319,7 +318,7 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 			shots[i]->tick(t,this);
 		}
 	}
-
+	doReticks();
 
 }
 
@@ -518,6 +517,31 @@ void Zombie_World::requestDestroy(Entity* e)
 	}
 	else
 	{
-		std::cout<<"requestDestroy got called with invalid entityIndex"<<std::endl;
+		bool found=false;
+		for (int i = 0; i < pCount; i++)
+		{
+			if ((Entity *)shots[i] == e)
+			{
+				delete shots[i];
+				shots[i] = 0;
+				found=true;
+				break;
+			}
+		}
+		if(!found)
+		for (int i = 0; i < zCount; i++)
+		{
+			if ((Entity *)zombies[i] == e)
+			{
+				delete zombies[i];
+				zombies[i] = 0;
+				found=true;
+				break;
+			}
+		}
+		if(found)
+			std::cout<<"requestDestroy got called with other entity pointer, was found later"<<std::endl;
+		else
+			std::cout<<"requestDestroy got called with invalid entity pointer:"<<std::endl;
 	}
 }
