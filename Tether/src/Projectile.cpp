@@ -78,11 +78,13 @@ void Projectile::retick(TickServiceProvider* tsp)
 	collisions.clear();
 }
 
+#include "WarnErrReporter.h"
 void Projectile::registerHitCheck(Entity* e, float seconds,TickServiceProvider* tsp)
 {
 	std::vector<InteractionManager *> * vec = tsp->getInterManVector();
 	tsp->getChunkManager()->giveInteractionManagers(e,vec,tsp);
 	int size=vec->size();
+	if(size<=0) WarnErrReporter::notInitializedErr("no chunks found in interManVec: uninitialized chunk?");
 	for(int i=0;i<size;i++)
 	{
 		(*vec)[i]->collide.registerInteractionCheck(this,e,seconds,tsp);

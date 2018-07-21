@@ -204,7 +204,6 @@ inline float Chunk::getH(int xh, int yh)
 
 void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 {
-	interMan->resetAll();//TODO move
 //	group->registered.clear();
 }
 

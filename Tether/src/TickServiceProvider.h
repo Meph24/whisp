@@ -10,13 +10,11 @@
 #define SRC_TICKSERVICEPROVIDER_H_
 
 class Entity;
-class TickServiceProvider;
-#include "Entity.h"
 #include "ICamera3D.h"
-#include "ChunkManager.h"
+class ChunkManager;
 class InteractionManager;
-#include "InteractionManager.h"
 #include "Retickable.h"
+#include <vector>
 
 //provides services for tickable items
 class TickServiceProvider
@@ -40,5 +38,9 @@ public:
 	TickServiceProvider();
 	virtual ~TickServiceProvider();
 };
+
+#include "ChunkManager.h"
+#include "Entity.h"
+#include "InteractionManager.h"
 
 #endif /* SRC_TICKSERVICEPROVIDER_H_ */

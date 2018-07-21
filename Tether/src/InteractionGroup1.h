@@ -47,8 +47,13 @@ inline void InteractionGroup1<PhysicsIF>::check(DualPointer<PhysicsIF> e,DualPoi
 	//double code starts here, see InteractionGroup2
 	if(tsp->tickID!=e.e->lastTickID)
 	{
-		reset();
+		e.e->reset();
 		e.e->lastTickID=tsp->tickID;
+	}
+	if(tsp->tickID!=r.e->lastTickID)
+	{
+		r.e->reset();
+		r.e->lastTickID=tsp->tickID;
 	}
 	if(!e.e->bb.doesIntersect(r.e->bb)) return;
 	AABB::intersectionCounter++;
@@ -60,7 +65,7 @@ inline void InteractionGroup1<PhysicsIF>::check(DualPointer<PhysicsIF> e,DualPoi
 			if((void *)r.pIF==e.e->alreadyChecked[i]) return;
 		}
 		e.e->alreadyChecked.push_back((void *)r.pIF);
-		r.pIF->alreadyChecked.push_back((void *)e.pIF);
+		r.e->alreadyChecked.push_back((void *)e.pIF);
 	}
 	//double code ends here
 	e.pIF->interact(e.e,r,time,tsp);

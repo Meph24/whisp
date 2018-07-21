@@ -55,6 +55,7 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(Slave
 	registerInteractionCheck(DualPointer<SlaveIF>(e,pIF),time,tsp);
 }
 
+
 template<typename MasterIF, typename SlaveIF>
 inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualPointer<SlaveIF> e, float time, TickServiceProvider* tsp)
 {
@@ -67,14 +68,21 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualP
 	secondCalled.push_back(e);
 }
 
+
 template<typename MasterIF, typename SlaveIF>
 inline void InteractionGroup2<MasterIF, SlaveIF>::check(DualPointer<MasterIF> f, DualPointer<SlaveIF> s, float time,TickServiceProvider* tsp)
 {
 	//double code starts here, see InteractionGroup1
+	//TODO simplify for InteractionGroup2
 	if(tsp->tickID!=f.e->lastTickID)
 	{
-		reset();
+		f.e->reset();
 		f.e->lastTickID=tsp->tickID;
+	}
+	if(tsp->tickID!=s.e->lastTickID)
+	{
+		s.e->reset();
+		s.e->lastTickID=tsp->tickID;
 	}
 	if(!f.e->bb.doesIntersect(s.e->bb)) return;
 	AABB::intersectionCounter++;
@@ -86,7 +94,7 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::check(DualPointer<MasterIF> f,
 			if((void *)s.pIF==f.e->alreadyChecked[i]) return;
 		}
 		f.e->alreadyChecked.push_back((void *)s.pIF);
-		s.pIF->alreadyChecked.push_back((void *)f.pIF);
+		s.e->alreadyChecked.push_back((void *)f.pIF);
 	}
 	//double code ends here
 	f.pIF->interact(f.e,s,time,tsp);
