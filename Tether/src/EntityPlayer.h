@@ -16,7 +16,6 @@ class Zombie_MouseInput;
 #include "Zombie_MouseInput.h"
 class Zombie_KeyInput;
 #include "Zombie_KeyInput.h"
-#include "Zombie_Physics.h"
 #include <SFML/Window.hpp>
 #include "SpeedMod.h"
 

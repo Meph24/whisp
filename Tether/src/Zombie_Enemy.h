@@ -4,12 +4,12 @@
 
 #include "SpeedMod.h"
 #include "ITexture.h"
-#include "Zombie_Physics.h"
 #include "ChunkManager.h"
 #include "Entity.h"
 #include "Pushable.h"
 #include "AnimationCycle.h"
 #include "Hittable.h"
+#include "EntityProjectile.h"
 
 class Zombie_Enemy: public Entity,public Pushable,public Hittable
 {
@@ -65,7 +65,7 @@ public:
 
 	void checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,ChunkManager * cm);
 	float checkBox(DualPointer<Projectile> projectile,MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo,spacevec relPos);//valid hit from 0 to 1, otherwise -1
-	void checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm);
+
 
 	virtual void testHit(std::vector<ProjectileCollision> * collisions,DualPointer<Projectile> projectile,ChunkManager * cm);
 

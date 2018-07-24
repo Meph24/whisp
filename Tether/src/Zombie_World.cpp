@@ -32,12 +32,6 @@ Zombie_World::Zombie_World(sf::Window * w):
 	{
 		zombies[i] = 0;
 	}
-	pCount = 1024;//TODO
-	shots = new EntityProjectile *[pCount];
-	for (int i = 0; i < pCount; i++)
-	{
-		shots[i] = 0;
-	}
 	wCount = 5;
 	guns = new Zombie_Gun * [wCount];
 
@@ -64,10 +58,6 @@ Zombie_World::Zombie_World(sf::Window * w):
 	keyInput = player->keyInp;
 	mouseInput = player->mouseInp;
 
-	physics = new Zombie_Physics(zCount * 2);
-	physics->cm=cm;//TODO implement cleaner solution
-	physics->pCount = &pCount;
-	physics->projectiles = shots;
 	ds=new DebugScreen(pm,&g);
 	pm->setName("       Total time",-1);
 	pm->setName("        flush etc",0);
@@ -95,14 +85,7 @@ void Zombie_World::restart()
 	}
 	player->HP = player->maxHP;
 	score = 0;
-	for (int i = 0; i < pCount; i++)
-	{
-		if (shots[i])
-		{
-			shots[i]->pos.y = cm->fromMeters(-1000);
-			shots[i]->posOld.y =cm->fromMeters(-1000);
-		}
-	}
+	//TODO clean chunks
 }
 
 
@@ -110,14 +93,12 @@ Zombie_World::~Zombie_World()
 {
 	//missing deletes (one-time tier 1 code, so who cares)
 	delete ds;
-	delete physics;
 	delete zombieTex;
 	delete tps;
 	delete pm;
 	delete adQ;
 	delete player;
 	delete[] zombies;
-	delete[] shots;
 }
 void Zombie_World::removeZombie(int zid)
 {
@@ -159,16 +140,6 @@ void Zombie_World::render(float seconds,Timestamp t)
 			zombies[i]->draw(t,viewFrustum,cm,this);//TODO
 		}
 	}
-	glEnable(GL_TEXTURE_2D);
-	for (int i = 0; i < pCount; i++)
-	{
-		if (shots[i])
-		{
-			shots[i]->draw(t,viewFrustum,cm,this);//TODO
-		}
-	}
-	glDisable(GL_TEXTURE_2D);
-
 
 	glPushMatrix();
 	glDisable(GL_DEPTH_TEST);
@@ -308,14 +279,6 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 	cm->tick(t,this);
 	pm->registerTime(timestep++);
 
-	for (int i = 0; i < pCount; i++)
-	{
-		if (shots[i])
-		{
-//			entityIndex=i;
-			shots[i]->tick(t,this);
-		}
-	}
 	pm->registerTime(timestep++);
 	doReticks();
 	pm->registerTime(timestep++);
@@ -331,6 +294,7 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 		destroy(toDelete[i]);
 	}
 	toDelete.clear();
+	cm->applyEntityChunkChanges();
 }
 
 void Zombie_World::loop()
@@ -381,19 +345,8 @@ void Zombie_World::loop()
 		cm->setMid(player->pos);
 
 
-		int index = -1;
-		for (int i = 0; i < pCount; i++)
-		{
-			if (!shots[i])
-			{
-				index = i;
-				break;
-			}
-		}
-		if(index!=-1)
-		{
-			shots[index] = guns[currentGun]->tick(replaceThisTimestamp,sec,player->cam,player,shot,cm);
-		}
+		guns[currentGun]->tick(replaceThisTimestamp,sec,player->cam,player,shot,cm);
+
 		pm->registerTime(timestep++);
 		for(int i=0;i<40;i++)
 			if (sec*4> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
@@ -431,17 +384,7 @@ void Zombie_World::trigger(bool pulled)
 		guns[currentGun]->stopShooting();
 		return;
 	}
-	int index = -1;
-	for (int i = 0; i < pCount; i++)
-	{
-		if (!shots[i])
-		{
-			index = i;
-			break;
-		}
-	}
-	if(index==-1) return;
-	shots[index] = guns[currentGun]->tryShoot(replaceThisTimestamp,player->cam,player,shot,cm);
+	guns[currentGun]->tryShoot(replaceThisTimestamp,player->cam,player,shot,cm);
 }
 
 void Zombie_World::switchWeapon(int dir)
@@ -501,17 +444,7 @@ Entity* Zombie_World::getTarget(Entity* me)
 void Zombie_World::destroy(Entity* e)
 {
 	bool found=false;
-	for (int i = 0; i < pCount; i++)
-	{
-		if ((Entity *)shots[i] == e)
-		{
-			delete shots[i];
-			shots[i] = 0;
-			found=true;
-			break;
-		}
-	}
-	if(!found)
+
 	for (int i = 0; i < zCount; i++)
 	{
 		if ((Entity *)zombies[i] == e)
@@ -550,38 +483,4 @@ ChunkManager* Zombie_World::getChunkManager()
 void Zombie_World::requestDestroy(Entity* e)
 {
 	toDelete.push_back(e);
-//	if(((Entity *)shots[entityIndex])==e)
-//	{
-//		delete shots[entityIndex];
-//		shots[entityIndex] = 0;
-//	}
-//	else
-//	{
-//		bool found=false;
-//		for (int i = 0; i < pCount; i++)
-//		{
-//			if ((Entity *)shots[i] == e)
-//			{
-//				delete shots[i];
-//				shots[i] = 0;
-//				found=true;
-//				break;
-//			}
-//		}
-//		if(!found)
-//		for (int i = 0; i < zCount; i++)
-//		{
-//			if ((Entity *)zombies[i] == e)
-//			{
-//				delete zombies[i];
-//				zombies[i] = 0;
-//				found=true;
-//				break;
-//			}
-//		}
-//		if(found)
-//			std::cout<<"requestDestroy got called with other entity pointer, was found later"<<std::endl;
-//		else
-//			std::cout<<"requestDestroy got called with invalid entity pointer:"<<std::endl;
-//	}
 }

@@ -20,6 +20,18 @@ class Frustum;
 #include <vector>
 #include "InteractionManager.h"
 
+struct chunkChange
+{
+	Entity * e;
+	spacevec loc;
+};
+
+struct chunkSearchResult
+{
+	int chunkIndex;
+	int vectorIndex;
+};
+
 class ChunkManager: public Tickable
 {
 	int chunkSize;//size of one chunk
@@ -37,24 +49,40 @@ class ChunkManager: public Tickable
 
 	spacelen gravity;
 
+	std::vector<chunkChange> addVec;//the entities that should be added to chunk[loc] soon
+	std::vector<chunkChange> removeVec;//the entities that should be removed from chunk[loc] soon (without deleting)
+	std::vector<chunkChange> deleteVec;//the entities that should be removed from chunk[loc] soon (with deleting)
+
+	int getIndxOrNeg1(spacevec abs);
 	int getIndx(spacevec abs);
 	int getIndx(chunkNum cx,chunkNum cz);//from absolute chunk coordinates
 	int getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ);//from absolute chunk coordinates
+	chunkSearchResult chunkSearch(Entity * e,int chunkIndx);//index -1=not found
 public:
 
+	//magic, do not use yourself:
+
 	spacevec activeChunk;//TODO debug only, remove after debugging
+	void tick(Timestamp t,TickServiceProvider * tsp);
+	void render(float lodQ,Frustum * viewFrustum, spacevec camOffset);//TODO drawable
+	void generateMissing(int count);
+	spacevec getWind(spacevec abs);
+	void applyEntityChunkChanges();//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
+	void setMid(spacevec abs);//absolute x,z
+
+	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
+	~ChunkManager();
+
+
+
+	//the interface: you can safely use these:
 
 	bool isValid(chunkNum cx,chunkNum cz);
 	float getChunkSize();
 	spacevec clip(spacevec pos,bool forceGround);
 	bool hitsGround(spacevec startpoint,spacevec endpoint);
 	spacelen getGravity();
-	void tick(Timestamp t,TickServiceProvider * tsp);
-	spacevec getWind(spacevec abs);
-	void generateMissing(int count);
-	void setMid(spacevec abs);//absolute x,z
 	spacelen getHeight(spacevec abs);//absolute x,z
-	void render(float lodQ,Frustum * viewFrustum, spacevec camOffset);//TODO drawable
 	flt toMeters(spacelen l);
 	vec3 toMeters(spacevec v);
 	spacelen fromMeters(flt l);
@@ -63,10 +91,16 @@ public:
 
 	void giveInteractionManagers(Entity * e,std::vector<InteractionManager *> * managers,TickServiceProvider * tsp);
 
-//	void registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp);
 
-	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
-	~ChunkManager();
+	void requestEntitySpawn(Entity * e);
+	void requestEntityDelete(Entity * e);
+	void requestEntityMove(Entity * e);
+
+	//search results are only valid right after acquisition
+	chunkSearchResult dumbSearch(Entity * e);//index -1=not found
+	chunkSearchResult smartSearch(Entity * e,spacevec pos);//index -1=not found
+	chunkSearchResult trySmartSearch(Entity * e,spacevec pos,bool reportWarn);//uses dumb search and report warning (if reportWarn), if not found with smart search; index -1=not found
+
 };
 
 #endif /* SRC_CHUNKMANAGER_H_ */

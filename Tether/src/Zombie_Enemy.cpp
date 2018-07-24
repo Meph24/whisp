@@ -282,7 +282,11 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	if(legDmg>0.25f*totalHP)
 		transitionAnim.update(seconds);
 	if(remainingHP<=0) fallAnim.update(seconds);
-	if(fallAnim.getCurStep(0)>=1) this->requestDestroy(tsp);
+	if(fallAnim.getCurStep(0)>=1)
+	{
+		exists=false;//TODO convert to new entity management
+		tsp->requestDestroy(this);
+	}
 	ChunkManager * cm=tsp->getChunkManager();
 	spacelen characterHeightConv=cm->fromMeters(size*2);
 
@@ -473,24 +477,6 @@ void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMete
 
 
 
-//TODO remove comment: old system
-void Zombie_Enemy::checkHitboxes(Zombie_Physics * ph,spacevec middleChunk,ChunkManager * cm)
-{
-//	spacevec relPos=pos-middleChunk;
-//	vec3 relPosMeters=cm->toMeters(relPos);
-//
-//	for (int i = 0; i < ph->pCount[0]; i++)
-//	{
-//		if (ph->projectiles[i])
-//		{
-//			if(ph->projectiles[i]->bb.doesIntersect(bb))
-//			{
-//				checkProjectile(ph->projectiles[i],relPosMeters,cm);
-//			}
-//		}
-//	}
-}
-
 float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, float xFrom, float xTo, float yFrom,float yTo, float zFrom, float zTo, spacevec relPos)
 {
 	float ret=-1;
@@ -584,7 +570,6 @@ void Zombie_Enemy::gotHit(float time, int part, EntityProjectile * projectile)
 	}
 }
 
-//TODO remove comment: new system
 void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPointer<Projectile> projectile,ChunkManager * cm)
 {
 	spacevec middleChunk=cm->getMiddleChunk();

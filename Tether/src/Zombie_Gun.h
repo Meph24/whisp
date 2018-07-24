@@ -41,8 +41,8 @@ public:
 
 	Zombie_Gun(std::string weaponName,float ReloadTime,const std::string& filename,float pitchModifier,ItemAmmo * pType,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread);
 	~Zombie_Gun();
-	EntityProjectile * tryShoot(Timestamp replaceThisTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm);
-	EntityProjectile * tick(Timestamp replaceThisTimestamp,float sec,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm);//TODO tsp
+	void tryShoot(Timestamp replaceThisTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm);
+	void tick(Timestamp replaceThisTimestamp,float sec,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm);//TODO tsp
 	void stopShooting();
 };
 

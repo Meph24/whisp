@@ -4,7 +4,6 @@
 #include <SFML/Window.hpp>
 #include "PerformanceMeter.h"
 #include "TextureStatic2D.h"
-#include "Zombie_Physics.h"
 #include "EntityProjectile.h"
 #include "EntityPlayer.h"
 #include "Graphics2D.h"
@@ -28,7 +27,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int wCount;
 
 	Zombie_Enemy ** zombies;
-	EntityProjectile ** shots;
 	PerformanceMeter * pm;
 	DebugScreen * ds;
 	Graphics2D * g;
@@ -41,7 +39,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	
 
 
-	Zombie_Physics * physics;
 	ChunkManager * cm;
 
 	ITexture * zombieTex;

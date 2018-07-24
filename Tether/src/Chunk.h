@@ -33,21 +33,17 @@ class Chunk: public Tickable //TODO Drawable?
 	//GLuint bufID;
 	ChunkManager * parent;
 
-//	InteractionGroup1<Pushable> * group;
-
-
-	std::vector<Entity *> managedEntities;//must be ticked by this chunk, usually entities that are located in this chunk (with a few exceptions)
 
 	inline float getH(int x,int y);//inside chunk grid
 public:
+	std::vector<Entity *> managedEntities;//must be ticked by this chunk, usually entities that are located in this chunk (with a few exceptions)
+
 	int lastTickID=0;
 	InteractionManager * interMan;
 	AABB bb;
 	void tick(Timestamp t,TickServiceProvider * tsp);
 	spacelen getHeight(flt x,flt z);//coordinates inside chunk
 	void render(int lod,spacevec camOffset);
-
-	void registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp);
 
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1
 	~Chunk();

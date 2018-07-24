@@ -90,7 +90,11 @@ void EntityProjectile::tick(Timestamp t, TickServiceProvider* tsp)
 
 	ChunkManager * cm=tsp->getChunkManager();
 	spacelen gravity=cm->getGravity();
-	bool destroy = cm->hitsGround(posOld,pos);
+	if(cm->hitsGround(posOld,pos))
+	{
+		requestDestroy(cm);
+		return;
+	}
 
 	posOld = pos;
 	spacevec vOld=v;
@@ -99,19 +103,17 @@ void EntityProjectile::tick(Timestamp t, TickServiceProvider* tsp)
 	double drag=spd*fromItem->drag;
 	v*=(1-drag*time);//TODO find exact or at least time-consistent solution (current solution behaves very wrong with high resistance values and is tickrate-dependent)
 	pos+=(v+vOld)*time*0.5f;
-	if(destroy) requestDestroy(tsp);
-	else
-	{
-		spacevec size;
-		size.x.floatpart=0;
-		size.y.floatpart=0;
-		size.z.floatpart=0;
-		size.x.intpart=0;
-		size.y.intpart=0;
-		size.z.intpart=0;
-		bb=AABB(posOld,size,pos-posOld);
-	}
+
+	spacevec size;
+	size.x.floatpart=0;
+	size.y.floatpart=0;
+	size.z.floatpart=0;
+	size.x.intpart=0;
+	size.y.intpart=0;
+	size.z.intpart=0;
+	bb=AABB(posOld,size,pos-posOld);
 	registerHitCheck((Entity *)this,time,tsp);
+
 }
 
 void EntityProjectile::setTexture(ITexture* texture)

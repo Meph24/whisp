@@ -22,7 +22,12 @@ public:
 	static void notInitializedErr(std::string text);
 	static void noOverrideErr(std::string text);
 	static void doubleErr(std::string text);
-	static void noEffectErr(std::string text);
+	static void noEffectErr(std::string text);//despite expected effect
+	static void notFoundWhereBelongsErr(std::string text);
+	static void notFoundErr(std::string text);
+	static void outsideWorldErr(std::string text);
+
+
 
 	//hard errors (requires crash and extensive log)
 	//TODO

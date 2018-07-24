@@ -11,10 +11,10 @@
 Entity::Entity()
 {}
 
-void Entity::requestDestroy(TickServiceProvider* tsp)
+void Entity::requestDestroy(ChunkManager * cm)
 {
 	exists=false;
-	tsp->requestDestroy(this);
+	cm->requestEntityDelete(this);
 }
 
 //bool Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)

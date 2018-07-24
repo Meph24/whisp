@@ -27,9 +27,10 @@ class Entity: public Tickable, Drawable
 public:
 	AABB bb;
 
-	EntityIdent ID;
+//	EntityIdent ID;
 
 	spacevec pos;
+	spacevec residentPos;//position that dictates in what chunk this entity belongs, do not touch, managed by chunk/chunkMagager
 	spacevec v;
 
 	Timestamp lastTick;//used for timing
@@ -65,7 +66,7 @@ public:
 	 * 4. delete / spawn
 	 */
 
-	void requestDestroy(TickServiceProvider * tsp);
+	void requestDestroy(ChunkManager * cm);
 	void reset();
 
 //	bool doAABBcheck(Entity * other, float time,TickServiceProvider* tsp);

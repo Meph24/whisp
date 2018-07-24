@@ -23,14 +23,14 @@ Zombie_Gun::~Zombie_Gun()
 #include <iostream>
 #include "MatrixLib2.h"
 #define recoilDampeningTime 0.5f
-EntityProjectile * Zombie_Gun::tryShoot(Timestamp replaceThisTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
+void Zombie_Gun::tryShoot(Timestamp replaceThisTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
 {
 	trigger=true;
 	if (timer <= 0)
 	{
 		timer = rld;
 	}
-	else return 0;
+	else return;
 
 	sounds[curSound]->play();
 	sounds[curSound]->setPitch(pitch*((rand()%16)/256.0f+1));
@@ -67,10 +67,10 @@ EntityProjectile * Zombie_Gun::tryShoot(Timestamp replaceThisTimestamp,ICamera3D
 	vec3 rand={(float)nm.GetValue(noiseTimer,0,0),(float)nm.GetValue(noiseTimer,0,55),0};
 	vec3 recoilRand=recoilSpread*rand;
 	recoilM.registerRecoil(recoil,recoilRand,{0,0,0});
-	return zp;
+	cm->requestEntitySpawn((Entity *)zp);
 }
 
-EntityProjectile * Zombie_Gun::tick(Timestamp replaceThisTimestamp,float sec,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
+void Zombie_Gun::tick(Timestamp replaceThisTimestamp,float sec,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
 {
 	vec3 recoilMod=recoilM.getRecoilDiff(sec);
 	cam->alpha-=recoilMod.x;
@@ -87,11 +87,9 @@ EntityProjectile * Zombie_Gun::tick(Timestamp replaceThisTimestamp,float sec,ICa
 	{
 		if(trigger)
 		{
-			EntityProjectile * zp=tryShoot(replaceThisTimestamp,cam,player,tex, cm);
-			return zp;
+			tryShoot(replaceThisTimestamp,cam,player,tex, cm);
 		}
 	}
-	return 0;
 }
 
 void Zombie_Gun::stopShooting()

@@ -28,7 +28,7 @@ spacelen Chunk::getHeight(flt xh, flt zh)
 }
 #include <iostream>
 #include <cmath>
-void Chunk::render(int lod,spacevec camOffset)
+void Chunk::render(int lod,spacevec camOffset)//TODO draw entities
 {
 	//std::cout<<"rendering x="<<x<<" y="<<y<<std::endl;
 	vec3 relpos=parent->toMeters(base-camOffset);
@@ -61,7 +61,6 @@ void Chunk::render(int lod,spacevec camOffset)
 
 	if(lod==1)
 	{
-
 		for(int myZ = 0 ; myZ<smallSize ; myZ++)
 		{
 			for(int myX = 0 ; myX<smallSize; myX++)
@@ -204,18 +203,17 @@ inline float Chunk::getH(int xh, int yh)
 
 void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 {
-//	group->registered.clear();
+	int size=managedEntities.size();
+	for(int i=0;i<size;i++)
+	{
+		managedEntities[i]->tick(t,tsp);
+	}
 }
 
-void Chunk::registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp)
-{
-//	group->registerInteractionCheck(e, time, tsp);
-}
 
 Chunk::~Chunk()
 {
 	delete height;
 	delete interMan;
-//	delete group;
 }
 

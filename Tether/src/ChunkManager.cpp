@@ -8,6 +8,7 @@
 
 #include "ChunkManager.h"
 
+
 ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir):
 chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
@@ -343,6 +344,184 @@ void ChunkManager::giveInteractionManagers(Entity* e,std::vector<InteractionMana
 			}
 		}
 	}
+}
+#include "WarnErrReporter.h"
+void ChunkManager::applyEntityChunkChanges()
+{
+	int size=deleteVec.size();
+	for(int i=0;i<size;i++)
+	{
+		chunkChange c=deleteVec[i];
+		chunkSearchResult res=trySmartSearch(c.e,c.loc,true);
+		if(res.chunkIndex==-1)
+		{
+			WarnErrReporter::notFoundErr("entity was not found, deleting it anyway...");
+			delete c.e;//TODO
+		}
+		else
+		{
+			Chunk * myChunk=chunks[res.chunkIndex];
+			if(c.e!=myChunk->managedEntities[res.vectorIndex])
+			{
+				WarnErrReporter::notFoundErr("entity was not where search results indicate, deleting it anyway...");
+				delete c.e;
+				continue;
+			}
+			int size=myChunk->managedEntities.size();
+			if(size-1==res.vectorIndex)
+			{
+				myChunk->managedEntities.pop_back();
+				delete c.e;
+			}
+			else
+			{
+				myChunk->managedEntities[res.vectorIndex]=myChunk->managedEntities[size-1];
+				myChunk->managedEntities.pop_back();
+				delete c.e;
+			}
+		}
+	}
+	deleteVec.clear();
+	size=addVec.size();
+	for(int i=0;i<size;i++)
+	{
+		chunkChange c=addVec[i];
+		int indx=getIndxOrNeg1(c.loc);
+		if(indx==-1)
+		{
+			WarnErrReporter::outsideWorldErr("someone tried to spawn entity outside of the world, deleting it...");
+			delete c.e;
+			continue;
+		}
+		if(!chunks[indx])
+		{
+			//TODO generate chunks smarter
+			while(!chunks[indx]) generateMissing(10);
+		}
+		chunks[indx]->managedEntities.push_back(c.e);
+		c.e->residentPos=c.loc;
+	}
+	addVec.clear();
+	size=removeVec.size();
+	for(int i=0;i<size;i++)
+	{
+		chunkChange c=removeVec[i];
+		chunkSearchResult res=trySmartSearch(c.e,c.loc,true);
+		if(res.chunkIndex==-1)
+		{
+			WarnErrReporter::notFoundErr("entity to remove could not be found, doing nothing...");
+		}
+		else
+		{
+			Chunk * myChunk=chunks[res.chunkIndex];
+			if(c.e!=myChunk->managedEntities[res.vectorIndex])
+			{
+				WarnErrReporter::notFoundErr("entity was not where search results indicate, doing nothing...");
+				continue;
+			}
+			int size=myChunk->managedEntities.size();
+			if(size-1==res.vectorIndex)
+			{
+				myChunk->managedEntities.pop_back();
+			}
+			else
+			{
+				myChunk->managedEntities[res.vectorIndex]=myChunk->managedEntities[size-1];
+				myChunk->managedEntities.pop_back();
+			}
+		}
+	}
+	removeVec.clear();
+}
+
+void ChunkManager::requestEntitySpawn(Entity* e)
+{
+	addVec.push_back({e,e->pos});//capture the position in this exact moment as the insert location
+}
+
+void ChunkManager::requestEntityDelete(Entity* e)
+{
+	deleteVec.push_back({e,e->residentPos});
+}
+
+void ChunkManager::requestEntityMove(Entity* e)
+{
+	addVec.push_back({e,e->pos});//capture the position in this exact moment as the new chunk location
+	removeVec.push_back({e,e->residentPos});
+}
+
+int ChunkManager::getIndxOrNeg1(spacevec abs)
+{
+	chunkNum x=abs.x.intpart;
+	chunkNum z=abs.z.intpart;
+	if(isValid(x,z)) return getIndx(x,z);
+	else return -1;
+}
+
+chunkSearchResult ChunkManager::dumbSearch(Entity* e)
+{
+	chunkSearchResult result;
+	result.chunkIndex=-1;
+	result.vectorIndex=-1;
+	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
+	{
+		result=chunkSearch(e,i);
+		if(result.chunkIndex!=-1)
+		{
+			return result;
+		}
+	}
+	return result;
+}
+
+chunkSearchResult ChunkManager::smartSearch(Entity* e, spacevec pos)
+{
+	chunkSearchResult ret;
+	ret.chunkIndex=getIndxOrNeg1(pos);
+	if(ret.chunkIndex==-1)
+	{
+		ret.vectorIndex=-1;
+		return ret;
+	}
+	return chunkSearch(e,ret.chunkIndex);
+}
+
+chunkSearchResult ChunkManager::trySmartSearch(Entity* e, spacevec pos,bool reportWarn)
+{
+	chunkSearchResult result=smartSearch(e,pos);
+	if(result.chunkIndex!=-1) return result;
+	result=dumbSearch(e);
+	if(reportWarn)
+	{
+		if(result.chunkIndex==-1) WarnErrReporter::notFoundErr("Entity not found");
+		else WarnErrReporter::notFoundWhereBelongsErr("Entity not found at stated location");
+	}
+	return result;
+}
+
+chunkSearchResult ChunkManager::chunkSearch(Entity* e, int chunkIndx)
+{
+	chunkSearchResult ret;
+	if(!chunks[chunkIndx])
+	{
+		ret.chunkIndex=-1;
+		ret.vectorIndex=-1;
+		return ret;
+	}
+	std::vector<Entity *> * myVec=&(chunks[chunkIndx]->managedEntities);
+	int size=myVec->size();
+	for(int i=0;i<size;i++)
+	{
+		if((*myVec)[i]==e)
+		{
+			ret.chunkIndex=chunkIndx;
+			ret.vectorIndex=i;
+			return ret;
+		}
+	}
+	ret.chunkIndex=-1;
+	ret.vectorIndex=-1;
+	return ret;
 }
 
 ChunkManager::~ChunkManager()

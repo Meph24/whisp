@@ -51,3 +51,33 @@ void WarnErrReporter::noEffectErr(std::string text)
 	std::cout<<std::endl;
 	std::cout<<std::endl;
 }
+
+void WarnErrReporter::notFoundWhereBelongsErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"soft error (notFoundWhereBelongsErr): no crash, but this should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}
+
+void WarnErrReporter::notFoundErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"soft error (notFoundErr): no crash, but this should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}
+
+void WarnErrReporter::outsideWorldErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"soft error (outsideWorldErr): no crash, but this should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}
