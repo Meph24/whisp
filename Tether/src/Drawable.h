@@ -10,12 +10,8 @@
 #define SRC_DRAWABLE_H_
 #include "Timestamp.h"
 class DrawServiceProvider;
-#include "DrawServiceProvider.h"
 class ChunkManager;
-#include "ChunkManager.h"
-#include "Spacevec.h"
 class Frustum;
-#include "Frustum.h"
 class Drawable
 {
 public:
@@ -23,5 +19,8 @@ public:
 	virtual ~Drawable();
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
 };
+#include "Frustum.h"
+#include "ChunkManager.h"
+#include "DrawServiceProvider.h"
 
 #endif /* SRC_DRAWABLE_H_ */

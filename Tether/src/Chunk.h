@@ -22,8 +22,9 @@ class ChunkManager;
 #include <vector>
 #include "AABB.h"
 class InteractionManager;
+#include "Drawable.h"
 
-class Chunk: public Tickable //TODO Drawable?
+class Chunk: public Tickable, public Drawable //TODO Drawable?
 {
 	spacevec base;
 	spacelen defaultH;
@@ -44,6 +45,7 @@ public:
 	void tick(Timestamp t,TickServiceProvider * tsp);
 	spacelen getHeight(flt x,flt z);//coordinates inside chunk
 	void render(int lod,spacevec camOffset);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1
 	~Chunk();

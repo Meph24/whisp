@@ -486,6 +486,30 @@ chunkSearchResult ChunkManager::smartSearch(Entity* e, spacevec pos)
 	return chunkSearch(e,ret.chunkIndex);
 }
 
+void ChunkManager::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+{
+	int startX=chunksPerAxis/2-renderDistanceChunks;
+	int startZ=chunksPerAxis/2-renderDistanceChunks;
+	int stopX=startX+renderDistanceChunks*2;
+	int stopZ=startZ+renderDistanceChunks*2;
+	if(startX<0) startX=0;
+	if(startZ<0) startZ=0;
+	if(stopX>chunksPerAxis) stopX=chunksPerAxis;
+	if(stopZ>chunksPerAxis) stopZ=chunksPerAxis;
+
+	for(int runz = startZ ; runz<stopZ ; runz++)
+	{
+		for(int runx = startX ; runx<stopX ; runx++)
+		{
+			int indx=runz*chunksPerAxis+runx;
+			if(chunks[indx])
+			{
+				chunks[indx]->draw(t,viewFrustum,cm,dsp);
+			}
+		}
+	}
+}
+
 chunkSearchResult ChunkManager::trySmartSearch(Entity* e, spacevec pos,bool reportWarn)
 {
 	chunkSearchResult result=smartSearch(e,pos);

@@ -210,6 +210,14 @@ void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 	}
 }
 
+void Chunk::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+{
+	int size=managedEntities.size();
+	for(int i=0;i<size;i++)
+	{
+		managedEntities[i]->draw(t,viewFrustum,cm,dsp);
+	}
+}
 
 Chunk::~Chunk()
 {

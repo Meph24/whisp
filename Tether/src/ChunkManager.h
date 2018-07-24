@@ -19,6 +19,7 @@ class Frustum;
 #include "Frustum.h"
 #include <vector>
 #include "InteractionManager.h"
+#include "Drawable.h"
 
 struct chunkChange
 {
@@ -32,7 +33,7 @@ struct chunkSearchResult
 	int vectorIndex;
 };
 
-class ChunkManager: public Tickable
+class ChunkManager: public Tickable, public Drawable
 {
 	int chunkSize;//size of one chunk
 	int chunksPerAxis;//width and height in chunks
@@ -65,6 +66,7 @@ public:
 	spacevec activeChunk;//TODO debug only, remove after debugging
 	void tick(Timestamp t,TickServiceProvider * tsp);
 	void render(float lodQ,Frustum * viewFrustum, spacevec camOffset);//TODO drawable
+	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	void generateMissing(int count);
 	spacevec getWind(spacevec abs);
 	void applyEntityChunkChanges();//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
