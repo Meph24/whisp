@@ -206,6 +206,11 @@ void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 	int size=managedEntities.size();
 	for(int i=0;i<size;i++)
 	{
+		if((managedEntities[i]->pos.x.intpart!=managedEntities[i]->residentPos.x.intpart)||
+			(managedEntities[i]->pos.z.intpart!=managedEntities[i]->residentPos.z.intpart))
+		{
+			tsp->getChunkManager()->requestEntityMove(managedEntities[i]);
+		}
 		managedEntities[i]->tick(t,tsp);
 	}
 }

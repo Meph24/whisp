@@ -52,7 +52,7 @@ class ChunkManager: public Tickable, public Drawable
 
 	std::vector<chunkChange> addVec;//the entities that should be added to chunk[loc] soon
 	std::vector<chunkChange> removeVec;//the entities that should be removed from chunk[loc] soon (without deleting)
-	std::vector<chunkChange> deleteVec;//the entities that should be removed from chunk[loc] soon (with deleting)
+	std::vector<Entity *> deleteVec;//the entities that should be removed from chunk[loc] soon (with deleting)
 
 	int getIndxOrNeg1(spacevec abs);
 	int getIndx(spacevec abs);
@@ -69,7 +69,7 @@ public:
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	void generateMissing(int count);
 	spacevec getWind(spacevec abs);
-	void applyEntityChunkChanges();//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
+	void applyEntityChunkChanges(TickServiceProvider * tsp);//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
 	void setMid(spacevec abs);//absolute x,z
 
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis

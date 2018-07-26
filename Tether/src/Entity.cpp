@@ -13,6 +13,8 @@ Entity::Entity()
 
 void Entity::requestDestroy(ChunkManager * cm)
 {
+	if(requestedDelete) return;
+	requestedDelete=true;
 	exists=false;
 	cm->requestEntityDelete(this);
 }
@@ -47,7 +49,10 @@ void Entity::reset()
 
 #include "WarnErrReporter.h"
 
-
+void Entity::onLeaveWorld(TickServiceProvider* tsp)
+{
+	requestDestroy(tsp->getChunkManager());//tsp->getChunkManager()->requestEntityDelete(this);
+}
 
 Entity::~Entity()
 {

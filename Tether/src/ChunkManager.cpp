@@ -346,51 +346,19 @@ void ChunkManager::giveInteractionManagers(Entity* e,std::vector<InteractionMana
 	}
 }
 #include "WarnErrReporter.h"
-void ChunkManager::applyEntityChunkChanges()
+void ChunkManager::applyEntityChunkChanges(TickServiceProvider * tsp)
 {
-	int size=deleteVec.size();
-	for(int i=0;i<size;i++)
-	{
-		chunkChange c=deleteVec[i];
-		chunkSearchResult res=trySmartSearch(c.e,c.loc,true);
-		if(res.chunkIndex==-1)
-		{
-			WarnErrReporter::notFoundErr("entity was not found, deleting it anyway...");
-			delete c.e;//TODO
-		}
-		else
-		{
-			Chunk * myChunk=chunks[res.chunkIndex];
-			if(c.e!=myChunk->managedEntities[res.vectorIndex])
-			{
-				WarnErrReporter::notFoundErr("entity was not where search results indicate, deleting it anyway...");
-				delete c.e;
-				continue;
-			}
-			int size=myChunk->managedEntities.size();
-			if(size-1==res.vectorIndex)
-			{
-				myChunk->managedEntities.pop_back();
-				delete c.e;
-			}
-			else
-			{
-				myChunk->managedEntities[res.vectorIndex]=myChunk->managedEntities[size-1];
-				myChunk->managedEntities.pop_back();
-				delete c.e;
-			}
-		}
-	}
-	deleteVec.clear();
-	size=addVec.size();
+	int size=addVec.size();
 	for(int i=0;i<size;i++)
 	{
 		chunkChange c=addVec[i];
 		int indx=getIndxOrNeg1(c.loc);
 		if(indx==-1)
 		{
-			WarnErrReporter::outsideWorldErr("someone tried to spawn entity outside of the world, deleting it...");
-			delete c.e;
+			if(c.e->refCounter==0)//freshly spawned outside
+			{
+				c.e->onLeaveWorld(tsp);//handle by calling the Entity and letting it decide what to do (save to disk/simple deletion)
+			}
 			continue;
 		}
 		if(!chunks[indx])
@@ -400,6 +368,7 @@ void ChunkManager::applyEntityChunkChanges()
 		}
 		chunks[indx]->managedEntities.push_back(c.e);
 		c.e->residentPos=c.loc;
+		c.e->refCounter++;
 	}
 	addVec.clear();
 	size=removeVec.size();
@@ -410,6 +379,7 @@ void ChunkManager::applyEntityChunkChanges()
 		if(res.chunkIndex==-1)
 		{
 			WarnErrReporter::notFoundErr("entity to remove could not be found, doing nothing...");
+			if(c.e->refCounter>1) WarnErrReporter::doubleErr("entity now has 2 chunks");
 		}
 		else
 		{
@@ -417,6 +387,7 @@ void ChunkManager::applyEntityChunkChanges()
 			if(c.e!=myChunk->managedEntities[res.vectorIndex])
 			{
 				WarnErrReporter::notFoundErr("entity was not where search results indicate, doing nothing...");
+				if(c.e->refCounter>1) WarnErrReporter::doubleErr("entity now has 2 chunks");
 				continue;
 			}
 			int size=myChunk->managedEntities.size();
@@ -429,9 +400,58 @@ void ChunkManager::applyEntityChunkChanges()
 				myChunk->managedEntities[res.vectorIndex]=myChunk->managedEntities[size-1];
 				myChunk->managedEntities.pop_back();
 			}
+			c.e->refCounter--;
+			if(c.e->refCounter==0)//moved outside
+			{
+				c.e->onLeaveWorld(tsp);//handle by calling the Entity and letting it decide what to do (save to disk/simple deletion)
+			}
 		}
 	}
 	removeVec.clear();
+	size=deleteVec.size();
+	for(int i=0;i<size;i++)
+	{
+		Entity * e=deleteVec[i];
+		if(e->refCounter<=0)
+		{
+			delete e;
+			continue;
+		}
+		else if(e->refCounter>1)
+		{
+			WarnErrReporter::doubleErr("entity is in more than one chunk, deleting it anyway...");
+			//TODO cleanup of remaining refs
+		}
+		chunkSearchResult res=trySmartSearch(e,e->residentPos,true);
+		if(res.chunkIndex==-1)
+		{
+			WarnErrReporter::notFoundErr("entity was not found despite refCounter>0, deleting it anyway...");
+			delete e;
+		}
+		else
+		{
+			Chunk * myChunk=chunks[res.chunkIndex];
+			if(e!=myChunk->managedEntities[res.vectorIndex])
+			{
+				WarnErrReporter::notFoundErr("entity was not where search results indicate, deleting it anyway...");
+				delete e;
+				continue;
+			}
+			int size=myChunk->managedEntities.size();
+			if(size-1==res.vectorIndex)
+			{
+				myChunk->managedEntities.pop_back();
+				delete e;
+			}
+			else
+			{
+				myChunk->managedEntities[res.vectorIndex]=myChunk->managedEntities[size-1];
+				myChunk->managedEntities.pop_back();
+				delete e;
+			}
+		}
+	}
+	deleteVec.clear();
 }
 
 void ChunkManager::requestEntitySpawn(Entity* e)
@@ -441,7 +461,7 @@ void ChunkManager::requestEntitySpawn(Entity* e)
 
 void ChunkManager::requestEntityDelete(Entity* e)
 {
-	deleteVec.push_back({e,e->residentPos});
+	deleteVec.push_back(e);
 }
 
 void ChunkManager::requestEntityMove(Entity* e)

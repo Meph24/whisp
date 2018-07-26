@@ -24,7 +24,11 @@ class Pushable;
 
 class Entity: public Tickable, Drawable
 {
+	bool requestedDelete=false;
 public:
+	int refCounter=0;//DO NOT TOUCH
+
+
 	AABB bb;
 
 //	EntityIdent ID;
@@ -39,7 +43,7 @@ public:
 	std::vector<void *> alreadyChecked;
 
 
-	bool exists=true;//if exists is false, memory will be freed soon [prev description: next tick (enough time for other threads to react)]
+	bool exists=true;//if exists is false, memory will be freed soon
 
 	bool multichunk=false;//must be set when updating aabb for collision to work correctly
 	//TODO include into AABB class?
@@ -58,13 +62,7 @@ public:
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
 	virtual void tick(Timestamp t,TickServiceProvider * tsp)=0;
-	/*
-	 * TODO movement stages:
-	 * 1. apply movement vector + calculate own Parameters like AABBs
-	 * 2. AABB intersection + collision detection
-	 * 3. physics apply forces, damage, ...
-	 * 4. delete / spawn
-	 */
+	virtual void onLeaveWorld(TickServiceProvider * tsp);//called when outside of loaded chunk area, can be overridden to implement saving to disk, ...
 
 	void requestDestroy(ChunkManager * cm);
 	void reset();

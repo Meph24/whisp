@@ -298,7 +298,7 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 		destroy(toDelete[i]);
 	}
 	toDelete.clear();
-	cm->applyEntityChunkChanges();
+	cm->applyEntityChunkChanges(this);
 }
 
 void Zombie_World::loop()
