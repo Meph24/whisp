@@ -63,6 +63,9 @@ public:
 
 	//magic, do not use yourself:
 
+
+	void requestEntityDelete(Entity * e);//do not call this yourself, call Entiy.requestDestroy instead
+	void requestEntityMove(Entity * e);//do not call yourself, managed by chunks
 	spacevec activeChunk;//TODO debug only, remove after debugging
 	void tick(Timestamp t,TickServiceProvider * tsp);
 	void render(float lodQ,Frustum * viewFrustum, spacevec camOffset);//TODO drawable
@@ -94,9 +97,8 @@ public:
 	void giveInteractionManagers(Entity * e,std::vector<InteractionManager *> * managers,TickServiceProvider * tsp);
 
 
-	void requestEntitySpawn(Entity * e);
-	void requestEntityDelete(Entity * e);
-	void requestEntityMove(Entity * e);
+	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!
+
 
 	//search results are only valid right after acquisition
 	chunkSearchResult dumbSearch(Entity * e);//index -1=not found

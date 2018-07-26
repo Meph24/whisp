@@ -64,7 +64,7 @@ public:
 	virtual void tick(Timestamp t,TickServiceProvider * tsp)=0;
 	virtual void onLeaveWorld(TickServiceProvider * tsp);//called when outside of loaded chunk area, can be overridden to implement saving to disk, ...
 
-	void requestDestroy(ChunkManager * cm);
+	void requestDestroy(ChunkManager * cm);//call this to request delete, do NOT delete any other way
 	void reset();
 
 //	bool doAABBcheck(Entity * other, float time,TickServiceProvider* tsp);
