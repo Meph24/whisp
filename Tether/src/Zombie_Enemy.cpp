@@ -287,7 +287,7 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	if(fallAnim.getCurStep(0)>=1)
 	{
 		exists=false;//TODO convert to new entity management
-		tsp->requestDestroy(this);
+		requestDestroy(tsp->getChunkManager());
 	}
 	ChunkManager * cm=tsp->getChunkManager();
 	spacelen characterHeightConv=cm->fromMeters(size*2);

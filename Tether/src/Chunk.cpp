@@ -224,6 +224,16 @@ void Chunk::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawService
 	}
 }
 
+void Chunk::clearEntities()
+{
+	int size=managedEntities.size();
+	for(int i=0;i<size;i++)
+	{
+		delete managedEntities[i];
+	}
+	managedEntities.clear();
+}
+
 Chunk::~Chunk()
 {
 	delete height;

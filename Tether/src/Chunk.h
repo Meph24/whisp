@@ -46,6 +46,7 @@ public:
 	spacelen getHeight(flt x,flt z);//coordinates inside chunk
 	void render(int lod,spacevec camOffset);
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	void clearEntities();
 
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1
 	~Chunk();

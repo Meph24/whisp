@@ -25,7 +25,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int zCount;//max number of zombies
 	int wCount;
 
-	Zombie_Enemy ** zombies;
 	PerformanceMeter * pm;
 	DebugScreen * ds;
 	Graphics2D * g;
@@ -54,7 +53,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int zombieDist;
 	AdaptiveQuality * adQ;
 
-	void removeZombie(int zid);
 	void render(float sec,Timestamp t);
 	void doPhysics(float sec,Timestamp t);
 	void spawnZombie();
@@ -62,9 +60,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 
 	bool reset = false;
 
-	void destroy(Entity * e);
-
-//	int entityIndex=0;//TODO
 public:
 	EntityPlayer * player;
 	bool debugScreen=false;
@@ -72,13 +67,10 @@ public:
 	Zombie_World(sf::Window * w);
 	~Zombie_World();
 
-	std::vector<Entity *> toDelete;
 
 	//TickServiceProvider
-	virtual void spawnEntity(Entity * e);//spawns Entity into World
 	virtual ICamera3D * getHolderCamera();//can return 0 if currently not held
 	virtual ChunkManager * getChunkManager();
-	virtual void requestDestroy(Entity * e);//do not call yourself, call Entity.requestDestroy(tsp) instead!
 
 	virtual Entity * getTarget(Entity * me);
 

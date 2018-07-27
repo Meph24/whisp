@@ -23,10 +23,8 @@ class TickServiceProvider
 	std::vector<Retickable *> retickRequests;
 public:
 	int tickID=0;
-	virtual void spawnEntity(Entity * e)=0;//spawns Entity into World
 	virtual ICamera3D * getHolderCamera()=0;//can return 0 if currently not held
 	virtual ChunkManager * getChunkManager()=0;
-	virtual void requestDestroy(Entity * e)=0;//do not call yourself, call Entity.requestDestroy(tsp) instead!
 	virtual Entity * getTarget(Entity * me)=0;
 	std::vector<InteractionManager *> * getInterManVector();//result could later depend on thread
 

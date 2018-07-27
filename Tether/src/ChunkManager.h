@@ -74,7 +74,7 @@ public:
 	spacevec getWind(spacevec abs);
 	void applyEntityChunkChanges(TickServiceProvider * tsp);//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
 	void setMid(spacevec abs,TickServiceProvider * tsp);//absolute x,z
-
+	void clearEntities();
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 

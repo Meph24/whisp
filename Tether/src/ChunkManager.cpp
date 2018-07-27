@@ -541,6 +541,14 @@ void ChunkManager::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,Draw
 	}
 }
 
+void ChunkManager::clearEntities()
+{
+	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
+	{
+		if(chunks[i]) chunks[i]->clearEntities();
+	}
+}
+
 chunkSearchResult ChunkManager::trySmartSearch(Entity* e, spacevec pos,bool reportWarn)
 {
 	chunkSearchResult result=smartSearch(e,pos);
@@ -606,39 +614,6 @@ float ChunkManager::getChunkSize()
 {
 	return chunkSize;
 }
-
-//void ChunkManager::registerCollisionCheck(DualPointer<Pushable> e, float time,TickServiceProvider* tsp)
-//{
-//	chunkNum minx=e.e->bb.low.x.intpart;
-//	chunkNum maxx=e.e->bb.high.x.intpart;
-//	chunkNum minz=e.e->bb.low.z.intpart;
-//	chunkNum maxz=e.e->bb.high.z.intpart;
-//
-//	if((maxx-minx)>=10 )
-//	{
-//		std::cout<<"fail: wrong bb; x:"<<minx<<"-"<<maxx<<"z:"<<minz<<"-"<<maxz<<std::endl;
-//	}
-//	assert((maxx-minx)<10);
-//	assert((maxz-minz)<10);
-//	for(chunkNum xrun=minx;xrun<=maxx;xrun++)
-//	{
-//		for(chunkNum zrun=minz;zrun<=maxz;zrun++)
-//		{
-//			if(isValid(xrun,zrun))
-//			{
-//				int indx=getIndx(xrun,zrun);
-//
-//				if(indx<0 || indx>chunksPerAxis*chunksPerAxis)
-//					std::cout<<"fail: wrong index: "<<indx<<std::endl;
-//				else
-//				if(chunks[indx])
-//					chunks[indx]->registerCollisionCheck(e,time,tsp);
-//			}
-//
-//		}
-//
-//	}
-//}
 
 bool ChunkManager::isValid(chunkNum cx, chunkNum cz)
 {

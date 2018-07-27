@@ -28,11 +28,6 @@ Zombie_World::Zombie_World(sf::Window * w):
 	spawnZombies=true;
 	zCount = *cfg.getint("test", "zombies");
 	zombieDist = *cfg.getint("test", "zombieDist");
-	zombies = new Zombie_Enemy *[zCount];
-	for (int i = 0; i < zCount; i++)
-	{
-		zombies[i] = 0;
-	}
 	wCount = 8;
 	guns = new Zombie_Gun * [wCount];
 
@@ -80,15 +75,9 @@ Zombie_World::Zombie_World(sf::Window * w):
 void Zombie_World::restart()
 {
 	spawnZombies=true;
-	for (int i = 0; i < zCount; i++)
-	{
-		if (zombies[i])
-		{
-			removeZombie(i);
-		}
-	}
 	player->HP = player->maxHP;
 	score = 0;
+	cm->clearEntities();
 	//TODO clean chunks
 }
 
@@ -102,16 +91,6 @@ Zombie_World::~Zombie_World()
 	delete pm;
 	delete adQ;
 	delete player;
-	delete[] zombies;
-}
-void Zombie_World::removeZombie(int zid)
-{
-	Zombie_Enemy * ptr=zombies[zid];
-	if (ptr)
-	{
-		zombies[zid] = 0;
-		delete ptr;
-	}
 }
 void Zombie_World::render(float seconds,Timestamp t)
 {
@@ -129,8 +108,9 @@ void Zombie_World::render(float seconds,Timestamp t)
 	glEnable(GL_TEXTURE_2D);
 
 	cm->render(lodQuality,viewFrustum,relPos);
-	cm->draw(t,viewFrustum,cm,this);
 	glDisable(GL_TEXTURE_2D);
+
+	cm->draw(t,viewFrustum,cm,this);
 	glPopMatrix();
 
 	spacevec treePos=cm->clip(cm->fromMeters(vec3(5,0,5)),true);
@@ -138,13 +118,7 @@ void Zombie_World::render(float seconds,Timestamp t)
 	Zombie_Tree tr=Zombie_Tree(cm->toMeters(relTree),tree, leaves);
 	tr.draw();
 
-	for (int i = 0; i < zCount; i++)
-	{
-		if (zombies[i])
-		{
-			zombies[i]->draw(t,viewFrustum,cm,this);//TODO
-		}
-	}
+
 
 	glPushMatrix();
 	glDisable(GL_DEPTH_TEST);
@@ -234,52 +208,11 @@ void Zombie_World::loadStandardTex()
 void Zombie_World::doPhysics(float sec,Timestamp t)
 {
 	initNextTick();
-//	spacevec mid=cm->getMiddleChunk();
 	player->tick(t,this);
 	hitmark -= sec * 10;
 	if (hitmark < 0) hitmark = 0;
 
-	for (int i = 0; i < zCount; i++)
-	{
-		if (zombies[i])
-		{
-			zombies[i]->tick(t,this);
-		}
-	}
 	pm->registerTime(timestep++);
-
-//	for (int i = 0; i < zCount; i++)
-//	{
-//		if (zombies[i])
-//		{
-//			cm->registerCollisionCheck(DualPointer<Pushable>(zombies[i],zombies[i]),sec,this);
-//		}
-//	}
-//	std::cout<<"collision counter: "<<AABB::intersectionCounter<<std::endl;
-//	std::cout<<"check counter: "<<AABB::checkCounter<<std::endl;
-//	cm->registerCollisionCheck(DualPointer<Pushable>(player,player),sec,this);
-//	pm->registerTime(timestep++);
-//#pragma omp parallel for schedule(dynamic, 1)
-//	for (int i = 0; i < zCount; i++)
-//	{
-//		if (zombies[i])
-//		{
-//			if (zombies[i]->remainingHP>0)
-//			{
-//				float hp = zombies[i]->remainingHP;
-//				zombies[i]->checkHitboxes(physics,mid,cm);
-//				if (hp - (zombies[i]->remainingHP))
-//				{
-//					hitmark = 1;
-//				}
-//				int scoreplus= hp-(zombies[i]->remainingHP);
-//				score +=scoreplus;
-//			}
-//		}
-//	}
-//	pm->registerTime(timestep++);
-
-
 
 	cm->tick(t,this);
 	pm->registerTime(timestep++);
@@ -287,18 +220,7 @@ void Zombie_World::doPhysics(float sec,Timestamp t)
 	pm->registerTime(timestep++);
 	doReticks();
 	pm->registerTime(timestep++);
-	int size=toDelete.size();
-	for(int i=0;i<size;i++)
-	{
-		int count=0;
-		for(int j=0;j<size;j++)
-		{
-			if(toDelete[i]==toDelete[j]) count++;
-		}
-		if(count>1) WarnErrReporter::doubleErr("found more than one request to delete specific entity");
-		destroy(toDelete[i]);
-	}
-	toDelete.clear();
+
 	cm->applyEntityChunkChanges(this);
 }
 
@@ -402,42 +324,18 @@ void Zombie_World::switchWeapon(int dir)
 void Zombie_World::spawnZombie()
 {
 	if(!spawnZombies) return;
-	int index = -1;
-	int z=0;
-	for (int i = 0; i < zCount; i++)
-	{
-		if (zombies[i] == 0)
-		{
-			index = i;
-			//break;
-		}
-		else z++;
 
-
-	}
-	if (index == -1) return;
+	if (Zombie_Enemy::zombieCount>=zCount) return;
 	float r1 = (rand()%1024);///500.0f;//TODO change
 	float maxDistMultiplier=1.2f;
 	float r2 = (((rand()%32768)/32768.0f)*(maxDistMultiplier-1)+ 1)*zombieDist;
-	zombies[index] = new Zombie_Enemy(replaceThisTimestamp,zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm);//TODO
+	cm->requestEntitySpawn(new Zombie_Enemy(replaceThisTimestamp,zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm));
+	std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
 	for(int i=1;i<32;i++)
 	{
-		int z=0;
-			for (int i = 0; i < zCount; i++)
-			{
-				if (zombies[i] == 0)
-				{
-					index = i;
-					//break;
-				}
-				else z++;
-
-
-			}
-			std::cout<<"zombie spawned, new zombie count:"<<z<<std::endl;
-			//if(z==zCount) spawnZombies=false;
-			if (index == -1) return;
-		zombies[index] = new Zombie_Enemy(replaceThisTimestamp,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm);//TODO
+		if (Zombie_Enemy::zombieCount>=zCount) return;
+		cm->requestEntitySpawn(new Zombie_Enemy(replaceThisTimestamp,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm));
+		std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
 	}
 }
 
@@ -446,33 +344,9 @@ Entity* Zombie_World::getTarget(Entity* me)
 	return (Entity *)player;
 }
 
-void Zombie_World::destroy(Entity* e)
-{
-	bool found=false;
-
-	for (int i = 0; i < zCount; i++)
-	{
-		if ((Entity *)zombies[i] == e)
-		{
-			delete zombies[i];
-			zombies[i] = 0;
-			found=true;
-			break;
-		}
-	}
-	if(!found)
-		std::cout<<"requestDestroy got called with invalid entity pointer:"<<e<<std::endl;
-}
-
 void Zombie_World::markRestart()
 {
 	reset = true;
-}
-
-void Zombie_World::spawnEntity(Entity* e)
-{
-	//TODO
-	std::cout<<"not implemented yet!!!"<<std::endl;
 }
 
 ICamera3D* Zombie_World::getHolderCamera()
@@ -485,7 +359,3 @@ ChunkManager* Zombie_World::getChunkManager()
 	return cm;
 }
 
-void Zombie_World::requestDestroy(Entity* e)
-{
-	toDelete.push_back(e);
-}

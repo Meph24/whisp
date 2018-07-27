@@ -35,6 +35,7 @@ void EntityProjectile::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,
 	vec3 interPosMeters=cm->toMeters(interPos);
 	tex->bind();
 	glColor3f(1.0f,1.0f, 0.1f);
+	glEnable(GL_TEXTURE_2D);
 
 	glPushMatrix();
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
@@ -81,6 +82,7 @@ void EntityProjectile::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,
 
 
 	glEnd();
+	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 }
 void EntityProjectile::tick(Timestamp t, TickServiceProvider* tsp)
