@@ -1,8 +1,8 @@
 #graphics
 resolutionX=1920
 resolutionY=1080
-renderDistance=8
-physicsDistance=8
+renderDistance=4
+physicsDistance=4
 chunkLoadRate=400
 terrainQuality=20.5
 maxRenderTime=16.0

@@ -20,7 +20,7 @@ chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDis
 		chunksBuf2[i]=0;
 	}
 	chunks=chunksBuf1;
-	setMid({{0,0.5f},{0,0.5f},{0,0.5f}});
+	setMid({{0,0.5f},{0,0.5f},{0,0.5f}},0);
 	gravity=fromMeters(gravityYdir);
 	defaultH=fromMeters(defaultHeight*1.0f);
 }
@@ -76,8 +76,8 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 	}
 }
 
-
-void ChunkManager::setMid(spacevec abs)
+#include "WarnErrReporter.h"
+void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 {
 	chunkNum midChunkCoo=chunksPerAxis/2;
 	chunkNum cx=abs.x.intpart;
@@ -109,7 +109,18 @@ void ChunkManager::setMid(spacevec abs)
 				if(xnew>=chunksPerAxis) result++;
 				if(result)//if chunk will be outside the loaded region
 				{
-					delete curChunk;
+					int size=curChunk->managedEntities.size();
+					for(int i=0;i<size;i++)
+					{
+						curChunk->managedEntities[i]->refCounter--;
+						if(curChunk->managedEntities[i]->refCounter)
+						{
+							WarnErrReporter::doubleErr("entity found in multiple chunks while one of them is destroyed, ignoring it");
+							continue;
+						}
+						curChunk->managedEntities[i]->onLeaveWorld(tsp);
+					}
+					delete curChunk;//TODO managed entities
 				}
 				else
 				{

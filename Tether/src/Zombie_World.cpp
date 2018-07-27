@@ -13,6 +13,7 @@ extern Zombie_MouseInput * mouseInput;
 #include "DrawServiceProvider.h"
 
 #include <iostream>
+
 Zombie_World::Zombie_World(sf::Window * w):
 		replaceThisTimestamp(0)
 {
@@ -346,7 +347,7 @@ void Zombie_World::loop()
 		replaceThisTimestamp.time+=addTime;
 
 
-		cm->setMid(player->pos);
+		cm->setMid(player->pos,this);
 
 
 		guns[currentGun]->tick(replaceThisTimestamp,sec,player->cam,player,shot,cm);

@@ -39,6 +39,10 @@ class Zombie_Enemy: public Entity,public Pushable,public Hittable
 	void gotHit(float time, int part, EntityProjectile * projectile);
 
 public:
+
+	static int zombieCount;
+
+
 	ChunkManager * cm;
 	float facing;
 	float speed;

@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <GL/glew.h>
 
+int Zombie_Enemy::zombieCount=0;
 
 Zombie_Enemy::Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,ChunkManager * chm):
 tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitionAnim(0.5f,0,1)
@@ -28,12 +29,13 @@ tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitio
 	pushForce=speed/30;
 
 	bb=AABB(pos);
+	zombieCount++;
 }
 
 
 Zombie_Enemy::~Zombie_Enemy()
 {
-
+	zombieCount--;
 }
 void Zombie_Enemy::drawTexturedCube(texCooSet tc)
 {
