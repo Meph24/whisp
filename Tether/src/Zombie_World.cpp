@@ -94,7 +94,6 @@ Zombie_World::~Zombie_World()
 }
 void Zombie_World::render(float seconds,Timestamp t)
 {
-
 	player->applyPerspective(true,cm);
 	spacevec relPos=cm->getMiddleChunk();
 	float renderTime=(pm->getTime(8)+pm->getTime(0))/1000000.0f;
