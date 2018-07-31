@@ -1,8 +1,8 @@
 #include "Zombie_Gun.h"
 
 
-Zombie_Gun::Zombie_Gun(std::string weaponName, float reloadTime,const std::string& filename,float pitchModifier,ItemAmmo * type,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread):
-rld(reloadTime), timer(0),pType(type),nm(),recoilM({1,0,1},0.5f,reloadTime),sBuf(),name(weaponName),pitch(pitchModifier),fullAuto(fullAutomatic),trigger(false),recoil(Recoil),recoilSpread(RecoilSpread)
+Zombie_Gun::Zombie_Gun(Timestamp initTimestamp,std::string weaponName, float reloadTime,const std::string& filename,float pitchModifier,ItemAmmo * type,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread):
+lastTimestamp(initTimestamp),rld(reloadTime), timer(0),pType(type),nm(),recoilM({1,0,1},0.5f,reloadTime),sBuf(),name(weaponName),pitch(pitchModifier),fullAuto(fullAutomatic),trigger(false),recoil(Recoil),recoilSpread(RecoilSpread)
 {
 	sBuf.loadFromFile(filename);
 	curSound=0;
@@ -23,7 +23,7 @@ Zombie_Gun::~Zombie_Gun()
 #include <iostream>
 #include "MatrixLib2.h"
 #define recoilDampeningTime 0.5f
-void Zombie_Gun::tryShoot(Timestamp replaceThisTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
+void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
 {
 	trigger=true;
 	if (timer <= 0)
@@ -69,7 +69,7 @@ void Zombie_Gun::tryShoot(Timestamp replaceThisTimestamp,ICamera3D * cam,EntityP
 		v.y = ml.curMatrix[1] * velX + ml.curMatrix[5] * velY + ml.curMatrix[9] * velZ;
 		v.z = ml.curMatrix[2] * velX + ml.curMatrix[6] * velY + ml.curMatrix[10] * velZ;
 
-		EntityProjectile * zp= new EntityProjectile(replaceThisTimestamp,(ItemAmmo*)pType->newClone(),player->getCamPos(),cm->fromMeters(v)+player->v);
+		EntityProjectile * zp= new EntityProjectile(callTimestamp,(ItemAmmo*)pType->newClone(),player->getCamPos(),cm->fromMeters(v)+player->v);
 		cm->requestEntitySpawn((Entity *)zp);
 
 		ml.popMatrix();
@@ -81,8 +81,9 @@ void Zombie_Gun::tryShoot(Timestamp replaceThisTimestamp,ICamera3D * cam,EntityP
 	recoilM.registerRecoil(recoil,recoilRand,{0,0,0});
 }
 
-void Zombie_Gun::tick(Timestamp replaceThisTimestamp,float sec,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
+void Zombie_Gun::tick(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
 {
+	float sec=callTimestamp-lastTimestamp;
 	vec3 recoilMod=recoilM.getRecoilDiff(sec);
 	cam->alpha-=recoilMod.x;
 	cam->beta+=recoilMod.y;
@@ -98,9 +99,10 @@ void Zombie_Gun::tick(Timestamp replaceThisTimestamp,float sec,ICamera3D * cam,E
 	{
 		if(trigger)
 		{
-			tryShoot(replaceThisTimestamp,cam,player,tex, cm);
+			tryShoot(callTimestamp,cam,player,tex, cm);
 		}
 	}
+	lastTimestamp=callTimestamp;
 }
 
 void Zombie_Gun::stopShooting()

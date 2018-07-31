@@ -1,16 +1,16 @@
 #graphics
 resolutionX=1920
 resolutionY=1080
-renderDistance=18
-physicsDistance=18
+renderDistance=6
+physicsDistance=6
 chunkLoadRate=400
-terrainQuality=.5
+terrainQuality=2.5
 maxRenderTime=9.0
 
 
 #test
-zombies=7000
-zombieDist=220
+zombies=1
+zombieDist=10
 
 
 #input

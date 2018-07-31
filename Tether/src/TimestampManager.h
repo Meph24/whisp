@@ -9,20 +9,30 @@
 #ifndef SRC_TIMESTAMPMANAGER_H_
 #define SRC_TIMESTAMPMANAGER_H_
 
+#include <SFML/Window.hpp>
 #include "Timestamp.h"
 #include "ShortNames.h"
 
 class TimestampManager
 {
+	sf::Clock clock;
+	i64 getCurrentTime();
+	float maxMasterWallTime;
+	float maxMasterGameTime;
+	Timestamp lastMasterTimestamp;
+	i64 lastMasterTime;
 public:
-	Timestamp lastUpdated;
-	i64 lastKnownTime;
-	float curTimescale;
-	float wantedTimescale;
+	float lastMasterRate;
 
-	Timestamp getNextTimestamp();//TODO
+	float targetRate;//can be changed freely at runtime
 
-	TimestampManager();
+	Timestamp masterUpdate();
+
+	Timestamp getSlaveTimestamp();
+
+
+
+	TimestampManager(float TargetRate,float MaxMasterWallTime,float MaxMasterGameTime);//time in ms
 	~TimestampManager();
 };
 

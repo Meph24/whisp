@@ -23,8 +23,7 @@ public:
 	~DebugScreen();
 
 
-
-	void draw(flt x,flt y,flt z);
+	int draw(flt x,flt y,flt z,int lineOffset);
 };
 
 #endif /* SRC_DEBUGSCREEN_H_ */

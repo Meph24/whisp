@@ -221,16 +221,18 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 	drawTexturedCube(tc);
 	glPopMatrix();
 }
+#include <iostream>
 void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
+	std::cout<<tickOffset<<std::endl;
 	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
 	if(!viewFrustum->inside(bb)) return;
 
 	bodyAnim.updateTemp(tickOffset);
 	if(legDmg>0.25f*totalHP)
-		transitionAnim.update(tickOffset);
-	if(remainingHP<=0) fallAnim.update(tickOffset);
+		transitionAnim.updateTemp(tickOffset);
+	if(remainingHP<=0) fallAnim.updateTemp(tickOffset);
 
 
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;

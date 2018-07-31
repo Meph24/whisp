@@ -130,9 +130,9 @@ void EventHandler::sendOn(EventHandler::event e)
 		}
 		else if ((e.ID == 1049) && e.value)
 		{
-			if (world->timeFactor == 1.0f)
-				world->timeFactor = 0.1f;
-			else world->timeFactor = 1.0f;
+			if (world->tm.targetRate == 1.0f)
+				world->tm.targetRate = 0.1f;
+			else world->tm.targetRate = 1.0f;
 		}
 		else if ((e.ID == 1024 + ('R' - 'A')) && e.value)
 		{

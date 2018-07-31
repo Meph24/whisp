@@ -4,11 +4,11 @@
 #include <SFML/Window.hpp>
 #include "PerformanceMeter.h"
 #include "TextureStatic2D.h"
-#include "EntityProjectile.h"
 #include "EntityPlayer.h"
 #include "Graphics2D.h"
 #include "Zombie_Gun.h"
 #include "AdaptiveQuality.h"
+#include "TimestampManager.h"
 
 #include "Pushable.h"
 #include "DualPointer.h"
@@ -17,16 +17,32 @@
 #include "DebugScreen.h"
 #include "ChunkManager.h"
 #include "TickServiceProvider.h"
+
+#define PM_GRAPHICS_OUTSIDE 0
+#define PM_GRAPHICS_WORLD 1
+#define PM_GRAPHICS_DRAWDEBUG 2
+#define PM_GRAPHICS_FLUSH 3
+
+
+#define PM_LOGIC_OUTSIDE 0
+#define PM_LOGIC_PRECALC 1
+#define PM_LOGIC_GUNTICK 2
+#define PM_LOGIC_SPAWN 3
+#define PM_LOGIC_PHYSICS 4
+#define PM_LOGIC_CHUNKGEN 5
+#define PM_LOGIC_CHUNKMOVE 6
+
+
 class Zombie_World: public TickServiceProvider, DrawServiceProvider
 {
-	Timestamp replaceThisTimestamp;//TODO replace with TimestampManager
 	bool spawnZombies;
-	int timestep=0;
 	int zCount;//max number of zombies
 	int wCount;
 
-	PerformanceMeter * pm;
-	DebugScreen * ds;
+	PerformanceMeter * pmLogic;
+	PerformanceMeter * pmGraphics;
+	DebugScreen * dsLogic;
+	DebugScreen * dsGraphics;
 	Graphics2D * g;
 
 	Zombie_Gun ** guns;
@@ -53,17 +69,21 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int zombieDist;
 	AdaptiveQuality * adQ;
 
-	void render(float sec,Timestamp t);
-	void doPhysics(float sec,Timestamp t);
-	void spawnZombie();
+	void render(Timestamp t);
+	void doPhysics(Timestamp t);
+	void spawnZombie(Timestamp t);
 	void restart();
+	void drawGameOver();
+	void doLogic();
+	void doGraphics();
 
 	bool reset = false;
+	int test;//TODO remove
 
 public:
 	EntityPlayer * player;
 	bool debugScreen=false;
-	float timeFactor = 1;
+	TimestampManager tm;
 	Zombie_World(sf::Window * w);
 	~Zombie_World();
 

@@ -26,6 +26,7 @@ public:
 	static void notFoundWhereBelongsErr(std::string text);
 	static void notFoundErr(std::string text);
 	static void outsideWorldErr(std::string text);
+	static void timeBackwardErr(std::string text);
 
 
 

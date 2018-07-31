@@ -15,8 +15,9 @@ extern Zombie_MouseInput * mouseInput;
 #include <iostream>
 
 Zombie_World::Zombie_World(sf::Window * w):
-		replaceThisTimestamp(0)
+		tm(1,1000,40)//TODO 20/20
 {
+	test=0;
 	Cfg cfg({ "./res/config.txt" });
 	int physDist=*cfg.getint("graphics", "physicsDistance");
 	int renderDist=*cfg.getint("graphics", "renderDistance");
@@ -30,46 +31,52 @@ Zombie_World::Zombie_World(sf::Window * w):
 	zombieDist = *cfg.getint("test", "zombieDist");
 	wCount = 8;
 	guns = new Zombie_Gun * [wCount];
-
-	guns[0] = new Zombie_Gun("Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f,1),false,{2,0.15f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[1] = new Zombie_Gun("Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f,1),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
-	guns[2] = new Zombie_Gun("American 180 .22",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f,1),true,{0.5f,0,0},{0.5f,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[3] = new Zombie_Gun("Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f,1),false,{5,0,0},{2,2,0});
-	guns[4] = new Zombie_Gun("G3A3 .308",0.12f,"res/gunshot.wav",0.75f,new ItemAmmo(800, 200,0.0008f,1),true,{3,0,0},{1.5f,1.5f,0});
-	guns[5] = new Zombie_Gun("Shotgun",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,45.0f,0.0022272754325748604f,9),true,{2.5f,0,0},{1.5f,1.5f,0});
-	guns[6] = new Zombie_Gun("Shotgun with Birdshot",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,0.30f,0.0038f,900),true,{2.5f,0,0},{1.5f,1.5f,0});
-	guns[7] = new Zombie_Gun("Cheat Blaster 180",0.08f,"res/gunshot.wav",0.5f,new ItemAmmo(600,200.30f,0.0018f,180),true,{0.5f,0,0},{0.5f,0.5f,0});
+	Timestamp timS=tm.getSlaveTimestamp();
+	guns[0] = new Zombie_Gun(timS,"Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f,1),false,{2,0.15f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[1] = new Zombie_Gun(timS,"Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f,1),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
+	guns[2] = new Zombie_Gun(timS,"American 180 .22",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f,1),true,{0.5f,0,0},{0.5f,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[3] = new Zombie_Gun(timS,"Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f,1),false,{5,0,0},{2,2,0});
+	guns[4] = new Zombie_Gun(timS,"G3A3 .308",0.12f,"res/gunshot.wav",0.75f,new ItemAmmo(800, 200,0.0008f,1),true,{3,0,0},{1.5f,1.5f,0});
+	guns[5] = new Zombie_Gun(timS,"Shotgun",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,45.0f,0.0022272754325748604f,9),true,{2.5f,0,0},{1.5f,1.5f,0});
+	guns[6] = new Zombie_Gun(timS,"Shotgun with Birdshot",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,0.30f,0.0038f,900),true,{2.5f,0,0},{1.5f,1.5f,0});
+	guns[7] = new Zombie_Gun(timS,"Cheat Blaster 180",0.08f,"res/gunshot.wav",0.5f,new ItemAmmo(600,200.30f,0.0018f,180),true,{0.5f,0,0},{0.5f,0.5f,0});
 
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
 
 	float sensX = *cfg.getfloat("input", "sensitivityX");
 	float sensY = *cfg.getfloat("input", "sensitivityY");
 
-	player=new EntityPlayer(replaceThisTimestamp,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
+	player=new EntityPlayer(timS,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
 	player->cam->zoom = 1;//TODO better zoom
 	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getfloat("graphics","maxRenderTime")));//TODO not hard code
 
 
-	pm = new PerformanceMeter(12,1000);
-	pm->roundtripUpdateIndex = 0;
+	pmLogic = new PerformanceMeter(PM_LOGIC_CHUNKMOVE+1,1000);
+	pmGraphics = new PerformanceMeter(PM_GRAPHICS_FLUSH+1,1000);
+	pmLogic->roundtripUpdateIndex = 0;
+	pmGraphics->roundtripUpdateIndex = 0;
 
 	//dirty
 	keyInput = player->keyInp;
 	mouseInput = player->mouseInp;
 
-	ds=new DebugScreen(pm,&g);
-	pm->setName("       Total time",-1);
-	pm->setName("        flush etc",0);
-	pm->setName("        guns tick",1);
-	pm->setName("            spawn",2);
-	pm->setName("      zombie tick",3);
-	pm->setName("       chunk tick",4);
-	pm->setName("      bullet tick",5);
-	pm->setName("           retick",6);
-	pm->setName("           delete",7);
-	pm->setName("           render",8);
-	pm->setName("      debugScreen",9);
-	pm->setName("     chunk update",10);
+	dsLogic=new DebugScreen(pmLogic,&g);
+	dsGraphics=new DebugScreen(pmGraphics,&g);
+
+	pmLogic->setName(" Total logic time",-1);
+	pmLogic->setName("  precalculations",PM_LOGIC_PRECALC);
+	pmLogic->setName("        guns tick",PM_LOGIC_GUNTICK);
+	pmLogic->setName("            spawn",PM_LOGIC_SPAWN);
+	pmLogic->setName("          physics",PM_LOGIC_PHYSICS);
+	pmLogic->setName(" chunk generation",PM_LOGIC_CHUNKGEN);
+	pmLogic->setName("   chunk movement",PM_LOGIC_CHUNKMOVE);
+	pmLogic->setName("            other",PM_LOGIC_OUTSIDE);
+
+	pmGraphics->setName("Total render time",-1);
+	pmGraphics->setName("   world contents",PM_GRAPHICS_WORLD);
+	pmGraphics->setName("     debug screen",PM_GRAPHICS_DRAWDEBUG);
+	pmGraphics->setName(" GPU work + syncs",PM_GRAPHICS_FLUSH);
+	pmGraphics->setName("            other",PM_GRAPHICS_OUTSIDE);
 }
 
 void Zombie_World::restart()
@@ -85,18 +92,36 @@ void Zombie_World::restart()
 Zombie_World::~Zombie_World()
 {
 	//missing deletes (one-time tier 1 code, so who cares)
-	delete ds;
+	delete cm;
+
+	delete dsLogic;
+	delete dsGraphics;
+	delete pmLogic;
+	delete pmGraphics;
+	delete g;
+
 	delete zombieTex;
+	delete grass;
+	delete shot;
+	delete tree;
+	delete leaves;
 	delete tps;
-	delete pm;
+	delete tps2;
+
+	for(int i=0;i<wCount;i++)
+	{
+		delete guns[i];
+	}
+	delete guns;
+
 	delete adQ;
 	delete player;
 }
-void Zombie_World::render(float seconds,Timestamp t)
+void Zombie_World::render(Timestamp t)
 {
 	player->applyPerspective(true,cm);
 	spacevec relPos=cm->getMiddleChunk();
-	float renderTime=(pm->getTime(8)+pm->getTime(0))/1000000.0f;
+	float renderTime=(pmGraphics->getTime(PM_GRAPHICS_WORLD)+pmGraphics->getTime(PM_GRAPHICS_FLUSH))/1000000.0f;
 	float quality=adQ->getQuality(renderTime);
 	Frustum * viewFrustum=player->newGetViewFrustum(cm,quality);
 
@@ -150,7 +175,7 @@ void Zombie_World::render(float seconds,Timestamp t)
 	glColor3f(0, 1, 0);
 	glPopMatrix();
 	float crosshairSize = 0.005f;
-	int crosshairAmount = 4;//TODO 4
+	int crosshairAmount = 4;
 
 	glDisable(GL_TEXTURE_2D);
 	glColor3f(1, hitmark, 0);
@@ -204,21 +229,16 @@ void Zombie_World::loadStandardTex()
 
 }
 #include "WarnErrReporter.h"
-void Zombie_World::doPhysics(float sec,Timestamp t)
+void Zombie_World::doPhysics(Timestamp t)
 {
 	initNextTick();
 	player->tick(t,this);
-	hitmark -= sec * 10;
+	hitmark -= 0.1;//sec * 10;
 	if (hitmark < 0) hitmark = 0;
 
-	pm->registerTime(timestep++);
-
 	cm->tick(t,this);
-	pm->registerTime(timestep++);
 
-	pm->registerTime(timestep++);
 	doReticks();
-	pm->registerTime(timestep++);
 
 	cm->applyEntityChunkChanges(this);
 }
@@ -230,75 +250,13 @@ void Zombie_World::loop()
 		reset = false;
 		restart();
 	}
-	if (player->HP < 0)
+	if (!(player->HP < 0))
 	{
-		glPushMatrix();
-		glColor3f(1, 0, 0);
-		glDisable(GL_DEPTH_TEST);
-		glLoadIdentity();
-		glScalef(1, 1, -1.01f);
-		g->drawString("GAME OVER", 9, -0.8f, -0.2f, 0.4f);
-		glColor3f(0, 1, 0);
-		g->drawString("R=restart", 9, -0.8f, -0.6f, 0.3f);
-
-		char scoreString[8];
-
-		int scoreTemp = score;
-		for (int i = 0; i < 8; i++)
-		{
-
-			scoreString[7 - i] = (scoreTemp % 10) + '0';
-			scoreTemp /= 10;
-		}
-		g->drawString("score:", 6, -0.8f, 0.8f, 0.1f);
-		g->drawString(scoreString, 8, -0.8f, 0.62f, 0.1f);
-		glPopMatrix();
-		glEnable(GL_DEPTH_TEST);
+		test=(test+1)%288;
+		if(!test)
+			doLogic();
 	}
-	else
-	{
-		timestep = 0;
-		pm->registerTime(timestep++);
-		float sec = pm->roundtriptime / 1000000.0f;
-		sec *= timeFactor;
-		if (sec < 0) sec = 0;
-		else if (sec>MAX_TICK_TIME) sec = MAX_TICK_TIME;
-		//TODO replace with TimestampManager
-		int addTime=(int)(sec*1000000);
-		replaceThisTimestamp.time+=addTime;
-
-
-		cm->setMid(player->pos,this);
-
-
-		guns[currentGun]->tick(replaceThisTimestamp,sec,player->cam,player,shot,cm);
-
-		pm->registerTime(timestep++);
-		for(int i=0;i<40;i++)
-			if (sec*4> (rand() % 32768) / 32768.0f) spawnZombie();//TODO change *2
-		pm->registerTime(timestep++);
-		doPhysics(sec,replaceThisTimestamp);
-		pm->registerTime(timestep++);
-		render(sec,replaceThisTimestamp);
-		pm->registerTime(timestep++);
-		if(debugScreen)
-		{
-			glPushMatrix();
-			glLoadIdentity();
-			glScalef(1, 1, -1.01f);
-			glColor3f(1, 0, 0);
-			glDisable(GL_DEPTH_TEST);
-			glEnable(GL_TEXTURE_2D);
-			vec3 ppos=cm->toMeters(player->pos);
-			ds->draw(ppos.x,ppos.y,ppos.z);
-			glDisable(GL_TEXTURE_2D);
-			glEnable(GL_DEPTH_TEST);
-			glPopMatrix();
-		}
-		pm->registerTime(timestep++);
-		cm->generateMissing(chunkLoadRate);
-		pm->registerTime(timestep++);
-	}
+	doGraphics();
 }
 
 
@@ -310,7 +268,7 @@ void Zombie_World::trigger(bool pulled)
 		guns[currentGun]->stopShooting();
 		return;
 	}
-	guns[currentGun]->tryShoot(replaceThisTimestamp,player->cam,player,shot,cm);
+	guns[currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,cm);
 }
 
 void Zombie_World::switchWeapon(int dir)
@@ -320,7 +278,7 @@ void Zombie_World::switchWeapon(int dir)
 	std::cout<<"gun switched to"<<currentGun<<std::endl;
 }
 
-void Zombie_World::spawnZombie()
+void Zombie_World::spawnZombie(Timestamp t)
 {
 	if(!spawnZombies) return;
 
@@ -328,12 +286,12 @@ void Zombie_World::spawnZombie()
 	float r1 = (rand()%1024);///500.0f;//TODO change
 	float maxDistMultiplier=1.2f;
 	float r2 = (((rand()%32768)/32768.0f)*(maxDistMultiplier-1)+ 1)*zombieDist;
-	cm->requestEntitySpawn(new Zombie_Enemy(replaceThisTimestamp,zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm));
+	cm->requestEntitySpawn(new Zombie_Enemy(t,zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm));
 	std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
 	for(int i=1;i<32;i++)
 	{
 		if (Zombie_Enemy::zombieCount>=zCount) return;
-		cm->requestEntitySpawn(new Zombie_Enemy(replaceThisTimestamp,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm));
+		cm->requestEntitySpawn(new Zombie_Enemy(t,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm));
 		std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
 	}
 }
@@ -341,6 +299,87 @@ void Zombie_World::spawnZombie()
 Entity* Zombie_World::getTarget(Entity* me)
 {
 	return (Entity *)player;
+}
+
+void Zombie_World::drawGameOver()
+{
+	glPushMatrix();
+	glColor3f(1, 0, 0);
+	glDisable(GL_DEPTH_TEST);
+	glLoadIdentity();
+	glScalef(1, 1, -1.01f);
+	g->drawString("GAME OVER", 9, -0.8f, -0.2f, 0.4f);
+	glColor3f(0, 1, 0);
+	g->drawString("R=restart", 9, -0.8f, -0.6f, 0.3f);
+
+	char scoreString[8];
+
+	int scoreTemp = score;
+	for (int i = 0; i < 8; i++)
+	{
+
+		scoreString[7 - i] = (scoreTemp % 10) + '0';
+		scoreTemp /= 10;
+	}
+	g->drawString("score:", 6, -0.8f, 0.8f, 0.1f);
+	g->drawString(scoreString, 8, -0.8f, 0.62f, 0.1f);
+	glPopMatrix();
+	glEnable(GL_DEPTH_TEST);
+}
+
+void Zombie_World::doLogic()
+{
+	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
+	Timestamp t=tm.masterUpdate();
+	pmLogic->registerTime(PM_LOGIC_PRECALC);
+	guns[currentGun]->tick(t,player->cam,player,shot,cm);
+	pmLogic->registerTime(PM_LOGIC_GUNTICK);
+	for(int i=0;i<40;i++)
+		if (0.03f> (rand() % 32768) / 32768.0f) spawnZombie(t);//TODO replace by better spawn mechanic
+	pmLogic->registerTime(PM_LOGIC_SPAWN);
+	doPhysics(t);
+	pmLogic->registerTime(PM_LOGIC_PHYSICS);
+	cm->generateMissing(chunkLoadRate);
+	pmLogic->registerTime(PM_LOGIC_CHUNKGEN);
+	cm->setMid(player->pos,this);
+	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);
+}
+
+void Zombie_World::doGraphics()
+{
+	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
+	if (player->HP < 0)
+	{
+		drawGameOver();
+	}
+	else
+	{
+		Timestamp t=tm.getSlaveTimestamp();
+		pmGraphics->registerTime(PM_GRAPHICS_OUTSIDE);
+		render(t);
+		pmGraphics->registerTime(PM_GRAPHICS_WORLD);
+		if(debugScreen)
+		{
+			glPushMatrix();
+			glLoadIdentity();
+			glScalef(1, 1, -1.01f);
+			glColor3f(1, 0, 0);
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_TEXTURE_2D);
+			vec3 ppos=cm->toMeters(player->pos);
+			int offset=dsGraphics->draw(ppos.x,ppos.y,ppos.z,0);
+			dsLogic->draw(player->pos.x.intpart,player->pos.y.intpart,player->pos.z.intpart,offset);
+			glDisable(GL_TEXTURE_2D);
+			glEnable(GL_DEPTH_TEST);
+			glPopMatrix();
+		}
+		pmGraphics->registerTime(PM_GRAPHICS_DRAWDEBUG);
+	}
+
+	sf::Time waitt = sf::microseconds(1000);//TODO enable/disable depending on framerate
+	sf::sleep(waitt);
+	glFlush();
+	pmGraphics->registerTime(PM_GRAPHICS_FLUSH);
 }
 
 void Zombie_World::markRestart()
