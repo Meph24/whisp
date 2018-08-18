@@ -53,9 +53,10 @@ void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, Draw
 	}
 }
 
-void EntityPlayer::applyPerspective(bool fresh,ChunkManager * cm)
+void EntityPlayer::applyPerspective(Timestamp t,bool fresh,ChunkManager * cm)
 {
-	spacevec relPos=pos-cm->getMiddleChunk();
+	float time=t-lastTick;
+	spacevec relPos=pos+v*time-cm->getMiddleChunk();
 	characterHeightConv=cm->fromMeters(characterHeight);//TODO only in one spot
 	relPos.y+=characterHeightConv;
 	cam->posX=cm->toMeters(relPos.x);
@@ -63,6 +64,11 @@ void EntityPlayer::applyPerspective(bool fresh,ChunkManager * cm)
 	cam->posZ=cm->toMeters(relPos.z);
 	if(fresh) cam->applyFresh();
 	else cam->apply();
+	vec3 fwd=cam->getForwardVector();
+	sf::Listener::setDirection(fwd.x,fwd.y,fwd.z);
+	vec3 upv=cam->getUpVector();
+	sf::Listener::setUpVector(upv.x,upv.y,upv.z);
+	sf::Listener::setPosition(cam->posX,cam->posY,cam->posZ);
 	isPerspective=true;
 }
 

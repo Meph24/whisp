@@ -119,7 +119,7 @@ Zombie_World::~Zombie_World()
 }
 void Zombie_World::render(Timestamp t)
 {
-	player->applyPerspective(true,cm);
+	player->applyPerspective(t,true,cm);
 	spacevec relPos=cm->getMiddleChunk();
 	float renderTime=(pmGraphics->getTime(PM_GRAPHICS_WORLD)+pmGraphics->getTime(PM_GRAPHICS_FLUSH))/1000000.0f;
 	float quality=adQ->getQuality(renderTime);
@@ -252,7 +252,7 @@ void Zombie_World::loop()
 	}
 	if (!(player->HP < 0))
 	{
-		test=(test+1)%288;
+		test=(test+1)%4;
 		if(!test)
 			doLogic();
 	}

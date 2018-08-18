@@ -11,7 +11,7 @@
 TickServiceProvider::TickServiceProvider()
 {
 	// TODO Auto-generated constructor stub
-
+	sm=new SoundManager();
 }
 
 TickServiceProvider::~TickServiceProvider()
@@ -45,4 +45,9 @@ void TickServiceProvider::doReticks()
 void TickServiceProvider::requestRetick(Retickable * r)
 {
 	retickRequests.push_back(r);
+}
+
+SoundManager* TickServiceProvider::getSoundManager()
+{
+	return sm;
 }

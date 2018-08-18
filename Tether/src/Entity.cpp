@@ -16,30 +16,15 @@ void Entity::requestDestroy(ChunkManager * cm)
 	if(requestedDelete) return;
 	requestedDelete=true;
 	exists=false;
+	int size=follower.size();
+	for(int i=0;i<size;i++)
+	{
+		follower[i]->notifyRemoval(this);
+	}
+	follower.clear();
 	cm->requestEntityDelete(this);
 }
 
-//bool Entity::doAABBcheck(Entity* other, float time,TickServiceProvider* tsp)
-//{
-//	if(tsp->tickID!=lastTickID)
-//	{
-//		reset();
-//		lastTickID=tsp->tickID;
-//	}
-//	if(!bb.doesIntersect(other->bb)) return false;
-//	AABB::intersectionCounter++;
-//	if(multichunk&&other->multichunk)
-//	{
-//		int size=alreadyChecked.size();
-//		for(int i=0;i<size;i++)
-//		{
-//			if(other==alreadyChecked[i]) return false;
-//		}
-//		alreadyChecked.push_back(other);
-//		other->alreadyChecked.push_back(this);
-//	}
-//	return true;
-//}
 
 void Entity::reset()
 {
@@ -51,11 +36,51 @@ void Entity::reset()
 
 void Entity::onLeaveWorld(TickServiceProvider* tsp)
 {
-	requestDestroy(tsp->getChunkManager());//tsp->getChunkManager()->requestEntityDelete(this);
+	requestDestroy(tsp->getChunkManager());
+}
+
+void Entity::follow(Entity* e)
+{
+	follower.push_back(e);
+}
+
+void Entity::unfollow(Entity* e)
+{
+	int found=-1;
+	int size=follower.size();
+	for(int i=0;i<size;i++)
+	{
+		if(follower[i]==e)
+		{
+			found=i;
+			break;
+		}
+	}
+	if(found==-1)
+	{
+		WarnErrReporter::notFoundErr("could not unfollow: not found in followers");
+		return;
+	}
+	follower[found]=follower[size-1];
+	follower.pop_back();
+}
+
+void Entity::notifyRemoval(Entity* e)
+{
+	WarnErrReporter::noOverrideErr("Someone requested notifyRemoval and did not override the method");
 }
 
 Entity::~Entity()
 {
+	int size=follower.size();
+	if(size>0)
+	{
+		WarnErrReporter::alreadyDeadErr("someone followed a dead entity");
+	}
+	for(int i=0;i<size;i++)
+	{
+		follower[i]->notifyRemoval(this);
+	}
 }
 
 /*

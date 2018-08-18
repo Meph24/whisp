@@ -32,8 +32,11 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 	}
 	else return;
 
-	sounds[curSound]->play();
+	sounds[curSound]->setVolume(10);
+	sounds[curSound]->setRelativeToListener(true);//disable 3D Audio
+	sounds[curSound]->setPosition(0,0,0);
 	sounds[curSound]->setPitch(pitch*((rand()%16)/256.0f+1));
+	sounds[curSound]->play();
 	curSound=(curSound+1)%maxSound;
 
 	vec3 v;
@@ -65,6 +68,11 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 		ml.rotatef(rand4*90, 0, 0, 1);//produces elliptical spread
 		ml.rotatef(rand3*greater, 1, 0, 0);//distance from center of aim is chosen by rand3
 
+		//TODO use normal vectors for shots like
+		//vec3 test=cam->getNormal({0,0,-1});
+		//v.x = test.x*10;
+		//v.y = test.y*10;
+		//v.z = test.z*10;
 		v.x = ml.curMatrix[0] * velX + ml.curMatrix[4] * velY + ml.curMatrix[8] * velZ;
 		v.y = ml.curMatrix[1] * velX + ml.curMatrix[5] * velY + ml.curMatrix[9] * velZ;
 		v.z = ml.curMatrix[2] * velX + ml.curMatrix[6] * velY + ml.curMatrix[10] * velZ;

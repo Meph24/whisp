@@ -7,7 +7,6 @@
 #include "MatrixLib2.h"
 class ICamera3D: public ICamera
 {
-	vec3 getNormal(vec3 v);
 	MatrixLib2 ml;
 protected:
 	float leftPart;
@@ -16,10 +15,14 @@ protected:
 	float downPart;
 	void applyFrustum();
 public:
+	vec3 getNormal(vec3 v);
 
 	float alpha, beta, gamma;
 
 	virtual void apply()=0;
+
+	vec3 getUpVector();
+	vec3 getForwardVector();
 
 	//only works if derived Cameras use the standard definition of alpha/beta/gamma
 	vec3 getNearNormal();

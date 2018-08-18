@@ -27,6 +27,7 @@ public:
 	static void notFoundErr(std::string text);
 	static void outsideWorldErr(std::string text);
 	static void timeBackwardErr(std::string text);
+	static void alreadyDeadErr(std::string text);
 
 
 

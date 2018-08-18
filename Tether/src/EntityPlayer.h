@@ -18,6 +18,7 @@ class Zombie_KeyInput;
 #include "Zombie_KeyInput.h"
 #include <SFML/Window.hpp>
 #include "SpeedMod.h"
+#include <SFML/Audio.hpp>
 
 class EntityPlayer: public Entity,public Pushable
 {
@@ -47,7 +48,7 @@ public:
 	spacevec getCamPos();
 	Frustum * newGetViewFrustum(ChunkManager * cm,float viewDistRestriction=-1);
 
-	void applyPerspective(bool fresh,ChunkManager * cm);//returns position that must be used for relative draws
+	void applyPerspective(Timestamp t,bool fresh,ChunkManager * cm);//returns position that must be used for relative draws
 
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 

@@ -16,6 +16,16 @@ vec3 ICamera3D::getNormal(vec3 v)
 	return ret;
 }
 
+vec3 ICamera3D::getUpVector()
+{
+	return getNormal({0,1,0});
+}
+
+vec3 ICamera3D::getForwardVector()
+{
+	return getNormal({0,0,-1});
+}
+
 ICamera3D::~ICamera3D()
 {
 }

@@ -9,6 +9,7 @@
 #ifndef SRC_TICKSERVICEPROVIDER_H_
 #define SRC_TICKSERVICEPROVIDER_H_
 
+#include "SoundManager.h"
 class Entity;
 #include "ICamera3D.h"
 class ChunkManager;
@@ -21,6 +22,7 @@ class TickServiceProvider
 {
 	std::vector<InteractionManager *> interManVec;
 	std::vector<Retickable *> retickRequests;
+	SoundManager * sm;
 public:
 	int tickID=0;
 	virtual ICamera3D * getHolderCamera()=0;//can return 0 if currently not held
@@ -32,6 +34,7 @@ public:
 	void initNextTick();
 	void doReticks();
 	void requestRetick(Retickable * e);
+	SoundManager * getSoundManager();
 
 	TickServiceProvider();
 	virtual ~TickServiceProvider();

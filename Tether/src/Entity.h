@@ -24,6 +24,7 @@ class Pushable;
 
 class Entity: public Tickable, Drawable
 {
+	std::vector<Entity *> follower;
 	bool requestedDelete=false;
 public:
 	int refCounter=0;//DO NOT TOUCH
@@ -56,8 +57,6 @@ public:
 	virtual void move(float time,ChunkManager * cm);
 */
 
-	//Chunk * mainChunk;//the ticking chunk
-	//std::vector<Chunk *> chunks;
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
@@ -67,7 +66,10 @@ public:
 	void requestDestroy(ChunkManager * cm);//call this to request delete, do NOT delete any other way
 	void reset();
 
-//	bool doAABBcheck(Entity * other, float time,TickServiceProvider* tsp);
+	void follow(Entity * e);
+	void unfollow(Entity * e);
+	virtual void notifyRemoval(Entity * e);
+
 
 
 	Entity();

@@ -67,7 +67,7 @@ void Projectile::retick(TickServiceProvider* tsp)
 		spacevec middleChunk=tsp->getChunkManager()->getMiddleChunk();
 		spacevec relPos=ze->pos-middleChunk;
 		vec3 relPosMeters=tsp->getChunkManager()->toMeters(relPos);
-		ze->checkProjectile(ep,relPosMeters,tsp->getChunkManager());
+		ze->checkProjectile(ep,relPosMeters,tsp);
 		break;
 		//TODO remove above temp code and implement this:
 		//params=BulletHittable::getBulletTargetParams(...)

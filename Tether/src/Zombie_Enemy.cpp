@@ -1,6 +1,7 @@
 #include "Zombie_Enemy.h"
 #include <cstdlib>
 #include <GL/glew.h>
+#include "EntitySound.h"
 
 int Zombie_Enemy::zombieCount=0;
 
@@ -16,7 +17,7 @@ tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitio
 	size = 0.6f + (std::rand() % 1024) / 1024.0f;
 	speed *= size;
 	remainingHP = 100 * size;
-	if (rand() % 640 == 0)//64
+	if (rand() % 4==0)//640 == 0)//64
 	{
 		speed *= 2;
 		size *= 5;
@@ -225,7 +226,6 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
-	std::cout<<tickOffset<<std::endl;
 	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
 	if(!viewFrustum->inside(bb)) return;
 
@@ -280,6 +280,7 @@ void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,Draw
 
 void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 {
+	headshot=true;
 	float seconds=t-lastTick;
 	lastTick=t;
 	bodyAnim.update(seconds);
@@ -295,6 +296,7 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	spacelen characterHeightConv=cm->fromMeters(size*2);
 
 	spacevec old=pos;
+	spacevec prev=pos;
 
 	pos.x += cm->fromMeters((speed)*cos(facing *TAU/360)*seconds);//Zombie walk "AI"
 	pos.z += cm->fromMeters(-(speed)*sin(facing*TAU/360)*seconds);
@@ -351,15 +353,16 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	sizeBB.y=characterHeightConv*1.5f;
 	sizeBB.z=sizeBB.x;
 
-
+	v=(pos-prev)/seconds;
 	bb=AABB(pos,sizeBB);
 	registerPushCheck((Entity *)this,seconds,tsp);
 	if(remainingHP>=0) registerHitCheck((Entity *)this,seconds,tsp);
 }
 
 #include "WarnErrReporter.h"
-void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,ChunkManager* cm)
+void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,TickServiceProvider* tsp)
 {
+	std::cout<<"inside checkProjectile"<<std::endl;
 	float before=this->remainingHP;
 	DualPointer<Projectile> projConv=DualPointer<Projectile>((Entity *)projectile,(Projectile *)projectile);
 
@@ -392,7 +395,11 @@ void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMete
 	ml.scalef(1, 3, 1);
 
 	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
-	gotHit(hitTime, 4, projectile);
+	if(gotHit(hitTime, 4, projectile))
+	{
+		EntitySound * es=new EntitySound(this,tsp->getSoundManager()->getCrippleSound());
+		cm->requestEntitySpawn(es);
+	}
 
 	ml.popMatrix();
 
@@ -405,7 +412,11 @@ void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMete
 	ml.scalef(1, 3, 1);
 
 	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
-	gotHit(hitTime, 5, projectile);
+	if(gotHit(hitTime, 5, projectile))
+	{
+		EntitySound * es=new EntitySound(this,tsp->getSoundManager()->getCrippleSound());
+		cm->requestEntitySpawn(es);
+	}
 
 	ml.popMatrix();
 	ml.popMatrix();
@@ -426,6 +437,13 @@ void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMete
 	ml.rotatef(tilted, 1, 0, 0);
 
 	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+
+	if(headshot&&(hitTime!=-1))
+	{
+		EntitySound * es=new EntitySound(this,tsp->getSoundManager()->getHeadshotSound(),0.65f);
+		cm->requestEntitySpawn(es);
+		headshot=false;
+	}
 	gotHit(hitTime, 0, projectile);
 
 
@@ -532,9 +550,10 @@ float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, 
 	return ret;
 }
 
-void Zombie_Enemy::gotHit(float time, int part, EntityProjectile * projectile)
+bool Zombie_Enemy::gotHit(float time, int part, EntityProjectile * projectile)
 {
-	if(time==-1) return;//no hit
+	bool before=legDmg>0.25f*totalHP;
+	if(time==-1) return false;//no hit
 	float dmgMult = 0;
 	//float armDmgMult = 0;
 	float legDmgMult = 0;
@@ -563,15 +582,18 @@ void Zombie_Enemy::gotHit(float time, int part, EntityProjectile * projectile)
 		legDmgMult = 0.55f;
 		break;
 	}
+	std::cout<<"hit on body part "<<part<<std::endl;
 	legDmg+=legDmgMult*projectile->fromItem->damagePerJoule;//TODO replace with better logic once guns 2.0 work
 	remainingHP -= projectile->fromItem->damagePerJoule*dmgMult;
 
 	projectile->pos.y.intpart -= 1000;
 	projectile->posOld.y.intpart -= 1000;
-	if(legDmg>0.25f*totalHP)
+	if((!before)&&(legDmg>0.25f*totalHP))
 	{
 		speed/=2.5f;
+		return true;
 	}
+	return false;
 }
 
 void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPointer<Projectile> projectile,ChunkManager * cm)

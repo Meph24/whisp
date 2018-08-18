@@ -13,7 +13,7 @@
 
 class Zombie_Enemy: public Entity,public Pushable,public Hittable
 {
-
+	bool headshot=true;
 	struct texCooSet{
 		float unitSize;
 		float startX, startY;
@@ -36,7 +36,7 @@ class Zombie_Enemy: public Entity,public Pushable,public Hittable
 	void drawLeg(int loc,float strength);
 	void drawTexturedCube(texCooSet textureCoordinates);
 
-	void gotHit(float time, int part, EntityProjectile * projectile);
+	bool gotHit(float time, int part, EntityProjectile * projectile);
 
 public:
 
@@ -67,7 +67,7 @@ public:
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
-	void checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,ChunkManager * cm);
+	void checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,TickServiceProvider* tsp);
 	float checkBox(DualPointer<Projectile> projectile,MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo,spacevec relPos);//valid hit from 0 to 1, otherwise -1
 
 
