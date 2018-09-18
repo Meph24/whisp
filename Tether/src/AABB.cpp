@@ -42,7 +42,7 @@ AABB::AABB(spacevec pos, spacevec sizeFromMid, spacevec movement):
 low(pos-sizeFromMid),high(pos+sizeFromMid)
 {
 	assert(sizeFromMid.x.intpart<10);
-	assert(movement.z.intpart<10);
+	assert(movement.z.intpart<10);//Assertion failed! Expression: movement.z.intpart<10
 	assert(movement.x.intpart<20);
 	assert(movement.z.intpart<20);
 	spacelen zero;
