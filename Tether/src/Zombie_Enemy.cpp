@@ -17,7 +17,7 @@ tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitio
 	size = 0.6f + (std::rand() % 1024) / 1024.0f;
 	speed *= size;
 	remainingHP = 100 * size;
-	if (rand() % 4==0)//640 == 0)//64
+	if (rand() % 640==0)//640 == 0)//64
 	{
 		speed *= 2;
 		size *= 5;

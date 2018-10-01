@@ -32,10 +32,10 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 	}
 	else return;
 
-	//sounds[curSound]->setVolume(10);
+	sounds[curSound]->setVolume(10);
 	sounds[curSound]->setRelativeToListener(true);//disable 3D Audio
-	//sounds[curSound]->setPosition(0,0,0);
-	//sounds[curSound]->setPitch(pitch*((rand()%16)/256.0f+1));
+	sounds[curSound]->setPosition(0,0,0);
+	sounds[curSound]->setPitch(pitch*((rand()%16)/256.0f+1));
 	sounds[curSound]->play();
 	curSound=(curSound+1)%maxSound;
 
