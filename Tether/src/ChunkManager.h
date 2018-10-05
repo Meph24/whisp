@@ -61,6 +61,13 @@ class ChunkManager: public Tickable, public Drawable
 	int getIndx(chunkNum cx,chunkNum cz);//from absolute chunk coordinates
 	int getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ);//from absolute chunk coordinates
 	chunkSearchResult chunkSearch(Entity * e,int chunkIndx);//index -1=not found
+
+	//search results are only valid right after acquisition
+	chunkSearchResult dumbSearch(Entity * e);//index -1=not found
+	chunkSearchResult smartSearch(Entity * e,spacevec pos);//index -1=not found
+	chunkSearchResult trySmartSearch(Entity * e,spacevec pos,bool reportWarn);//uses dumb search and report warning (if reportWarn), if not found with smart search; index -1=not found
+
+
 public:
 
 	//magic, do not use yourself:
@@ -101,11 +108,6 @@ public:
 
 	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!
 
-
-	//search results are only valid right after acquisition
-	chunkSearchResult dumbSearch(Entity * e);//index -1=not found
-	chunkSearchResult smartSearch(Entity * e,spacevec pos);//index -1=not found
-	chunkSearchResult trySmartSearch(Entity * e,spacevec pos,bool reportWarn);//uses dumb search and report warning (if reportWarn), if not found with smart search; index -1=not found
 
 };
 
