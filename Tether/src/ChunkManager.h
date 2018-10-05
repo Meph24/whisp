@@ -20,7 +20,7 @@ class Frustum;
 #include <vector>
 #include "InteractionManager.h"
 #include "Drawable.h"
-#include "LockChunk.h"
+#include "LockFast.h"
 
 struct chunkChange
 {
@@ -36,7 +36,7 @@ struct chunkSearchResult
 
 class ChunkManager: public Tickable, public Drawable
 {
-	std::vector<LockChunk *> locks;
+	LockFast dataStructureLock;
 	int chunkSize;//size of one chunk
 	int chunksPerAxis;//width and height in chunks
 	spacelen defaultH;
