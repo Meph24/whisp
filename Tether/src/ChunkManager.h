@@ -67,11 +67,11 @@ class ChunkManager: public Tickable, public Drawable
 	chunkSearchResult smartSearch(Entity * e,spacevec pos);//index -1=not found
 	chunkSearchResult trySmartSearch(Entity * e,spacevec pos,bool reportWarn);//uses dumb search and report warning (if reportWarn), if not found with smart search; index -1=not found
 
+	bool isValid(chunkNum cx,chunkNum cz);
 
 public:
 
 	//magic, do not use yourself:
-
 
 	void requestEntityDelete(Entity * e);//do not call this yourself, call Entiy.requestDestroy instead
 	void requestEntityMove(Entity * e);//do not call yourself, managed by chunks
@@ -80,33 +80,30 @@ public:
 	void render(float lodQ,Frustum * viewFrustum, spacevec camOffset);//TODO drawable
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	void generateMissing(int count);
-	spacevec getWind(spacevec abs);
 	void applyEntityChunkChanges(TickServiceProvider * tsp);//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
 	void setMid(spacevec abs,TickServiceProvider * tsp);//absolute x,z
 	void clearEntities();
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 
+	///the non-critical interface: you can always safely use these
 
-
-	//the interface: you can safely use these:
-
-	bool isValid(chunkNum cx,chunkNum cz);
 	float getChunkSize();
-	spacevec clip(spacevec pos,bool forceGround);
-	bool hitsGround(spacevec startpoint,spacevec endpoint);
-	spacelen getGravity();
-	spacelen getHeight(spacevec abs);//absolute x,z
+	spacelen getGravity();//currently a constant
 	flt toMeters(spacelen l);
 	vec3 toMeters(spacevec v);
 	spacelen fromMeters(flt l);
 	spacevec fromMeters(vec3 v);
-	spacevec getMiddleChunk();
 
+	//the partially critical interface: only call from main tick thread
+	//writing:
+	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!!
 	void giveInteractionManagers(Entity * e,std::vector<InteractionManager *> * managers,TickServiceProvider * tsp);
-
-
-	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!
+	//read-only:
+	spacelen getHeight(spacevec abs);//absolute x,z
+	spacevec getMiddleChunk();
+	bool hitsGround(spacevec startpoint,spacevec endpoint);
+	spacevec clip(spacevec pos,bool forceGround);
 
 
 };

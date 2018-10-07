@@ -222,10 +222,6 @@ void ChunkManager::generateMissing(int count)
 	}
 }
 
-spacevec ChunkManager::getWind(spacevec abs)
-{
-	return {{0,0},{0,0},{0,0}};//TODO
-}
 
 void ChunkManager::tick(Timestamp t, TickServiceProvider* tsp)
 {
