@@ -18,7 +18,7 @@ class LockFast
 {
 	std::mutex m;
 public:
-	bool tryLock();
+	bool try_lock();
 	void lock();
 	void unlock();
 

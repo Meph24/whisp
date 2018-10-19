@@ -15,6 +15,8 @@ class WarnErrReporter
 {
 public:
 
+	//TODO log errors and warnings to file
+
 	//warnings:
 
 
@@ -28,7 +30,10 @@ public:
 	static void outsideWorldErr(std::string text);
 	static void timeBackwardErr(std::string text);
 	static void alreadyDeadErr(std::string text);
+	//TODO go through them and sort to semi-hard where needed
 
+	//semi-hard errors (no crash so far, default behavior can correct error but may fail to do so
+	static void notDeletedErr(std::string text);
 
 
 	//hard errors (requires crash and extensive log)

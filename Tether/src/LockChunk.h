@@ -9,17 +9,25 @@
 #ifndef SRC_LOCKCHUNK_H_
 #define SRC_LOCKCHUNK_H_
 #include <vector>
+#include "LockFast.h"
+#include "Chunk.h"
 class LockChunk
 {
+	LockFast myLock;
 public:
-	std::vector<int> chunkInd;//the chunks contained by this lock chunk
+
+	//the chunks contained by this lock chunk, subject to external change unless you own the lock
+	std::vector<Chunk *> chunks;
+
+	//do not use the lock API directly, use managers (if you can)
+	//whoever changes the chunk vector or pointers in a chunk must have the corresponding lock
+	bool try_lock();
+	void lock();
+	void unlock();
 
 
-	//whoever changes pointers in a chunk must have the corresponding lock
-	void lockBlocking();
-	void freeLock();
 
-	LockChunk();
+	LockChunk(int containedChunksX,int containedChunksZ);
 	~LockChunk();
 };
 

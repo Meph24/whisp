@@ -8,15 +8,15 @@
 
 #include "TickServiceProvider.h"
 
-TickServiceProvider::TickServiceProvider()
+TickServiceProvider::TickServiceProvider():
+threadDataMan(1)
 {
-	// TODO Auto-generated constructor stub
 	sm=new SoundManager();
 }
 
 TickServiceProvider::~TickServiceProvider()
 {
-	// TODO Auto-generated destructor stub
+	delete sm;
 }
 
 void TickServiceProvider::initNextTick()
@@ -26,10 +26,11 @@ void TickServiceProvider::initNextTick()
 	AABB::checkCounter=0;
 }
 
-std::vector<InteractionManager*>* TickServiceProvider::getInterManVector()
+std::vector<InteractionManager*>* TickServiceProvider::getInterManVector(unsigned int threadID)
 {
-	interManVec.clear();
-	return &interManVec;
+	std::vector<InteractionManager*>* myVec=threadDataMan.getInteractionManVec(threadID);
+	myVec->clear();
+	return myVec;
 }
 
 void TickServiceProvider::doReticks()

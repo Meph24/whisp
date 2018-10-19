@@ -7,15 +7,37 @@
  */
 
 #include "LockChunk.h"
+#include "WarnErrReporter.h"
 
-LockChunk::LockChunk()
+LockChunk::LockChunk(int containedChunksX,int containedChunksZ)
 {
-	// TODO Auto-generated constructor stub
+	for(int i=0;i<containedChunksX*containedChunksZ;i++)
+	{
+		chunks.push_back(0);
+	}
+}
 
+bool LockChunk::try_lock()
+{
+	return myLock.try_lock();
+}
+
+void LockChunk::lock()
+{
+	myLock.lock();
+}
+
+void LockChunk::unlock()
+{
+	myLock.unlock();
 }
 
 LockChunk::~LockChunk()
 {
-	// TODO Auto-generated destructor stub
+	int size=chunks.size();
+	for(int i=0;i<size;i++)
+	{
+		if(chunks[i]) WarnErrReporter::notDeletedErr("LockChunk deleted before it was empty");
+	}
 }
 

@@ -101,3 +101,13 @@ void WarnErrReporter::alreadyDeadErr(std::string text)
 	std::cout<<std::endl;
 	std::cout<<std::endl;
 }
+
+void WarnErrReporter::notDeletedErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"semi-hard error (notDeletedErr): no crash so far, my still happen later, this definitely should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}

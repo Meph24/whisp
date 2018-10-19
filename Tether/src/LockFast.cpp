@@ -14,7 +14,7 @@ LockFast::LockFast()
 
 }
 
-bool LockFast::tryLock()
+bool LockFast::try_lock()
 {
 	return m.try_lock();
 }

@@ -9,9 +9,25 @@
 #include "ChunkManager.h"
 
 
-ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir):
+ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk, float gravityYdir):
 chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
+	lockChunkSizeX=1;
+	lockChunkSizeZ=1;
+	while(chunksPerLockchunk>3)
+	{
+		lockChunkSizeX*=2;
+		lockChunkSizeZ*=2;
+		chunksPerLockchunk/=4;
+	}
+	if(chunksPerLockchunk>1)
+	{
+		lockChunkSizeX*=2;
+	}
+	lockChunkStartX=0;
+	lockChunkStartZ=0;
+	lockChunksPerAxisX=(chunksPerAxis+lockChunkSizeX*2-2)/lockChunkSizeX;
+	lockChunksPerAxisZ=(chunksPerAxis+lockChunkSizeZ*2-2)/lockChunkSizeZ;
 	chunksBuf1=new Chunk * [chunksPerAxis*chunksPerAxis];
 	chunksBuf2=new Chunk * [chunksPerAxis*chunksPerAxis];
 	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
@@ -133,22 +149,8 @@ void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 		lowX=newLowX;
 		lowZ=newLowZ;
 	}
-	if(cx<lowX) return;
-	if(cz<lowZ) return;
-	if(cx>=(lowX+chunksPerAxis)) return;
-	if(cz>=(lowZ+chunksPerAxis)) return;
-
-	int myInd=getIndx(cx,cz);
-	if(chunks[myInd]==0)
-	{
-		spacevec chunkBase;
-		chunkBase.y=fromMeters(0);
-		chunkBase.x.floatpart=0;
-		chunkBase.z.floatpart=0;
-		chunkBase.x.intpart=cx;
-		chunkBase.z.intpart=cz;
-		chunks[myInd]=new Chunk(chunkBase,chunkSize,this);
-	}
+	correctLockChunks();
+	tryCreateChunk(cx,cz);//make sure middle chunk exists so player is always in a loaded chunk
 }
 
 int ChunkManager::getIndx(chunkNum cx,chunkNum cz)
@@ -176,49 +178,19 @@ void ChunkManager::generateMissing(int count)
 		for(int i=0;i<j;i++)
 		{
 			xrun+=dir;
-			if(chunks[getIndx(xrun,zrun)]==0)
-			{
-				spacevec chunkBase;
-				chunkBase.y=fromMeters(0);
-				chunkBase.x.floatpart=0;
-				chunkBase.z.floatpart=0;
-				chunkBase.x.intpart=xrun;
-				chunkBase.z.intpart=zrun;
-				chunks[getIndx(xrun,zrun)]=new Chunk(chunkBase,chunkSize,this);
-				if(!(--count)) return;
-			}
+			if(tryCreateChunk(xrun,zrun)) if(!(--count)) return;
 		}
 		for(int i=0;i<j;i++)
 		{
 			zrun+=dir;
-			if(chunks[getIndx(xrun,zrun)]==0)
-			{
-				spacevec chunkBase;
-				chunkBase.y=fromMeters(0);
-				chunkBase.x.floatpart=0;
-				chunkBase.z.floatpart=0;
-				chunkBase.x.intpart=xrun;
-				chunkBase.z.intpart=zrun;
-				chunks[getIndx(xrun,zrun)]=new Chunk(chunkBase,chunkSize,this);
-				if(!(--count)) return;
-			}
+			if(tryCreateChunk(xrun,zrun)) if(!(--count)) return;
 		}
 	}
 	dir=-dir;
 	for(int i=0;i<chunksPerAxis-1;i++)
 	{
 		xrun+=dir;
-		if(chunks[getIndx(xrun,zrun)]==0)
-		{
-			spacevec chunkBase;
-			chunkBase.y=fromMeters(0);
-			chunkBase.x.floatpart=0;
-			chunkBase.z.floatpart=0;
-			chunkBase.x.intpart=xrun;
-			chunkBase.z.intpart=zrun;
-			chunks[getIndx(xrun,zrun)]=new Chunk(chunkBase,chunkSize,this);
-			if(!(--count)) return;
-		}
+		if(tryCreateChunk(xrun,zrun)) if(!(--count)) return;
 	}
 }
 
@@ -274,6 +246,123 @@ spacevec ChunkManager::fromMeters(vec3 v)
 spacelen ChunkManager::getGravity()
 {
 	return gravity;
+}
+
+void ChunkManager::correctLockChunks()
+{
+	chunkNum highX=lowX+chunksPerAxis;
+	chunkNum highZ=lowZ+chunksPerAxis;
+	chunkNum lockChunkStopX=lockChunkStartX+lockChunksPerAxisX*lockChunkSizeX;
+	chunkNum lockChunkStopZ=lockChunkStartZ+lockChunksPerAxisZ*lockChunkSizeZ;
+	if ((lowX-lockChunkStartX>=0)&&
+		(lowZ-lockChunkStartZ>=0)&&
+		(lockChunkStopX-highX>=0)&&
+		(lockChunkStopZ-highZ>=0))
+	{
+		return;//no need to change anything
+	}
+
+	int size=lockChunks.size();
+	std::vector<std::shared_ptr<LockChunk>> tempBuf(size);//TODO correct way to preallocate?
+	for(int i=0;i<size;i++)
+	{
+		tempBuf.push_back(lockChunks[i]);
+	}
+
+	chunkNum newX=lockChunkStartX;
+	chunkNum newZ=lockChunkStartZ;
+	if(lockChunkStartX-lowX>0)
+	{
+		chunkNum correctionSize=(lockChunkStartX-lowX+lockChunkSizeX-1)/lockChunkSizeX;
+		newX-=correctionSize*lockChunkSizeX;
+	}
+	else if(highX-lockChunkStopX>0)
+	{
+		chunkNum correctionSize=(lockChunkStartX-lowX+lockChunkSizeX-1)/lockChunkSizeX;
+		newX+=correctionSize*lockChunkSizeX;
+	}
+	if(lockChunkStartZ-lowZ>0)
+	{
+		chunkNum correctionSize=(lockChunkStartZ-lowZ+lockChunkSizeZ-1)/lockChunkSizeZ;
+		newZ-=correctionSize*lockChunkSizeZ;
+	}
+	else if(highZ-lockChunkStopZ>0)
+	{
+		chunkNum correctionSize=(lockChunkStartZ-lowZ+lockChunkSizeZ-1)/lockChunkSizeZ;
+		newZ+=correctionSize*lockChunkSizeZ;
+	}
+
+	for(int zrun=0;zrun<lockChunksPerAxisZ;zrun++)
+	{
+		for(int xrun=0;xrun<lockChunksPerAxisX;xrun++)
+		{
+			int newInd=zrun*lockChunksPerAxisX+xrun;
+			chunkNum realX=newX+xrun*lockChunkSizeX;
+			chunkNum realZ=newZ+zrun*lockChunkSizeZ;
+			int oldX=realX/lockChunkSizeX-lockChunkStartX;
+			int oldZ=realZ/lockChunkSizeZ-lockChunkStartZ;
+			int oldInd=oldZ*lockChunksPerAxisX+oldX;
+
+			if(insideLimits(oldX,oldZ,lockChunksPerAxisX,lockChunksPerAxisZ))
+			{
+				tempBuf[newInd]=lockChunks[oldInd];//TODO check if correct
+				lockChunks[oldInd]=std::shared_ptr<LockChunk>(0);//TODO check if correct
+			}
+			else
+			{
+				tempBuf[newInd]=std::shared_ptr<LockChunk>(new LockChunk(lockChunkSizeX,lockChunkSizeZ));//TODO more?
+			}
+		}
+	}
+	int size=lockChunksPerAxisX*lockChunksPerAxisZ;
+	for(int i=0;i<size;i++)
+	{
+		if(lockChunks[i])//non-null in old structure
+		{
+			lockChunks[i]->lock();
+
+			make sure every contained chunk is null
+
+			lockChunks[i]->unlock();
+			free the own shared ptr//TODO make sure shared pointer free properly deletes lockchunk
+		}
+	}
+
+	//TODO
+
+	lockChunks=tempBuf;//TODO replace by non-dummy
+}
+
+bool ChunkManager::tryCreateChunk(chunkNum cx, chunkNum cz)
+{
+	if(cx<lowX) return false;
+	if(cz<lowZ) return false;
+	if(cx>=(lowX+chunksPerAxis)) return false;
+	if(cz>=(lowZ+chunksPerAxis)) return false;
+
+	int myInd=getIndx(cx,cz);
+	if(chunks[myInd]==0)
+	{
+		spacevec chunkBase;
+		chunkBase.y=fromMeters(0);
+		chunkBase.x.floatpart=0;
+		chunkBase.z.floatpart=0;
+		chunkBase.x.intpart=cx;
+		chunkBase.z.intpart=cz;
+		chunks[myInd]=new Chunk(chunkBase,chunkSize,this);
+	}
+	else return false;
+	//TODO lockchunks
+	return true;
+}
+
+bool ChunkManager::insideLimits(int x, int z, int maxX, int maxZ)
+{
+	if(x<0) return false;
+	if(z<0) return false;
+	if(x>=maxX) return false;
+	if(z>=maxZ) return false;
+	return true;
 }
 
 spacevec ChunkManager::clip(spacevec pos, bool forceGround)

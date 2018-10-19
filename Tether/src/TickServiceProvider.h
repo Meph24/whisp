@@ -16,11 +16,12 @@ class ChunkManager;
 class InteractionManager;
 #include "Retickable.h"
 #include <vector>
+#include "ThreadDataManager.h"
 
-//provides services for tickable items
+//provides services for tickable stuff
 class TickServiceProvider
 {
-	std::vector<InteractionManager *> interManVec;
+	ThreadDataManager threadDataMan;
 	std::vector<Retickable *> retickRequests;
 	SoundManager * sm;
 public:
@@ -28,13 +29,14 @@ public:
 	virtual ICamera3D * getHolderCamera()=0;//can return 0 if currently not held
 	virtual ChunkManager * getChunkManager()=0;
 	virtual Entity * getTarget(Entity * me)=0;
-	std::vector<InteractionManager *> * getInterManVector();//result could later depend on thread
+	std::vector<InteractionManager *> * getInterManVector(unsigned int threadID=0);
 
 	//initializes the next tick, call once before ticking everyone
 	void initNextTick();
 	void doReticks();
 	void requestRetick(Retickable * e);
 	SoundManager * getSoundManager();
+
 
 	TickServiceProvider();
 	virtual ~TickServiceProvider();

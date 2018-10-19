@@ -20,7 +20,8 @@ class Frustum;
 #include <vector>
 #include "InteractionManager.h"
 #include "Drawable.h"
-#include "LockFast.h"
+#include "LockChunk.h"
+#include <memory>
 
 struct chunkChange
 {
@@ -50,11 +51,21 @@ class ChunkManager: public Tickable, public Drawable
 
 	int renderDistanceChunks;
 
+	int lockChunkSizeX;
+	int lockChunkSizeZ;
+	chunkNum lockChunkStartX;
+	chunkNum lockChunkStartZ;
+	int lockChunksPerAxisX;
+	int lockChunksPerAxisZ;
+
+
 	spacelen gravity;
 
 	std::vector<chunkChange> addVec;//the entities that should be added to chunk[loc] soon
 	std::vector<chunkChange> removeVec;//the entities that should be removed from chunk[loc] soon (without deleting)
 	std::vector<Entity *> deleteVec;//the entities that should be removed from chunk[loc] soon (with deleting)
+
+	std::vector<std::shared_ptr<LockChunk>> lockChunks;
 
 	int getIndxOrNeg1(spacevec abs);
 	int getIndx(spacevec abs);
@@ -68,6 +79,13 @@ class ChunkManager: public Tickable, public Drawable
 	chunkSearchResult trySmartSearch(Entity * e,spacevec pos,bool reportWarn);//uses dumb search and report warning (if reportWarn), if not found with smart search; index -1=not found
 
 	bool isValid(chunkNum cx,chunkNum cz);
+
+	void correctLockChunks();//does nothing if already correct
+
+	bool tryCreateChunk(chunkNum cx,chunkNum cz);
+	bool insideLimits(int x,int z,int maxX,int maxZ);
+
+	//TODO void deleteChunk()
 
 public:
 
@@ -83,7 +101,9 @@ public:
 	void applyEntityChunkChanges(TickServiceProvider * tsp);//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
 	void setMid(spacevec abs,TickServiceProvider * tsp);//absolute x,z
 	void clearEntities();
-	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, float gravityYdir);//render distance should be lower than half of the total chunks per axis
+
+	//chunksPerLockchunk must be power of 2, if its not, it will be assigned one
+	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks,int chunksPerLockchunk, float gravityYdir);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 
 	///the non-critical interface: you can always safely use these
