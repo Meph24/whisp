@@ -12,7 +12,7 @@ void ThreadDataManager::reset(unsigned int newThreadCount)
 {
 	if(interManVecs)
 	{
-		for(int i=0;i<threadCount;i++)
+		for(unsigned int i=0;i<threadCount;i++)
 		{
 			if(interManVecs[i])
 				delete interManVecs[i];
@@ -22,6 +22,10 @@ void ThreadDataManager::reset(unsigned int newThreadCount)
 	if(newThreadCount)
 	{
 		interManVecs=new std::vector<InteractionManager *> *[newThreadCount];
+		for(unsigned int i=0;i<newThreadCount;i++)
+		{
+			interManVecs[i]=new std::vector<InteractionManager *>();
+		}
 	}
 	else
 	{
@@ -32,7 +36,13 @@ void ThreadDataManager::reset(unsigned int newThreadCount)
 
 std::vector<InteractionManager*>* ThreadDataManager::getInteractionManVec(unsigned int threadID)
 {
-	return interManVecs[threadCount];
+	if(interManVecs[threadID]==0)
+	{
+		std::cout<<"du idiot hast vergessen den zu initialisieren"<<std::endl;
+		return 0;
+	}
+	//std::cout<<"inside getInteractionManVec"<<std::endl;
+	return interManVecs[threadID];
 }
 
 ThreadDataManager::ThreadDataManager(unsigned int threadCount)

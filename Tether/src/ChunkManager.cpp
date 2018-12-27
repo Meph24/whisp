@@ -149,7 +149,7 @@ void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 		lowX=newLowX;
 		lowZ=newLowZ;
 	}
-	correctLockChunks();
+	//correctLockChunks();
 	tryCreateChunk(cx,cz);//make sure middle chunk exists so player is always in a loaded chunk
 }
 
@@ -314,6 +314,7 @@ void ChunkManager::correctLockChunks()
 			}
 		}
 	}
+	/*
 	int size=lockChunksPerAxisX*lockChunksPerAxisZ;
 	for(int i=0;i<size;i++)
 	{
@@ -321,13 +322,13 @@ void ChunkManager::correctLockChunks()
 		{
 			lockChunks[i]->lock();
 
-			make sure every contained chunk is null
+			//make sure every contained chunk is null
 
 			lockChunks[i]->unlock();
-			free the own shared ptr//TODO make sure shared pointer free properly deletes lockchunk
+			//free the own shared ptr//TODO make sure shared pointer free properly deletes lockchunk
 		}
 	}
-
+*/
 	//TODO
 
 	lockChunks=tempBuf;//TODO replace by non-dummy

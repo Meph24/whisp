@@ -8,15 +8,16 @@
 
 #include "TickServiceProvider.h"
 
-TickServiceProvider::TickServiceProvider():
-threadDataMan(1)
+TickServiceProvider::TickServiceProvider()
 {
+	threadDataMan=new ThreadDataManager(1);
 	sm=new SoundManager();
 }
 
 TickServiceProvider::~TickServiceProvider()
 {
 	delete sm;
+	delete threadDataMan;
 }
 
 void TickServiceProvider::initNextTick()
@@ -28,7 +29,7 @@ void TickServiceProvider::initNextTick()
 
 std::vector<InteractionManager*>* TickServiceProvider::getInterManVector(unsigned int threadID)
 {
-	std::vector<InteractionManager*>* myVec=threadDataMan.getInteractionManVec(threadID);
+	std::vector<InteractionManager*>* myVec=threadDataMan->getInteractionManVec(threadID);
 	myVec->clear();
 	return myVec;
 }

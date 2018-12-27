@@ -10,7 +10,7 @@
 #define SRC_LOCKCHUNK_H_
 #include <vector>
 #include "LockFast.h"
-#include "Chunk.h"
+class Chunk;
 class LockChunk
 {
 	LockFast myLock;
@@ -30,5 +30,6 @@ public:
 	LockChunk(int containedChunksX,int containedChunksZ);
 	~LockChunk();
 };
+#include "Chunk.h"
 
 #endif /* SRC_LOCKCHUNK_H_ */

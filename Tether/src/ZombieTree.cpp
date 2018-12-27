@@ -9,17 +9,25 @@
 #include "ZombieTree.h"
 #include <GL/glew.h>
 
-Zombie_Tree::Zombie_Tree(vec3 position, ITexture* textureLog, ITexture* textureLeaves):
-pos(position),tex1(textureLog),tex2(textureLeaves)
+Zombie_Tree::Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves):
+tex1(textureLog),tex2(textureLeaves)
 {
+	surviveClearing=true;
+	bb=AABB(position);
+	pos=position;
+	v.set0();
 	d = 0.8f;//TODO
 	h = 18;
 }
 
-Zombie_Tree::Zombie_Tree(vec3 position, flt diameter, flt height,  ITexture* textureLog, ITexture* textureLeaves):
-d(diameter),h(height+8),pos(position),tex1(textureLog),tex2(textureLeaves)
+Zombie_Tree::Zombie_Tree(spacevec position, flt diameter, flt height, flt diameterLeavse,  ITexture* textureLog, ITexture* textureLeaves):
+d(diameter),h(height+8),tex1(textureLog),tex2(textureLeaves)
 {
-
+	surviveClearing=true;
+	bb=AABB(position);
+	pos=position;
+	dLeaves = diameterLeavse;
+	v.set0();
 }
 
 void Zombie_Tree::drawLog()
@@ -54,7 +62,7 @@ void Zombie_Tree::drawLog()
 
 void Zombie_Tree::drawLeaves()
 {
-	flt r = d*6;
+	flt r = d*dLeaves;
 	glBegin(GL_TRIANGLE_FAN);
 
 	glTexCoord2f(0,0);
@@ -77,14 +85,21 @@ void Zombie_Tree::drawLeaves()
 
 }
 
-void Zombie_Tree::draw()
+void Zombie_Tree::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
+	float tickOffset=t-lastTick;
+	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
+	if(!viewFrustum->inside(bb)) return;
+
+	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
+	vec3 interPosMeters=cm->toMeters(interPos);
+
 	tex1->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
 
 	glPushMatrix();
-	glTranslatef(pos.x, pos.y-8, pos.z);
+	glTranslatef(interPosMeters.x, interPosMeters.y-8, interPosMeters.z);
 
 	drawLog();
 	glRotatef(180,0,1,0);
@@ -103,31 +118,10 @@ void Zombie_Tree::draw()
 		glRotatef(30,0,1,0);
 	}
 
-
-
 	glDisable(GL_TEXTURE_2D);
-
-
-
-
-
-
-
-
 
 	glPopMatrix();
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 Zombie_Tree::~Zombie_Tree()
@@ -135,3 +129,16 @@ Zombie_Tree::~Zombie_Tree()
 	// TODO Auto-generated destructor stub
 }
 
+void Zombie_Tree::tick(Timestamp t, TickServiceProvider* tsp)
+{
+//	float seconds=t-lastTick;
+	lastTick=t;
+
+	ChunkManager * cm=tsp->getChunkManager();
+
+	pos=cm->clip(pos,true);
+
+	int temp = (h - rootSize) + (d * dLeaves);
+	if(temp<rootSize) temp=rootSize;
+	bb=AABB(pos, cm->fromMeters(vec3(d*dLeaves,temp,d*dLeaves)));
+}

@@ -16,12 +16,12 @@ class ChunkManager;
 class InteractionManager;
 #include "Retickable.h"
 #include <vector>
-#include "ThreadDataManager.h"
+class ThreadDataManager;
 
 //provides services for tickable stuff
 class TickServiceProvider
 {
-	ThreadDataManager threadDataMan;
+	ThreadDataManager * threadDataMan;
 	std::vector<Retickable *> retickRequests;
 	SoundManager * sm;
 public:
@@ -42,6 +42,7 @@ public:
 	virtual ~TickServiceProvider();
 };
 
+#include "ThreadDataManager.h"
 #include "ChunkManager.h"
 #include "Entity.h"
 #include "InteractionManager.h"

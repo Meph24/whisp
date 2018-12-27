@@ -9,10 +9,11 @@
 #ifndef SRC_PROJECTILECOLLISION_H_
 #define SRC_PROJECTILECOLLISION_H_
 
-class Hittable;
-#include "Entity.h"
 #include "DualPointer.h"
 #include "Spacevec.h"
+
+class Hittable;
+class Entity;
 
 class ProjectileCollision
 {
@@ -29,5 +30,6 @@ public:
 	~ProjectileCollision();
 };
 #include "Hittable.h"
+#include "Entity.h"
 
 #endif /* SRC_PROJECTILECOLLISION_H_ */

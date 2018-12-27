@@ -9,7 +9,7 @@
 #ifndef SRC_THREADDATAMANAGER_H_
 #define SRC_THREADDATAMANAGER_H_
 
-#include "InteractionManager.h"
+class InteractionManager;
 #include <vector>
 
 class ThreadDataManager
@@ -23,5 +23,6 @@ public:
 	ThreadDataManager(unsigned int threadCount=1);
 	~ThreadDataManager();
 };
+#include "InteractionManager.h"
 
 #endif /* SRC_THREADDATAMANAGER_H_ */

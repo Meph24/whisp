@@ -27,6 +27,8 @@ class Entity: public Tickable, Drawable
 	std::vector<Entity *> follower;
 	bool requestedDelete=false;
 public:
+	bool surviveClearing=false;
+
 	int refCounter=0;//DO NOT TOUCH
 
 

@@ -226,12 +226,27 @@ void Chunk::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawService
 
 void Chunk::clearEntities()
 {
+	std::vector<Entity *> remain;
 	int size=managedEntities.size();
 	for(int i=0;i<size;i++)
 	{
-		delete managedEntities[i];
+		if(managedEntities[i]->surviveClearing)
+		{
+			remain.push_back(managedEntities[i]);
+		}
+		else
+		{
+			delete managedEntities[i];
+		}
 	}
 	managedEntities.clear();
+
+	size=remain.size();
+	for(int i=0;i<size;i++)
+	{
+		managedEntities.push_back(remain[i]);
+	}
+	remain.clear();
 }
 
 Chunk::~Chunk()

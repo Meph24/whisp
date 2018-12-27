@@ -294,6 +294,8 @@ struct vec3if
 	float fLength(float chunkSize);
 	double dLength(double chunkSize);
 
+	void set0();
+
 	flt dot(vec3 v);//use only if already relativized, otherwise precision problems
 
 };
@@ -461,6 +463,17 @@ inline vec3if<I, F> vec3if<I, F>::operator -()
 	zero.z.floatpart=0;
 	zero.z.intpart=0;
 	return zero-*this;
+}
+
+template<typename I, typename F>
+inline void vec3if<I, F>::set0()
+{
+	x.floatpart=0;
+	x.intpart=0;
+	y.floatpart=0;
+	y.intpart=0;
+	z.floatpart=0;
+	z.intpart=0;
 }
 
 template<typename I, typename F>

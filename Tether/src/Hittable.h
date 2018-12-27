@@ -9,11 +9,13 @@
 #ifndef SRC_HITTABLE_H_
 #define SRC_HITTABLE_H_
 #include "hitType.h"
-#include "BulletHittable.h"
-class ProjectileCollision;
 #include "ProjectileCollision.h"
 #include "DualPointer.h"
 class Projectile;
+class BulletHittable;
+class ChunkManager;
+class TickServiceProvider;
+#include <vector>
 class Hittable
 {
 public:
@@ -26,5 +28,8 @@ public:
 };
 
 #include "Projectile.h"
+#include "BulletHittable.h"
+#include "ChunkManager.h"
+#include "TickServiceProvider.h"
 
 #endif /* SRC_HITTABLE_H_ */

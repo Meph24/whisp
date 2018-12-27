@@ -24,7 +24,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	chunkLoadRate=*cfg.getint("graphics", "chunkLoadRate");
 	lodQuality=*cfg.getfloat("graphics", "terrainQuality");
 	std::cout<<"testStart"<<std::endl;
-	cm=new ChunkManager(16,physDist*2,renderDist,9.81f);
+	cm=new ChunkManager(16,physDist*2,renderDist,16,9.81f);//TODO make chunksPerLockchunk configurable
 	currentGun=0;
 	spawnZombies=true;
 	zCount = *cfg.getint("test", "zombies");
@@ -137,12 +137,6 @@ void Zombie_World::render(Timestamp t)
 	cm->draw(t,viewFrustum,cm,this);
 	glPopMatrix();
 
-	spacevec treePos=cm->clip(cm->fromMeters(vec3(5,0,5)),true);
-	spacevec relTree=treePos-relPos;
-	Zombie_Tree tr=Zombie_Tree(cm->toMeters(relTree),tree, leaves);
-	tr.draw();
-
-
 
 	glPushMatrix();
 	glDisable(GL_DEPTH_TEST);
@@ -227,6 +221,8 @@ void Zombie_World::loadStandardTex()
 
 	g = new Graphics2D(64);
 
+	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
+	cm->requestEntitySpawn(tr);
 }
 #include "WarnErrReporter.h"
 void Zombie_World::doPhysics(Timestamp t)
@@ -252,8 +248,8 @@ void Zombie_World::loop()
 	}
 	if (!(player->HP < 0))
 	{
-		test=(test+1)%4;
-		if(!test)
+		//test=(test+1)%4;
+		//if(!test)
 			doLogic();
 	}
 	doGraphics();
@@ -292,6 +288,9 @@ void Zombie_World::spawnZombie(Timestamp t)
 	{
 		if (Zombie_Enemy::zombieCount>=zCount) return;
 		cm->requestEntitySpawn(new Zombie_Enemy(t,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm));
+		float r3 = (rand()%7)+13;
+		float r4 = ((rand()%32768)/32768.0f)*4 + 5;
+		cm->requestEntitySpawn(new Zombie_Tree(player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),1.2, r3, r4, tree, leaves));
 		std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
 	}
 }
