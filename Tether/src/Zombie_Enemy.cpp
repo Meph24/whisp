@@ -8,7 +8,7 @@ int Zombie_Enemy::zombieCount=0;
 Zombie_Enemy::Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,ChunkManager * chm):
 tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitionAnim(0.5f,0,1)
 {
-	acceptedConversions=FLAG_HIT_TYPE_BULLET;
+	acceptedConversions=FLAG_HIT_TYPE_BULLET_LIKE;
 	lastTick=spawnTime;
 	pos=cm->clip(startPos,true);
 	v=cm->fromMeters({0,0,0});
@@ -596,7 +596,7 @@ bool Zombie_Enemy::gotHit(float time, int part, EntityProjectile * projectile)
 	return false;
 }
 
-void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPointer<Projectile> projectile,ChunkManager * cm)
+void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm)
 {
 	spacevec middleChunk=cm->getMiddleChunk();
 	spacevec relPos=pos-middleChunk;
@@ -629,7 +629,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPoi
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
-		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
 	ml.popMatrix();
@@ -645,7 +645,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPoi
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
-		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
 	ml.popMatrix();
@@ -669,7 +669,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPoi
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
-		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
 
@@ -683,7 +683,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPoi
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
-		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
 	ml.popMatrix();
@@ -701,7 +701,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPoi
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
-		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
 	ml.popMatrix();
@@ -717,7 +717,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,DualPoi
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
-		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,cm->activeChunk));
+		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
 	ml.popMatrix();

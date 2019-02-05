@@ -16,7 +16,7 @@ ITexture * EntityProjectile::tex=new TextureDummy();
 EntityProjectile::EntityProjectile(Timestamp spawnTime,ItemAmmo * item,spacevec position,spacevec velocity):
 fromItem(item)
 {
-	type=FLAG_HIT_TYPE_BULLET;
+	type=FLAG_HIT_TYPE_BULLET_LIKE;
 	posOld=position;
 	lastTick=spawnTime;
 	pos=position;

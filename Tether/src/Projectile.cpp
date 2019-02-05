@@ -24,10 +24,10 @@ void Projectile::interact(Entity* self, DualPointer<Hittable> other, float time,
 		return;
 	}
 
-	hitType match=type&other.pIF->acceptedConversions;
+	hitType match=type&other.pIF->acceptedConversions;//per definition only 0 or 1 bits can be set
 	if(match==0) return;
 	int before=collisions.size();
-	other.pIF->testHit(&collisions,DualPointer<Projectile>(self,this),tsp->getChunkManager());
+	other.pIF->testHit(&collisions,match,DualPointer<Projectile>(self,this),tsp->getChunkManager());
 	int after=collisions.size();
 	if(after) if(!before) tsp->requestRetick((Retickable *)this);
 }
@@ -52,6 +52,22 @@ void Projectile::retick(TickServiceProvider* tsp)
 	}
 	for(int i=0;i<size;i++)
 	{
+		bool cont;
+		switch(type)
+		{
+		case FLAG_HIT_TYPE_BULLET_LIKE:
+			{
+				HittableBulletLike * hittable=collisions[i].hitVictim.pIF->asHittableBulletLike();
+				ProjectileBulletLike * projectile=asProjectileBulletLike();
+				cont=projectile->collide(hittable,collisions[i],tsp);
+				break;
+			}
+//		case FLAG_HIT_TYPE_INTERACT:
+//			break;
+		default:
+			WarnErrReporter::unknownTypeErr("Projectile has unknown type flag, ignoring this collision");
+			return;
+		}
 		EntityProjectile * ep=dynamic_cast<EntityProjectile *>(this);
 		if(ep==0)
 		{
@@ -68,7 +84,8 @@ void Projectile::retick(TickServiceProvider* tsp)
 		spacevec relPos=ze->pos-middleChunk;
 		vec3 relPosMeters=tsp->getChunkManager()->toMeters(relPos);
 		ze->checkProjectile(ep,relPosMeters,tsp);
-		break;
+
+		if(!cont) break;
 		//TODO remove above temp code and implement this:
 		//params=BulletHittable::getBulletTargetParams(...)
 		//continue,damageProperties=BulletProjectile::applyHit(params);
@@ -89,6 +106,11 @@ void Projectile::registerHitCheck(Entity* e, float seconds,TickServiceProvider* 
 	{
 		(*vec)[i]->collide.registerInteractionCheck(this,e,seconds,tsp);
 	}
+}
+
+ProjectileBulletLike* Projectile::asProjectileBulletLike()
+{
+	return 0;
 }
 
 Projectile::~Projectile()

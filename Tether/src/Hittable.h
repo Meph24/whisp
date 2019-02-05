@@ -9,26 +9,25 @@
 #ifndef SRC_HITTABLE_H_
 #define SRC_HITTABLE_H_
 #include "hitType.h"
+#include "HittableBulletLike.h"
 #include "ProjectileCollision.h"
 #include "DualPointer.h"
 class Projectile;
-class BulletHittable;
 class ChunkManager;
 class TickServiceProvider;
 #include <vector>
 class Hittable
 {
 public:
-	hitType acceptedConversions=0;
+	hitType acceptedConversions=0;//can have multiple flags set
 
-	virtual void testHit(std::vector<ProjectileCollision> * collisions,DualPointer<Projectile> projectile,ChunkManager * cm);
+	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm);
 	void registerHitCheck(Entity * e,float seconds,TickServiceProvider * tsp);
-	virtual BulletHittable * asBulletHittable();//default is return null, if not overwritten
+	virtual HittableBulletLike * asHittableBulletLike();//default is return null, if not overwritten
 	virtual ~Hittable();
 };
 
 #include "Projectile.h"
-#include "BulletHittable.h"
 #include "ChunkManager.h"
 #include "TickServiceProvider.h"
 

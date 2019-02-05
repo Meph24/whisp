@@ -22,6 +22,7 @@ public:
 
 	//soft errors (no crash, some default behavior is used)
 	static void notInitializedErr(std::string text);
+	static void unknownTypeErr(std::string text);
 	static void noOverrideErr(std::string text);
 	static void doubleErr(std::string text);
 	static void noEffectErr(std::string text);//despite expected effect

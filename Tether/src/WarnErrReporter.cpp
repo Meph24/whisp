@@ -102,6 +102,16 @@ void WarnErrReporter::alreadyDeadErr(std::string text)
 	std::cout<<std::endl;
 }
 
+void WarnErrReporter::unknownTypeErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"soft error (unknownTypeErr): no crash, but this should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}
+
 void WarnErrReporter::notDeletedErr(std::string text)
 {
 	std::cout<<std::endl;
@@ -111,3 +121,4 @@ void WarnErrReporter::notDeletedErr(std::string text)
 	std::cout<<std::endl;
 	std::cout<<std::endl;
 }
+

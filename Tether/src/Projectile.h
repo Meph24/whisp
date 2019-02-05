@@ -11,17 +11,19 @@
 
 #include <vector>
 #include "Spacevec.h"
+#include "hitType.h"
 #include "Hittable.h"
 #include "DualPointer.h"
 #include "Retickable.h"
 class Entity;
 class TickServiceProvider;
 class ProjectileCollision;
+class ProjectileBulletLike;
 class Projectile: public Retickable
 {
 	std::vector<ProjectileCollision> collisions;
 public:
-	hitType type=0;
+	hitType type=0;//must have exactly 1 bit set (by implementations)
 
 	spacevec posOld;
 	void interact(Entity * self,DualPointer<Hittable> other, float time, TickServiceProvider* tsp);
@@ -30,6 +32,9 @@ public:
 
 	virtual void retick(TickServiceProvider * tsp);
 
+	virtual ProjectileBulletLike * asProjectileBulletLike();//default is return null, if not overwritten
+
+
 	//TODO delete collisions at end of retick
 
 	virtual ~Projectile();
@@ -37,5 +42,6 @@ public:
 #include "Entity.h"
 #include "TickServiceProvider.h"
 #include "ProjectileCollision.h"
+#include "ProjectileBulletLike.h"
 
 #endif /* SRC_PROJECTILE_H_ */

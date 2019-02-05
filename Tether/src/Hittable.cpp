@@ -9,10 +9,6 @@
 #include "Hittable.h"
 
 
-BulletHittable* Hittable::asBulletHittable()
-{
-	return 0;
-}
 #include "WarnErrReporter.h"
 void Hittable::registerHitCheck(Entity* e,float seconds, TickServiceProvider* tsp)
 {
@@ -27,11 +23,16 @@ void Hittable::registerHitCheck(Entity* e,float seconds, TickServiceProvider* ts
 	}
 }
 
+HittableBulletLike* Hittable::asHittableBulletLike()
+{
+	return 0;//if not overridden, return 0
+}
+
 Hittable::~Hittable()
 {
 }
 
-void Hittable::testHit(std::vector<ProjectileCollision> * collisions,DualPointer<Projectile> projectile,ChunkManager * cm)
+void Hittable::testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm)
 {
 	//default: do nothing
 	//override this to enable collision checks

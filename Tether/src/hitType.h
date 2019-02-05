@@ -9,8 +9,8 @@
 #ifndef SRC_HITTYPE_H_
 #define SRC_HITTYPE_H_
 
-#define FLAG_HIT_TYPE_BULLET 0x1
-#define FLAG_HIT_TYPE_INVENTORY 0x2
+#define FLAG_HIT_TYPE_BULLET_LIKE 0x1
+#define FLAG_HIT_TYPE_INTERACT 0x2
 
 typedef unsigned int hitType;//bitvector
 
