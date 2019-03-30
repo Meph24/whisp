@@ -11,14 +11,19 @@
 
 #include "HittableBulletLike.h"
 #include "ProjectileCollision.h"
+#include "Projectile.h"
+#include "DualPointer.h"
 
 class ProjectileBulletLike
 {
 public:
+	float deformation=0;//0-1
+
+
 	ProjectileBulletLike();
 	~ProjectileBulletLike();
 
-	bool collide(HittableBulletLike * hittable,ProjectileCollision collision,TickServiceProvider* tsp);//return if projectile continues to fly
+	bool collide(DualPointer<Projectile> self,HittableBulletLike * hittable,ProjectileCollision collision,TickServiceProvider* tsp);//return if projectile continues to fly
 };
 
 #endif /* SRC_PROJECTILEBULLETLIKE_H_ */

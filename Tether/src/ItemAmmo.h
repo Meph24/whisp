@@ -17,11 +17,8 @@
 class ItemAmmo: public Item
 {
 public:
-	float bulletMass;//per bullet
+	BulletLikeType bulletData;//per bullet
 	int bulletQuantity;
-	float damagePerJoule;//soft tissue damage
-	float penResist;//Energy deposition multiplier
-	float drag;//calulated from area,Cd,mass,constants
 	float explEnergy;//energy contained in the cartridge (0 for crossbow bolt)
 	float randomEnergyDev;//as part of whole e.g. 0.02
 	float spinPenalty;//radius of barrel minus bullet radius; unit: m

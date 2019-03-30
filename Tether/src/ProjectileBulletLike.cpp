@@ -19,8 +19,14 @@ ProjectileBulletLike::~ProjectileBulletLike()
 	// TODO Auto-generated destructor stub
 }
 #include <iostream>
-bool ProjectileBulletLike::collide(HittableBulletLike* hittable,ProjectileCollision collision,TickServiceProvider* tsp)
+bool ProjectileBulletLike::collide(DualPointer<Projectile> self,HittableBulletLike* hittable,ProjectileCollision collision,TickServiceProvider* tsp)
 {
 	std::cout<<"hello projectile"<<std::endl;
-	return false;//projectile stops
+	//some calculations
+	float vBefore=tsp->getChunkManager()->toMeters(self.e->v);
+	float vAfter=0;//TODO
+	float deltaE=0.5*mass*(vBefore*vBefore-vAfter*vAfter);
+	float dmg=deltaE*(dmgPerJd0*(1-deformation)+dmgPerJd1*deformation);
+
+	return false;//TODO projectile currently stops immediately
 }
