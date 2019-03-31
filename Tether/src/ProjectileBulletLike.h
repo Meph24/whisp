@@ -13,6 +13,7 @@
 #include "ProjectileCollision.h"
 #include "Projectile.h"
 #include "DualPointer.h"
+#include "BulletLikeSource.h"
 
 class ProjectileBulletLike
 {
@@ -20,8 +21,11 @@ public:
 	float deformation=0;//0-1
 
 
+
 	ProjectileBulletLike();
-	~ProjectileBulletLike();
+	virtual ~ProjectileBulletLike();
+
+	virtual BulletLikeSource * getSource()=0;
 
 	bool collide(DualPointer<Projectile> self,HittableBulletLike * hittable,ProjectileCollision collision,TickServiceProvider* tsp);//return if projectile continues to fly
 };
