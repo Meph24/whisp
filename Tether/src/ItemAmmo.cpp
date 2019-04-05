@@ -9,7 +9,7 @@
 #include "ItemAmmo.h"
 
 ItemAmmo::ItemAmmo(float spd,float dmg,float drg, int bulletCount):
-bulletQuantity(bulletCount),damagePerJoule(dmg),drag(drg),explEnergy(spd)
+bulletData(0.001f,dmg,dmg,drg),bulletQuantity(bulletCount),explEnergy(spd)
 {
 	ID.group=ITEM_GROUP_AMMO;
 }

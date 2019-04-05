@@ -77,7 +77,7 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 		v.y = ml.curMatrix[1] * velX + ml.curMatrix[5] * velY + ml.curMatrix[9] * velZ;
 		v.z = ml.curMatrix[2] * velX + ml.curMatrix[6] * velY + ml.curMatrix[10] * velZ;
 
-		EntityProjectile * zp= new EntityProjectile(callTimestamp,(ItemAmmo*)pType->newClone(),player->getCamPos(),cm->fromMeters(v)+player->v);
+		EntityProjectileBulletLike * zp= new EntityProjectileBulletLike(player,pType->bulletData,callTimestamp,player->getCamPos(),cm->fromMeters(v)+player->v);
 		cm->requestEntitySpawn((Entity *)zp);
 
 		ml.popMatrix();

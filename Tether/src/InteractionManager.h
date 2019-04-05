@@ -8,10 +8,9 @@
 
 #ifndef SRC_INTERACTIONMANAGER_H_
 #define SRC_INTERACTIONMANAGER_H_
-#include "Pushable.h"
+class Pushable;
 class Projectile;
-#include "Projectile.h"
-#include "Hittable.h"
+class Hittable;
 #include "InteractionGroup1.h"
 #include "InteractionGroup2.h"
 class InteractionManager
@@ -28,4 +27,7 @@ public:
 	~InteractionManager();
 };
 
+#include "Projectile.h"
+#include "Pushable.h"
+#include "Hittable.h"
 #endif /* SRC_INTERACTIONMANAGER_H_ */

@@ -8,10 +8,11 @@
 #include "Entity.h"
 #include "Pushable.h"
 #include "AnimationCycle.h"
+#include "EntityProjectileBulletLike.h"
 #include "Hittable.h"
-#include "EntityProjectile.h"
+#include "HittableBulletLike.h"
 
-class Zombie_Enemy: public Entity,public Pushable,public Hittable
+class Zombie_Enemy: public Entity,public Pushable,public Hittable, public HittableBulletLike
 {
 	bool headshot=true;
 	struct texCooSet{
@@ -36,7 +37,7 @@ class Zombie_Enemy: public Entity,public Pushable,public Hittable
 	void drawLeg(int loc,float strength);
 	void drawTexturedCube(texCooSet textureCoordinates);
 
-	bool gotHit(float time, int part, EntityProjectile * projectile);
+	bool gotHit(float time, int part, EntityProjectileBulletLike * projectile);
 
 public:
 
@@ -67,13 +68,16 @@ public:
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
-	void checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,TickServiceProvider* tsp);
+	void checkProjectile(EntityProjectileBulletLike * projectile,vec3 relPosMeters,TickServiceProvider* tsp);
 	float checkBox(DualPointer<Projectile> projectile,MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo,spacevec relPos);//valid hit from 0 to 1, otherwise -1
 
 
 	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm);
 
 	virtual void push(spacevec amount);
+
+	virtual HittableBulletLike * asHittableBulletLike();
+
 //	virtual spacevec getPos();
 //	virtual void onAABBintersect(Entity * other,float time,TickServiceProvider * tsp);
 //

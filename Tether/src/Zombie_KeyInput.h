@@ -1,5 +1,7 @@
 #pragma once
-#include "Zombie_MouseInput.h"
+class Zombie_MouseInput;
+class ICamera3D;
+#include "vec3.h"
 class Zombie_KeyInput
 {
 	ICamera3D * cam;
@@ -26,3 +28,5 @@ public:
 	vec3 getVelocity();
 };
 
+#include "Zombie_MouseInput.h"
+#include "ICamera3D.h"

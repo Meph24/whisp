@@ -172,7 +172,7 @@ void Zombie_World::render(Timestamp t)
 	int crosshairAmount = 4;
 
 	glDisable(GL_TEXTURE_2D);
-	glColor3f(1, hitmark, 0);
+	glColor3f(1, player->hitmark, 0);
 
 	glPushMatrix();
 	for (int i = 0; i < crosshairAmount; i++)
@@ -215,7 +215,7 @@ void Zombie_World::loadStandardTex()
 
 	shot = new TextureStatic2D(tps2, "./res/fireball.png");
 	shot->update();
-	EntityProjectile::setTexture(shot);
+	EntityProjectileBulletLike::setTexture(shot);
 	leaves = new TextureStatic2D(tps2, "./res/leaves.png");
 	leaves->update();
 
@@ -229,8 +229,6 @@ void Zombie_World::doPhysics(Timestamp t)
 {
 	initNextTick();
 	player->tick(t,this);
-	hitmark -= 0.1;//sec * 10;
-	if (hitmark < 0) hitmark = 0;
 
 	cm->tick(t,this);
 

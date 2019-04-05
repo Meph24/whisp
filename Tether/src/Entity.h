@@ -11,16 +11,12 @@
 #include "Spacevec.h"
 #include "Drawable.h"
 class TickServiceProvider;
-class Tickable;
 #include "Tickable.h"
-#include "TickServiceProvider.h"
-#include "EntityIdent.h"
+//#include "EntityIdent.h"
 #include <vector>
-#include "Chunk.h"
 #include "AABB.h"
 class Frustum;
-#include "Frustum.h"
-class Pushable;
+class ChunkManager;
 
 class Entity: public Tickable, Drawable
 {
@@ -77,5 +73,9 @@ public:
 	Entity();
 	virtual ~Entity();
 };
+
+#include "ChunkManager.h"
+#include "Frustum.h"
+#include "TickServiceProvider.h"
 
 #endif /* SRC_ENTITY_H_ */

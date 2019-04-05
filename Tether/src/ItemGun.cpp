@@ -8,11 +8,11 @@
 
 #include "ItemGun.h"
 #include "ICamera3D.h"
-#include "EntityProjectile.h"
 #include "MatrixLib2.h"
 #include "MatrixLib.h"
 #include <cmath>
 
+#include "EntityProjectileBulletLike.h"
 #include "TickServiceProvider.h"
 
 ItemGun::ItemGun():
@@ -40,7 +40,7 @@ void ItemGun::fire(TickServiceProvider* tsp)
 	float cartridgeEnergy=ammo->explEnergy*barrelEfficiency;
 	float weaponEnergy=additionalEnergy+additionalEnergy*rand2*ammo->randomEnergyDev;
 	float totalEnergy=cartridgeEnergy+cartridgeEnergy*rand1*ammo->randomEnergyDev+weaponEnergy;
-	float vel=totalEnergy*2/(ammo->bulletMass*ammo->bulletQuantity);
+	float vel=totalEnergy*2/(ammo->bulletData.mass*ammo->bulletQuantity);
 	vel=sqrt(vel);
 	float maxSpreadX=0;//TODO calculate hor		degrees
 	float maxSpreadY=0;//TODO calculate vert	degrees

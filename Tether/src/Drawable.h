@@ -19,8 +19,8 @@ public:
 	virtual ~Drawable();
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
 };
-#include "Frustum.h"
-#include "ChunkManager.h"
+//#include "Frustum.h"
+//#include "ChunkManager.h"
 #include "DrawServiceProvider.h"
 
 #endif /* SRC_DRAWABLE_H_ */

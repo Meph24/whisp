@@ -19,7 +19,7 @@ public:
 	//TODO float penResist;//Energy deposition multiplier
 	float drag;//calulated from area,Cd,mass,constants
 
-	BulletLikeType();
+	BulletLikeType(float m,float d0,float d1,float drg);
 	~BulletLikeType();
 };
 

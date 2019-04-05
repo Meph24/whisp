@@ -8,6 +8,7 @@ int Zombie_Enemy::zombieCount=0;
 Zombie_Enemy::Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,ChunkManager * chm):
 tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitionAnim(0.5f,0,1)
 {
+	fac=FACTION_ZOMBIES;
 	acceptedConversions=FLAG_HIT_TYPE_BULLET_LIKE;
 	lastTick=spawnTime;
 	pos=cm->clip(startPos,true);
@@ -360,7 +361,7 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 }
 
 #include "WarnErrReporter.h"
-void Zombie_Enemy::checkProjectile(EntityProjectile * projectile,vec3 relPosMeters,TickServiceProvider* tsp)
+void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,vec3 relPosMeters,TickServiceProvider* tsp)
 {
 	std::cout<<"inside checkProjectile"<<std::endl;
 	float before=this->remainingHP;
@@ -550,7 +551,7 @@ float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, 
 	return ret;
 }
 
-bool Zombie_Enemy::gotHit(float time, int part, EntityProjectile * projectile)
+bool Zombie_Enemy::gotHit(float time, int part, EntityProjectileBulletLike * projectile)
 {
 	bool before=legDmg>0.25f*totalHP;
 	if(time==-1) return false;//no hit
@@ -583,8 +584,8 @@ bool Zombie_Enemy::gotHit(float time, int part, EntityProjectile * projectile)
 		break;
 	}
 	std::cout<<"hit on body part "<<part<<std::endl;
-	legDmg+=legDmgMult*projectile->fromItem->damagePerJoule;//TODO replace with better logic once guns 2.0 work
-	remainingHP -= projectile->fromItem->damagePerJoule*dmgMult;
+	legDmg+=legDmgMult*projectile->typeB.dmgPerJd0;//TODO replace with better logic once guns 2.0 work
+	remainingHP -= projectile->typeB.dmgPerJd0*dmgMult;
 
 	projectile->pos.y.intpart -= 1000;
 	projectile->posOld.y.intpart -= 1000;
@@ -730,6 +731,11 @@ void Zombie_Enemy::push(spacevec amount)
 	pos+=amount;//TODO?
 }
 
+
+HittableBulletLike* Zombie_Enemy::asHittableBulletLike()
+{
+	return this;
+}
 //spacevec Zombie_Enemy::getPos()
 //{
 //	return pos;

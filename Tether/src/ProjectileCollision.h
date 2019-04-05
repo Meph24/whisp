@@ -12,10 +12,10 @@
 #include "DualPointer.h"
 #include "Spacevec.h"
 #include "hitType.h"
-#include "HitData.h"
 
 class Hittable;
 class Entity;
+class HitData;
 
 class ProjectileCollision
 {
@@ -36,5 +36,6 @@ public:
 };
 #include "Hittable.h"
 #include "Entity.h"
+#include "HitData.h"
 
 #endif /* SRC_PROJECTILECOLLISION_H_ */

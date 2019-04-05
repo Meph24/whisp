@@ -8,10 +8,10 @@
 
 #include "BulletLikeType.h"
 
-BulletLikeType::BulletLikeType()
-{
-	// TODO Auto-generated constructor stub
 
+BulletLikeType::BulletLikeType(float m, float d0, float d1, float myDrag):
+mass(m),dmgPerJd0(d0),dmgPerJd1(d1),drag(myDrag)
+{
 }
 
 BulletLikeType::~BulletLikeType()

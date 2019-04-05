@@ -10,7 +10,6 @@
 #define SRC_CHUNK_H_
 
 #define defaultHeight -1
-#include "Pushable.h"
 //#include "InteractionGroup1.h"
 #include "DualPointer.h"
 #include "Spacevec.h"
@@ -18,7 +17,6 @@
 #include "MatrixLib.h"
 #include <GL/glew.h>
 class ChunkManager;
-#include "ChunkManager.h"
 #include <vector>
 #include "AABB.h"
 class InteractionManager;
@@ -52,5 +50,6 @@ public:
 	~Chunk();
 };
 #include "InteractionManager.h"
+#include "ChunkManager.h"
 
 #endif /* SRC_CHUNK_H_ */

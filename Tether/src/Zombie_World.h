@@ -49,7 +49,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	int currentGun;
 
 	int score=0;
-	float hitmark = 0;
 	
 
 

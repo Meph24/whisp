@@ -31,4 +31,6 @@ template<typename PhysicsIF>
 inline DualPointer<PhysicsIF>::~DualPointer()
 {}
 
+#include "Entity.h"
+
 #endif /* SRC_DUALPOINTER_H_ */

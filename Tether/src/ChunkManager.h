@@ -10,18 +10,16 @@
 #define SRC_CHUNKMANAGER_H_
 
 class Chunk;
-#include "Chunk.h"
-#include "Pushable.h"
 #include "DualPointer.h"
 #include "Tickable.h"
 #include "Spacevec.h"
 class Frustum;
-#include "Frustum.h"
+class InteractionManager;
 #include <vector>
-#include "InteractionManager.h"
 #include "Drawable.h"
-#include "LockChunk.h"
 #include <memory>
+class LockChunk;
+#include "LockFast.h"
 
 struct chunkChange
 {
@@ -127,5 +125,9 @@ public:
 
 
 };
+#include "Chunk.h"
+#include "Frustum.h"
+#include "InteractionManager.h"
+#include "LockChunk.h"
 
 #endif /* SRC_CHUNKMANAGER_H_ */

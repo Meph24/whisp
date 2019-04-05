@@ -13,6 +13,7 @@
 #define ITEM_GROUP_AMMO (ITEM_GROUP_FIRST_FREE+1)
 
 #include "Compatibility.h"
+#include "BulletLikeType.h"
 
 class ItemAmmo: public Item
 {

@@ -7,6 +7,7 @@
  */
 
 #include "EntityPlayer.h"
+#include "SpeedMod.h"
 
 EntityPlayer::EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
 speed(characterSpeed)
@@ -134,6 +135,8 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	characterHeightConv=tsp->getChunkManager()->fromMeters(characterHeight);//TODO only in one spot
 	float time=t-lastTick;
 	lastTick=t;
+	hitmark -= time * 10;
+	if (hitmark < 0) hitmark = 0;
 	ChunkManager * cm=tsp->getChunkManager();
 	HP += maxHP*time / 200;
 	if (HP > maxHP) HP = maxHP;
@@ -171,7 +174,15 @@ void EntityPlayer::push(spacevec amount)
 	pos+=amount;//TODO?
 	HP -= 15625*(amount.fLengthSq(16));//TODO not hard code chunk size
 }
-
+#include <iostream>
+void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,HittableBulletLike* victim)
+{
+	if(!victim) std::cout<<"victim 0"<<std::endl;
+	else if(dmg>0 && victim->fac==FACTION_ZOMBIES)
+	{
+		hitmark=1;
+	}
+}
 //spacevec EntityPlayer::getPos()
 //{
 //	return pos;

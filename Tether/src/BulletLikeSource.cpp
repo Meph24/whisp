@@ -19,3 +19,7 @@ BulletLikeSource::~BulletLikeSource()
 	// TODO Auto-generated destructor stub
 }
 
+void BulletLikeSource::hitCallback(float dmg, bool kill, bool projDestroyed,HittableBulletLike* victim)
+{
+	//TODO warn? should not be executed, should be overridden
+}

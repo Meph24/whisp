@@ -10,17 +10,14 @@
 #define SRC_ENTITYPLAYER_H_
 #include "Entity.h"
 #include "Pushable.h"
-#include "CameraTP.h"
-#include "Frustum.h"
 class Zombie_MouseInput;
-#include "Zombie_MouseInput.h"
 class Zombie_KeyInput;
-#include "Zombie_KeyInput.h"
 #include <SFML/Window.hpp>
-#include "SpeedMod.h"
 #include <SFML/Audio.hpp>
-
-class EntityPlayer: public Entity,public Pushable
+class CameraTP;
+class Frustum;
+#include "BulletLikeSource.h"
+class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 {
 	void setTP(bool on);
 
@@ -39,6 +36,7 @@ public:
 	float HP=-1;
 	float maxHP=100;
 	float speed=0;
+	float hitmark=0;
 
 	EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
 	~EntityPlayer();
@@ -55,11 +53,19 @@ public:
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
 	virtual void push(spacevec amount);
+
+	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);
+
 //	virtual spacevec getPos();
 
 //	virtual void onAABBintersect(Entity* other,float time,TickServiceProvider * tsp);
 
 //	virtual Pushable * toPushable();
 };
+
+#include "CameraTP.h"
+#include "Frustum.h"
+#include "Zombie_MouseInput.h"
+#include "Zombie_KeyInput.h"
 
 #endif /* SRC_ENTITYPLAYER_H_ */

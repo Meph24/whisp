@@ -3,7 +3,7 @@
 
 #include <SFML/Audio.hpp>
 
-#include "EntityProjectile.h"
+#include "EntityProjectileBulletLike.h"
 class EntityPlayer;
 #include "EntityPlayer.h"
 #include "ICamera3D.h"

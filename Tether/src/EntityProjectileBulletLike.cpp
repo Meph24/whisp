@@ -6,29 +6,31 @@
  *     Version:	2.0
  */
 
-#include "EntityProjectile.h"
+#include "EntityProjectileBulletLike.h"
+
 #include "TickServiceProvider.h"
 
 
-ITexture * EntityProjectile::tex=new TextureDummy();
+ITexture * EntityProjectileBulletLike::tex=new TextureDummy();
 
 
-EntityProjectile::EntityProjectile(Timestamp spawnTime,ItemAmmo * item,spacevec position,spacevec velocity):
-fromItem(item)
+EntityProjectileBulletLike::EntityProjectileBulletLike(BulletLikeSource * origin,BulletLikeType t,Timestamp spawnTime,spacevec position,spacevec velocity):
+typeB(t),source(origin)
+//,fromItem(item)
 {
-	type=FLAG_HIT_TYPE_BULLET_LIKE;
+	typeH=FLAG_HIT_TYPE_BULLET_LIKE;
 	posOld=position;
 	lastTick=spawnTime;
 	pos=position;
 	v=velocity;
 }
 
-EntityProjectile::~EntityProjectile()
+EntityProjectileBulletLike::~EntityProjectileBulletLike()
 {
-	delete fromItem;
+//	delete fromItem;
 }
 
-void EntityProjectile::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
+void EntityProjectileBulletLike::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;//TODO frustum culling?
@@ -85,7 +87,7 @@ void EntityProjectile::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 }
-void EntityProjectile::tick(Timestamp t, TickServiceProvider* tsp)
+void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
 {
 	float time=t-lastTick;
 	lastTick=t;
@@ -102,7 +104,7 @@ void EntityProjectile::tick(Timestamp t, TickServiceProvider* tsp)
 	spacevec vOld=v;
 	v.y -= gravity * time;
 	double spd=v.dLength(cm->getChunkSize());
-	double drag=spd*fromItem->drag;
+	double drag=spd*typeB.drag;
 	v*=(1-drag*time);//TODO find exact or at least time-consistent solution (current solution behaves very wrong with high resistance values and is tickrate-dependent)
 	pos+=(v+vOld)*time*0.5f;
 
@@ -117,8 +119,28 @@ void EntityProjectile::tick(Timestamp t, TickServiceProvider* tsp)
 	registerHitCheck((Entity *)this,time,tsp);
 
 }
+#include <iostream>
+bool EntityProjectileBulletLike::collide(HittableBulletLike* hittable,ProjectileCollision collision,TickServiceProvider* tsp)
+{
+	//some calculations
+	float vSqBefore=tsp->getChunkManager()->toMeters(v).lengthSq();
+	float vSqAfter=0;//TODO
+	float deltaE=0.5*typeB.mass*(vSqBefore*vSqBefore-vSqAfter*vSqAfter);
+	float dmg=deltaE*(typeB.dmgPerJd0*(1-deformation)+typeB.dmgPerJd1*deformation);
 
-void EntityProjectile::setTexture(ITexture* texture)
+	std::cout<<"hello projectile; dmg: "<<dmg<<std::endl;
+	if(!source) std::cout<<"source 0"<<std::endl;
+	else if(!hittable) std::cout<<"hittable 0"<<std::endl;
+	else if(dmg>0) source->hitCallback(dmg,false,true,hittable);
+	return false;//TODO projectile currently stops immediately
+}
+
+EntityProjectileBulletLike* EntityProjectileBulletLike::asProjectileBulletLike()
+{
+	return this;
+}
+
+void EntityProjectileBulletLike::setTexture(ITexture* texture)
 {
 	if(tex) delete tex;
 	tex=texture;

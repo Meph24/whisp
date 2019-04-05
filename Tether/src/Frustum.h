@@ -11,8 +11,8 @@
 #define FRUSTUM_PLANE_COUNT 5
 #include "DivisionPlane.h"
 #include "AABB.h"
-#include "ITexture.h"
-#include "ChunkManager.h"
+class ChunkManager;
+class ITexture;
 class Frustum
 {
 public:
@@ -31,5 +31,8 @@ public:
 	Frustum();
 	~Frustum();
 };
+
+#include "ChunkManager.h"
+#include "ITexture.h"
 
 #endif /* SRC_FRUSTUM_H_ */

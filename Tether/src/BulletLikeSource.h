@@ -8,13 +8,15 @@
 
 #ifndef SRC_BULLETLIKESOURCE_H_
 #define SRC_BULLETLIKESOURCE_H_
-
+class HittableBulletLike;
 class BulletLikeSource
 {
 public:
 	BulletLikeSource();
-	~BulletLikeSource();
+	virtual ~BulletLikeSource();
+
+	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);
 
 };
-
+#include "HittableBulletLike.h"
 #endif /* SRC_BULLETLIKESOURCE_H_ */

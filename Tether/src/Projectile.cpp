@@ -13,7 +13,7 @@
 
 void Projectile::interact(Entity* self, DualPointer<Hittable> other, float time,TickServiceProvider* tsp)
 {
-	if(type==0)
+	if(typeH==0)
 	{
 		WarnErrReporter::notInitializedErr("Projectile has no type flag set, ignoring this collision");
 		return;
@@ -24,7 +24,7 @@ void Projectile::interact(Entity* self, DualPointer<Hittable> other, float time,
 		return;
 	}
 
-	hitType match=type&other.pIF->acceptedConversions;//per definition only 0 or 1 bits can be set
+	hitType match=typeH&other.pIF->acceptedConversions;//per definition only 0 or 1 bits can be set
 	if(match==0) return;
 	int before=collisions.size();
 	other.pIF->testHit(&collisions,match,DualPointer<Projectile>(self,this),tsp->getChunkManager());
@@ -33,7 +33,7 @@ void Projectile::interact(Entity* self, DualPointer<Hittable> other, float time,
 }
 
 //TODO remove includes along with temp code
-#include "EntityProjectile.h"
+#include "EntityProjectileBulletLike.h"
 #include "Zombie_Enemy.h"
 
 void Projectile::retick(TickServiceProvider* tsp)
@@ -53,12 +53,12 @@ void Projectile::retick(TickServiceProvider* tsp)
 	for(int i=0;i<size;i++)
 	{
 		bool cont;
-		switch(type)
+		switch(typeH)
 		{
 		case FLAG_HIT_TYPE_BULLET_LIKE:
 			{
 				HittableBulletLike * hittable=collisions[i].hitVictim.pIF->asHittableBulletLike();
-				ProjectileBulletLike * projectile=asProjectileBulletLike();
+				EntityProjectileBulletLike * projectile=asProjectileBulletLike();
 				cont=projectile->collide(hittable,collisions[i],tsp);
 				break;
 			}
@@ -68,7 +68,7 @@ void Projectile::retick(TickServiceProvider* tsp)
 			WarnErrReporter::unknownTypeErr("Projectile has unknown type flag, ignoring this collision");
 			return;
 		}
-		EntityProjectile * ep=dynamic_cast<EntityProjectile *>(this);
+		EntityProjectileBulletLike * ep=dynamic_cast<EntityProjectileBulletLike *>(this);
 		if(ep==0)
 		{
 			WarnErrReporter::notInitializedErr("ep is null");
@@ -108,11 +108,11 @@ void Projectile::registerHitCheck(Entity* e, float seconds,TickServiceProvider* 
 	}
 }
 
-ProjectileBulletLike* Projectile::asProjectileBulletLike()
+Projectile::~Projectile()
+{
+}
+
+EntityProjectileBulletLike* Projectile::asProjectileBulletLike()
 {
 	return 0;
 }
-
-Projectile::~Projectile()
-{}
-

@@ -8,12 +8,18 @@
 
 #ifndef SRC_HITTABLEBULLETLIKE_H_
 #define SRC_HITTABLEBULLETLIKE_H_
-
+#include "faction.h"
 class HittableBulletLike
 {
 public:
+	faction fac=FACTION_UNDEFINED;
+
 	HittableBulletLike();
-	~HittableBulletLike();
+	virtual ~HittableBulletLike();
+
+
+	virtual void executeHit();
+
 };
 
 #endif /* SRC_HITTABLEBULLETLIKE_H_ */
