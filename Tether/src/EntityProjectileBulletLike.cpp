@@ -9,7 +9,7 @@
 #include "EntityProjectileBulletLike.h"
 
 #include "TickServiceProvider.h"
-
+#include "Zombie_Enemy.h"
 
 ITexture * EntityProjectileBulletLike::tex=new TextureDummy();
 
@@ -120,8 +120,17 @@ void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
 
 }
 #include <iostream>
+#include "WarnErrReporter.h"
 bool EntityProjectileBulletLike::collide(HittableBulletLike* hittable,ProjectileCollision collision,TickServiceProvider* tsp)
 {
+
+	Zombie_Enemy * ze=dynamic_cast<Zombie_Enemy *>(collision.hitVictim.e);
+	if(ze==0)
+	{
+		WarnErrReporter::wrongTypeErr("hard-coded cast to zombie failed");
+		return true;
+	}
+	ze->checkProjectile(this,tsp);//TODO
 	//some calculations
 	float vSqBefore=tsp->getChunkManager()->toMeters(v).lengthSq();
 	float vSqAfter=0;//TODO

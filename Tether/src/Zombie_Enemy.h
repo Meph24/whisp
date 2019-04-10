@@ -68,8 +68,8 @@ public:
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
-	void checkProjectile(EntityProjectileBulletLike * projectile,vec3 relPosMeters,TickServiceProvider* tsp);
-	float checkBox(DualPointer<Projectile> projectile,MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo,spacevec relPos);//valid hit from 0 to 1, otherwise -1
+	void checkProjectile(EntityProjectileBulletLike * projectile,TickServiceProvider* tsp);
+	float checkBox(DualPointer<Projectile> projectile,MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo);//valid hit from 0 to 1, otherwise -1
 
 
 	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm);

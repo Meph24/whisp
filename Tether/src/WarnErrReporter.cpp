@@ -122,3 +122,12 @@ void WarnErrReporter::notDeletedErr(std::string text)
 	std::cout<<std::endl;
 }
 
+void WarnErrReporter::wrongTypeErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"soft error (wrongTypeErr): no crash, but this should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}

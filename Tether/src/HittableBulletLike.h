@@ -18,7 +18,7 @@ public:
 	virtual ~HittableBulletLike();
 
 
-	virtual void executeHit();
+	virtual void executeHit();//TODO
 
 };
 

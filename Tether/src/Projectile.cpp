@@ -59,7 +59,19 @@ void Projectile::retick(TickServiceProvider* tsp)
 			{
 				HittableBulletLike * hittable=collisions[i].hitVictim.pIF->asHittableBulletLike();
 				EntityProjectileBulletLike * projectile=asProjectileBulletLike();
+
+				if(projectile==0)
+				{
+					WarnErrReporter::wrongTypeErr("projectile conversion failed");
+					break;
+				}
 				cont=projectile->collide(hittable,collisions[i],tsp);
+
+				//TODO remove above temp code and implement this:
+				//params=BulletHittable::getBulletTargetParams(...)
+				//cont,damageProperties=BulletProjectile::applyHit(params);
+				//BulletHittable::applyDamage(damageProperties);
+
 				break;
 			}
 //		case FLAG_HIT_TYPE_INTERACT:
@@ -68,29 +80,8 @@ void Projectile::retick(TickServiceProvider* tsp)
 			WarnErrReporter::unknownTypeErr("Projectile has unknown type flag, ignoring this collision");
 			return;
 		}
-		EntityProjectileBulletLike * ep=dynamic_cast<EntityProjectileBulletLike *>(this);
-		if(ep==0)
-		{
-			WarnErrReporter::notInitializedErr("ep is null");
-			break;
-		}
-		Zombie_Enemy * ze=dynamic_cast<Zombie_Enemy *>(collisions[i].hitVictim.e);
-		if(ze==0)
-		{
-			WarnErrReporter::notInitializedErr("ze is null");
-			break;
-		}
-		spacevec middleChunk=tsp->getChunkManager()->getMiddleChunk();
-		spacevec relPos=ze->pos-middleChunk;
-		vec3 relPosMeters=tsp->getChunkManager()->toMeters(relPos);
-		ze->checkProjectile(ep,relPosMeters,tsp);
 
 		if(!cont) break;
-		//TODO remove above temp code and implement this:
-		//params=BulletHittable::getBulletTargetParams(...)
-		//continue,damageProperties=BulletProjectile::applyHit(params);
-		//BulletHittable::applyDamage(damageProperties);
-		//if(!continue) break;
 	}
 	collisions.clear();
 }

@@ -18,3 +18,7 @@ HittableBulletLike::~HittableBulletLike()
 {
 	// TODO Auto-generated destructor stub
 }
+
+void HittableBulletLike::executeHit()
+{
+}

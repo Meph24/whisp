@@ -361,15 +361,13 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 }
 
 #include "WarnErrReporter.h"
-void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,vec3 relPosMeters,TickServiceProvider* tsp)
+void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickServiceProvider* tsp)
 {
 	std::cout<<"inside checkProjectile"<<std::endl;
 	float before=this->remainingHP;
 	DualPointer<Projectile> projConv=DualPointer<Projectile>((Entity *)projectile,(Projectile *)projectile);
 
-	spacevec middleChunk=cm->getMiddleChunk();
 	ml.loadIdentity();
-	ml.translatef(relPosMeters.x, relPosMeters.y, relPosMeters.z);
 	ml.rotatef(facing, 0, 1, 0);
 	ml.rotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
 	ml.scalef(size, size, size);
@@ -395,7 +393,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,vec3 
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if(gotHit(hitTime, 4, projectile))
 	{
 		EntitySound * es=new EntitySound(this,tsp->getSoundManager()->getCrippleSound());
@@ -412,7 +410,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,vec3 
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if(gotHit(hitTime, 5, projectile))
 	{
 		EntitySound * es=new EntitySound(this,tsp->getSoundManager()->getCrippleSound());
@@ -437,7 +435,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,vec3 
 	ml.scalef(2, 2, 2);
 	ml.rotatef(tilted, 1, 0, 0);
 
-	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 
 	if(headshot&&(hitTime!=-1))
 	{
@@ -455,7 +453,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,vec3 
 	ml.translatef(0, 0.6f, 0);
 	ml.scalef(1, 3, 2);
 
-	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	gotHit(hitTime, 1, projectile);
 
 	ml.popMatrix();
@@ -470,7 +468,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,vec3 
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	gotHit(hitTime, 2, projectile);
 
 	ml.popMatrix();
@@ -483,7 +481,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,vec3 
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	gotHit(hitTime, 3, projectile);
 
 	ml.popMatrix();
@@ -500,7 +498,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,vec3 
 
 
 
-float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, float xFrom, float xTo, float yFrom,float yTo, float zFrom, float zTo, spacevec relPos)
+float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, float xFrom, float xTo, float yFrom,float yTo, float zFrom, float zTo)
 {
 	float ret=-1;
 	ml->pushMatrix();
@@ -509,8 +507,8 @@ float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, 
 	mat4 matOut;
 	ml->invertMatrix(ml->curMatrix, matOut.mat);
 
-	vec3 p1 = matOut* (cm->toMeters(projectile.pIF->posOld-relPos));
-	vec3 p2 = matOut*(cm->toMeters(projectile.e->pos-relPos));
+	vec3 p1 = matOut* (cm->toMeters(projectile.pIF->posOld-pos));
+	vec3 p2 = matOut*(cm->toMeters(projectile.e->pos-pos));
 	//projectile now relative to cube, where cube is at 0-1 on all 3 axis
 	float vx = p2.x - p1.x;//TODO check for 0
 	float vy = p2.y - p1.y;
@@ -599,11 +597,7 @@ bool Zombie_Enemy::gotHit(float time, int part, EntityProjectileBulletLike * pro
 
 void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm)
 {
-	spacevec middleChunk=cm->getMiddleChunk();
-	spacevec relPos=pos-middleChunk;
-	vec3 relPosMeters=cm->toMeters(relPos);
 	ml.loadIdentity();
-	ml.translatef(relPosMeters.x, relPosMeters.y, relPosMeters.z);
 	ml.rotatef(facing, 0, 1, 0);
 	ml.rotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
 	ml.scalef(size, size, size);
@@ -627,7 +621,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
@@ -643,7 +637,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
@@ -667,7 +661,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	ml.scalef(2, 2, 2);
 	ml.rotatef(tilted, 1, 0, 0);
 
-	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
@@ -681,7 +675,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	ml.translatef(0, 0.6f, 0);
 	ml.scalef(1, 3, 2);
 
-	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
@@ -699,7 +693,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
@@ -715,7 +709,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	ml.translatef(0, -0.6f, 0);
 	ml.scalef(1, 3, 1);
 
-	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f,middleChunk);
+	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
 	{
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
@@ -736,22 +730,3 @@ HittableBulletLike* Zombie_Enemy::asHittableBulletLike()
 {
 	return this;
 }
-//spacevec Zombie_Enemy::getPos()
-//{
-//	return pos;
-//}
-//#include "Zombie_Physics.h"
-//#include "EntityPlayer.h"
-//void Zombie_Enemy::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
-//{
-//	Pushable * push=other->toPushable();//dynamic_cast<Pushable *>(other);
-//	if(push)
-//	{
-////		pushEntities(this,push,time,tsp->getChunkManager());
-//	}
-//}
-//
-//Pushable* Zombie_Enemy::toPushable()
-//{
-//	return this;
-//}
