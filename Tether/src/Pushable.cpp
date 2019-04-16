@@ -37,8 +37,8 @@ void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, T
 		float zP = f*difZ;
 
 		spacevec move=cm->fromMeters(vec3(xP,0,zP)*time);//amplification factor here
-		push(move);
-		other.pIF->push(-move);
+		push(move,tsp);
+		other.pIF->push(-move,tsp);
 	}
 }
 

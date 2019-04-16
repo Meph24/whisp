@@ -142,6 +142,13 @@ bool EntityProjectileBulletLike::collide(HittableBulletLike* hittable,Projectile
 	else if(!hittable) std::cout<<"hittable 0"<<std::endl;
 	else if(dmg>0) source->hitCallback(dmg,false,true,hittable);
 	return false;//TODO projectile currently stops immediately
+
+
+	//TODO remove above temp code and implement this (old proposal):
+	//params=BulletHittable::getBulletTargetParams(...)
+	//cont,damageProperties=BulletProjectile::applyHit(params);
+	//BulletHittable::applyDamage(damageProperties);
+
 }
 
 EntityProjectileBulletLike* EntityProjectileBulletLike::asProjectileBulletLike()

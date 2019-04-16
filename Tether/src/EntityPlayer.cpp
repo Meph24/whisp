@@ -121,9 +121,12 @@ Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestri
 	}
 	ret->planes[1]=cam->getLeftPlane();
 	ret->planes[2]=cam->getRightPlane();
-	ret->planes[4]=cam->getFarPlane(viewDistRestriction);//TODO evaluate usefulness
-	//   planes[5] would be the near plane, gain from it would be 0 most of the time, so not included here
-	for(int i=0;i<5;i++)//TODO do not hard-code
+	ret->planes[4]=cam->getFarPlane(viewDistRestriction);
+	if(FRUSTUM_PLANE_COUNT==6)
+	{
+		ret->planes[5]=cam->getNearPlane();
+	}
+	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{
 		ret->planes[i].distanceInChunks/=cm->getChunkSize();
 	}
@@ -169,10 +172,10 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	registerPushCheck((Entity *)this,time,tsp);
 }
 
-void EntityPlayer::push(spacevec amount)
+void EntityPlayer::push(spacevec amount, TickServiceProvider* tsp)
 {
-	pos+=amount;//TODO?
-	HP -= 15625*(amount.fLengthSq(16));//TODO not hard code chunk size
+	pos+=amount;
+	HP -= 15625*(tsp->getChunkManager()->toMeters(amount).lengthSq());
 }
 #include <iostream>
 void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,HittableBulletLike* victim)
@@ -183,24 +186,3 @@ void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,Hittable
 		hitmark=1;
 	}
 }
-//spacevec EntityPlayer::getPos()
-//{
-//	return pos;
-//}
-
-//#include "Zombie_Physics.h"
-//#include "Zombie_Enemy.h"
-//void EntityPlayer::onAABBintersect(Entity* other,float time,TickServiceProvider * tsp)
-//{
-//	Pushable * push=other->toPushable();//dynamic_cast<Pushable *>(other);
-//	if(push)
-//	{
-////		pushEntities(this,push,time,tsp->getChunkManager());
-//	}
-//
-//}
-//
-//Pushable* EntityPlayer::toPushable()
-//{
-//	return this;
-//}

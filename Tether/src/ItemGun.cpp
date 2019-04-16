@@ -50,7 +50,7 @@ void ItemGun::fire(TickServiceProvider* tsp)
 		float rand3=0;//TODO -1 1
 		float rand4=0;//TODO -1 1
 		ICamera3D * cam=tsp->getHolderCamera();
-		spacevec pos=tsp->getChunkManager()->fromMeters(vec3(cam->posX,cam->posY,cam->posZ));
+//TODO		spacevec pos=tsp->getChunkManager()->fromMeters(vec3(cam->posX,cam->posY,cam->posZ));
 
 		MatrixLib2 ml(2);
 		ml.loadIdentity();

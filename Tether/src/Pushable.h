@@ -19,7 +19,7 @@ public:
 	float pushForce=0;
 	void registerPushCheck(Entity * e,float seconds,TickServiceProvider * tsp);
 	void interact(Entity * self,DualPointer<Pushable> other, float time, TickServiceProvider* tsp);
-	virtual void push(spacevec amount)=0;
+	virtual void push(spacevec amount, TickServiceProvider* tsp)=0;
 	virtual ~Pushable();
 };
 

@@ -74,14 +74,10 @@ public:
 
 	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm);
 
-	virtual void push(spacevec amount);
+	virtual void push(spacevec amount, TickServiceProvider* tsp);
 
 	virtual HittableBulletLike * asHittableBulletLike();
 
-//	virtual spacevec getPos();
-//	virtual void onAABBintersect(Entity * other,float time,TickServiceProvider * tsp);
-//
-//	virtual Pushable * toPushable();
 };
 
 #endif /* SRC_ZOMBIE_ENEMY_H_ */

@@ -8,7 +8,11 @@
 
 #ifndef SRC_FRUSTUM_H_
 #define SRC_FRUSTUM_H_
+
 #define FRUSTUM_PLANE_COUNT 5
+//must be 5 or 6
+//6 uses near plane
+
 #include "DivisionPlane.h"
 #include "AABB.h"
 class ChunkManager;
@@ -23,6 +27,7 @@ public:
 	//2nd/3rd: left+right planes
 	//4th: upper plane if player looks down, lower plane otherwise
 	//5th: distance plane
+	//6th (not used with FRUSTUM_PLANE_COUNT==5): near plane: gain from it would be 0 most of the time, so not included here
 
 	void debugDraw(ITexture * tex,ChunkManager * cm);
 

@@ -11,6 +11,8 @@
 #include "WarnErrReporter.h"
 #include <algorithm>
 
+#include "EntityProjectileBulletLike.h"
+
 void Projectile::interact(Entity* self, DualPointer<Hittable> other, float time,TickServiceProvider* tsp)
 {
 	if(typeH==0)
@@ -32,9 +34,6 @@ void Projectile::interact(Entity* self, DualPointer<Hittable> other, float time,
 	if(after) if(!before) tsp->requestRetick((Retickable *)this);
 }
 
-//TODO remove includes along with temp code
-#include "EntityProjectileBulletLike.h"
-#include "Zombie_Enemy.h"
 
 void Projectile::retick(TickServiceProvider* tsp)
 {
@@ -66,11 +65,6 @@ void Projectile::retick(TickServiceProvider* tsp)
 					break;
 				}
 				cont=projectile->collide(hittable,collisions[i],tsp);
-
-				//TODO remove above temp code and implement this:
-				//params=BulletHittable::getBulletTargetParams(...)
-				//cont,damageProperties=BulletProjectile::applyHit(params);
-				//BulletHittable::applyDamage(damageProperties);
 
 				break;
 			}

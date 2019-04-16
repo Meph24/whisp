@@ -720,9 +720,9 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	ml.popMatrix();
 }
 
-void Zombie_Enemy::push(spacevec amount)
+void Zombie_Enemy::push(spacevec amount, TickServiceProvider* tsp)
 {
-	pos+=amount;//TODO?
+	pos+=amount;
 }
 
 

@@ -52,15 +52,10 @@ public:
 
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
-	virtual void push(spacevec amount);
+	virtual void push(spacevec amount, TickServiceProvider* tsp);
 
 	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);
 
-//	virtual spacevec getPos();
-
-//	virtual void onAABBintersect(Entity* other,float time,TickServiceProvider * tsp);
-
-//	virtual Pushable * toPushable();
 };
 
 #include "CameraTP.h"
