@@ -88,7 +88,6 @@ void Zombie_Tree::drawLeaves()
 void Zombie_Tree::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
-	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
 	if(!viewFrustum->inside(bb)) return;
 
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
@@ -126,7 +125,7 @@ void Zombie_Tree::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawS
 
 Zombie_Tree::~Zombie_Tree()
 {
-	// TODO Auto-generated destructor stub
+	//Textures are not owned by tree
 }
 
 void Zombie_Tree::tick(Timestamp t, TickServiceProvider* tsp)

@@ -131,3 +131,23 @@ void WarnErrReporter::wrongTypeErr(std::string text)
 	std::cout<<std::endl;
 	std::cout<<std::endl;
 }
+
+void WarnErrReporter::wrongAttachmentErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"semi-hard error (wrongAttachmentErr): no crash so far, my still happen later, this definitely should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}
+
+void WarnErrReporter::missingAttachmentErr(std::string text)
+{
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<"soft error (missingAttachmentErr): no crash, but this should not have happened:"<<std::endl;
+	std::cout<<text<<std::endl;
+	std::cout<<std::endl;
+	std::cout<<std::endl;
+}

@@ -227,7 +227,6 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
-	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
 	if(!viewFrustum->inside(bb)) return;
 
 	bodyAnim.updateTemp(tickOffset);

@@ -8,6 +8,7 @@
 
 #include "EntitySound.h"
 
+#include "WarnErrReporter.h"
 
 EntitySound::EntitySound(Entity* attachedTo,const sf::SoundBuffer& soundTemplate,float pitch,bool enable3D):
 attached(attachedTo)
@@ -18,9 +19,12 @@ attached(attachedTo)
 		pos=attached->pos;
 		v=attached->v;
 	}
-	//TODO else error
+	else
+	{
+		WarnErrReporter::missingAttachmentErr("EntitySound attachedTo==0");
+	}
 	sound.setBuffer(soundTemplate);
-	sound.setRelativeToListener(!enable3D);//enable 3D Audio
+	sound.setRelativeToListener(!enable3D);//enable 3D Audio; yes this is correct!
 	sound.setMinDistance(2);
 	sound.setVolume(100);
 	sound.setPitch(pitch);
@@ -29,22 +33,20 @@ attached(attachedTo)
 	std::cout<<"sound created"<<std::endl;
 }
 
-#include "WarnErrReporter.h"
 void EntitySound::notifyRemoval(Entity* e)
 {
 	if(attached!=e)
 	{
-		//TODO err
+		WarnErrReporter::wrongAttachmentErr("EntitySound attached!=e");
 	}
 	attached=0;
 	pos=e->pos;
 	v=e->v;
 }
-#include "WarnErrReporter.h"
+
 void EntitySound::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
 {
 	float tickOffset=t-lastTick;
-	if(!exists) return;//TODO this kind of check should be done by the caller beforehand
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
 	vec3 interPosMeters=cm->toMeters(interPos);
 	sound.setPosition(interPosMeters.x,interPosMeters.y,interPosMeters.z);
@@ -54,7 +56,6 @@ void EntitySound::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawS
 		std::cout<<"SOUND PLAY"<<std::endl;
 		playSoon=false;
 	}
-//	else std::cout<<"sound alive @ "<<interPosMeters<<" observer:"<<viewFrustum->observerPos<<std::endl;
 }
 
 void EntitySound::tick(Timestamp t, TickServiceProvider* tsp)

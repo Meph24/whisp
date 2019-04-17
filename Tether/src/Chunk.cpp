@@ -220,7 +220,8 @@ void Chunk::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawService
 	int size=managedEntities.size();
 	for(int i=0;i<size;i++)
 	{
-		managedEntities[i]->draw(t,viewFrustum,cm,dsp);
+		if(managedEntities[i]->exists)
+			managedEntities[i]->draw(t,viewFrustum,cm,dsp);
 	}
 }
 
