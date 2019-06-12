@@ -330,15 +330,30 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	}
 
 	vec3 relPos=cm->toMeters(pos-tsp->getTarget(this)->pos);
-	float wishAngle=atan2(relPos.x, relPos.z);
-	wishAngle *= 360 / TAU;
-	wishAngle += 90;
-	float dif = abs(wishAngle - facing);
-	float difplus = abs(wishAngle - (facing+360));
-	float difminus = abs(wishAngle - (facing-360));
-	if (difplus < dif) facing += 360;
-	else if (difminus<dif) facing -= 360;
-	facing = facing *(1 - seconds) + seconds*wishAngle;
+
+	vec3 mySpeed=cm->toMeters(v);
+	vec3 xprod=crossProduct(mySpeed,relPos);
+//	float mySpdSq=mySpeed.lengthSq();
+//	if(mySpdSq==0) mySpdSq=1;
+//	facing-=seconds*xprod.y/mySpdSq*20;
+	if(xprod.y>0)
+	{
+		facing-=seconds*60;
+	}
+	else
+	{
+		facing+=seconds*60;
+	}
+
+//	float wishAngle=atan2(relPos.x, relPos.z);
+//	wishAngle *= 360 / TAU;
+//	wishAngle += 90;
+//	float dif = abs(wishAngle - facing);
+//	float difplus = abs(wishAngle - (facing+360));
+//	float difminus = abs(wishAngle - (facing-360));
+//	if (difplus < dif) facing += 360;
+//	else if (difminus<dif) facing -= 360;
+//	facing = facing *(1 - seconds) + seconds*wishAngle;
 
 	spacevec sizeBB;
 
