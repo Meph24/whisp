@@ -12,6 +12,7 @@
 #define ITEM_GROUP_UNIQUE_TICK 0
 #define ITEM_GROUP_UNIQUE_NOTICK 1
 #define ITEM_GROUP_FIRST_FREE 2
+#define ITEM_GROUP_USELESS 3
 
 
 class ItemIdent

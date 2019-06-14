@@ -14,13 +14,13 @@
 #include <string>
 class Item: public Tickable
 {
-	std::string name;
+	std::string name;//TODO localized
 
 public:
 	ItemIdent ID;
 	u32 amount;//non-unique items can be stacks of arbitrary size, stackable items must be copyable
-	float mass;//per unit
-	float volume;//per unit
+	float mass;//per unit (kg)
+	float volume;//per unit (l)
 
 	float getTotalVolume();
 	float getTotalMass();
