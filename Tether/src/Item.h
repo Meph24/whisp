@@ -19,14 +19,15 @@ class Item: public Tickable
 public:
 	ItemIdent ID;
 	u32 amount;//non-unique items can be stacks of arbitrary size, stackable items must be copyable
-	float mass;//per unit (kg)
-	float volume;//per unit (l)
+	float mass;//kg per unit
+	float volume;//l per unit
 
 	float getTotalVolume();
 	float getTotalMass();
 	std::string getDisplayString();
 
 	virtual Item * newClone();
+	virtual void draw();//when held by player: must draw GUI and/or the physical item
 
 	Item();
 	virtual ~Item();

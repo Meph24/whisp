@@ -42,6 +42,8 @@ EntityPlayer::~EntityPlayer()
 	delete cam;
 	delete keyInp;
 	delete mouseInp;
+	if(heldItem) delete heldItem;
+	if(inventory) delete inventory;
 }
 
 void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, DrawServiceProvider* dsp)

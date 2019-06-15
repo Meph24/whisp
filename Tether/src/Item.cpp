@@ -42,3 +42,8 @@ std::string Item::getDisplayString()
 	else ret=std::to_string(amount)+ret;
 	return ret;
 }
+
+void Item::draw()
+{
+
+}

@@ -16,6 +16,9 @@ class Zombie_KeyInput;
 #include <SFML/Audio.hpp>
 class CameraTP;
 class Frustum;
+class Item;
+class ItemContainer;
+
 #include "BulletLikeSource.h"
 class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 {
@@ -23,6 +26,7 @@ class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 
 	bool isPerspective=false;
 public:
+
 	Zombie_MouseInput * mouseInp;
 	Zombie_KeyInput * keyInp;
 
@@ -37,6 +41,9 @@ public:
 	float maxHP=100;
 	float speed=0;
 	float hitmark=0;
+
+	Item * heldItem;
+	ItemContainer * inventory;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
 
 	EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
 	~EntityPlayer();
@@ -62,5 +69,7 @@ public:
 #include "Frustum.h"
 #include "Zombie_MouseInput.h"
 #include "Zombie_KeyInput.h"
+#include "Item.h"
+#include "ItemContainer.h"
 
 #endif /* SRC_ENTITYPLAYER_H_ */
