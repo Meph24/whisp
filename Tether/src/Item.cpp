@@ -20,6 +20,25 @@ Item* Item::newClone()
 	return 0;
 }
 
+void Item::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+{
+
+}
+
+void Item::giveNewUniqueNotickID()
+{
+	ID.group=ITEM_GROUP_UNIQUE_NOTICK;
+	ID.insideID=notickIDcounter;
+	notickIDcounter++;
+}
+
+void Item::giveNewUniqueTickID()
+{
+	ID.group=ITEM_GROUP_UNIQUE_TICK;
+	ID.insideID=tickIDcounter;
+	tickIDcounter++;
+}
+
 Item::~Item()
 {
 	// TODO Auto-generated destructor stub
@@ -41,9 +60,4 @@ std::string Item::getDisplayString()
 	if(ID.group==ITEM_GROUP_UNIQUE_TICK||ID.group==ITEM_GROUP_UNIQUE_NOTICK) ret="- "+ret;
 	else ret=std::to_string(amount)+ret;
 	return ret;
-}
-
-void Item::draw()
-{
-
 }

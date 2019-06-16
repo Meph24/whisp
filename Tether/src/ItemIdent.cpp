@@ -31,3 +31,8 @@ bool ItemIdent::isInGroup(unsigned int groupID)
 {
 	return group==groupID;
 }
+
+bool ItemIdent::operator ==(ItemIdent other)
+{
+	return (group==other.group) && (insideID==other.insideID);
+}

@@ -11,6 +11,7 @@
 ItemContainer::ItemContainer():
 items()
 {
+
 	// TODO Auto-generated constructor stub
 
 }
@@ -74,7 +75,7 @@ Item * ItemContainer::newClone()
 void ItemContainer::insertR(Item* it)
 {
 	Item * last=items.back();
-	if((last->ID.group==it->ID.group)&&(last->ID.insideID==it->ID.insideID))
+	if(last->ID==it->ID)
 	{
 		last->amount+=it->amount;
 	}

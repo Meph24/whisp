@@ -19,12 +19,13 @@ class ItemIdent
 {
 public:
 	unsigned int group;
-	unsigned int insideID;
+	unsigned int insideID;//both identical mean item is identical (and can be stacked if stackable)
 
 	bool isUnique();
 	bool needsTick();//always false if item is not unique
 	bool isInGroup(unsigned int groupID);
-	//TODO equal operator
+	bool operator==(ItemIdent other);
+
 	ItemIdent();
 	~ItemIdent();
 };

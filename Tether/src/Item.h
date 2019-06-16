@@ -12,9 +12,16 @@
 #include "ShortNames.h"
 #include "Tickable.h"
 #include <string>
-class Item: public Tickable
+class Item: public Tickable, public Drawable
 {
 	std::string name;//TODO localized
+
+	static u32 notickIDcounter=1;//0 is reserved
+	static u32 tickIDcounter=1;//0 is reserved
+
+protected:
+	void giveNewUniqueNotickID();//generates a new unique ID for a non-tick-requesting unique item
+	void giveNewUniqueTickID();//generates a new unique ID for a tick-requesting unique item
 
 public:
 	ItemIdent ID;
@@ -27,7 +34,7 @@ public:
 	std::string getDisplayString();
 
 	virtual Item * newClone();
-	virtual void draw();//when held by player: must draw GUI and/or the physical item
+	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);//when held by player: must draw GUI and/or the physical item
 
 	Item();
 	virtual ~Item();

@@ -21,7 +21,7 @@ protected:
 public:
 	virtual u32 maximumAdd(Item * item);
 	virtual Item * addItem(Item * item);
-	virtual Item * removeNextItem(u32 maxCount);
+	virtual Item * removeNextItem(u32 maxCount);//returns the last item with up to an amount of maxCount
 
 	virtual Item * newClone();
 	ItemContainer();

@@ -12,8 +12,17 @@
 class DrawServiceProvider
 {
 public:
+	ICamera3D * cam;
+
 	DrawServiceProvider();
 	virtual ~DrawServiceProvider();
+
+	vec3 getForwardViewVec();//the direction where the current view is looking
+	vec3 getUpViewVec();//the direction where up is in the current view
+
+	void transformViewToGUI();//must be reverted after draw calls finished
+	void revertView();
+
 };
 
 #endif /* SRC_DRAWSERVICEPROVIDER_H_ */
