@@ -77,6 +77,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 	pmGraphics->setName("     debug screen",PM_GRAPHICS_DRAWDEBUG);
 	pmGraphics->setName(" GPU work + syncs",PM_GRAPHICS_FLUSH);
 	pmGraphics->setName("            other",PM_GRAPHICS_OUTSIDE);
+	setCam(player->cam);
 }
 
 void Zombie_World::restart()
@@ -137,13 +138,10 @@ void Zombie_World::render(Timestamp t)
 	cm->draw(t,viewFrustum,cm,this);
 	glPopMatrix();
 
-
-	glPushMatrix();
-	glDisable(GL_DEPTH_TEST);
-	glLoadIdentity();
+	glEnable(GL_TEXTURE_2D);
+	transformViewToGUI();
 	glColor3f(0, 1, 0);
 	glPushMatrix();
-	glScalef(1, 1, -1.01f);
 	char scoreString[8];
 	int scoreTemp = score;
 	for (int i = 0; i < 8; i++)
@@ -178,16 +176,14 @@ void Zombie_World::render(Timestamp t)
 	for (int i = 0; i < crosshairAmount; i++)
 	{
 		glBegin(GL_TRIANGLES);
-		glVertex3f(0, crosshairSize, -1.01f);
-		glVertex3f(-crosshairSize, crosshairSize * 6, -1.01f);
-		glVertex3f(crosshairSize, crosshairSize * 6, -1.01f);
+		glVertex3f(0, crosshairSize, 1);
+		glVertex3f(-crosshairSize, crosshairSize * 6, 1);
+		glVertex3f(crosshairSize, crosshairSize * 6, 1);
 		glEnd();
 		glRotatef(360.0f / crosshairAmount, 0, 0, 1);
 	}
 	glPopMatrix();
-
-	glEnable(GL_DEPTH_TEST);
-	glPopMatrix();
+	revertView();
 	delete viewFrustum;
 }
 
@@ -300,11 +296,8 @@ Entity* Zombie_World::getTarget(Entity* me)
 
 void Zombie_World::drawGameOver()
 {
-	glPushMatrix();
+	transformViewToGUI();
 	glColor3f(1, 0, 0);
-	glDisable(GL_DEPTH_TEST);
-	glLoadIdentity();
-	glScalef(1, 1, -1.01f);
 	g->drawString("GAME OVER", 9, -0.8f, -0.2f, 0.4f);
 	glColor3f(0, 1, 0);
 	g->drawString("R=restart", 9, -0.8f, -0.6f, 0.3f);
@@ -320,8 +313,7 @@ void Zombie_World::drawGameOver()
 	}
 	g->drawString("score:", 6, -0.8f, 0.8f, 0.1f);
 	g->drawString(scoreString, 8, -0.8f, 0.62f, 0.1f);
-	glPopMatrix();
-	glEnable(GL_DEPTH_TEST);
+	revertView();
 }
 
 void Zombie_World::doLogic()
@@ -357,18 +349,14 @@ void Zombie_World::doGraphics()
 		pmGraphics->registerTime(PM_GRAPHICS_WORLD);
 		if(debugScreen)
 		{
-			glPushMatrix();
-			glLoadIdentity();
-			glScalef(1, 1, -1.01f);
+			transformViewToGUI();
 			glColor3f(1, 0, 0);
-			glDisable(GL_DEPTH_TEST);
 			glEnable(GL_TEXTURE_2D);
 			vec3 ppos=cm->toMeters(player->pos);
 			int offset=dsGraphics->draw(ppos.x,ppos.y,ppos.z,0);
 			dsLogic->draw(player->pos.x.intpart,player->pos.y.intpart,player->pos.z.intpart,offset);
 			glDisable(GL_TEXTURE_2D);
-			glEnable(GL_DEPTH_TEST);
-			glPopMatrix();
+			revertView();
 		}
 		pmGraphics->registerTime(PM_GRAPHICS_DRAWDEBUG);
 	}

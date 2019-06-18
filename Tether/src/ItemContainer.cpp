@@ -85,6 +85,11 @@ void ItemContainer::insertR(Item* it)
 	}
 }
 
+void ItemContainer::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+{
+
+}
+
 ItemContainer::~ItemContainer()
 {
 	u32 size=items.size();

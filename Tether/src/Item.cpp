@@ -8,6 +8,9 @@
 
 #include "Item.h"
 
+u32 Item::notickIDcounter=1;
+u32 Item::tickIDcounter=1;
+
 Item::Item()
 {
 	// TODO Auto-generated constructor stub

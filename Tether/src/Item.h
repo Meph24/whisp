@@ -11,15 +11,16 @@
 #include "ItemIdent.h"
 #include "ShortNames.h"
 #include "Tickable.h"
+#include "Drawable.h"
 #include <string>
 class Item: public Tickable, public Drawable
 {
-	std::string name;//TODO localized
-
-	static u32 notickIDcounter=1;//0 is reserved
-	static u32 tickIDcounter=1;//0 is reserved
+	static u32 notickIDcounter;//0 is reserved
+	static u32 tickIDcounter;//0 is reserved
 
 protected:
+	std::string name;//TODO localized
+
 	void giveNewUniqueNotickID();//generates a new unique ID for a non-tick-requesting unique item
 	void giveNewUniqueTickID();//generates a new unique ID for a tick-requesting unique item
 

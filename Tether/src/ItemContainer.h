@@ -24,6 +24,8 @@ public:
 	virtual Item * removeNextItem(u32 maxCount);//returns the last item with up to an amount of maxCount
 
 	virtual Item * newClone();
+	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);//when held by player: must draw GUI and/or the physical item
+
 	ItemContainer();
 	virtual ~ItemContainer();
 };
