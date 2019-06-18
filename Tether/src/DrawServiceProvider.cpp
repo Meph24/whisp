@@ -22,20 +22,21 @@ vec3 DrawServiceProvider::getForwardViewVec()
 	return cam->getForwardVector();
 }
 
-void DrawServiceProvider::transformViewToGUI()
+void DrawServiceProvider::transformViewToGUI(float priority)
 {
 	glPushMatrix();
 //	depthStatus=glIsEnabled(GL_DEPTH_TEST);
 //	glDisable(GL_DEPTH_TEST);
 	glLoadIdentity();
+	float prioScale=2.25f-priority;
 	if(!cam)
 	{
-		glScalef(1.0625f,1.0625f,-1.0625f);
+		glScalef(prioScale,prioScale,-prioScale);
 		WarnErrReporter::notInitializedErr("camera not initialized (in transformViewToGUI)");
 	}
 	else
 	{
-		glScalef(cam->minView*1.25f*cam->zoom, cam->minView*1.25f*cam->zoom, -cam->minView*1.25f);
+		glScalef(cam->minView*prioScale*cam->zoom, cam->minView*prioScale*cam->zoom, -cam->minView*prioScale);
 	}
 
 

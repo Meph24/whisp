@@ -37,7 +37,7 @@ typedef struct
 
 } subsection;
 
-//This class is not thread safe! This class does not fully support multiple instances of itself! Look at the code for exceptions to this rule.
+//This class is not thread safe! This class does not fully support multiple instances of itself! Reset all subsections before using another instance!
 class Graphics2D
 {
 	float * xCircle;
@@ -49,7 +49,7 @@ class Graphics2D
 	unsigned int maxStack;
 	TexParamSet tps;
 	bool deleteTex;
-	float charLen = 400.0f / 1024.0f;
+	float charLen = 400.0f / 1024.0f;//TODO not hardcode
 
 	void initCircle();
 
@@ -86,10 +86,12 @@ public:
 	void fillOval(float xCenter, float yCenter, float xRad, float yRad);
 	void drawString(const char * str,int len,float xll,float yll, float size);
 	void setColor(float r, float g, float b);
-	void endDraw();
-	void beginDraw();
-	Graphics2D(int circleSegments);
-	Graphics2D(int circleSegments, ITexture * myFont);
+//	void endDraw();
+//	void beginDraw();
+
+
+	//DO NOT CALL THIS CONSTRUCTOR WITHOUT "myFont" BEFORE OGL IS INITIALIZED!!!
+	Graphics2D(int circleSegments,float aspectRatio=1, ITexture * myFont=0);
 	~Graphics2D();
 };
 

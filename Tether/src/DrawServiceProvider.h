@@ -25,7 +25,8 @@ public:
 	vec3 getForwardViewVec();//the direction where the current view is looking
 	vec3 getUpViewVec();//the direction where up is in the current view
 
-	void transformViewToGUI();//call revertView after draw calls finished!!!; must not be activated multiple times within any instances at the same time (call revertView in between!)
+	//priority 0-1, higher prio GUI elements cover lower prio ones when they overlap
+	void transformViewToGUI(float priority=0.5f);//call revertView after draw calls finished!!!; must not be activated multiple times within any instances at the same time (call revertView in between!)
 	void revertView();
 
 };

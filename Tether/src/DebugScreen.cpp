@@ -19,7 +19,6 @@ DebugScreen::~DebugScreen()
 	// TODO Auto-generated destructor stub
 }
 
-//#include <iostream>
 #include <sstream>
 int DebugScreen::draw(flt x,flt y,flt z,int lineOffset)
 {
@@ -31,7 +30,6 @@ int DebugScreen::draw(flt x,flt y,flt z,int lineOffset)
 		std::string s=pm->getInfo(i,FLAG_RECENTAVG+FLAG_SPIKES+FLAG_NOW);
 		g[0]->drawString(s.c_str(),s.length(),-1.4f,0.8f-(lineOffset-1)*textSize,textSize);
 		lineOffset++;
-		//std::cout<<s<<std::endl;
 	}
 	std::ostringstream myString;
 	myString<<"x = "<<x<<" | y = "<<y<<" | z = "<<z;

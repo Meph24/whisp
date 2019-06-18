@@ -2,41 +2,47 @@
 #include <cmath>
 #include "TextureStatic2D.h"
 
-Graphics2D::Graphics2D(int circleSegments, ITexture * myFont) :
-segments(circleSegments),
-tps(0,0),
-deleteTex(false),
-font(myFont)
-{
-	initCircle();
-	maxi.x = 1;//TODO correct
-	maxi.y = 1;
-	maxStack = 256;//TODO add optional parameter
-	curMax = new point[maxStack];
-	curMax[0] = maxi;
-}
-#include <iostream>
 
-//DO NOT CALL THIS CONSTRUCTOR BEFORE OGL IS INITIALIZED!!!
-Graphics2D::Graphics2D(int circleSegments) :
+#include <iostream>
+#include "myAssert.h"
+
+Graphics2D::Graphics2D(int circleSegments,float aspectRatio, ITexture * myFont) :
 segments(circleSegments),
-tps(2, 2),
+stack(0),
+tps(myFont==0?2:0, myFont==0?2:0),
 deleteTex(true)
 {
-	//tps = new TexParamSet(2, 2);
-	if (!tps.addI(GL_TEXTURE_WRAP_S, GL_REPEAT)) std::cout << "fuckshit" << std::endl;
-	if (!tps.addI(GL_TEXTURE_WRAP_T, GL_REPEAT)) std::cout << "fuckshit" << std::endl;
-	if (!tps.addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
-	if (!tps.addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
+	if(myFont)
+	{
+		deleteTex=false;
+	}
+	else
+	{
+		deleteTex=true;
 
+		if (!tps.addI(GL_TEXTURE_WRAP_S, GL_REPEAT)) std::cout << "fuckshit" << std::endl;//TODO different error
+		if (!tps.addI(GL_TEXTURE_WRAP_T, GL_REPEAT)) std::cout << "fuckshit" << std::endl;
+		if (!tps.addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
+		if (!tps.addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
+
+		font = new TextureStatic2D(&tps, "./res/font.png");
+		font->update();
+	}
 	initCircle();
-	maxi.x = 1;//TODO correct
-	maxi.y = 1;
+	assert(aspectRatio>0);
+	if(aspectRatio>=1)
+	{
+		maxi.x = aspectRatio;
+		maxi.y = 1;
+	}
+	else
+	{
+		maxi.x=1;
+		maxi.y=1/aspectRatio;
+	}
 	maxStack = 256;//TODO add optional parameter
 	curMax = new point[maxStack];
 	curMax[0] = maxi;
-	font = new TextureStatic2D(&tps, "./res/font.png");
-	font->update();
 }
 
 Graphics2D::~Graphics2D()
@@ -70,15 +76,15 @@ void Graphics2D::initCircle()
 	}
 }
 
-void Graphics2D::beginDraw()
-{
-	glLoadIdentity();
-}
-
-void Graphics2D::endDraw()
-{
-	glFlush();  // Render now
-}
+//void Graphics2D::beginDraw()
+//{
+//	glLoadIdentity();
+//}
+//
+//void Graphics2D::endDraw()
+//{
+//	glFlush();  // Render now
+//}
 
 float Graphics2D::getMaxX()
 {
@@ -103,7 +109,7 @@ void Graphics2D::setSubsection(subsection * s)
 {
 	if (stack + 1 == maxStack)
 	{
-		//TODO throw exception
+		//TODO error
 	}
 	else
 	{
@@ -116,8 +122,15 @@ void Graphics2D::setSubsection(subsection * s)
 
 void Graphics2D::resetLastSubsection()
 {
-	glPopMatrix();
-	stack--;
+	if(stack>0)
+	{
+		glPopMatrix();
+		stack--;
+	}
+	else
+	{
+		//TODO error
+	}
 }
 void Graphics2D::resetAllSubsections()
 {
@@ -273,7 +286,6 @@ void Graphics2D::drawString(const char * str,int len, float xll, float yll, floa
 	font->bind();
 	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
-	//glColor3f(1.0f, 1.0f, 1.0f);
 	for (int i = 0; i < len; i++)
 	{
 		float tx = (str[i] % 16)/16.0f;
@@ -282,21 +294,16 @@ void Graphics2D::drawString(const char * str,int len, float xll, float yll, floa
 		float dy = yll;
 
 		glTexCoord2f(tx, ty + 1.0f / 16.0f);
-		//glTexCoord2f(0, 0);
 		glVertex3f(dx, dy,1);
 
 		glTexCoord2f(tx + 1.0f / 16.0f, ty + 1.0f / 16.0f);
-		//glTexCoord2f(1, 0);
 		glVertex3f(dx + charLen*size, dy,1);
 
 		glTexCoord2f(tx + 1.0f / 16.0f, ty);
-		//glTexCoord2f(1, 1);
 		glVertex3f(dx + charLen*size, dy + size,1);
 
 		glTexCoord2f(tx, ty);
-		//glTexCoord2f(0, 1);
 		glVertex3f(dx, dy + size,1);
-		//std::cout << "tx:" << tx << " ty:" << ty<<std::endl;
 	}
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
