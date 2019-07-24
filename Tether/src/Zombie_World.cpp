@@ -349,8 +349,8 @@ void Zombie_World::doGraphics()
 		pmGraphics->registerTime(PM_GRAPHICS_WORLD);
 		if(debugScreen)
 		{
-			transformViewToGUI();
-			glColor3f(1, 0, 0);
+			transformViewToGUI(1);
+			glColor3f(1, 0, 1);
 			glEnable(GL_TEXTURE_2D);
 			vec3 ppos=cm->toMeters(player->pos);
 			int offset=dsGraphics->draw(ppos.x,ppos.y,ppos.z,0);
