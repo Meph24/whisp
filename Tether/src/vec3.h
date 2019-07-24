@@ -24,7 +24,7 @@ public:
 
 	//returns bit vector of comparison lsb=x
 	unsigned int operator<(vec3 other);
-	unsigned int operator>(vec3 other);
+	unsigned int operator>(vec3 other);//TODO must be const?
 
 	void normalize();
 	flt normGetLen();//normalize this vec3 and return length of the unnormalized version
