@@ -9,20 +9,23 @@
 #ifndef SRC_CHUNK_H_
 #define SRC_CHUNK_H_
 
-#define defaultHeight -1
-//#include "InteractionGroup1.h"
-#include "DualPointer.h"
-#include "Spacevec.h"
 #include "Tickable.h"
-#include "MatrixLib.h"
-#include <GL/glew.h>
-class ChunkManager;
-#include <vector>
-#include "AABB.h"
-class InteractionManager;
 #include "Drawable.h"
 
-class Chunk: public Tickable, public Drawable //TODO Drawable?
+#include "AABB.h"
+
+class ChunkManager;
+class InteractionManager;
+
+#include <GL/glew.h>
+#include <vector>
+
+
+#define defaultHeight -1
+
+//#include "InteractionGroup1.h"
+
+class Chunk: public Tickable, public Drawable
 {
 	spacevec base;
 	spacelen defaultH;
@@ -42,7 +45,7 @@ public:
 	AABB bb;
 	void tick(Timestamp t,TickServiceProvider * tsp);
 	spacelen getHeight(flt x,flt z);//coordinates inside chunk
-	void render(int lod,spacevec camOffset);
+	void render(int lod,spacevec camOffset);//TODO replace
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	void clearEntities();
 

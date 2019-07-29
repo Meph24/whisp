@@ -8,9 +8,8 @@ extern Zombie_MouseInput * mouseInput;
 
 #include "SpeedMod.h"
 #include "ZombieTree.h"
-
-#include "TickServiceProvider.h"
-#include "DrawServiceProvider.h"
+#include "TextureStatic2D.h"
+#include "Zombie_Enemy.h"
 
 #include <iostream>
 
@@ -25,21 +24,10 @@ Zombie_World::Zombie_World(sf::Window * w):
 	lodQuality=*cfg.getfloat("graphics", "terrainQuality");
 	std::cout<<"testStart"<<std::endl;
 	cm=new ChunkManager(16,physDist*2,renderDist,16,9.81f);//TODO make chunksPerLockchunk configurable
-	currentGun=0;
 	spawnZombies=true;
 	zCount = *cfg.getint("test", "zombies");
 	zombieDist = *cfg.getint("test", "zombieDist");
-	wCount = 8;
-	guns = new Zombie_Gun * [wCount];
 	Timestamp timS=tm.getSlaveTimestamp();
-	guns[0] = new Zombie_Gun(timS,"Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f,1),false,{2,0.15f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[1] = new Zombie_Gun(timS,"Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f,1),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
-	guns[2] = new Zombie_Gun(timS,"American 180 .22",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f,1),true,{0.5f,0,0},{0.5f,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[3] = new Zombie_Gun(timS,"Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f,1),false,{5,0,0},{2,2,0});
-	guns[4] = new Zombie_Gun(timS,"G3A3 .308",0.12f,"res/gunshot.wav",0.75f,new ItemAmmo(800, 200,0.0008f,1),true,{3,0,0},{1.5f,1.5f,0});
-	guns[5] = new Zombie_Gun(timS,"Shotgun",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,45.0f,0.0022272754325748604f,9),true,{2.5f,0,0},{1.5f,1.5f,0});
-	guns[6] = new Zombie_Gun(timS,"Shotgun with Birdshot",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,0.30f,0.0038f,900),true,{2.5f,0,0},{1.5f,1.5f,0});
-	guns[7] = new Zombie_Gun(timS,"Cheat Blaster 180",0.08f,"res/gunshot.wav",0.5f,new ItemAmmo(600,200.30f,0.0018f,180),true,{0.5f,0,0},{0.5f,0.5f,0});
 
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
 
@@ -84,7 +72,7 @@ void Zombie_World::restart()
 {
 	spawnZombies=true;
 	player->HP = player->maxHP;
-	score = 0;
+	player->score = 0;
 	cm->clearEntities();
 	//TODO clean chunks
 }
@@ -109,11 +97,6 @@ Zombie_World::~Zombie_World()
 	delete tps;
 	delete tps2;
 
-	for(int i=0;i<wCount;i++)
-	{
-		delete guns[i];
-	}
-	delete guns;
 
 	delete adQ;
 	delete player;
@@ -127,63 +110,11 @@ void Zombie_World::render(Timestamp t)
 	Frustum * viewFrustum=player->newGetViewFrustum(cm,quality);
 
 	grass->bind();
-	glColor3f(0.2f, 0.6f, 0.1f);
-
-	glPushMatrix();
-	glEnable(GL_TEXTURE_2D);
-
-	cm->render(lodQuality,viewFrustum,relPos);
-	glDisable(GL_TEXTURE_2D);
+	cm->render(lodQuality,viewFrustum,relPos);//TODO integrate into draw()?!
 
 	cm->draw(t,viewFrustum,cm,this);
-	glPopMatrix();
+	player->draw(t,viewFrustum,cm,this);//TODO  this is the job of the chunk manager
 
-	glEnable(GL_TEXTURE_2D);
-	transformViewToGUI();
-	glColor3f(0, 1, 0);
-	glPushMatrix();
-	char scoreString[8];
-	int scoreTemp = score;
-	for (int i = 0; i < 8; i++)
-	{
-		scoreString[7 - i] = (scoreTemp % 10)+'0';
-		scoreTemp /= 10;
-	}
-	g->drawString("score:", 6, -0.8f, 0.8f, 0.1f);
-	g->drawString(scoreString, 8, -0.8f, 0.62f, 0.1f);
-
-	scoreTemp = player->HP;
-	for (int i = 0; i < 3; i++)
-	{
-		scoreString[7 - i] = (scoreTemp % 10) + '0';
-		scoreTemp /= 10;
-	}
-	g->drawString("health:", 7, -0.2f, 0.8f, 0.1f);
-	g->drawString(scoreString+5, 3, -0.2f, 0.62f, 0.1f);
-
-	glColor3f(1, 1, 0);
-	g->drawString("Weapon:", 7, 0.6f, -0.66f, 0.1f);
-	g->drawString(guns[currentGun]->name.c_str(), guns[currentGun]->name.length(), 0.6f, -0.82f, 0.1f);
-	glColor3f(0, 1, 0);
-	glPopMatrix();
-	float crosshairSize = 0.005f;
-	int crosshairAmount = 4;
-
-	glDisable(GL_TEXTURE_2D);
-	glColor3f(1, player->hitmark, 0);
-
-	glPushMatrix();
-	for (int i = 0; i < crosshairAmount; i++)
-	{
-		glBegin(GL_TRIANGLES);
-		glVertex3f(0, crosshairSize, 1);
-		glVertex3f(-crosshairSize, crosshairSize * 6, 1);
-		glVertex3f(crosshairSize, crosshairSize * 6, 1);
-		glEnd();
-		glRotatef(360.0f / crosshairAmount, 0, 0, 1);
-	}
-	glPopMatrix();
-	revertView();
 	delete viewFrustum;
 }
 
@@ -224,7 +155,7 @@ void Zombie_World::loadStandardTex()
 void Zombie_World::doPhysics(Timestamp t)
 {
 	initNextTick();
-	player->tick(t,this);
+	player->tick(t,this);//TODO insert into chunk manager
 
 	cm->tick(t,this);
 
@@ -255,19 +186,11 @@ void Zombie_World::trigger(bool pulled)
 {
 	if (!pulled)
 	{
-		guns[currentGun]->stopShooting();
+		player->guns[player->currentGun]->stopShooting();
 		return;
 	}
-	guns[currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,cm);
+	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,cm);
 }
-
-void Zombie_World::switchWeapon(int dir)
-{
-	guns[currentGun]->stopShooting();
-	currentGun=(currentGun+dir+wCount*1024)%wCount;//TODO
-	std::cout<<"gun switched to"<<currentGun<<std::endl;
-}
-
 void Zombie_World::spawnZombie(Timestamp t)
 {
 	if(!spawnZombies) return;
@@ -294,7 +217,7 @@ Entity* Zombie_World::getTarget(Entity* me)
 	return (Entity *)player;
 }
 
-void Zombie_World::drawGameOver()
+void Zombie_World::drawGameOver()//TODO find new home
 {
 	transformViewToGUI();
 	glColor3f(1, 0, 0);
@@ -304,10 +227,9 @@ void Zombie_World::drawGameOver()
 
 	char scoreString[8];
 
-	int scoreTemp = score;
+	int scoreTemp = player->score;
 	for (int i = 0; i < 8; i++)
 	{
-
 		scoreString[7 - i] = (scoreTemp % 10) + '0';
 		scoreTemp /= 10;
 	}
@@ -321,7 +243,7 @@ void Zombie_World::doLogic()
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
 	Timestamp t=tm.masterUpdate();
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
-	guns[currentGun]->tick(t,player->cam,player,shot,cm);
+	player->guns[player->currentGun]->tick(t,player->cam,player,shot,cm);
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
 	for(int i=0;i<40;i++)
 		if (0.03f> (rand() % 32768) / 32768.0f) spawnZombie(t);//TODO replace by better spawn mechanic
@@ -382,3 +304,7 @@ ChunkManager* Zombie_World::getChunkManager()
 	return cm;
 }
 
+ITexture* Zombie_World::suggestFont()
+{
+	return g->font;
+}

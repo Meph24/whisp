@@ -8,9 +8,10 @@
 
 #include "EntityPlayer.h"
 #include "SpeedMod.h"
+#include "TopLevelInventory.h"
 
 EntityPlayer::EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
-speed(characterSpeed)
+speed(characterSpeed),heldItem(0),inventory(0)
 {
 	lastTick=spawnTime;
 	pos=startPos;
@@ -35,6 +36,20 @@ speed(characterSpeed)
 	pushForce=speed/30;
 
 	bb=AABB(pos);
+
+	heldItem=new TopLevelInventory(this);
+
+	wCount = 8;
+	guns = new Zombie_Gun * [wCount];
+	guns[0] = new Zombie_Gun(spawnTime,"Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f,1),false,{2,0.15f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[1] = new Zombie_Gun(spawnTime,"Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f,1),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
+	guns[2] = new Zombie_Gun(spawnTime,"American 180 .22",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f,1),true,{0.5f,0,0},{0.5f,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns[3] = new Zombie_Gun(spawnTime,"Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f,1),false,{5,0,0},{2,2,0});
+	guns[4] = new Zombie_Gun(spawnTime,"G3A3 .308",0.12f,"res/gunshot.wav",0.75f,new ItemAmmo(800, 200,0.0008f,1),true,{3,0,0},{1.5f,1.5f,0});
+	guns[5] = new Zombie_Gun(spawnTime,"Shotgun",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,45.0f,0.0022272754325748604f,9),true,{2.5f,0,0},{1.5f,1.5f,0});
+	guns[6] = new Zombie_Gun(spawnTime,"Shotgun with Birdshot",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,0.30f,0.0038f,900),true,{2.5f,0,0},{1.5f,1.5f,0});
+	guns[7] = new Zombie_Gun(spawnTime,"Cheat Blaster 180",0.08f,"res/gunshot.wav",0.5f,new ItemAmmo(600,200.30f,0.0018f,180),true,{0.5f,0,0},{0.5f,0.5f,0});
+
 }
 
 EntityPlayer::~EntityPlayer()
@@ -42,9 +57,24 @@ EntityPlayer::~EntityPlayer()
 	delete cam;
 	delete keyInp;
 	delete mouseInp;
+	for(int i=0;i<wCount;i++)
+	{
+		delete guns[i];
+	}
+	delete guns;
 	if(heldItem) delete heldItem;
 	if(inventory) delete inventory;
 }
+
+
+
+void EntityPlayer::switchWeapon(int dir)
+{
+	guns[currentGun]->stopShooting();
+	currentGun=(currentGun+dir+wCount*1024)%wCount;//TODO
+	std::cout<<"gun switched to"<<currentGun<<std::endl;
+}
+
 
 void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, DrawServiceProvider* dsp)
 {
@@ -54,6 +84,55 @@ void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, Draw
 		//TODO draw yourself
 		isPerspective=false;
 	}
+
+	glEnable(GL_TEXTURE_2D);
+	dsp->transformViewToGUI();
+	glColor3f(0, 1, 0);
+	glPushMatrix();
+	char scoreString[8];
+	int scoreTemp = score;
+	for (int i = 0; i < 8; i++)
+	{
+		scoreString[7 - i] = (scoreTemp % 10)+'0';
+		scoreTemp /= 10;
+	}
+	dsp->g->drawString("score:", 6, -0.8f, 0.8f, 0.1f);
+	dsp->g->drawString(scoreString, 8, -0.8f, 0.62f, 0.1f);
+
+	scoreTemp = HP;
+	for (int i = 0; i < 3; i++)
+	{
+		scoreString[7 - i] = (scoreTemp % 10) + '0';
+		scoreTemp /= 10;
+	}
+	dsp->g->drawString("health:", 7, -0.2f, 0.8f, 0.1f);
+	dsp->g->drawString(scoreString+5, 3, -0.2f, 0.62f, 0.1f);
+
+	glColor3f(1, 1, 0);
+	dsp->g->drawString("Weapon:", 7, 0.6f, -0.66f, 0.1f);
+	dsp->g->drawString(guns[currentGun]->name.c_str(), guns[currentGun]->name.length(), 0.6f, -0.82f, 0.1f);
+	glColor3f(0, 1, 0);
+	glPopMatrix();
+	float crosshairSize = 0.005f;
+	int crosshairAmount = 4;
+
+	glDisable(GL_TEXTURE_2D);
+	glColor3f(1, hitmark, 0);
+
+	glPushMatrix();
+	for (int i = 0; i < crosshairAmount; i++)
+	{
+		glBegin(GL_TRIANGLES);
+		glVertex3f(0, crosshairSize, 1);
+		glVertex3f(-crosshairSize, crosshairSize * 6, 1);
+		glVertex3f(crosshairSize, crosshairSize * 6, 1);
+		glEnd();
+		glRotatef(360.0f / crosshairAmount, 0, 0, 1);
+	}
+	glPopMatrix();
+	dsp->revertView();
+
+	if(heldItem) heldItem->draw(t,viewFrustum,cm,dsp);
 }
 
 void EntityPlayer::applyPerspective(Timestamp t,bool fresh,ChunkManager * cm)

@@ -11,6 +11,7 @@
 #include "TickServiceProvider.h"
 #include "Zombie_Enemy.h"
 
+#include "TextureDummy.h"
 ITexture * EntityProjectileBulletLike::tex=new TextureDummy();
 
 

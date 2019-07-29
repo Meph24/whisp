@@ -1,28 +1,24 @@
 #pragma once
-#include "Zombie_Enemy.h"
-#include "CameraFP.h"
-#include <SFML/Window.hpp>
-#include "PerformanceMeter.h"
-#include "TextureStatic2D.h"
-#include "EntityPlayer.h"
-#include "Graphics2D.h"
-#include "Zombie_Gun.h"
-#include "AdaptiveQuality.h"
+
+#include "TickServiceProvider.h"
+#include "DrawServiceProvider.h"
+
 #include "TimestampManager.h"
 
-#include "Pushable.h"
-#include "DualPointer.h"
+class AdaptiveQuality;
+class PerformanceMeter;
+class ITexture;
+class ChunkManager;
+class DebugScreen;
+class EntityPlayer;
 
-#include "PerformanceMeter.h"
-#include "DebugScreen.h"
-#include "ChunkManager.h"
-#include "TickServiceProvider.h"
+#include <SFML/Window.hpp>
+
 
 #define PM_GRAPHICS_OUTSIDE 0
 #define PM_GRAPHICS_WORLD 1
 #define PM_GRAPHICS_DRAWDEBUG 2
 #define PM_GRAPHICS_FLUSH 3
-
 
 #define PM_LOGIC_OUTSIDE 0
 #define PM_LOGIC_PRECALC 1
@@ -37,19 +33,12 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 {
 	bool spawnZombies;
 	int zCount;//max number of zombies
-	int wCount;
 
 	PerformanceMeter * pmLogic;
 	PerformanceMeter * pmGraphics;
 	DebugScreen * dsLogic;
 	DebugScreen * dsGraphics;
-	Graphics2D * g;
 
-	Zombie_Gun ** guns;
-	int currentGun;
-
-	int score=0;
-	
 
 
 	ChunkManager * cm;
@@ -86,22 +75,28 @@ public:
 	Zombie_World(sf::Window * w);
 	~Zombie_World();
 
-
 	//TickServiceProvider
 	virtual ICamera3D * getHolderCamera();//can return 0 if currently not held
 	virtual ChunkManager * getChunkManager();
 
 	virtual Entity * getTarget(Entity * me);
 
-
 	void loadStandardTex();
 
 	void trigger(bool pulled);
 
-	void switchWeapon(int dir);
-
 	void loop();
 
 	void markRestart();
+
+	//from DrawServiceProvider:
+	virtual ITexture * suggestFont();//returns 0 if no suggestion is made
 };
+
+#include "PerformanceMeter.h"
+#include "ITexture.h"
+#include "ChunkManager.h"
+#include "DebugScreen.h"
+#include "EntityPlayer.h"
+#include "AdaptiveQuality.h"
 

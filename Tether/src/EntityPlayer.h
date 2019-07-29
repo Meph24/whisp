@@ -8,24 +8,33 @@
 
 #ifndef SRC_ENTITYPLAYER_H_
 #define SRC_ENTITYPLAYER_H_
-#include "Entity.h"
+
+#include "BulletLikeSource.h"
 #include "Pushable.h"
+#include "Entity.h"
+
+
 class Zombie_MouseInput;
 class Zombie_KeyInput;
-#include <SFML/Window.hpp>
-#include <SFML/Audio.hpp>
+class Zombie_Gun;
 class CameraTP;
 class Frustum;
 class Item;
 class ItemContainer;
 
-#include "BulletLikeSource.h"
+
+#include <SFML/Window.hpp>
+#include <SFML/Audio.hpp>
+
+
 class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 {
 	void setTP(bool on);
 
 	bool isPerspective=false;
 public:
+
+	int score=0;
 
 	Zombie_MouseInput * mouseInp;
 	Zombie_KeyInput * keyInp;
@@ -42,8 +51,13 @@ public:
 	float speed=0;
 	float hitmark=0;
 
-	Item * heldItem;
-	ItemContainer * inventory;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
+	//TODO replace this section
+	int wCount;
+	Zombie_Gun ** guns;
+	int currentGun=0;
+
+	Item * heldItem;//to browse the inventory, "heldItem" is switched with "inventory"
+	Item * inventory;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
 
 	EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
 	~EntityPlayer();
@@ -63,12 +77,15 @@ public:
 
 	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);
 
+
+	void switchWeapon(int dir);
 };
 
 #include "CameraTP.h"
 #include "Frustum.h"
 #include "Zombie_MouseInput.h"
 #include "Zombie_KeyInput.h"
+#include "Zombie_Gun.h"
 #include "Item.h"
 #include "ItemContainer.h"
 

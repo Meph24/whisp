@@ -9,14 +9,18 @@
 #ifndef SRC_FRUSTUM_H_
 #define SRC_FRUSTUM_H_
 
+#include "DivisionPlane.h"
+#include "AABB.h"
+
+class ChunkManager;
+class ITexture;
+
+
 #define FRUSTUM_PLANE_COUNT 5
 //must be 5 or 6
 //6 uses near plane
 
-#include "DivisionPlane.h"
-#include "AABB.h"
-class ChunkManager;
-class ITexture;
+
 class Frustum
 {
 public:

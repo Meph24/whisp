@@ -8,9 +8,12 @@
 
 #ifndef SRC_ZOMBIETREE_H_
 #define SRC_ZOMBIETREE_H_
-#include "MatrixLib.h"
-#include "ITexture.h"
+
 #include "Entity.h"
+
+#include "MatrixLib.h"
+
+class ITexture;
 
 class Zombie_Tree: public Entity
 {
@@ -32,5 +35,7 @@ public:
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 };
+
+#include "ITexture.h"
 
 #endif /* SRC_ZOMBIETREE_H_ */

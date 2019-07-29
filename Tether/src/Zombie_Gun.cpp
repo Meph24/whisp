@@ -47,8 +47,8 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 	int cheat=0;
 	if(pType->bulletQuantity>1) shotgun=1;
 	if(pType->bulletQuantity==180) cheat=1;
-	float maxSpreadX=0.5f/60.0f*(1+120*shotgun*(1+cheat*7));//9.5f;//1/60.0f;//TODO properly implement
-	float maxSpreadY=0.5f/60.0f*(1+120*shotgun*(1+cheat*3));//9.5f;//1/60.0f;//TODO remove, test only
+	float maxSpreadX=0.5f/60.0f*(1+(1.5f*120-1)*shotgun*(1+cheat*7));//9.5f;//1/60.0f;//TODO properly implement
+	float maxSpreadY=0.5f/60.0f*(1+(1.5f*120-1)*shotgun*(1+cheat*3));//9.5f;//1/60.0f;//TODO remove, test only
 	float greater=maxSpreadX>maxSpreadY?maxSpreadX:maxSpreadY;
 
 	MatrixLib2 ml(2);

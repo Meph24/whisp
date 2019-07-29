@@ -54,6 +54,11 @@ spacelen ChunkManager::getHeight(spacevec abs)
 #include <iostream>
 void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 {
+
+
+	glPushMatrix();
+	glEnable(GL_TEXTURE_2D);
+
 	int startX=chunksPerAxis/2-renderDistanceChunks;
 	int startZ=chunksPerAxis/2-renderDistanceChunks;
 	int stopX=startX+renderDistanceChunks*2;
@@ -90,6 +95,8 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 			}
 		}
 	}
+	glDisable(GL_TEXTURE_2D);
+	glPopMatrix();
 }
 
 #include "WarnErrReporter.h"

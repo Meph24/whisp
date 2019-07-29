@@ -57,3 +57,34 @@ void DrawServiceProvider::revertView()
 	glPopMatrix();
 //	if(depthStatus) glEnable(GL_DEPTH_TEST);
 }
+
+float DrawServiceProvider::getAspectRatio()
+{
+	return cam->width/cam->height;
+}
+
+bool DrawServiceProvider::reinitGraphics()
+{
+	return false;//TODO
+}
+
+ITexture* DrawServiceProvider::suggestFont()
+{
+	return 0;
+}
+
+void DrawServiceProvider::registerTransparentCallback(float priority,Drawable* callbackRequester)
+{
+	callbackList.push_back(std::make_pair(priority,callbackRequester));
+}
+
+void DrawServiceProvider::doTransparentCallbacks(Timestamp t,Frustum * viewFrustum,ChunkManager* cm)
+{
+	std::sort(callbackList.begin(), callbackList.end());
+	isTransparentPass=true;
+	for(auto e : callbackList)
+	{
+		e.second->draw(t,viewFrustum,cm,this);
+	}
+	isTransparentPass=false;
+}

@@ -8,15 +8,22 @@
 
 #ifndef SRC_ENTITY_H_
 #define SRC_ENTITY_H_
-#include "Spacevec.h"
-#include "Drawable.h"
-class TickServiceProvider;
+
 #include "Tickable.h"
-//#include "EntityIdent.h"
-#include <vector>
+#include "Drawable.h"
+
 #include "AABB.h"
+#include "Spacevec.h"
+
+class TickServiceProvider;
 class Frustum;
 class ChunkManager;
+class DrawServiceProvider;
+
+#include <vector>
+
+
+//#include "EntityIdent.h"
 
 class Entity: public Tickable, Drawable
 {
@@ -77,5 +84,6 @@ public:
 #include "ChunkManager.h"
 #include "Frustum.h"
 #include "TickServiceProvider.h"
+#include "DrawServiceProvider.h"
 
 #endif /* SRC_ENTITY_H_ */

@@ -8,22 +8,25 @@
 
 #ifndef SRC_ENTITYPROJECTILEBULLETLIKE_H_
 #define SRC_ENTITYPROJECTILEBULLETLIKE_H_
-#include "Entity.h"
-//#include "ItemAmmo.h"
-#include "TextureDummy.h"
 
-#include "HittableBulletLike.h"
-#include "ProjectileCollision.h"
+#include "Entity.h"
 #include "Projectile.h"
-#include "BulletLikeSource.h"
+
 #include "BulletLikeType.h"
+#include "ProjectileCollision.h"
+
+class BulletLikeSource;
+class ITexture;
+class HittableBulletLike;
+
+//#include "ItemAmmo.h"
 
 class EntityProjectileBulletLike: public Entity, public Projectile
 {
 public:
 	float deformation=0;//0-1
 
-	static ITexture * tex;
+	static ITexture * tex;//TODO find better texture loading solution
 //	ItemAmmo * fromItem;
 	BulletLikeType typeB;
 
@@ -42,5 +45,8 @@ public:
 	static void setTexture(ITexture * texture);
 };
 
+#include "HittableBulletLike.h"
+#include "BulletLikeSource.h"
+#include "ITexture.h"
 
 #endif /* SRC_ENTITYPROJECTILEBULLETLIKE_H_ */

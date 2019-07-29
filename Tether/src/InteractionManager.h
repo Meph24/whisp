@@ -3,16 +3,19 @@
  *
  *  Created on:	19.05.2018
  *      Author:	HL65536
- *     Version:	1.0
+ *     Version:	2.0
  */
 
 #ifndef SRC_INTERACTIONMANAGER_H_
 #define SRC_INTERACTIONMANAGER_H_
+
+#include "InteractionGroup1.h"
+#include "InteractionGroup2.h"
+
 class Pushable;
 class Projectile;
 class Hittable;
-#include "InteractionGroup1.h"
-#include "InteractionGroup2.h"
+
 class InteractionManager
 {
 public:

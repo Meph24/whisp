@@ -9,16 +9,21 @@
 #ifndef SRC_PROJECTILE_H_
 #define SRC_PROJECTILE_H_
 
-#include <vector>
+#include "Retickable.h"
+
 #include "Spacevec.h"
 #include "hitType.h"
 #include "DualPointer.h"
-#include "Retickable.h"
+
 class Hittable;
 class Entity;
 class TickServiceProvider;
 class ProjectileCollision;
 class EntityProjectileBulletLike;
+
+
+#include <vector>
+
 class Projectile: public Retickable
 {
 	std::vector<ProjectileCollision> collisions;
@@ -39,6 +44,7 @@ public:
 
 	virtual ~Projectile();
 };
+
 #include "Entity.h"
 #include "TickServiceProvider.h"
 #include "ProjectileCollision.h"

@@ -8,15 +8,43 @@
 
 #ifndef SRC_DRAWSERVICEPROVIDER_H_
 #define SRC_DRAWSERVICEPROVIDER_H_
-#include "ICamera3D.h"
+
+#include "vec3.h"
+#include "Timestamp.h"
+
+class Drawable;
+class Frustum;
+class ChunkManager;
+class Graphics2D;
+class ICamera3D;
+class ITexture;
+
+#include <vector>
+#include <algorithm>
+#include <utility>
+
+//use with caution: when using this, code sections outside of these regions are called twice
+#define TRANSPARENT_SECTION_DO_LATER(priority) \
+	dsp->registerTransparentCallback(priority,this); \
+	if(dsp->isTransparentPass)
+
+#define OTHER_SECTION \
+	else
+
+
+
+
 class DrawServiceProvider
 {
+	std::vector<std::pair<float,Drawable *> > callbackList;
 protected:
 
 	ICamera3D * cam;
 	void setCam(ICamera3D * myCam);
 //	bool depthStatus;
 public:
+	Graphics2D * g;//the default graphics object
+	bool isTransparentPass=false;
 
 
 	DrawServiceProvider();//set camera after init!!!!!
@@ -29,6 +57,22 @@ public:
 	void transformViewToGUI(float priority=0.5f);//call revertView after draw calls finished!!!; must not be activated multiple times within any instances at the same time (call revertView in between!)
 	void revertView();
 
+	float getAspectRatio();
+
+	virtual bool reinitGraphics();//returns if graphics must be reinitialized at beginning of draw() (do stuff like reconfigure aspect ratio, ...)
+	virtual ITexture * suggestFont();//returns 0 if no suggestion is made
+
+	void registerTransparentCallback(float priority,Drawable * callbackRequester);
+	void doTransparentCallbacks(Timestamp t,Frustum * viewFrustum,ChunkManager* cm);
+
+
 };
+
+#include "Drawable.h"
+#include "Frustum.h"
+#include "ChunkManager.h"
+#include "Graphics2D.h"
+#include "ICamera3D.h"
+#include "ITexture.h"
 
 #endif /* SRC_DRAWSERVICEPROVIDER_H_ */

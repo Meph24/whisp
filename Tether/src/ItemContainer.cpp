@@ -8,6 +8,8 @@
 
 #include "ItemContainer.h"
 
+Graphics2D * ItemContainer::g=0;
+
 ItemContainer::ItemContainer():
 items()
 {
@@ -85,9 +87,26 @@ void ItemContainer::insertR(Item* it)
 	}
 }
 
+
 void ItemContainer::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
 {
+	if((!g) || dsp->reinitGraphics()) g=new Graphics2D(6,dsp->getAspectRatio(),dsp->suggestFont());
+	dsp->transformViewToGUI(0.75f);
+	subsection inventoryBounds=g->generateSubsection(0,0,2,2,SNAP_W);
+	TRANSPARENT_SECTION_DO_LATER(0.75f)
+	{
+		g->setSubsection(&inventoryBounds);
+		glColor4f(1,1,1,0.5f);
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(-1, -1, 1);
+		glVertex3f(-1, 1, 1);
+		glVertex3f(1, 1, 1);
+		glVertex3f(1, -1, 1);
+		glEnd();
+		g->resetLastSubsection();
+	}
 
+	dsp->revertView();
 }
 
 ItemContainer::~ItemContainer()

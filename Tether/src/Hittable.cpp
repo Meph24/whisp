@@ -15,7 +15,11 @@ void Hittable::registerHitCheck(Entity* e,float seconds, TickServiceProvider* ts
 	std::vector<InteractionManager *> * vec = tsp->getInterManVector();
 	tsp->getChunkManager()->giveInteractionManagers(e,vec,tsp);
 	int size=vec->size();
-	if(size<=0) WarnErrReporter::notInitializedErr("no chunks found in interManVec: uninitialized chunk?");
+	if(size<=0)
+	{
+		WarnErrReporter::notInitializedErr("no chunks found in interManVec: uninitialized chunk?");
+		std::cout<<e->pos<<" "<<e->exists<<" "<<e->v<<" "<<tsp->getChunkManager()->getMiddleChunk();
+	}
 	for(int i=0;i<size;i++)
 	{
 		tsp->getChunkManager()->activeChunk=(*vec)[i]->chunk;

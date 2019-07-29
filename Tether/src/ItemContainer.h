@@ -9,11 +9,20 @@
 #ifndef SRC_ITEMCONTAINER_H_
 #define SRC_ITEMCONTAINER_H_
 
-#include "Item.h"
 #include <vector>
+
+#include "Item.h"
+#include "Graphics2D.h"
 
 class ItemContainer: public Item
 {
+	static Graphics2D * g;
+
+	unsigned int selected=0;//item slot selected
+	unsigned int firstInList=0;//item on top of scrollable list
+
+
+
 protected:
 	std::vector<Item *> items;
 	void insertR(Item * it);
