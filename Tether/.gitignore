@@ -6,3 +6,5 @@
 /rls/
 /dbg/
 *.settings/*
+*.swp
+.sconsign.dblite

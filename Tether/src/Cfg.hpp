@@ -1,4 +1,3 @@
-
 #ifndef SRC_CFG_H_
 #define SRC_CFG_H_
 
@@ -10,18 +9,18 @@
 //	especially loading SPECIFIC sections is an optimisation task
 */
 
-#include <vector>
-#include <map>
-#include <string>
 #include <iostream>
+#include <map>
+#include <optional>
+#include <regex>
+#include <string>
+#include <vector>
 
-using std::cout;
-using std::endl;
-
-
-using std::vector;
 using std::map;
+using std::optional;
+using std::ostream;
 using std::string;
+using std::vector;
 
 
 //DEV this stuff is currently in development
@@ -36,119 +35,36 @@ using std::string;
 class Cfg
 {
 public:
-	class section
+
+	class Section
 	{
+		string m_name;
 	public:
-		map <string, int> num;
-		map <string, float> flt;
+		Section(const string& sectionname);
+		Section(const Section& section);
+		Section& operator= (const Section& section);
+
+		map <string, long> num;
+		map <string, double> flt;
 		map <string, string> str;
 
-		int setint(string key, int value);
-		int setfloat(string key, float value);
-		int setstring(string key, string value);
-		int * getint(string key);
-		float * getfloat(string key);
-		string * getstring(string key);
+		bool isInt(string key) const;
+		bool isFlt(string key) const;
+		bool isStr(string key) const;
+
+		const long* getInt(const string& key) const;
+		const double* getFlt(const string& key) const;
+		const string* getStr(const string& key) const;
+		const string& name() const;
+
+		void set(const string& key, long value);
+		void set(const string& key, double value);
+		void set(const string& key, const string& value);
+
+		friend ostream& operator<< (ostream& os, const Section& section);
 	};
 
-
-private:
-
-
-	class Reader
-	{
-	private:
-
-		unsigned int readBegin;
-
-		string section;
-		string id;
-		string value;
-
-		unsigned int linecounter = 0;
-
-		string line;
-		unsigned int currentIndex;
-
-		struct configdea_statemachine
-		{
-			int q;
-		};
-
-		enum configdea_states
-		{
-			trap = -1,		//default trap state
-			q0 = 0,
-			q1 = 1,
-			q2 = 2,
-			q3 = 3,
-			q4 = 4,
-			q5 = 5,
-			q6 = 6,
-			q7 = 7,
-			q8 = 8,
-			q9 = 9,
-
-			NUM_CONFIGDEA_STATES
-		};
-
-		void configdea_init(configdea_statemachine* M);
-
-		void configdea_d_check(configdea_statemachine* M, char sym);
-		void configdea_d_load(configdea_statemachine* M, char sym);
-
-		int configdea_exit(configdea_statemachine* M);
-
-		enum type_sup
-		{
-			none = -1,
-
-			integer = 0,
-			flt = 1,
-			str = 2,
-
-			NUM_TYPE_SUP
-		};
-
-		type_sup gettype(string);
-
-		void markReadBegin(int add);
-		void markReadEnd(int add, string& container);
-
-		map<string, Cfg::section> buildmap;
-
-		void save();
-
-	public:
-
-		int checkfile(string filename);
-		map <string, Cfg::section> readfile(string filename);
-	}r;
-
-
-
-
-
-private:
-	map<string, section> sections;
-
-public:
-
-
-	/*
-	//	Takes a list of files it should read configs from
-	//	will check them first and then load the contents
-	*/
-	Cfg()
-	{}
-	Cfg(vector<string> filelist);
-	~Cfg();
-
-	int check(string filename);
-	int load(string filename);
-	int unload();
-	int unload(string sectionname);
-
+	map<string, Section> sections;
 
 
 	/*
@@ -158,9 +74,9 @@ public:
 	//
 	//		/ret :	  type						int, float, string you choose
 	*/
-	int * getint(string section, string key);
-	float * getfloat(string section, string key);
-	string * getstring(string section, string key);
+	const long* getInt(const string& section, const string& key) const;
+	const double* getFlt(const string& section, const string& key) const;
+	const string* getStr(const string& section, const string& key) const;
 
 	/*
 	//	Function to get a specific section directly
@@ -174,7 +90,9 @@ public:
 	//				For example if you're writing a graphics component, sound config is of low interest to you anyway
 	//				so you can extract a reference to the graphics section and pass it to the component
 	*/
-	Cfg::section& getSection(string sectionname);
+	Cfg::Section getSection(const string& sectionname) const;
+	void insertSection(const Section& section);
+	void createSection(const string& sectionname);
 
 	/*
 	//	Functions for extracting a key, value pair
@@ -188,14 +106,15 @@ public:
 	//	Should you have more than one appearances of the same Key in different sections, you will get the first element the algorythm can find that matches
 	//	If you dont know exactly should better use the signature: > type * gettype(string section, string key); <
 	*/
-	int * getint(string key);
-	float * getfloat(string key);
-	string * getstring(string key);
+	const long * getInt(const string& key) const;
+	const double * getFlt(const string& key) const;
+	const string * getStr(const string& key) const;
 
 
-	void setint(string section, string key, int value);
-	void setfloat(string section, string key, float value);
-	void setstring(string section, string key, string value);
+	void set(const string& section, const string& key, long value);
+	void set(const string& section, const string& key, double value);
+	void set(const string& section, const string& key, const string& value);
+
 
 	friend std::ostream& operator<< (std::ostream& os, const Cfg& c);
 

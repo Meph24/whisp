@@ -1,15 +1,20 @@
 #include "Zombie_World.h"
-#include "Cfg.h"
+
+#include "Cfg.hpp"
+#include "CfgIO.hpp"
+
 //dirty
 #include "Zombie_KeyInput.h"
 #include "Zombie_MouseInput.h"
-extern Zombie_KeyInput * keyInput;
-extern Zombie_MouseInput * mouseInput;
+
+extern Zombie_KeyInput* keyInput;
+extern Zombie_MouseInput* mouseInput;
 
 #include "SpeedMod.h"
 #include "ZombieTree.h"
 #include "TextureStatic2D.h"
 #include "Zombie_Enemy.h"
+
 
 #include <iostream>
 
@@ -17,26 +22,27 @@ Zombie_World::Zombie_World(sf::Window * w):
 		tm(1,1000,40)//TODO 20/20
 {
 	test=0;
-	Cfg cfg({ "./res/config.txt" });
-	int physDist=*cfg.getint("graphics", "physicsDistance");
-	int renderDist=*cfg.getint("graphics", "renderDistance");
-	chunkLoadRate=*cfg.getint("graphics", "chunkLoadRate");
-	lodQuality=*cfg.getfloat("graphics", "terrainQuality");
+	CfgIO cfgio( "./res/config.txt" );
+	Cfg cfg = cfgio.load();
+	int physDist=*cfg.getInt("graphics", "physicsDistance");
+	int renderDist=*cfg.getInt("graphics", "renderDistance");
+	chunkLoadRate=*cfg.getInt("graphics", "chunkLoadRate");
+	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
 	std::cout<<"testStart"<<std::endl;
 	cm=new ChunkManager(16,physDist*2,renderDist,16,9.81f);//TODO make chunksPerLockchunk configurable
 	spawnZombies=true;
-	zCount = *cfg.getint("test", "zombies");
-	zombieDist = *cfg.getint("test", "zombieDist");
+	zCount = *cfg.getInt("test", "zombies");
+	zombieDist = *cfg.getInt("test", "zombieDist");
 	Timestamp timS=tm.getSlaveTimestamp();
 
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
 
-	float sensX = *cfg.getfloat("input", "sensitivityX");
-	float sensY = *cfg.getfloat("input", "sensitivityY");
+	float sensX = *cfg.getFlt("input", "sensitivityX");
+	float sensY = *cfg.getFlt("input", "sensitivityY");
 
 	player=new EntityPlayer(timS,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
 	player->cam->zoom = 1;//TODO better zoom
-	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getfloat("graphics","maxRenderTime")));//TODO not hard code
+	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getFlt("graphics","maxRenderTime")));//TODO not hard code
 
 
 	pmLogic = new PerformanceMeter(PM_LOGIC_CHUNKMOVE+1,1000);

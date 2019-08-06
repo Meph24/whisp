@@ -1,17 +1,15 @@
 #include "MainApp.h"
-#include <GL/glew.h>
 
-#include "EventHandler.h"
-
+#include <iostream>
 #include <vector>
 
+#include <GL/glew.h>
+
+#include "Cfg.hpp"
+#include "CfgIO.hpp"
+
+#include "EventHandler.h"
 #include "IMediaHandle.h"
-
-// error handling
-#include <iostream>
-
-#include "Cfg.h"
-
 
 #define PHYSICS_MAX_TICKLENGTH 20000
 
@@ -33,10 +31,11 @@ graphics(sfmlHandle)
 	//int x=*(cfg->getint("graphics", "resolutionX"));
 	//int y=*(cfg->getint("graphics", "resolutionY"));
 	//free(pointer);
-	Cfg cfg({ "./res/config.txt" });
+	CfgIO cfgio ( "./res/config.txt" );
+	Cfg cfg = cfgio.load();
 
-	int x=*cfg.getint("graphics", "resolutionX");
-	int y=*cfg.getint("graphics", "resolutionY");
+	int x=*cfg.getInt("graphics", "resolutionX");
+	int y=*cfg.getInt("graphics", "resolutionY");
 
 	
 

@@ -7,8 +7,8 @@ csrc=$(wildcard *.c)
 cppsrc=$(wildcard *.cpp) $(wildcard noise/*.cpp) $(wildcard noise/module/*.cpp) $(wildcard noise/model/*.cpp)
 obj=$(cppsrc:.cpp=.o) $(csrc:.c=.o)
 
-CXX=g++
-CXXFLAGS += -std=c++14 -g3 
+CXX=g++-9
+CXXFLAGS += -std=c++1z -g3 
 CXXFLAGS += -Wall -pthread
 
 LDFLAGS+= -lGL -lGLEW
