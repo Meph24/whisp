@@ -22,10 +22,10 @@ vec3 operator*(mat3 mat,vec3 b)
 
 
 
-vec3 operator*(vec3 b, mat4 a){ return a*b; };
+vec3 operator*(vec3 b, mat4 a){ return a*b; }
 
 vec3 operator*(vec3 b, mat3 a)
 {
 	return a * b;
 }
-;
+
