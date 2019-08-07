@@ -8,8 +8,6 @@
 
 #include "ItemContainer.h"
 
-Graphics2D * ItemContainer::g=0;
-
 ItemContainer::ItemContainer():
 items()
 {
@@ -87,23 +85,67 @@ void ItemContainer::insertR(Item* it)
 	}
 }
 
+/*
+#include <iostream>
+#include <string>
 
+
+
+#include <filesystem>
+namespace fs = std::filesystem;
+#define FS_SUPPORT "native"
+
+    //#include <experimental/filesystem>
+    //namespace fs = std::experimental::filesystem;
+    //#define FS_SUPPORT "experimental"
+
+    //#define FS_SUPPORT "not supported"
+
+using std::cout;
+using std::string;
+
+int fuck (int argc , char** argv)
+{
+    cout << "Filesystem library support status : " << FS_SUPPORT << '\n';
+
+    if(FS_SUPPORT == "not_supported") return 1;
+
+    fs::path p0;
+    p0 = "/home/meph/Documents";
+
+    cout << p0    << " "
+                << ((fs::exists(p0))?"exists": "does not exists")
+                << " and is " << (fs::is_directory(p0)? "a directory":"not a")
+                << " directory!" << "\n\nIt has following content:\nFlat:\n";
+    for(auto& e : fs::directory_iterator(p0))
+    {
+        cout << e << '\n';
+    }
+//    cout << "Recursive:\n";
+//    for(auto& e : fs::recursive_directory_iterator(p0))
+//    {
+//        cout << e << '\n';
+//    }
+    return 0;
+}
+*/
 void ItemContainer::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
 {
-	if((!g) || dsp->reinitGraphics()) g=new Graphics2D(6,dsp->getAspectRatio(),dsp->suggestFont());
 	dsp->transformViewToGUI(0.75f);
-	subsection inventoryBounds=g->generateSubsection(0,0,2,2,SNAP_W);
+	subsection inventoryBounds=dsp->g->generateSubsection(0,0,2,2,SNAP_W);
+//	std::cout<<"test here1"<<std::endl;
 	TRANSPARENT_SECTION_DO_LATER(0.75f)
 	{
-		g->setSubsection(&inventoryBounds);
-		glColor4f(1,1,1,0.5f);
-		glBegin(GL_TRIANGLE_FAN);
-		glVertex3f(-1, -1, 1);
-		glVertex3f(-1, 1, 1);
-		glVertex3f(1, 1, 1);
-		glVertex3f(1, -1, 1);
-		glEnd();
-		g->resetLastSubsection();
+//		std::cout<<"test here2"<<std::endl;
+//		dsp->g->setSubsection(&inventoryBounds);
+//		glColor4f(1,1,1,0.5f);
+//		glBegin(GL_TRIANGLE_FAN);
+//		glVertex3f(-1, -1, 1);
+//		glVertex3f(-1, 1, 1);
+//		glVertex3f(1, 1, 1);
+//		glVertex3f(1, -1, 1);
+//		glEnd();
+//		dsp->g->resetLastSubsection();
 	}
 
 	dsp->revertView();

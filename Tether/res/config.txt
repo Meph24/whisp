@@ -10,7 +10,7 @@ maxRenderTime=120.0
 
 #test
 zombies=5
-zombieDist=40
+zombieDist=50
 
 
 #input

@@ -25,7 +25,7 @@ class ITexture;
 
 //use with caution: when using this, code sections outside of these regions are called twice
 #define TRANSPARENT_SECTION_DO_LATER(priority) \
-	dsp->registerTransparentCallback(priority,this); \
+	if(!dsp->isTransparentPass) dsp->registerTransparentCallback(priority,this); \
 	if(dsp->isTransparentPass)
 
 #define OTHER_SECTION \

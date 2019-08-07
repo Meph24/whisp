@@ -24,7 +24,7 @@ speed(characterSpeed),heldItem(0),inventory(0)
 	cam->width=w->getSize().x;
 	cam->maxView=1024*8;
 	setTP(false);
-	cam->zoom=1;//TODO provide interface
+	cam->zoom=1;//TODO zoom change should be in control of player class
 	mouseInp = new Zombie_MouseInput(this, w);
 	mouseInp->sensitivityX=sensX;
 	mouseInp->sensitivityY=sensY;

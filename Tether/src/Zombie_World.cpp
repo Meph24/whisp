@@ -114,6 +114,7 @@ void Zombie_World::render(Timestamp t)
 
 	cm->draw(t,viewFrustum,cm,this);
 	player->draw(t,viewFrustum,cm,this);//TODO  this is the job of the chunk manager
+	doTransparentCallbacks(t,viewFrustum,cm);//TODO bugs here
 
 	delete viewFrustum;
 }
@@ -207,7 +208,7 @@ void Zombie_World::spawnZombie(Timestamp t)
 		cm->requestEntitySpawn(new Zombie_Enemy(t,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm));
 		float r3 = (rand()%7)+13;
 		float r4 = ((rand()%32768)/32768.0f)*4 + 5;
-		cm->requestEntitySpawn(new Zombie_Tree(player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),1.2, r3, r4, tree, leaves));
+//		cm->requestEntitySpawn(new Zombie_Tree(player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),1.2, r3, r4, tree, leaves));
 		std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
 	}
 }
