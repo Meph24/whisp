@@ -1,13 +1,11 @@
 #include "Cfg.hpp"
 
 #include <iostream>
-#include <optional>
 #include <regex>
 #include <string>
 #include <fstream>
 
 using std::cerr;
-using std::optional;
 using std::regex_match;
 using std::string;
 

@@ -36,8 +36,8 @@ class ITexture;
 
 class DrawServiceProvider
 {
-	std::vector<std::pair<float,Drawable *> > callbackList;
 protected:
+	std::vector<std::pair<float,Drawable *> > callbackList;
 
 	ICamera3D * cam;
 	void setCam(ICamera3D * myCam);

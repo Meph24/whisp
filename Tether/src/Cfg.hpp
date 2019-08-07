@@ -11,13 +11,11 @@
 
 #include <iostream>
 #include <map>
-#include <optional>
 #include <regex>
 #include <string>
 #include <vector>
 
 using std::map;
-using std::optional;
 using std::ostream;
 using std::string;
 using std::vector;

@@ -1,5 +1,6 @@
 #pragma once
 #include <GL/glew.h>
+#include <iostream>
 #include "ITexture.h"
 
 #define SNAP_SW 0
@@ -84,7 +85,8 @@ public:
 	void feedRects(unsigned int count, float * x, float * y, float * width, float * height, float * r, float * g, float * b);
 	void feedRects(unsigned int count, float * x, float * y, float width, float height, float * r, float * g, float * b);
 	void fillOval(float xCenter, float yCenter, float xRad, float yRad);
-	void drawString(const char * str,int len,float xll,float yll, float size);
+	void drawString(const char * str,float xll,float yll, float size,int len=-1,int maxLen=-1);
+	void drawString(std::string str,float xll,float yll, float size,int maxLen=-1);
 	void setColor(float r, float g, float b);
 //	void endDraw();
 //	void beginDraw();

@@ -1,4 +1,4 @@
-#graphics
+[graphics]
 resolutionX=1920
 resolutionY=1080
 renderDistance=12
@@ -8,11 +8,11 @@ terrainQuality=2.0
 maxRenderTime=120.0
 
 
-#test
+[test]
 zombies=5
 zombieDist=50
 
 
-#input
+[input]
 sensitivityX=0.0431654676
 sensitivityY=0.0431654676

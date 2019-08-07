@@ -28,13 +28,13 @@ int DebugScreen::draw(flt x,flt y,flt z,int lineOffset)//TODO drawable + paramet
 	for(i=-1;i<num;i++)
 	{
 		std::string s=pm->getInfo(i,FLAG_RECENTAVG+FLAG_SPIKES+FLAG_NOW);
-		g[0]->drawString(s.c_str(),s.length(),-1.4f,0.8f-(lineOffset-1)*textSize,textSize);
+		g[0]->drawString(s,-1.4f,0.8f-(lineOffset-1)*textSize,textSize);
 		lineOffset++;
 	}
 	std::ostringstream myString;
 	myString<<"x = "<<x<<" | y = "<<y<<" | z = "<<z;
 	std::string s=myString.str();
-	g[0]->drawString(s.c_str(),s.length(),-1.4f,0.8f-(lineOffset-1)*textSize,textSize);
+	g[0]->drawString(s,-1.4f,0.8f-(lineOffset-1)*textSize,textSize);
 	lineOffset++;
 	return lineOffset;
 }

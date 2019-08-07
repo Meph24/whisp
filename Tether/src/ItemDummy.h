@@ -14,8 +14,9 @@
 class ItemDummy: public Item
 {
 public:
-	ItemDummy();
+	ItemDummy(std::string dummyName="Duftkerze");
 	~ItemDummy();
+	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 };
 
 #endif /* SRC_ITEMDUMMY_H_ */

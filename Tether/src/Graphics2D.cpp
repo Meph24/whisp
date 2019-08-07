@@ -279,9 +279,14 @@ void Graphics2D::fillOval(float xCenter, float yCenter, float xRad, float yRad)
 	glEnd();
 }
 
-#include <iostream>
-void Graphics2D::drawString(const char * str,int len, float xll, float yll, float size)
+void Graphics2D::drawString(const char * str,float xll,float yll, float size,int len,int maxLen)
 {
+	if(len==-1)
+	{
+		len=0;
+		while(str[len]) len++;
+	}
+	if(maxLen!=-1) len=len>maxLen?maxLen:len;
 	if (len < 1) return;
 	font->bind();
 	glEnable(GL_TEXTURE_2D);
@@ -307,4 +312,9 @@ void Graphics2D::drawString(const char * str,int len, float xll, float yll, floa
 	}
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
+}
+
+void Graphics2D::drawString(std::string str, float xll, float yll, float size, int maxLen)
+{
+	drawString(str.c_str(),xll,yll,size,str.length(),maxLen);
 }

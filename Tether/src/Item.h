@@ -19,12 +19,12 @@ class Item: public Tickable, public Drawable
 	static u32 tickIDcounter;//0 is reserved
 
 protected:
-	std::string name;//TODO localized
 
 	void giveNewUniqueNotickID();//generates a new unique ID for a non-tick-requesting unique item
 	void giveNewUniqueTickID();//generates a new unique ID for a tick-requesting unique item
 
 public:
+	std::string name;
 	ItemIdent ID;
 	u32 amount;//non-unique items can be stacks of arbitrary size, stackable items must be copyable
 	float mass;//kg per unit

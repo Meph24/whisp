@@ -72,6 +72,8 @@ Zombie_World::Zombie_World(sf::Window * w):
 	pmGraphics->setName(" GPU work + syncs",PM_GRAPHICS_FLUSH);
 	pmGraphics->setName("            other",PM_GRAPHICS_OUTSIDE);
 	setCam(player->cam);
+
+	std::cout<<"initFin"<<std::endl;
 }
 
 void Zombie_World::restart()
@@ -109,6 +111,7 @@ Zombie_World::~Zombie_World()
 }
 void Zombie_World::render(Timestamp t)
 {
+	callbackList.clear();
 	player->applyPerspective(t,true,cm);
 	spacevec relPos=cm->getMiddleChunk();
 	float renderTime=(pmGraphics->getTime(PM_GRAPHICS_WORLD)+pmGraphics->getTime(PM_GRAPHICS_FLUSH))/1000000.0f;
@@ -153,7 +156,7 @@ void Zombie_World::loadStandardTex()
 	leaves = new TextureStatic2D(tps2, "./res/leaves.png");
 	leaves->update();
 
-	g = new Graphics2D(64);
+	g = new Graphics2D(64,getAspectRatio());
 
 	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
 	cm->requestEntitySpawn(tr);
@@ -228,9 +231,9 @@ void Zombie_World::drawGameOver()//TODO find new home
 {
 	transformViewToGUI();
 	glColor3f(1, 0, 0);
-	g->drawString("GAME OVER", 9, -0.8f, -0.2f, 0.4f);
+	g->drawString("GAME OVER", -0.8f, -0.2f, 0.4f);
 	glColor3f(0, 1, 0);
-	g->drawString("R=restart", 9, -0.8f, -0.6f, 0.3f);
+	g->drawString("R=restart", -0.8f, -0.6f, 0.3f);
 
 	char scoreString[8];
 
@@ -240,8 +243,8 @@ void Zombie_World::drawGameOver()//TODO find new home
 		scoreString[7 - i] = (scoreTemp % 10) + '0';
 		scoreTemp /= 10;
 	}
-	g->drawString("score:", 6, -0.8f, 0.8f, 0.1f);
-	g->drawString(scoreString, 8, -0.8f, 0.62f, 0.1f);
+	g->drawString("score:", -0.8f, 0.8f, 0.1f);
+	g->drawString(scoreString, -0.8f, 0.62f, 0.1f, 8);
 	revertView();
 }
 

@@ -21,10 +21,10 @@ class ItemContainer: public Item
 
 
 protected:
-	std::vector<Item *> items;
 	void insertR(Item * it);
 
 public:
+	std::vector<Item *> items;
 	virtual u32 maximumAdd(Item * item);
 	virtual Item * addItem(Item * item);
 	virtual Item * removeNextItem(u32 maxCount);//returns the last item with up to an amount of maxCount

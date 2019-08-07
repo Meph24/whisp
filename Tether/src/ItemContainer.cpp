@@ -129,23 +129,50 @@ int fuck (int argc , char** argv)
     return 0;
 }
 */
+#include "ShortNames.h"
+#include "WarnErrReporter.h"
 void ItemContainer::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
 {
 	dsp->transformViewToGUI(0.75f);
-	subsection inventoryBounds=dsp->g->generateSubsection(0,0,2,2,SNAP_W);
-//	std::cout<<"test here1"<<std::endl;
+	subsection inventoryBounds=dsp->g->generateSubsection(0,0,1.8f,1.8f,SNAP_MID);
 	TRANSPARENT_SECTION_DO_LATER(0.75f)
 	{
-//		std::cout<<"test here2"<<std::endl;
-//		dsp->g->setSubsection(&inventoryBounds);
-//		glColor4f(1,1,1,0.5f);
-//		glBegin(GL_TRIANGLE_FAN);
-//		glVertex3f(-1, -1, 1);
-//		glVertex3f(-1, 1, 1);
-//		glVertex3f(1, 1, 1);
-//		glVertex3f(1, -1, 1);
-//		glEnd();
-//		dsp->g->resetLastSubsection();
+		dsp->g->setSubsection(&inventoryBounds);
+		glColor4f(0,0,0,0.75f);
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(-1, -1, 1);
+		glVertex3f(-1, 1, 1);
+		glVertex3f(1, 1, 1);
+		glVertex3f(1, -1, 1);
+		glEnd();
+
+		dsp->g->resetLastSubsection();
+		dsp->revertView();
+
+	}
+	OTHER_SECTION
+	{
+		dsp->transformViewToGUI(0.751f);
+		u32 maxListLen=32;
+		u32 last=items.size();//actually last item index + 1
+		u32 maxListIndx=firstInList+maxListLen;//actually last item index + 1
+		maxListIndx=maxListIndx<last?maxListIndx:last;
+		float firstLine=1;
+		float lineIncrement=-2.0f/maxListLen;
+		float curLine=firstLine;
+		glColor3f(1,1,1);
+		dsp->g->setSubsection(&inventoryBounds);
+		for(u32 i=firstInList;i<maxListIndx;i++)
+		{
+			Item * item=items[i];
+			if(!item) WarnErrReporter::notInitializedErr("Found item that is null despite item slot being occupied");
+			else
+			{
+				curLine+=lineIncrement;
+				dsp->g->drawString(item->name,-0.95f,curLine,-lineIncrement);
+			}
+		}
+		dsp->g->resetLastSubsection();
 	}
 
 	dsp->revertView();

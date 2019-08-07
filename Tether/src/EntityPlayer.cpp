@@ -9,6 +9,7 @@
 #include "EntityPlayer.h"
 #include "SpeedMod.h"
 #include "TopLevelInventory.h"
+#include "ItemDummy.h"
 
 EntityPlayer::EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
 speed(characterSpeed),heldItem(0),inventory(0)
@@ -37,7 +38,12 @@ speed(characterSpeed),heldItem(0),inventory(0)
 
 	bb=AABB(pos);
 
-	heldItem=new TopLevelInventory(this);
+	TopLevelInventory * tli=new TopLevelInventory(this);
+	for(int i=0;i<42;i++)
+	{
+		tli->items.push_back(new ItemDummy("Duftkerze Nummer "+std::to_string(i)));
+	}
+//	heldItem=tli;//TODO reenable this line to enable inventory
 
 	wCount = 8;
 	guns = new Zombie_Gun * [wCount];
@@ -96,8 +102,8 @@ void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, Draw
 		scoreString[7 - i] = (scoreTemp % 10)+'0';
 		scoreTemp /= 10;
 	}
-	dsp->g->drawString("score:", 6, -0.8f, 0.8f, 0.1f);
-	dsp->g->drawString(scoreString, 8, -0.8f, 0.62f, 0.1f);
+	dsp->g->drawString("score:", -0.8f, 0.8f, 0.1f);
+	dsp->g->drawString(scoreString, -0.8f, 0.62f, 0.1f, 8);
 
 	scoreTemp = HP;
 	for (int i = 0; i < 3; i++)
@@ -105,12 +111,12 @@ void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, Draw
 		scoreString[7 - i] = (scoreTemp % 10) + '0';
 		scoreTemp /= 10;
 	}
-	dsp->g->drawString("health:", 7, -0.2f, 0.8f, 0.1f);
-	dsp->g->drawString(scoreString+5, 3, -0.2f, 0.62f, 0.1f);
+	dsp->g->drawString("health:", -0.2f, 0.8f, 0.1f);
+	dsp->g->drawString(scoreString+5, -0.2f, 0.62f, 0.1f, 3);
 
 	glColor3f(1, 1, 0);
-	dsp->g->drawString("Weapon:", 7, 0.6f, -0.66f, 0.1f);
-	dsp->g->drawString(guns[currentGun]->name.c_str(), guns[currentGun]->name.length(), 0.6f, -0.82f, 0.1f);
+	dsp->g->drawString("Weapon:", 0.6f, -0.66f, 0.1f);
+	dsp->g->drawString(guns[currentGun]->name, 0.6f, -0.82f, 0.1f);
 	glColor3f(0, 1, 0);
 	glPopMatrix();
 	float crosshairSize = 0.005f;

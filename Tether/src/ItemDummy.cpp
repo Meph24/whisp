@@ -8,11 +8,12 @@
 
 #include "ItemDummy.h"
 
-ItemDummy::ItemDummy()
+ItemDummy::ItemDummy(std::string dummyName)
 {
-	name="Duftkerze";
+	name=dummyName;
 	ID.group=ITEM_GROUP_USELESS;
 	ID.insideID=0;
+	amount=1;
 	mass=0.5f;
 	volume=0.5f;
 
@@ -23,3 +24,6 @@ ItemDummy::~ItemDummy()
 	// TODO Auto-generated destructor stub
 }
 
+void ItemDummy::tick(Timestamp t, TickServiceProvider* tsp)
+{
+}
