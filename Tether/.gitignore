@@ -1,0 +1,12 @@
+/Debug/
+/Release/
+/SFML-2.4.2/
+/src.zip
+/src (2).zip
+/rls/
+/dbg/
+*.settings/*
+*.swp
+.sconsign.dblite
+.cproject
+.project

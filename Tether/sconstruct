@@ -1,0 +1,183 @@
+import os
+import re
+
+### directory variables ###
+root = "."
+source_root = 'src'
+build_root = 'build'
+test_root = 'test'
+
+
+### Compiler ###
+cxx = 'g++-9'
+cppdefines = {}
+cppflags = ['-Wall','-Wpedantic']
+cxxflags = ['-std=c++1z']
+
+
+### Dependencies ###A
+lib = ['GL', 'GLEW']
+lib += ['sfml-graphics', 'sfml-window', 'sfml-system', 'sfml-network', 'sfml-audio', 'pthread']
+libpaths = []
+
+
+### build environment specification ###
+
+env = Environment()
+
+env.Replace(CXX = cxx)
+env.Append(LIBS = lib)
+env.Append(LIBPATH = libpaths)
+env.Append(CPPDEFINES = cppdefines)
+env.Append(CPPFLAGS = cppflags)
+env.Append(CXXFLAGS = cxxflags)
+
+#release configuration
+release_env = env.Clone()
+release_build_dir = build_root+"/release"
+release_env.Append(CPPDEFINES=['BUILD_RELEASE'])
+release_env.Append(CXXFLAGS=['-O3'])
+release_env.VariantDir(release_build_dir+'/main',source_root)
+release_env.VariantDir(release_build_dir+'/test',test_root)
+
+#debug configuration
+debug_env = env.Clone()
+debug_build_dir = build_root+"/debug"
+debug_env.Append(CPPDEFINES=['BUILD_DEBUG'])
+debug_env.Append(CXXFLAGS=['-g3'])
+debug_env.VariantDir(debug_build_dir+'/main',source_root)
+debug_env.VariantDir(debug_build_dir+'/test',test_root)
+
+
+### Source Collection ###
+sourceDirectories = []
+sourceFiles = []
+headerFiles = []
+for root, dirnames, filenames in os.walk(source_root):
+ for dirname in dirnames:
+  sourceDirectories  = sourceDirectories + [root+'/'+dirname]
+  print('>>> add src dir ' + root + '/' + dirname + ' to the source directory list')
+ for file in filenames:
+  if file.endswith(('.c','.cpp')):
+   sourceFiles.append(os.path.join(root,file))
+  if file.endswith(('.h', '.hpp')):
+   headerFiles.append(os.path.join(root, file))
+
+if not sourceFiles:
+ print('No Source files found !')
+elif len(sourceFiles) > 10:
+ print(str(len(sourceFiles)) + ' Source files found !')
+else:
+ print('Sources found :')
+ for src in sourceFiles:
+  print 's> '+src
+
+if not headerFiles:
+ print('No Header files found !')
+elif len(headerFiles) > 10:
+ print(str(len(headerFiles)) + ' Header files found !')
+else:
+ print('Headers found : ')
+ for hdr in headerFiles:
+  print 'h> ' + hdr
+
+### Test Collection ###
+testSources = []
+for root, dirnames, filenames, in os.walk(test_root):
+ for file in filenames:
+  if file.endswith(('.c','.cpp')):
+   testSources.append(os.path.join(root,file))
+
+if not testSources:
+ print('No Tests found!')
+else:
+ print('Tests found :')
+ for t in testSources:
+  n = t
+  if t.endswith('.cpp'):
+   n = t.replace('.cpp', '')
+  elif t.endswith('.c'):
+   n = t.replace('.c', '')
+  print('t> ' + n[len(test_root)+1:])
+
+
+variantSourceDirectories=[x.replace(source_root,build_root) for x in sourceDirectories]
+variantSourceFiles = [x.replace(source_root,build_root) for x in sourceFiles]
+
+
+releaseobjects = []
+for src in sourceFiles:
+ releaseobjectname = src.replace(source_root, release_build_dir,1)
+ releaseobjectname = releaseobjectname.replace('.cpp', '.o')
+ releaseobjects = releaseobjects + [releaseobjectname]
+ Alias("release", release_env.Object(releaseobjectname, src))
+
+debugobjects = []
+for src in sourceFiles:
+ debugobjectname = src.replace(source_root, debug_build_dir,1)
+ debugobjectname = debugobjectname.replace('.cpp', '.o')
+ debugobjects = debugobjects + [debugobjectname]
+ Alias("debug", debug_env.Object(debugobjectname, src))
+
+
+### TESTING
+
+release_test_env = release_env.Clone()
+release_test_env.Append(LIBS=['gtest','gtest_main', 'pthread'])
+release_test_env.Append(CPPDEFINES=['BUILD_UNITTEST'])
+
+debug_test_env = debug_env.Clone()
+debug_test_env.Append(LIBS=['gtest','gtest_main', 'pthread'])
+debug_test_env.Append(CPPDEFINES=['BUILD_UNITTEST'])
+
+test_release_dir = release_build_dir+'/test'
+test_release_bin_dir = 'bin/test'
+test_debug_dir = debug_build_dir+'/test'
+test_debug_bin_dir = 'bin/test/debug'
+
+releasetestobjects = []
+releasetestmainobjects = releaseobjects
+releasetestmainobjects = [x for x in releasetestmainobjects if not x.endswith('main.o')]
+for test in testSources:
+ objname = test.replace(test_root, test_release_dir,1)
+ objname = objname.replace('.cpp', '.o')
+ execname = test.replace(test_root+"/", test_release_bin_dir+"/")
+ execname = execname.replace('.cpp','.test')
+ releasetestobjects = releasetestobjects + [objname]
+ Alias("test", release_test_env.Object(objname, test))
+ Alias("test", release_test_env.Program(execname, releasetestmainobjects+[objname]))
+
+debugtestobjects = []
+debugtestmainobjects = debugobjects
+debugtestmainobjects = [x for x in debugtestmainobjects if not x.endswith('/main.o')]
+for test in testSources:
+ objname = test.replace(test_root, test_debug_dir,1)
+ objname = objname.replace('.cpp', '.o')
+ execname = test.replace(test_root+"/", test_debug_bin_dir+"/")
+ execname = execname.replace('.cpp','.test')
+ debugtestobjects = debugtestobjects + [objname]
+ Alias("test", debug_test_env.Object(objname, test))
+ Alias("test", debug_test_env.Program(execname, debugtestmainobjects+[objname]))
+ 
+
+## MAIN PROGRAM '''
+Default([ release_env.Program('bin/whisp', releaseobjects),
+		  debug_env.Program('bin/whisp_debug', debugobjects)
+		])
+
+#install_dir = "install"
+
+#h_d_map = {}
+
+#for h in headerFiles:
+ #install_location = "/".join(h.split("/")[1:-1])
+ #if not install_location in h_d_map:
+  #h_d_map[install_location] = []
+ #h_d_map[install_location] += [h]
+#
+#for d in h_d_map:
+ #Alias("install", Install(dir=install_dir+"/"+d, source=h_d_map[d]))
+#
+#Alias("install", Install(dir=install_dir, source="bin/libmoar.a"))
+
+Alias("clean", Clean('dirs', ['bin', 'build', 'install']))
