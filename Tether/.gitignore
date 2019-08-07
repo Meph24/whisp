@@ -8,3 +8,5 @@
 *.settings/*
 *.swp
 .sconsign.dblite
+.cproject
+.project
