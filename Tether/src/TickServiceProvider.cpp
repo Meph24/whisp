@@ -12,6 +12,7 @@ TickServiceProvider::TickServiceProvider()
 {
 	threadDataMan=new ThreadDataManager(1);
 	sm=new SoundManager();
+	eMap=new EventMapper();
 }
 
 TickServiceProvider::~TickServiceProvider()

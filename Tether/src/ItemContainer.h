@@ -21,6 +21,8 @@ class ItemContainer: public Item
 
 
 protected:
+	const u32 maxListLen=32;
+
 	void insertR(Item * it);
 
 public:
@@ -31,6 +33,7 @@ public:
 
 	virtual Item * newClone();
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);//when held by player: must draw GUI and/or the physical item
+	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
 	ItemContainer();
 	virtual ~ItemContainer();

@@ -17,6 +17,7 @@ extern Zombie_MouseInput* mouseInput;
 
 
 #include <iostream>
+#include "EventDefines.h"
 
 Zombie_World::Zombie_World(sf::Window * w):
 		tm(1,1000,40)//TODO 20/20
@@ -34,6 +35,38 @@ Zombie_World::Zombie_World(sf::Window * w):
 	zCount = *cfg.getInt("test", "zombies");
 	zombieDist = *cfg.getInt("test", "zombieDist");
 	Timestamp timS=tm.getSlaveTimestamp();
+
+
+	eMap->registerAction(
+			EVENT_ID_KEY_F3,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_DEBUG_SCREEN_ACTIVE,
+			EVENT_VALUE_KEY_PRESSED);
+	eMap->registerAction(
+			EVENT_ID_KEY_R,
+			MAPPER_MODE_ADD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_RESTART,
+			0);
+	eMap->registerAction(
+			EVENT_ID_KEY_E,
+			MAPPER_MODE_ADD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_INVENTORY,
+			0);
+	eMap->registerAction(
+			EVENT_ID_KEY_ARROW_UP,
+			MAPPER_MODE_ADD,
+			-CONDITION_SELECTION_ACTIVE,
+			STATUS_ID_SELECTION_UP,
+			0);
+	eMap->registerAction(
+			EVENT_ID_KEY_ARROW_DOWN,
+			MAPPER_MODE_ADD,
+			-CONDITION_SELECTION_ACTIVE,
+			STATUS_ID_SELECTION_DOWN,
+			0);
 
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
 
@@ -176,9 +209,8 @@ void Zombie_World::doPhysics(Timestamp t)
 
 void Zombie_World::loop()
 {
-	if (reset)
+	if (eMap->getStatusAndReset(STATUS_ID_RESTART))
 	{
-		reset = false;
 		restart();
 	}
 	if (!(player->HP < 0))
@@ -282,7 +314,7 @@ void Zombie_World::doGraphics()
 		pmGraphics->registerTime(PM_GRAPHICS_OUTSIDE);
 		render(t);
 		pmGraphics->registerTime(PM_GRAPHICS_WORLD);
-		if(debugScreen)
+		if(eMap->getStatus(STATUS_ID_DEBUG_SCREEN_ACTIVE))
 		{
 			transformViewToGUI(1);
 			glColor3f(1, 0, 1);
@@ -300,11 +332,6 @@ void Zombie_World::doGraphics()
 	sf::sleep(waitt);
 	glFlush();
 	pmGraphics->registerTime(PM_GRAPHICS_FLUSH);
-}
-
-void Zombie_World::markRestart()
-{
-	reset = true;
 }
 
 ICamera3D* Zombie_World::getHolderCamera()

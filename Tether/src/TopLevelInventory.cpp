@@ -20,6 +20,3 @@ TopLevelInventory::~TopLevelInventory()
 	// TODO Auto-generated destructor stub
 }
 
-void TopLevelInventory::tick(Timestamp t, TickServiceProvider* tsp)
-{
-}

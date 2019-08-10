@@ -133,6 +133,7 @@ int fuck (int argc , char** argv)
 #include "WarnErrReporter.h"
 void ItemContainer::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
 {
+	std::cout<<"selected: "<<selected<<std::endl;
 	dsp->transformViewToGUI(0.75f);
 	subsection inventoryBounds=dsp->g->generateSubsection(0,0,1.8f,1.8f,SNAP_MID);
 	TRANSPARENT_SECTION_DO_LATER(0.75f)
@@ -149,11 +150,27 @@ void ItemContainer::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,Dra
 		dsp->g->resetLastSubsection();
 		dsp->revertView();
 
+
+		dsp->transformViewToGUI(0.751f);
+		dsp->g->setSubsection(&inventoryBounds);
+		int selectionOffset=selected-firstInList;
+		subsection selection=dsp->g->generateSubsection(0,-(selectionOffset+0.5f)*2.0f/maxListLen+1,2.0f,2.0f,SNAP_N);
+		dsp->g->setSubsection(&selection);
+
+		glColor4f(1,1,0.5f,0.2f);
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(-1, -1.0f/maxListLen, 1);
+		glVertex3f(-1, 1.0f/maxListLen, 1);
+		glVertex3f(1, 1.0f/maxListLen, 1);
+		glVertex3f(1, -1.0f/maxListLen, 1);
+		glEnd();
+
+		dsp->g->resetAllSubsections();
+		dsp->revertView();
 	}
 	OTHER_SECTION
 	{
-		dsp->transformViewToGUI(0.751f);
-		u32 maxListLen=32;
+		dsp->transformViewToGUI(0.752f);
 		u32 last=items.size();//actually last item index + 1
 		u32 maxListIndx=firstInList+maxListLen;//actually last item index + 1
 		maxListIndx=maxListIndx<last?maxListIndx:last;
@@ -176,6 +193,20 @@ void ItemContainer::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,Dra
 	}
 
 	dsp->revertView();
+}
+#include "EventDefines.h"
+void ItemContainer::tick(Timestamp t, TickServiceProvider* tsp)
+{
+	EventMapper * eMap=tsp->eMap;
+	i64 selectAdd=eMap->getStatusAndReset(STATUS_ID_SELECTION_DOWN);
+	selectAdd-=eMap->getStatusAndReset(STATUS_ID_SELECTION_UP);
+	if(items.size()<1) return;
+	while(selectAdd+selected<0) selectAdd+=items.size();
+	while(selectAdd+selected>=(i64)items.size()) selectAdd-=items.size();
+	selected=(u32)(selectAdd+selected);
+	if(selected<firstInList) firstInList=selected;
+	if(selected>=firstInList+maxListLen) firstInList=selected-maxListLen+1;
+
 }
 
 ItemContainer::~ItemContainer()

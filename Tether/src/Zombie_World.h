@@ -41,6 +41,7 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 
 
 
+
 	ChunkManager * cm;
 
 	ITexture * zombieTex;
@@ -65,12 +66,12 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	void doLogic();
 	void doGraphics();
 
-	bool reset = false;
 	int test;//TODO remove
 
 public:
+
+
 	EntityPlayer * player;
-	bool debugScreen=false;
 	TimestampManager tm;
 	Zombie_World(sf::Window * w);
 	~Zombie_World();
@@ -86,8 +87,6 @@ public:
 	void trigger(bool pulled);
 
 	void loop();
-
-	void markRestart();
 
 	//from DrawServiceProvider:
 	virtual ITexture * suggestFont();//returns 0 if no suggestion is made

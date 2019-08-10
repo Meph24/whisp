@@ -65,6 +65,7 @@ void EventHandler::sendOn(EventHandler::event e)
 	std::cout << e.ID << "/" << e.value << std::endl;
 	if (enabledProgram==1)//zombie
 	{
+		world->eMap->event(e);
 		if (e.ID == 2048)
 		{
 			if (mouseInput)
@@ -74,10 +75,6 @@ void EventHandler::sendOn(EventHandler::event e)
 		{
 			if (mouseInput)
 				mouseInput->mouseMovedY(e.value);
-		}
-		else if ((e.ID == 1111)&&e.value)
-		{
-			world->debugScreen=!world->debugScreen;
 		}
 		else if (e.ID == 1024 + ('W' - 'A'))
 		{
@@ -134,15 +131,7 @@ void EventHandler::sendOn(EventHandler::event e)
 				world->tm.targetRate = 0.1f;
 			else world->tm.targetRate = 1.0f;
 		}
-		else if ((e.ID == 1024 + ('R' - 'A')) && e.value)
-		{
-			world->markRestart();
-		}
-		
 	}
-	
-	
-
 }
 
 void EventHandler::handle(EventHandler::event e)

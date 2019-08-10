@@ -43,7 +43,7 @@ speed(characterSpeed),heldItem(0),inventory(0)
 	{
 		tli->items.push_back(new ItemDummy("Duftkerze Nummer "+std::to_string(i)));
 	}
-//	heldItem=tli;//TODO reenable this line to enable inventory
+	inventory=tli;//TODO reenable this line to enable inventory
 
 	wCount = 8;
 	guns = new Zombie_Gun * [wCount];
@@ -219,9 +219,21 @@ Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestri
 	}
 	return ret;
 }
-
+#include "EventDefines.h"
 void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 {
+	EventMapper * eMap=tsp->eMap;
+	if(eMap->getStatusAndReset(STATUS_ID_INVENTORY))
+	{
+		Item * temp=heldItem;//put inventory in hand or put it back
+		heldItem=inventory;
+		inventory=temp;
+		eMap->toggleCondition(CONDITION_SELECTION_ACTIVE);//TODO find out which is inventory and set value ORed accordingly
+	}
+
+	if(heldItem) heldItem->tick(t,tsp);
+
+
 	characterHeightConv=tsp->getChunkManager()->fromMeters(characterHeight);//TODO only in one spot
 	float time=t-lastTick;
 	lastTick=t;

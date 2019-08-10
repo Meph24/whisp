@@ -17,6 +17,7 @@ class InteractionManager;
 #include "Retickable.h"
 #include <vector>
 class ThreadDataManager;
+class EventMapper;
 
 //provides services for tickable stuff
 class TickServiceProvider
@@ -25,6 +26,9 @@ class TickServiceProvider
 	std::vector<Retickable *> retickRequests;
 	SoundManager * sm;
 public:
+
+	EventMapper * eMap;
+
 	int tickID=0;
 	virtual ICamera3D * getHolderCamera()=0;//can return 0 if currently not held
 	virtual ChunkManager * getChunkManager()=0;
@@ -46,5 +50,6 @@ public:
 #include "ChunkManager.h"
 #include "Entity.h"
 #include "InteractionManager.h"
+#include "EventMapper.h"
 
 #endif /* SRC_TICKSERVICEPROVIDER_H_ */
