@@ -11,3 +11,5 @@
 .cproject
 .project
 whisp
+bin/
+build/

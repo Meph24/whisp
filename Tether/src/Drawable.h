@@ -18,8 +18,8 @@ class Frustum;
 class Drawable
 {
 public:
-	Drawable();
-	virtual ~Drawable();
+	Drawable() = default;
+	virtual ~Drawable() = default;
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
 };
 
