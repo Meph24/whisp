@@ -2,7 +2,7 @@
 #     define CFGIO_HPP
 
 #include "Cfg.hpp"
-#include "CfgIOBase.hpp"
+#include "IFileIO.hpp"
 
 #include <regex>
 #include <string>
@@ -12,7 +12,7 @@ using std::pair;
 using std::regex;
 using std::string;
 
-class CfgIO : public CfgIOBase
+class CfgIO : public IFileIO<Cfg>
 {
 public:
 	//any integer is a sequence of digits
