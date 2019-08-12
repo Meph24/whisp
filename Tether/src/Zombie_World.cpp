@@ -23,7 +23,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 {
 	test=0;
 	CfgIO cfgio( "./res/config.txt" );
-	Cfg cfg = cfgio.load();
+	Cfg cfg = cfgio.get();
 	int physDist=*cfg.getInt("graphics", "physicsDistance");
 	int renderDist=*cfg.getInt("graphics", "renderDistance");
 	chunkLoadRate=*cfg.getInt("graphics", "chunkLoadRate");
@@ -214,7 +214,18 @@ void Zombie_World::spawnZombie(Timestamp t)
 	for(int i=1;i<32;i++)
 	{
 		if (Zombie_Enemy::zombieCount>=zCount) return;
-		cm->requestEntitySpawn(new Zombie_Enemy(t,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm));
+		cm->requestEntitySpawn
+			(
+				new Zombie_Enemy
+				(
+					t,
+					zombieTex,
+					player->pos+cm->fromMeters(
+							vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)
+											  ),
+					cm
+				)
+			);
 		
 		//currently unused
 		//float r3 = (rand()%7)+13;

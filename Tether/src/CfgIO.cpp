@@ -105,7 +105,7 @@ double CfgIO::readFloatstring(const string& s) const
 	return std::stod(m);
 }
 
-Cfg CfgIO::load() const
+Cfg CfgIO::get() const
 {
 	ifstream file (m_filename);
 	if (file.fail())

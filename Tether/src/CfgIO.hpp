@@ -39,7 +39,7 @@ public:
 	CfgIO(const string& filename);
 	const string& filename() const;
 	
-	virtual Cfg load() const;
+	virtual Cfg get() const;
 	virtual void save(const Cfg& cfg) const;
 
 public:
@@ -51,5 +51,6 @@ public:
 	double readFloatstring(const string& s) const;
 
 };
+
 #endif /* CFGIO_HPP */
 
