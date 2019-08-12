@@ -5,6 +5,8 @@
 
 #include "TimestampManager.h"
 
+#include "Mesh.hpp"
+
 class AdaptiveQuality;
 class PerformanceMeter;
 class ITexture;
@@ -39,9 +41,9 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	DebugScreen * dsLogic;
 	DebugScreen * dsGraphics;
 
-
-
 	ChunkManager * cm;
+
+	Mesh * diamond_mesh;
 
 	ITexture * zombieTex;
 	ITexture * grass;

@@ -15,6 +15,10 @@ extern Zombie_MouseInput* mouseInput;
 #include "TextureStatic2D.h"
 #include "Zombie_Enemy.h"
 
+#include "Mesh.hpp"
+#include "diamondMesh.hpp"
+#include "EntityDiamond.hpp"
+
 
 #include <iostream>
 
@@ -160,6 +164,14 @@ void Zombie_World::loadStandardTex()
 
 	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
 	cm->requestEntitySpawn(tr);
+
+	diamond_mesh = new Mesh(diamondMesh(9, 0.3f, 2.0f));
+	EntityDiamond* diamond = new EntityDiamond
+		(
+			cm->fromMeters(vec3(-10, 0, 10)), 
+			Model(diamond_mesh, 0.5f)
+		);
+	cm->requestEntitySpawn(diamond);
 }
 #include "WarnErrReporter.h"
 void Zombie_World::doPhysics(Timestamp t)

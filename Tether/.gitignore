@@ -11,5 +11,6 @@
 .cproject
 .project
 whisp
+whisp_debug
 bin/
 build/
