@@ -34,17 +34,31 @@ low(pos),high(pos)
 AABB::AABB(spacevec pos, spacevec sizeFromMid):
 low(pos-sizeFromMid),high(pos+sizeFromMid)
 {
-	assert(sizeFromMid.x.intpart<10);
-	assert(sizeFromMid.z.intpart<10);
+	if(sizeFromMid.x.intpart>=10||sizeFromMid.z.intpart>=10)//TODO find the bug that causes this and remove afterwards
+	{
+		std::cout<<"REPORT THIS BUG, IT IS RARE AND NEEDS TO BE FIXED:"<<std::endl;
+		std::cout<<sizeFromMid<<std::endl;
+		std::cout<<pos<<std::endl;
+		assert(sizeFromMid.x.intpart<10);
+		assert(sizeFromMid.z.intpart<10);
+	}
 }
 
 AABB::AABB(spacevec pos, spacevec sizeFromMid, spacevec movement):
 low(pos-sizeFromMid),high(pos+sizeFromMid)
 {
-	assert(sizeFromMid.x.intpart<10);
-	assert(movement.z.intpart<10);//Assertion failed! Expression: movement.z.intpart<10
-	assert(movement.x.intpart<20);
-	assert(movement.z.intpart<20);
+	if(sizeFromMid.x.intpart>=10||sizeFromMid.z.intpart>=10||movement.z.intpart>=10||movement.x.intpart>=10)//TODO find the bug that causes this and remove afterwards
+	{
+		std::cout<<"REPORT THIS BUG, IT IS RARE AND NEEDS TO BE FIXED:"<<std::endl;
+		std::cout<<sizeFromMid<<std::endl;
+		std::cout<<pos<<std::endl;
+		std::cout<<movement<<std::endl;
+
+		assert(sizeFromMid.x.intpart<10);
+		assert(sizeFromMid.z.intpart<10);
+		assert(movement.z.intpart<10);//Assertion failed! Expression: movement.z.intpart<10
+		assert(movement.x.intpart<10);
+	}
 	spacelen zero;
 	zero.floatpart=0;
 	zero.intpart=0;

@@ -18,7 +18,6 @@ class TopLevelInventory: public ItemContainer
 public:
 	TopLevelInventory(EntityPlayer * myOwner);
 	virtual ~TopLevelInventory();
-	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 };
 
 #include "EntityPlayer.h"
