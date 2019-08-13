@@ -1,10 +1,10 @@
-#include "EntityDiamond.hpp"
+#include "ModelEntity.hpp"
 
 #include <cmath>
 
 #include "Mesh.hpp"
 
-EntityDiamond::EntityDiamond(spacevec position, const Model& model)
+ModelEntity::ModelEntity(spacevec position, const Model& model)
 :
 	model(model)
 {
@@ -15,11 +15,11 @@ EntityDiamond::EntityDiamond(spacevec position, const Model& model)
 	v.set0();
 }
 
-EntityDiamond::~EntityDiamond()
+ModelEntity::~ModelEntity()
 {}
 
 
-void EntityDiamond::draw(	
+void ModelEntity::draw(	
 					Timestamp ts, 
 					Frustum* viewFrustum, 
 					ChunkManager* cm, 
@@ -43,7 +43,7 @@ void EntityDiamond::draw(
 	glPopMatrix();
 }
 
-void EntityDiamond::tick
+void ModelEntity::tick
 				(
 					Timestamp t,
 					TickServiceProvider* tsp

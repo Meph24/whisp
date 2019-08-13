@@ -1,4 +1,14 @@
 #include "Mesh.hpp"
+#include <string>
+#include <iostream>
+
+using std::cout;
+using std::string;
+
+Mesh::Mesh()
+	:
+		m_extent(0.0,0.0,0.0)
+{}
 
 const vec3& Mesh::extent() const
 {
@@ -142,4 +152,48 @@ Mesh::TriangleIterator Mesh::begin()
 Mesh::TriangleIterator Mesh::end()
 {
 	return TriangleIterator(triangleCount(), this, triangleCount());
+}
+
+
+ostream& operator<< (ostream& os, const Mesh& m)
+{
+	for(auto v : m.vertices)
+	{
+		os << v.x << " " << v.y << " " << v.z << " ";
+	}
+	os << "| ";
+	for(auto i : m.indices)
+	{
+		os << i << " ";
+	}
+	return os;
+}
+
+istream& operator>> (istream& is, Mesh& m)
+{
+	float x, y ,z;
+	string s;
+	if(!is.eof())
+	{
+		is >> s;
+		cout << ">>>>" << s << '\n';
+		while(s != "|")
+		{
+			x = std::stof(s);
+			is >> y >> z;
+			vec3 newv (x, y , z);
+			m.vertices.push_back(newv);
+			cout << "vec  " << newv << '\n';
+			if(is.eof()) break;
+			is >> s;
+		}
+		unsigned int i;	
+		while(!is.eof())
+		{
+			is >> i;
+			m.indices.push_back(i);
+		}
+	}
+	m.m_extent = m.calculateExtent();
+	return is;
 }

@@ -17,7 +17,8 @@ extern Zombie_MouseInput* mouseInput;
 
 #include "Mesh.hpp"
 #include "diamondMesh.hpp"
-#include "EntityDiamond.hpp"
+#include "ModelEntity.hpp"
+#include "MeshIO.hpp"
 
 
 #include <iostream>
@@ -199,12 +200,21 @@ void Zombie_World::loadStandardTex()
 	cm->requestEntitySpawn(tr);
 
 	diamond_mesh = new Mesh(diamondMesh(9, 0.3f, 2.0f));
-	EntityDiamond* diamond = new EntityDiamond
+	MeshIO meshio("./res/cross.mesh");
+	cross_mesh = new Mesh(meshio.get());
+	ModelEntity* diamond = new ModelEntity
 		(
 			cm->fromMeters(vec3(-10, 0, 10)), 
 			Model(diamond_mesh, 0.5f)
 		);
 	cm->requestEntitySpawn(diamond);
+	ModelEntity* cross = new ModelEntity
+		(
+			cm->fromMeters(vec3(-10, 0, -10)),
+			Model(cross_mesh, 0.5f)
+		);
+	cm->requestEntitySpawn(cross);
+
 }
 #include "WarnErrReporter.h"
 void Zombie_World::doPhysics(Timestamp t)

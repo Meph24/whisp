@@ -7,12 +7,12 @@
 #include "Model.hpp"
 #include "Timestamp.h"
 
-class EntityDiamond : public Entity
+class ModelEntity : public Entity
 {
 	Model model;
 public:
-	EntityDiamond(spacevec position, const Model& model);
-	~EntityDiamond();
+	ModelEntity(spacevec position, const Model& model);
+	~ModelEntity();
 
 	virtual void draw(	Timestamp ts, 
 						Frustum* viewFrustum, 

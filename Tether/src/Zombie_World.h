@@ -44,6 +44,7 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	ChunkManager * cm;
 
 	Mesh * diamond_mesh;
+	Mesh * cross_mesh;
 
 	ITexture * zombieTex;
 	ITexture * grass;

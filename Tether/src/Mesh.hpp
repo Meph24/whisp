@@ -2,11 +2,15 @@
 #     define MESH_HPP
 
 #include "vec3.h"
+#include <iostream>
 #include <vector>
 #include <array>
 
 using std::array;
 using std::vector;
+using std::istream;
+using std::ostream;
+
 
 struct Mesh
 {
@@ -18,6 +22,8 @@ struct Mesh
 
 	vec3 m_extent;
 	
+	Mesh();
+
 		template<typename VertexIterator, typename IndexIterator>
 	Mesh(
 		VertexIterator vertex_begin, VertexIterator vertex_end,
@@ -67,7 +73,13 @@ struct Mesh
 
 private:
 	vec3 calculateExtent();
+
+public:
+	friend ostream& operator<< (ostream& os, const Mesh& m);
+	friend istream& operator>> (istream& os, Mesh& m);
 };
 
+ostream& operator<< (ostream& os, const Mesh& m);
+istream& operator>> (istream& os, const Mesh& m);
 
 #endif /* MESH_HPP */
