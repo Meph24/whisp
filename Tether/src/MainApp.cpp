@@ -32,7 +32,7 @@ graphics(sfmlHandle)
 	//int y=*(cfg->getint("graphics", "resolutionY"));
 	//free(pointer);
 	CfgIO cfgio ( "./res/config.txt" );
-	Cfg cfg = cfgio.load();
+	Cfg cfg = cfgio.get();
 
 	int x=*cfg.getInt("graphics", "resolutionX");
 	int y=*cfg.getInt("graphics", "resolutionY");

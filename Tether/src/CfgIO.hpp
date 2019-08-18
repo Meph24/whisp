@@ -2,7 +2,7 @@
 #     define CFGIO_HPP
 
 #include "Cfg.hpp"
-#include "CfgIOBase.hpp"
+#include "IFileIO.hpp"
 
 #include <regex>
 #include <string>
@@ -12,7 +12,7 @@ using std::pair;
 using std::regex;
 using std::string;
 
-class CfgIO : public CfgIOBase
+class CfgIO : public IFileIO<Cfg>
 {
 public:
 	//any integer is a sequence of digits
@@ -39,7 +39,7 @@ public:
 	CfgIO(const string& filename);
 	const string& filename() const;
 	
-	virtual Cfg load() const;
+	virtual Cfg get() const;
 	virtual void save(const Cfg& cfg) const;
 
 public:
@@ -51,5 +51,6 @@ public:
 	double readFloatstring(const string& s) const;
 
 };
+
 #endif /* CFGIO_HPP */
 

@@ -1,3 +1,11 @@
+
+#general
+./res/config.txt
+
+#linux
+*.swp
+
+#eclipse
 /Debug/
 /Release/
 /SFML-2.4.2/
@@ -6,8 +14,17 @@
 /rls/
 /dbg/
 *.settings/*
-*.swp
-.sconsign.dblite
 .cproject
 .project
+
+
+#sconstruct
+.sconsign.dblite
+bin/
+build/
+
+#default executable location
 whisp
+whisp_debug
+
+

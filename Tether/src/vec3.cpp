@@ -118,8 +118,6 @@ unsigned int vec3::operator >(vec3 b)
 }
 
 
-
-
 //get "similarity" between two unit vectors (0°=1 90°=0 180°=-1)
 flt dotProduct(vec3 a, vec3 b)
 {

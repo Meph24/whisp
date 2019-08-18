@@ -15,6 +15,11 @@ extern Zombie_MouseInput* mouseInput;
 #include "TextureStatic2D.h"
 #include "Zombie_Enemy.h"
 
+#include "Mesh.hpp"
+#include "diamondMesh.hpp"
+#include "ModelEntity.hpp"
+#include "MeshIO.hpp"
+
 
 #include <iostream>
 #include "EventDefines.h"
@@ -24,7 +29,7 @@ Zombie_World::Zombie_World(sf::Window * w):
 {
 	test=0;
 	CfgIO cfgio( "./res/config.txt" );
-	Cfg cfg = cfgio.load();
+	Cfg cfg = cfgio.get();
 	int physDist=*cfg.getInt("graphics", "physicsDistance");
 	int renderDist=*cfg.getInt("graphics", "renderDistance");
 	chunkLoadRate=*cfg.getInt("graphics", "chunkLoadRate");
@@ -193,6 +198,23 @@ void Zombie_World::loadStandardTex()
 
 	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
 	cm->requestEntitySpawn(tr);
+
+	diamond_mesh = new Mesh(diamondMesh(9, 0.3f, 2.0f));
+	MeshIO meshio("./res/cross.mesh");
+	cross_mesh = new Mesh(meshio.get());
+	ModelEntity* diamond = new ModelEntity
+		(
+			cm->fromMeters(vec3(-10, 0, 10)), 
+			Model(diamond_mesh, 0.5f)
+		);
+	cm->requestEntitySpawn(diamond);
+	ModelEntity* cross = new ModelEntity
+		(
+			cm->fromMeters(vec3(-10, 0, -10)),
+			Model(cross_mesh, 0.5f)
+		);
+	cm->requestEntitySpawn(cross);
+
 }
 #include "WarnErrReporter.h"
 void Zombie_World::doPhysics(Timestamp t)
@@ -246,7 +268,18 @@ void Zombie_World::spawnZombie(Timestamp t)
 	for(int i=1;i<32;i++)
 	{
 		if (Zombie_Enemy::zombieCount>=zCount) return;
-		cm->requestEntitySpawn(new Zombie_Enemy(t,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm));
+		cm->requestEntitySpawn
+			(
+				new Zombie_Enemy
+				(
+					t,
+					zombieTex,
+					player->pos+cm->fromMeters(
+							vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)
+											  ),
+					cm
+				)
+			);
 		
 		//TODO better spawn algorithm: https://www.youtube.com/watch?v=7WcmyxyFO7o
 
