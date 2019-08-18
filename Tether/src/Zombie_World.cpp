@@ -248,6 +248,9 @@ void Zombie_World::spawnZombie(Timestamp t)
 		if (Zombie_Enemy::zombieCount>=zCount) return;
 		cm->requestEntitySpawn(new Zombie_Enemy(t,zombieTex,  player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),cm));
 		
+		//TODO better spawn algorithm: https://www.youtube.com/watch?v=7WcmyxyFO7o
+
+
 		//currently unused
 		//float r3 = (rand()%7)+13;
 		//float r4 = ((rand()%32768)/32768.0f)*4 + 5;
