@@ -10,6 +10,7 @@
 #define SRC_TIMESTAMPMANAGER_H_
 
 #include <SFML/Window.hpp>
+
 #include "Timestamp.h"
 #include "ShortNames.h"
 

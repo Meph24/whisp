@@ -10,7 +10,9 @@
 #define SRC_ITEXTURE_H_
 
 #include "TexParamSet.h"
+
 #include <GL/glew.h>
+
 class ITexture
 {
 protected:

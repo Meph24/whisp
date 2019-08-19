@@ -8,7 +8,9 @@
 
 #ifndef SRC_SPEEDMOD_H_
 #define SRC_SPEEDMOD_H_
-#include "MatrixLib.h"
+
+#include "MathStuff.h"
+
 class SpeedMod
 {
 public:

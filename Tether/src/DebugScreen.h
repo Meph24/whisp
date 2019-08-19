@@ -9,9 +9,10 @@
 #ifndef SRC_DEBUGSCREEN_H_
 #define SRC_DEBUGSCREEN_H_
 
+#include "MathStuff.h"
 
-#include "Graphics2D.h"
-#include "PerformanceMeter.h"
+class Graphics2D;
+class PerformanceMeter;
 
 class DebugScreen
 {

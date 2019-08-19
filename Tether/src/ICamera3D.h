@@ -5,6 +5,7 @@
 #include "ICamera.h"
 #include "DivisionPlane.h"
 #include "MatrixLib2.h"
+
 class ICamera3D: public ICamera
 {
 	MatrixLib2 ml;
@@ -46,4 +47,5 @@ public:
 	ICamera3D();
 	virtual ~ICamera3D();
 };
+
 #endif /*SRC_ICAMERA3D_H_*/

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <thread>
-#include "IMediaHandle.h"
 #include <vector>
 
+class IMediaHandle;
 
 
 /*

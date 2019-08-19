@@ -2,8 +2,8 @@
 #ifndef SRC_VEC3_H_
 #define SRC_VEC3_H_
 
-
 #include "MathStuff.h"
+
 #include <iostream>
 
 class vec3

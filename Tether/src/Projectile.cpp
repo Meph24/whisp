@@ -9,9 +9,13 @@
 #include "Projectile.h"
 
 #include "WarnErrReporter.h"
-#include <algorithm>
-
 #include "EntityProjectileBulletLike.h"
+#include "TickServiceProvider.h"
+#include "InteractionManager.h"
+#include "ChunkManager.h"
+#include "Hittable.h"
+
+#include <algorithm>
 
 void Projectile::interact(Entity* self, DualPointer<Hittable> other, float time,TickServiceProvider* tsp)
 {

@@ -9,15 +9,16 @@
 #ifndef SRC_TICKSERVICEPROVIDER_H_
 #define SRC_TICKSERVICEPROVIDER_H_
 
-#include "SoundManager.h"
-class Entity;
-#include "ICamera3D.h"
-class ChunkManager;
-class InteractionManager;
-#include "Retickable.h"
-#include <vector>
 class ThreadDataManager;
 class EventMapper;
+class Entity;
+class ChunkManager;
+class InteractionManager;
+class SoundManager;
+class Retickable;
+class ICamera3D;
+
+#include <vector>
 
 //provides services for tickable stuff
 class TickServiceProvider
@@ -45,11 +46,5 @@ public:
 	TickServiceProvider();
 	virtual ~TickServiceProvider();
 };
-
-#include "ThreadDataManager.h"
-#include "ChunkManager.h"
-#include "Entity.h"
-#include "InteractionManager.h"
-#include "EventMapper.h"
 
 #endif /* SRC_TICKSERVICEPROVIDER_H_ */

@@ -68,11 +68,4 @@ public:
 
 };
 
-#include "Drawable.h"
-#include "Frustum.h"
-#include "ChunkManager.h"
-#include "Graphics2D.h"
-#include "ICamera3D.h"
-#include "ITexture.h"
-
 #endif /* SRC_DRAWSERVICEPROVIDER_H_ */

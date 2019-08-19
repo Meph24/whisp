@@ -7,6 +7,10 @@
  */
 
 #include "ItemContainer.h"
+#include "TickServiceProvider.h"
+#include "DrawServiceProvider.h"
+#include "EventMapper.h"
+#include "Graphics2D.h"
 
 ItemContainer::ItemContainer():
 items()
@@ -131,6 +135,8 @@ int fuck (int argc , char** argv)
 */
 #include "ShortNames.h"
 #include "WarnErrReporter.h"
+#include <iostream>
+
 void ItemContainer::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
 {
 	std::cout<<"selected: "<<selected<<std::endl;

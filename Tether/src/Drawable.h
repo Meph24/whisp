@@ -24,13 +24,4 @@ public:
 };
 
 
-//ugly hack: fuck c++'s include ordering bullshit
-#ifndef SRC_ENTITY_H_
-#include "DrawServiceProvider.h"
-#include "Frustum.h"
-#include "ChunkManager.h"
-#endif /* SRC_ENTITY_H_ */
-//do not include yet if coming from Entity.h
-
-
 #endif /* SRC_DRAWABLE_H_ */

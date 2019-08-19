@@ -1,13 +1,7 @@
 #pragma once
 
-#include "SFML/Window.hpp"
-#include <fstream>
-#include "SFML/Graphics.hpp"
-
 #include "SFMLHandle.h"
 #include "Graphics.h"
-
-#include "HardCursorHandle.h"
 
 class MainApp
 {

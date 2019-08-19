@@ -3,10 +3,7 @@
 
 #include "Mesh.hpp"
 
-#include <array>
 #include <GL/glew.h>
-
-using std::array;
 
 class Model
 {

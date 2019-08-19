@@ -7,6 +7,7 @@
  */
 
 #include "ProjectileCollision.h"
+#include "HitData.h"
 
 
 ProjectileCollision::ProjectileCollision(float Location, Entity* asEntity,Hittable* asHittable,hitType myType,spacevec OriginChunk):

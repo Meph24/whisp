@@ -14,9 +14,8 @@
 #define MAX_TICK_TIME 0.02f
 
 class TickServiceProvider;
-//#include "TickServiceProvider.h"
-
 class Entity;
+
 class Tickable
 {
 public:

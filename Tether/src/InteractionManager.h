@@ -30,7 +30,4 @@ public:
 	~InteractionManager();
 };
 
-#include "Projectile.h"
-#include "Pushable.h"
-#include "Hittable.h"
 #endif /* SRC_INTERACTIONMANAGER_H_ */

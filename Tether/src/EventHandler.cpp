@@ -1,4 +1,9 @@
+
 #include "EventHandler.h"
+#include "EntityPlayer.h"
+#include "EventMapper.h"
+
+
 #include <iostream>
 
 EventHandler::Filter::Filter()
@@ -53,6 +58,8 @@ extern int enabledProgram;
 extern Zombie_World * world;
 
 #include "CameraTP.h"
+
+
 void EventHandler::sendOn(EventHandler::event e)
 {
 	//TODO dont hardcode stuff

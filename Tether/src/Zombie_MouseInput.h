@@ -1,7 +1,10 @@
 #pragma once
-#include "SFML/Window.hpp"
+
 class EntityPlayer;
 class ICamera3D;
+
+#include "SFML/Window.hpp"
+
 class Zombie_MouseInput
 {
 	EntityPlayer * player;
@@ -22,6 +25,3 @@ public:
 
 	ICamera3D * getCam();
 };
-
-#include "ICamera3D.h"
-#include "EntityPlayer.h"

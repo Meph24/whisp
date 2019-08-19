@@ -45,10 +45,4 @@ public:
 	virtual ~Projectile();
 };
 
-#include "Entity.h"
-#include "TickServiceProvider.h"
-#include "ProjectileCollision.h"
-#include "EntityProjectileBulletLike.h"
-#include "Hittable.h"
-
 #endif /* SRC_PROJECTILE_H_ */

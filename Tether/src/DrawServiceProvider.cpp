@@ -7,8 +7,11 @@
  */
 
 #include "DrawServiceProvider.h"
-#include <GL/glew.h>
 #include "WarnErrReporter.h"
+#include "ICamera3D.h"
+#include "Drawable.h"
+
+#include <GL/glew.h>
 
 DrawServiceProvider::DrawServiceProvider()
 {}

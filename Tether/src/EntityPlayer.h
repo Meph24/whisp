@@ -81,12 +81,4 @@ public:
 	void switchWeapon(int dir);
 };
 
-#include "CameraTP.h"
-#include "Frustum.h"
-#include "Zombie_MouseInput.h"
-#include "Zombie_KeyInput.h"
-#include "Zombie_Gun.h"
-#include "Item.h"
-#include "ItemContainer.h"
-
 #endif /* SRC_ENTITYPLAYER_H_ */

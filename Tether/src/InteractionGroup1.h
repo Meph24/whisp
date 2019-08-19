@@ -8,11 +8,13 @@
 
 #ifndef SRC_INTERACTIONGROUP1_H_
 #define SRC_INTERACTIONGROUP1_H_
+
 class Entity;
-#include "AABB.h"
-#include "Entity.h"
+
 #include "TickServiceProvider.h"
+#include "AABB.h"
 #include "DualPointer.h"
+
 #include <vector>
 
 template<typename PhysicsIF>

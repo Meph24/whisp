@@ -1,5 +1,7 @@
-#include "Zombie_KeyInput.h"
 
+#include "Zombie_KeyInput.h"
+#include "Zombie_MouseInput.h"
+#include "ICamera3D.h"
 
 Zombie_KeyInput::Zombie_KeyInput(Zombie_MouseInput * toToggle,ICamera3D * referenceCam):
 cam(referenceCam),mouseInput(toToggle), frontVec(0), rightVec(0)

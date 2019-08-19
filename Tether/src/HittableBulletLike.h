@@ -8,7 +8,9 @@
 
 #ifndef SRC_HITTABLEBULLETLIKE_H_
 #define SRC_HITTABLEBULLETLIKE_H_
+
 #include "faction.h"
+
 class HittableBulletLike
 {
 public:

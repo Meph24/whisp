@@ -7,6 +7,11 @@
  */
 
 #include "ChunkManager.h"
+#include "Chunk.h"
+#include "Entity.h"
+#include "InteractionManager.h"
+#include "LockChunk.h"
+#include "Frustum.h"
 
 
 ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk, float gravityYdir):

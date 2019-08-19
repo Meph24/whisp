@@ -8,7 +8,9 @@
 
 #ifndef SRC_RETICKABLE_H_
 #define SRC_RETICKABLE_H_
+
 class TickServiceProvider;
+
 class Retickable
 {
 public:
@@ -18,5 +20,4 @@ public:
 	virtual ~Retickable();
 };
 
-#include "TickServiceProvider.h"
 #endif /* SRC_RETICKABLE_H_ */

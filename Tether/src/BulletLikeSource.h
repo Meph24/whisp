@@ -18,5 +18,4 @@ public:
 	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);
 
 };
-#include "HittableBulletLike.h"
 #endif /* SRC_BULLETLIKESOURCE_H_ */

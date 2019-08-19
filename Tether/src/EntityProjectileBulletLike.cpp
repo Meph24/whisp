@@ -10,8 +10,11 @@
 
 #include "TickServiceProvider.h"
 #include "Zombie_Enemy.h"
-
 #include "TextureDummy.h"
+#include "BulletLikeSource.h"
+#include "Frustum.h"
+#include "ChunkManager.h"
+
 ITexture * EntityProjectileBulletLike::tex=new TextureDummy();
 
 

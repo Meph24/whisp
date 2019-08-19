@@ -1,9 +1,10 @@
 #ifndef ENTITYDIAMOND_HPP
 #     define ENTITYDIAMOND_HPP
 
-#include "MatrixLib.h"
-
 #include "Entity.h"
+
+#include "Spacevec.h"
+
 #include "Model.hpp"
 #include "Timestamp.h"
 

@@ -9,7 +9,7 @@
 #ifndef SRC_RECOILMANAGER_H_
 #define SRC_RECOILMANAGER_H_
 
-#include "MatrixLib.h"
+#include "vec3.h"
 
 class RecoilManager
 {

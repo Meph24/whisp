@@ -8,9 +8,13 @@
 
 #ifndef SRC_LOCKCHUNK_H_
 #define SRC_LOCKCHUNK_H_
-#include <vector>
-#include "LockFast.h"
+
 class Chunk;
+
+#include "LockFast.h"
+
+#include <vector>
+
 class LockChunk
 {
 	LockFast myLock;

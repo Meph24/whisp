@@ -7,6 +7,10 @@
  */
 
 #include "Pushable.h"
+#include "TickServiceProvider.h"
+#include "Entity.h"
+#include "InteractionManager.h"
+#include "ChunkManager.h"
 
 void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, TickServiceProvider* tsp)
 {

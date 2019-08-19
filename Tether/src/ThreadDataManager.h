@@ -10,6 +10,7 @@
 #define SRC_THREADDATAMANAGER_H_
 
 class InteractionManager;
+
 #include <vector>
 
 class ThreadDataManager

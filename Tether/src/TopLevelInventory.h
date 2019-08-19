@@ -10,6 +10,7 @@
 #define SRC_TOPLEVELINVENTORY_H_
 
 #include "ItemContainer.h"
+
 class EntityPlayer;
 
 class TopLevelInventory: public ItemContainer
@@ -20,5 +21,4 @@ public:
 	virtual ~TopLevelInventory();
 };
 
-#include "EntityPlayer.h"
 #endif /* SRC_TOPLEVELINVENTORY_H_ */

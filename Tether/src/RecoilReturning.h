@@ -8,7 +8,9 @@
 
 #ifndef SRC_RECOILRETURNING_H_
 #define SRC_RECOILRETURNING_H_
+
 #include "RecoilManager.h"
+
 class RecoilReturning : public RecoilManager
 {
 	vec3 retP;

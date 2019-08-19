@@ -8,8 +8,10 @@
 
 #include "Hittable.h"
 
-
+#include "InteractionManager.h"
 #include "WarnErrReporter.h"
+#include "ChunkManager.h"
+
 void Hittable::registerHitCheck(Entity* e,float seconds, TickServiceProvider* tsp)
 {
 	std::vector<InteractionManager *> * vec = tsp->getInterManVector();

@@ -1,7 +1,6 @@
+
 #include "Zombie_World.h"
 
-#include "Cfg.hpp"
-#include "CfgIO.hpp"
 
 //dirty
 #include "Zombie_KeyInput.h"
@@ -10,19 +9,33 @@
 extern Zombie_KeyInput* keyInput;
 extern Zombie_MouseInput* mouseInput;
 
-#include "SpeedMod.h"
 #include "ZombieTree.h"
 #include "TextureStatic2D.h"
 #include "Zombie_Enemy.h"
+#include "PerformanceMeter.h"
 
+
+#include "Cfg.hpp"
+#include "CfgIO.hpp"
 #include "Mesh.hpp"
 #include "diamondMesh.hpp"
 #include "ModelEntity.hpp"
 #include "MeshIO.hpp"
 
 
-#include <iostream>
 #include "EventDefines.h"
+#include "EntityPlayer.h"
+#include "Graphics2D.h"
+#include "ChunkManager.h"
+#include "Zombie_Gun.h"
+#include "DebugScreen.h"
+#include "EventMapper.h"
+#include "CameraTP.h"
+#include "AdaptiveQuality.h"
+#include "EntityProjectileBulletLike.h"
+#include "Frustum.h"
+
+#include <iostream>
 
 Zombie_World::Zombie_World(sf::Window * w):
 		tm(1,1000,40)//TODO 20/20

@@ -81,9 +81,4 @@ public:
 	virtual ~Entity();
 };
 
-#include "ChunkManager.h"
-#include "Frustum.h"
-#include "TickServiceProvider.h"
-#include "DrawServiceProvider.h"
-
 #endif /* SRC_ENTITY_H_ */

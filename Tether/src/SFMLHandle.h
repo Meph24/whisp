@@ -1,11 +1,11 @@
 #pragma once
 
-
 #include "IMediaHandle.h"
-#include <SFML/Window.hpp>
+
 #include "EventHandler.h"
 #include "Buffer.h"
-#include <string>
+
+#include <SFML/Window.hpp>
 
 class SFMLHandle : public IMediaHandle
 {

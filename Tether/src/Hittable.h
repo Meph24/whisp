@@ -8,14 +8,18 @@
 
 #ifndef SRC_HITTABLE_H_
 #define SRC_HITTABLE_H_
+
 #include "hitType.h"
-class HittableBulletLike;
 #include "ProjectileCollision.h"
 #include "DualPointer.h"
+
+class HittableBulletLike;
 class Projectile;
 class ChunkManager;
 class TickServiceProvider;
+
 #include <vector>
+
 class Hittable
 {
 public:
@@ -30,10 +34,5 @@ public:
 
 	virtual ~Hittable();
 };
-
-#include "Projectile.h"
-#include "ChunkManager.h"
-#include "TickServiceProvider.h"
-#include "HittableBulletLike.h"
 
 #endif /* SRC_HITTABLE_H_ */

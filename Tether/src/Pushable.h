@@ -8,10 +8,13 @@
 
 #ifndef SRC_PUSHABLE_H_
 #define SRC_PUSHABLE_H_
-#include "Spacevec.h"
-#include "DualPointer.h"
+
 class Entity;
 class TickServiceProvider;
+
+#include "Spacevec.h"
+#include "DualPointer.h"
+
 class Pushable
 {
 public:
@@ -22,8 +25,5 @@ public:
 	virtual void push(spacevec amount, TickServiceProvider* tsp)=0;
 	virtual ~Pushable();
 };
-
-#include "TickServiceProvider.h"
-#include "Entity.h"
 
 #endif /* SRC_PUSHABLE_H_ */

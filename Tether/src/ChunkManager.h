@@ -128,9 +128,4 @@ public:
 
 };
 
-#include "Chunk.h"
-#include "Frustum.h"
-#include "InteractionManager.h"
-#include "LockChunk.h"
-
 #endif /* SRC_CHUNKMANAGER_H_ */

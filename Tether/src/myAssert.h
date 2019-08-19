@@ -14,6 +14,6 @@
 
 #include <assert.h>
 
-
+//TODO rethink assert policy: use more often: make options for soft asserts (non-crash but report errors, trigger dumps, ...)
 
 #endif /* SRC_MYASSERT_H_ */

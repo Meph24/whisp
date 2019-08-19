@@ -8,11 +8,15 @@
 
 #ifndef SRC_INTERACTIONGROUP2_H_
 #define SRC_INTERACTIONGROUP2_H_
+
 class Entity;
+class TickServiceProvider;
+
 #include "AABB.h"
-#include "Entity.h"
-#include "TickServiceProvider.h"
 #include "DualPointer.h"
+#include "Projectile.h"
+#include "Entity.h"
+
 #include <vector>
 
 template<typename MasterIF,typename SlaveIF>

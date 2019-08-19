@@ -41,7 +41,4 @@ public:
 	~Frustum();
 };
 
-#include "ChunkManager.h"
-#include "ITexture.h"
-
 #endif /* SRC_FRUSTUM_H_ */

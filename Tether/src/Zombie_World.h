@@ -5,14 +5,12 @@
 
 #include "TimestampManager.h"
 
-#include "Mesh.hpp"
-
 class AdaptiveQuality;
 class PerformanceMeter;
-class ITexture;
-class ChunkManager;
 class DebugScreen;
 class EntityPlayer;
+class Mesh;
+class TexParamSet;
 
 #include <SFML/Window.hpp>
 
@@ -93,11 +91,4 @@ public:
 	//from DrawServiceProvider:
 	virtual ITexture * suggestFont();//returns 0 if no suggestion is made
 };
-
-#include "PerformanceMeter.h"
-#include "ITexture.h"
-#include "ChunkManager.h"
-#include "DebugScreen.h"
-#include "EntityPlayer.h"
-#include "AdaptiveQuality.h"
 

@@ -11,7 +11,7 @@
 
 #include "Entity.h"
 
-#include "MatrixLib.h"
+#include "Spacevec.h"
 
 class ITexture;
 
@@ -35,7 +35,5 @@ public:
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 };
-
-#include "ITexture.h"
 
 #endif /* SRC_ZOMBIETREE_H_ */

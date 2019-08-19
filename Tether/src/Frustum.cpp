@@ -8,6 +8,10 @@
 
 #include "Frustum.h"
 
+#include "ChunkManager.h"
+#include "ITexture.h"
+
+
 Frustum::Frustum()
 {}
 

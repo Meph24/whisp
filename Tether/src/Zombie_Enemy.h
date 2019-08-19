@@ -2,15 +2,16 @@
 #ifndef SRC_ZOMBIE_ENEMY_H_
 #define SRC_ZOMBIE_ENEMY_H_
 
-#include "SpeedMod.h"
-#include "ITexture.h"
-#include "ChunkManager.h"
 #include "Entity.h"
 #include "Pushable.h"
-#include "AnimationCycle.h"
-#include "EntityProjectileBulletLike.h"
 #include "Hittable.h"
 #include "HittableBulletLike.h"
+
+class ITexture;
+class EntityProjectileBulletLike;
+
+#include "MatrixLib2.h"
+#include "AnimationCycle.h"
 
 class Zombie_Enemy: public Entity,public Pushable,public Hittable, public HittableBulletLike
 {

@@ -10,6 +10,7 @@
 #define SRC_ITEMAMMO_H_
 
 #include "Item.h"
+
 #define ITEM_GROUP_AMMO (ITEM_GROUP_FIRST_FREE+1)
 
 #include "Compatibility.h"

@@ -34,8 +34,5 @@ public:
 	ProjectileCollision(float Location,DualPointer<Hittable> HitVictim,hitType myType);
 	~ProjectileCollision();
 };
-#include "Hittable.h"
-#include "Entity.h"
-#include "HitData.h"
 
 #endif /* SRC_PROJECTILECOLLISION_H_ */

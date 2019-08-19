@@ -45,8 +45,4 @@ public:
 	static void setTexture(ITexture * texture);
 };
 
-#include "HittableBulletLike.h"
-#include "BulletLikeSource.h"
-#include "ITexture.h"
-
 #endif /* SRC_ENTITYPROJECTILEBULLETLIKE_H_ */

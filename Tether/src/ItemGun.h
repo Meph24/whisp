@@ -9,9 +9,13 @@
 #ifndef SRC_ITEMGUN_H_
 #define SRC_ITEMGUN_H_
 
-#include "ItemAmmo.h"
-#include "MatrixLib.h"
+#include "Item.h"
+
+class ItemAmmo;
+
+#include "vec3.h"
 #include "RecoilReturning.h"
+#include "Compatibility.h"
 
 class ItemGun: public Item
 {

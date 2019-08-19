@@ -8,11 +8,15 @@
 
 #ifndef SRC_ITEM_H_
 #define SRC_ITEM_H_
-#include "ItemIdent.h"
-#include "ShortNames.h"
+
 #include "Tickable.h"
 #include "Drawable.h"
+
+#include "ItemIdent.h"
+#include "ShortNames.h"
+
 #include <string>
+
 class Item: public Tickable, public Drawable
 {
 	static u32 notickIDcounter;//0 is reserved

@@ -52,7 +52,5 @@ public:
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1
 	~Chunk();
 };
-#include "InteractionManager.h"
-#include "ChunkManager.h"
 
 #endif /* SRC_CHUNK_H_ */

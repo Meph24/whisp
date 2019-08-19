@@ -7,6 +7,10 @@
  */
 
 #include "Chunk.h"
+#include "ChunkManager.h"
+#include "InteractionManager.h"
+#include "Entity.h"
+
 spacelen Chunk::getHeight(flt xh, flt zh)
 {
 	if(xh<0) return defaultH*2.0f;

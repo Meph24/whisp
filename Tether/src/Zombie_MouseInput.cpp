@@ -1,5 +1,7 @@
-#include "Zombie_MouseInput.h"
 
+#include "Zombie_MouseInput.h"
+#include "EntityPlayer.h"
+#include "CameraTP.h"
 
 Zombie_MouseInput::Zombie_MouseInput(EntityPlayer * playerToSteer, sf::Window * window) :
 player(playerToSteer),

@@ -1,8 +1,10 @@
 #pragma once
+
 #include "ITexture.h"
+
 #include <string>
-class TextureStatic2D :
-	public ITexture
+
+class TextureStatic2D: public ITexture
 {
 	const char * fName;
 public:

@@ -1,19 +1,18 @@
 #ifndef SRC_ZOMBIE_GUN_H_
 #define SRC_ZOMBIE_GUN_H_
 
-#include <SFML/Audio.hpp>
-
-#include "EntityProjectileBulletLike.h"
+class ItemAmmo;
+class ICamera3D;
 class EntityPlayer;
-#include "EntityPlayer.h"
-#include "ICamera3D.h"
-#include "ITexture.h"
-#include "ItemAmmo.h"
+class ITexture;
+class ChunkManager;
+
+#include "Timestamp.h"
 #include "RecoilReturning.h"
 
-#include "MatrixLib.h"
-
 #include "noise/noise.h"
+#include <SFML/Audio.hpp>
+
 using namespace noise;
 
 class Zombie_Gun

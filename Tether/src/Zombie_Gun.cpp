@@ -1,5 +1,11 @@
 #include "Zombie_Gun.h"
 
+#include "ICamera3D.h"
+#include "EntityProjectileBulletLike.h"
+#include "ChunkManager.h"
+#include "EntityPlayer.h"
+#include "ItemAmmo.h"
+
 
 Zombie_Gun::Zombie_Gun(Timestamp initTimestamp,std::string weaponName, float reloadTime,const std::string& filename,float pitchModifier,ItemAmmo * type,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread):
 lastTimestamp(initTimestamp),rld(reloadTime), timer(0),pType(type),nm(),recoilM({1,0,1},0.5f,reloadTime),sBuf(),name(weaponName),pitch(pitchModifier),fullAuto(fullAutomatic),trigger(false),recoil(Recoil),recoilSpread(RecoilSpread)

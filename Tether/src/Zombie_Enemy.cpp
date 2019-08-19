@@ -1,7 +1,18 @@
 #include "Zombie_Enemy.h"
+
+#include "EntitySound.h"
+#include "ChunkManager.h"
+#include "Projectile.h"
+#include "EntityProjectileBulletLike.h"
+#include "TickServiceProvider.h"
+#include "SoundManager.h"
+#include "Frustum.h"
+#include "ITexture.h"
+#include "SpeedMod.h"
+#include "Chunk.h"
+
 #include <cstdlib>
 #include <GL/glew.h>
-#include "EntitySound.h"
 
 int Zombie_Enemy::zombieCount=0;
 

@@ -7,6 +7,8 @@
  */
 
 #include "DebugScreen.h"
+#include "Graphics2D.h"
+#include "PerformanceMeter.h"
 
 DebugScreen::DebugScreen(PerformanceMeter * p,Graphics2D ** gr):
 g(gr),pm(p),textSize(0.1f)

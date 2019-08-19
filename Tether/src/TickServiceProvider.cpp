@@ -7,6 +7,10 @@
  */
 
 #include "TickServiceProvider.h"
+#include "Retickable.h"
+#include "ThreadDataManager.h"
+#include "SoundManager.h"
+#include "EventMapper.h"
 
 TickServiceProvider::TickServiceProvider()
 {

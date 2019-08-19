@@ -9,8 +9,9 @@
 #ifndef SRC_ITEMMAGAZINE_H_
 #define SRC_ITEMMAGAZINE_H_
 
-#include "Compatibility.h"
 #include "ItemContainer.h"
+
+#include "Compatibility.h"
 
 class ItemMagazine: public ItemContainer
 {

@@ -8,7 +8,8 @@
 
 #ifndef SRC_DIVISIONPLANE_H_
 #define SRC_DIVISIONPLANE_H_
-#include "MatrixLib.h"
+#include "Spacevec.h"
+#include "vec3.h"
 #include "AABB.h"
 //divides space into 2 pieces
 //optimized for telling on which side each of many AABBs are

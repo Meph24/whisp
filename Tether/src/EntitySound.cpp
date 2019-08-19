@@ -9,6 +9,9 @@
 #include "EntitySound.h"
 
 #include "WarnErrReporter.h"
+#include "Frustum.h"
+#include "TickServiceProvider.h"
+#include "ChunkManager.h"
 
 EntitySound::EntitySound(Entity* attachedTo,const sf::SoundBuffer& soundTemplate,float pitch,bool enable3D):
 attached(attachedTo)

@@ -7,13 +7,14 @@
  */
 
 #include "ItemGun.h"
+
 #include "ICamera3D.h"
 #include "MatrixLib2.h"
-#include "MatrixLib.h"
-#include <cmath>
-
-#include "EntityProjectileBulletLike.h"
 #include "TickServiceProvider.h"
+#include "ItemAmmo.h"
+#include "ChunkManager.h"
+
+#include <cmath>
 
 ItemGun::ItemGun():
 recoilM({0,0,0},0,0)//TODO

@@ -8,7 +8,9 @@
 
 #ifndef SRC_SOUNDMANAGER_H_
 #define SRC_SOUNDMANAGER_H_
+
 #include <SFML/Audio.hpp>
+
 class SoundManager
 {
 	sf::SoundBuffer headshotSound;

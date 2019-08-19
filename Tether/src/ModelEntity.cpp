@@ -3,6 +3,9 @@
 #include <cmath>
 
 #include "Mesh.hpp"
+#include "ChunkManager.h"
+#include "TickServiceProvider.h"
+#include "Frustum.h"
 
 ModelEntity::ModelEntity(spacevec position, const Model& model)
 :

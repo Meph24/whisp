@@ -7,6 +7,11 @@
  */
 
 #include "ZombieTree.h"
+#include "ChunkManager.h"
+#include "TickServiceProvider.h"
+#include "ITexture.h"
+#include "Frustum.h"
+
 #include <GL/glew.h>
 
 Zombie_Tree::Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves):

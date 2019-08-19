@@ -7,6 +7,8 @@
  */
 
 #include "Entity.h"
+#include "ChunkManager.h"
+#include "TickServiceProvider.h"
 
 Entity::Entity()
 {}

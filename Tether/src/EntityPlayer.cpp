@@ -7,9 +7,22 @@
  */
 
 #include "EntityPlayer.h"
+
 #include "SpeedMod.h"
 #include "TopLevelInventory.h"
 #include "ItemDummy.h"
+#include "CameraTP.h"
+#include "HittableBulletLike.h"
+#include "TickServiceProvider.h"
+#include "ChunkManager.h"
+#include "Zombie_KeyInput.h"
+#include "EventMapper.h"
+#include "Frustum.h"
+#include "DrawServiceProvider.h"
+#include "Zombie_Gun.h"
+#include "Graphics2D.h"
+#include "Zombie_MouseInput.h"
+#include "ItemAmmo.h"
 
 EntityPlayer::EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
 speed(characterSpeed),heldItem(0),inventory(0)

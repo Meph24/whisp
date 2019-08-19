@@ -1,7 +1,9 @@
 #pragma once
 #include <GL/glew.h>
 #include <iostream>
-#include "ITexture.h"
+
+class ITexture;
+#include "TexParamSet.h"
 
 #define SNAP_SW 0
 #define SNAP_W 3
