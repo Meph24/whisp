@@ -11,8 +11,9 @@
 
 #include "Spacevec.h"
 #include "ShortNames.h"
+//#include "Drawable.h"
 
-class AABB
+class AABB//: public Drawable
 {
 public:
 	spacevec low;
@@ -26,6 +27,8 @@ public:
 	bool doesIntersect(AABB * other);
 
 	bool isMultichunk();
+
+//	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 
 	AABB();//uninitialized
 	AABB(spacevec pos);//point-like stationary object

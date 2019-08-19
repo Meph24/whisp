@@ -78,6 +78,13 @@ bool AABB::isMultichunk()
 	return (low.x.intpart!=high.x.intpart)||(low.z.intpart!=high.z.intpart);
 }
 
+//void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+//{
+//	if(!viewFrustum->inside(*this)) return;
+//
+//
+//}
+
 AABB::~AABB()
 {}
 

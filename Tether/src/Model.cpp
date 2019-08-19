@@ -69,7 +69,7 @@ vec3 Model::extent() const
 void Model::drawBuffered()
 {
 	glBindVertexArray(vertexArrayObject);
-	glDrawElements(GL_TRIANGLES, m_mesh->indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_mesh->indices.size(), GL_UNSIGNED_INT,0);
 	glBindVertexArray(0);
 }
 
@@ -120,6 +120,7 @@ void Model::draw()
 	glPushMatrix();
 
 	drawNative();
+//	drawBuffered();
 
 	glPopMatrix();
 }
