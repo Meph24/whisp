@@ -1,6 +1,6 @@
 
 #general
-./res/config.txt
+res/config.txt
 
 #linux
 *.swp
