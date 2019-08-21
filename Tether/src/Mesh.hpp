@@ -71,6 +71,8 @@ struct Mesh
 	TriangleIterator end();
 
 
+	vec3 lowestPoint() const;
+
 private:
 	vec3 calculateExtent();
 

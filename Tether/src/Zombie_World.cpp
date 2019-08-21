@@ -2,6 +2,10 @@
 #include "Zombie_World.h"
 
 
+#include <iostream>
+
+using std::cout;
+
 //dirty
 #include "Zombie_KeyInput.h"
 #include "Zombie_MouseInput.h"
@@ -34,6 +38,7 @@ extern Zombie_MouseInput* mouseInput;
 #include "AdaptiveQuality.h"
 #include "EntityProjectileBulletLike.h"
 #include "Frustum.h"
+#include "WarnErrReporter.h"
 
 #include <iostream>
 
@@ -217,19 +222,25 @@ void Zombie_World::loadStandardTex()
 	cross_mesh = new Mesh(meshio.get());
 	ModelEntity* diamond = new ModelEntity
 		(
-			cm->fromMeters(vec3(-10, 0, 10)), 
-			Model(diamond_mesh, 0.5f)
+			Model(diamond_mesh, 0.8f)
 		);
-	cm->requestEntitySpawn(diamond);
+	spawnGrounded
+		(
+			diamond,
+			cm->fromMeters(vec3(3, 0, 3))
+		);
 	ModelEntity* cross = new ModelEntity
 		(
-			cm->fromMeters(vec3(-10, 0, -10)),
-			Model(cross_mesh, 0.5f)
+			Model(cross_mesh, 2.0f)
 		);
-	cm->requestEntitySpawn(cross);
-
+	spawnGrounded
+		(
+			cross,
+			cm->fromMeters(vec3(1, 0, 1))
+		);
 }
-#include "WarnErrReporter.h"
+
+
 void Zombie_World::doPhysics(Timestamp t)
 {
 	initNextTick();
@@ -309,6 +320,23 @@ void Zombie_World::spawnZombie(Timestamp t)
 Entity* Zombie_World::getTarget(Entity* me)
 {
 	return (Entity *)player;
+}
+
+void Zombie_World::spawn(Entity* ep, spacevec pos)
+{
+	ep->pos = pos;
+	cm->requestEntitySpawn(ep);
+}
+
+void Zombie_World::spawnGrounded(ModelEntity* ep, spacevec pos)
+{
+	spacevec thispos = cm->clip(pos, true);
+	cout << "Clipped pos : " << thispos << '\n';
+	spacelen ground_distance = cm->fromMeters(ep->groundedDistance());
+	cout << "Ground distance " << ground_distance << '\n';
+	thispos.y -= ground_distance;
+	cout << "Spawn Grounded on location " << thispos << '\n';
+	spawn(ep, thispos);
 }
 
 void Zombie_World::drawGameOver()//TODO find new home

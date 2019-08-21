@@ -3,7 +3,10 @@
 #include "TickServiceProvider.h"
 #include "DrawServiceProvider.h"
 
+#include "ModelEntity.hpp"
+
 #include "TimestampManager.h"
+#include "Spacevec.h"
 
 class AdaptiveQuality;
 class PerformanceMeter;
@@ -81,6 +84,9 @@ public:
 	virtual ChunkManager * getChunkManager();
 
 	virtual Entity * getTarget(Entity * me);
+
+	void spawn(Entity*, spacevec);
+	void spawnGrounded(ModelEntity* ep, spacevec pos);
 
 	void loadStandardTex();
 

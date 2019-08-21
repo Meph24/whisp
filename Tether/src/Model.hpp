@@ -34,6 +34,7 @@ public:
 	 * @return Vec3 with maximum occupated space in each direction from mid (radial).
 	 */
 	vec3 extent() const;
+	float groundDistance() const;
 
 	void draw();
 	void drawBuffered(); //with buffered objects
