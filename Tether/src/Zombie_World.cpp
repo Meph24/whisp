@@ -191,7 +191,7 @@ void Zombie_World::render(Timestamp t)
 
 void Zombie_World::loadStandardTex()
 {
-	tps = new TexParamSet(2, 2);
+	tps = new TexParamSet();
 	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	tps->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
 	tps->addF(GL_TEXTURE_MIN_FILTER, GL_LINEAR);//GL_NEAREST);
@@ -205,7 +205,7 @@ void Zombie_World::loadStandardTex()
 	tree->update();
 
 
-	tps2 = new TexParamSet(2, 2);
+	tps2 = new TexParamSet();
 	tps2->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	tps2->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
 	tps2->addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST);

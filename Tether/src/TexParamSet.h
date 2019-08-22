@@ -1,25 +1,20 @@
 #pragma once
 
+#include <vector>
 #include <GL/glew.h>
 
 class TexParamSet
 {
-	GLenum * enumI;
-	GLenum * enumF;
-	GLint * paramI;
-	GLfloat * paramF;
-	int iCount;
-	int fCount;
-	int iMax;
-	int fMax;
+	std::vector<GLenum> enumI;
+	std::vector<GLenum> enumF;
+	std::vector<GLint> paramI;
+	std::vector<GLfloat> paramF;
 
 public:
-	//return: true if success
-	bool addI(GLenum e, GLint i);
-	//return: true if success
-	bool addF(GLenum e, GLfloat f);
+	void addI(GLenum e, GLint i);
+	void addF(GLenum e, GLfloat f);
 	void apply();
-	TexParamSet(int maxParamsI, int maxParamsF);
+	TexParamSet();
 	~TexParamSet();
 };
 
