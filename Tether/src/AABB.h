@@ -9,12 +9,15 @@
 #ifndef SRC_AABB_H_
 #define SRC_AABB_H_
 
+#include "Drawable.h"
+
 #include "Spacevec.h"
 #include "ShortNames.h"
-//#include "Drawable.h"
 
-class AABB//: public Drawable
+class AABB: public Drawable
 {
+private:
+	vec3 convert(int bitvec);
 public:
 	spacevec low;
 	spacevec high;
@@ -28,7 +31,7 @@ public:
 
 	bool isMultichunk();
 
-//	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 
 	AABB();//uninitialized
 	AABB(spacevec pos);//point-like stationary object

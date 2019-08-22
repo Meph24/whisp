@@ -225,7 +225,10 @@ void Chunk::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawService
 	for(int i=0;i<size;i++)
 	{
 		if(managedEntities[i]->exists)
+		{
 			managedEntities[i]->draw(t,viewFrustum,cm,dsp);
+			if(cm->drawAABBs) managedEntities[i]->bb.draw(t,viewFrustum,cm,dsp);
+		}
 	}
 }
 

@@ -85,7 +85,12 @@ Zombie_World::Zombie_World(sf::Window * w):
 			-CONDITION_SELECTION_ACTIVE,
 			STATUS_ID_SELECTION_DOWN,
 			0);
-
+	eMap->registerAction(
+			EVENT_ID_KEY_B,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_DRAW_AABBs,
+			EVENT_VALUE_KEY_PRESSED);
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
 
 	float sensX = *cfg.getFlt("input", "sensitivityX");
@@ -352,6 +357,7 @@ void Zombie_World::doLogic()
 
 void Zombie_World::doGraphics()
 {
+	cm->drawAABBs=eMap->getStatus(STATUS_ID_DRAW_AABBs)==1;
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
 	if (player->HP < 0)
 	{

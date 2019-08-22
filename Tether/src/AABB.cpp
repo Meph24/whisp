@@ -7,6 +7,11 @@
  */
 
 #include "AABB.h"
+#include "Frustum.h"
+#include "ChunkManager.h"
+#include "ICamera3D.h"
+#include "DrawServiceProvider.h"
+#include <GL/glew.h>
 
 u64 AABB::intersectionCounter=0;
 u64 AABB::checkCounter=0;
@@ -78,12 +83,87 @@ bool AABB::isMultichunk()
 	return (low.x.intpart!=high.x.intpart)||(low.z.intpart!=high.z.intpart);
 }
 
-//void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
-//{
-//	if(!viewFrustum->inside(*this)) return;
-//
-//
-//}
+void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+{
+	if(!viewFrustum->inside(*(this))) return;
+	float widthOnScreen=1.0f/1024;//apparent size on the screen
+	float maxWidthPortion=0.4f;//max opaque portion (0-1), for distant objects
+
+	spacevec sizeHalf=(high-low)/2.0f;
+	spacevec mid=low+sizeHalf;
+
+	spacevec interPos=mid-viewFrustum->observerPos;
+	vec3 interPosMeters=cm->toMeters(interPos);
+
+	float dist=(interPosMeters-dsp->getCamPos()).length();
+
+	float width=widthOnScreen*dist;
+	vec3 distMax=cm->toMeters(sizeHalf);
+	flt maxAbsoluteSize=distMax.x;
+	maxAbsoluteSize=distMax.y<maxAbsoluteSize?distMax.y:maxAbsoluteSize;
+	maxAbsoluteSize=distMax.z<maxAbsoluteSize?distMax.z:maxAbsoluteSize;
+	maxAbsoluteSize*=maxWidthPortion;
+
+	width=width>maxAbsoluteSize?maxAbsoluteSize:width;
+
+	vec3 distMin=distMax-vec3(width,width,width);
+
+	glPushMatrix();
+	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
+
+	glColor3f(1,1,1);
+	std::cout<<std::endl;
+	for(int i=0;i<3;i++)
+	{
+		int firCoo=1<<i;
+		int secCoo=(firCoo<<1)&7;
+		secCoo=secCoo==0?1:secCoo;
+		int terCoo=(secCoo<<1)&7;
+		terCoo=terCoo==0?1:terCoo;
+
+		for(int j=0;j<4;j++)
+		{
+			int firCooMult=(j&1)*2-1;
+			int secTerCooMult=(j&2)-1;
+			vec3 fir=convert(firCoo)*firCooMult;
+			vec3 sec=convert(secCoo)*secTerCooMult;
+			vec3 ter=convert(terCoo)*secTerCooMult;
+//			std::cout<<"AABB draw: "<<fir<<" "<<sec<<" "<<ter<<std::endl;
+
+			vec3 baseOut=(fir+sec+ter)*distMax;
+			vec3 baseIn=(fir*distMax+(sec+ter)*distMin);
+
+			vec3 arm1Out=(fir-sec+ter)*distMax;
+			vec3 arm1In=(fir*distMax+(ter-sec)*distMin);
+
+			vec3 arm2Out=(fir+sec-ter)*distMax;
+			vec3 arm2In=(fir*distMax+(sec-ter)*distMin);
+
+			glBegin(GL_TRIANGLE_FAN);
+
+			vec3
+			curVec=baseOut; glVertex3f(curVec.x,curVec.y,curVec.z);
+			curVec=arm1Out; glVertex3f(curVec.x,curVec.y,curVec.z);
+			curVec=arm1In; glVertex3f(curVec.x,curVec.y,curVec.z);
+			curVec=baseIn; glVertex3f(curVec.x,curVec.y,curVec.z);
+			curVec=arm2In; glVertex3f(curVec.x,curVec.y,curVec.z);
+			curVec=arm2Out; glVertex3f(curVec.x,curVec.y,curVec.z);
+
+			glEnd();
+		}
+	}
+
+	std::cout<<"AABB size: "<<distMax<<" "<<distMin<<" "<<width<<" "<<dist<<std::endl;
+	glPopMatrix();
+}
+
+vec3 AABB::convert(int bitvec)
+{
+	flt x=bitvec&1;
+	flt y=(bitvec&2)/2;
+	flt z=(bitvec&4)/4;
+	return vec3(x,y,z);
+}
 
 AABB::~AABB()
 {}

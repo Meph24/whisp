@@ -108,6 +108,7 @@ public:
 
 	///the non-critical interface: you can always safely use these
 
+	bool drawAABBs=false;
 	float getChunkSize();
 	spacelen getGravity();//currently a constant
 	flt toMeters(spacelen l);
