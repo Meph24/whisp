@@ -1,6 +1,7 @@
 #include "Mesh.hpp"
 #include <string>
 #include <iostream>
+#include <cmath>
 
 using std::cout;
 using std::string;
@@ -34,6 +35,19 @@ vec3 Mesh::calculateExtent()
 		max_z = (z > max_z)? z : max_z;
 	}
 	return vec3(max_x, max_y, max_z);
+}
+
+vec3 Mesh::lowestPoint() const
+{
+	vec3 low(0.0,INFINITY,0.0);
+	for (auto v : vertices)
+	{
+		if(v.y < low.y) 
+		{
+			low = v;
+		}
+	}
+	return low;
 }
 
 

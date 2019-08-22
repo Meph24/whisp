@@ -7,20 +7,23 @@
 #include "TickServiceProvider.h"
 #include "Frustum.h"
 
-ModelEntity::ModelEntity(spacevec position, const Model& model)
+ModelEntity::ModelEntity(const Model& model)
 :
 	model(model)
 {
 	surviveClearing = true;
 
-	bb = AABB(position);
-	pos = position;
 	v.set0();
 }
 
 ModelEntity::~ModelEntity()
 {}
 
+
+float ModelEntity::groundedDistance() const
+{
+	return model.groundDistance();
+}
 
 void ModelEntity::draw(	
 					Timestamp ts, 
@@ -55,7 +58,8 @@ void ModelEntity::tick
 	lastTick = t;
 	ChunkManager* cm = tsp->getChunkManager();
 
-	pos=cm->clip(pos, true);
+	//entity attribute changes go here
+
 	bb = AABB(pos, cm->fromMeters(model.extent()));
 }
 

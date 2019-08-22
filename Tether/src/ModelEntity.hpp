@@ -12,8 +12,12 @@ class ModelEntity : public Entity
 {
 	Model model;
 public:
-	ModelEntity(spacevec position, const Model& model);
+	ModelEntity(const Model& model);
 	~ModelEntity();
+
+	//temporary solution to find extent in a certain direction
+	// here the direction is hardcoded to below
+	virtual float groundedDistance() const;
 
 	virtual void draw(	Timestamp ts, 
 						Frustum* viewFrustum, 

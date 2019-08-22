@@ -66,6 +66,13 @@ vec3 Model::extent() const
 	return m_scale * m_mesh->extent();
 }
 
+float Model::groundDistance() const
+{
+	float f =  m_scale * m_mesh->lowestPoint().y;
+	std::cout << "Model Lowest Point : " << f << '\n';
+	return f;
+}
+
 void Model::drawBuffered()
 {
 	glBindVertexArray(vertexArrayObject);
@@ -118,6 +125,8 @@ void Model::drawNative()
 void Model::draw()
 {
 	glPushMatrix();
+
+	glScalef(m_scale, m_scale, m_scale);
 
 	drawNative();
 //	drawBuffered();
