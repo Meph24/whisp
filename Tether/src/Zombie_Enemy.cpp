@@ -370,13 +370,13 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 
 	if(legDmg>0.25f*totalHP)
 	{
-		sizeBB.x=characterHeightConv;
+		sizeBB.x=characterHeightConv*0.8f;
 	}
 	else
 	{
-		sizeBB.x=characterHeightConv*0.3f;
+		sizeBB.x=characterHeightConv*0.4f;
 	}
-	sizeBB.y=characterHeightConv*1.5f;
+	sizeBB.y=characterHeightConv*0.9f;
 	sizeBB.z=sizeBB.x;
 
 	v=(pos-prev)/seconds;
