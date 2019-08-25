@@ -10,6 +10,11 @@ TexParamSet::~TexParamSet()
 {
 }
 
+void TexParamSet::enableMipmap()
+{
+	mipmap=true;
+}
+
 void TexParamSet::addI(GLenum e, GLint i)
 {
 	enumI.push_back(e);
@@ -35,4 +40,5 @@ void TexParamSet::apply()
 	{
 		glTexParameterf(GL_TEXTURE_2D, enumF[i], paramF[i]);
 	}
+	if(mipmap) glGenerateMipmap(GL_TEXTURE_2D);
 }

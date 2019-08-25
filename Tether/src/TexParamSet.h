@@ -9,8 +9,10 @@ class TexParamSet
 	std::vector<GLenum> enumF;
 	std::vector<GLint> paramI;
 	std::vector<GLfloat> paramF;
+	bool mipmap=false;
 
 public:
+	void enableMipmap();//default: disabled
 	void addI(GLenum e, GLint i);
 	void addF(GLenum e, GLfloat f);
 	void apply();

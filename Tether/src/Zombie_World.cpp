@@ -194,8 +194,11 @@ void Zombie_World::loadStandardTex()
 	tps = new TexParamSet();
 	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	tps->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	tps->addF(GL_TEXTURE_MIN_FILTER, GL_LINEAR);//GL_NEAREST);
+	tps->addF(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);//GL_NEAREST);
 	tps->addF(GL_TEXTURE_MAG_FILTER, GL_LINEAR);//GL_NEAREST);
+	tps->addF(GL_TEXTURE_MAX_ANISOTROPY_EXT,16);//TODO compatibility check
+	tps->addF(GL_TEXTURE_LOD_BIAS,0);
+	tps->enableMipmap();
 
 	zombieTex = new TextureStatic2D(tps, "./res/zombie.png");
 	zombieTex->update();
