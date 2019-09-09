@@ -8,7 +8,7 @@
 
 #include "Frustum.h"
 
-#include "ChunkManager.h"
+#include "IWorld.h"
 #include "ITexture.h"
 
 
@@ -29,7 +29,7 @@ bool Frustum::inside(AABB bb)
 	return inside(&bb.low.x);
 }
 
-void Frustum::debugDraw(ITexture * tex,ChunkManager * cm)
+void Frustum::debugDraw(ITexture * tex,IWorld * w)
 {
 	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{
@@ -37,7 +37,9 @@ void Frustum::debugDraw(ITexture * tex,ChunkManager * cm)
 		vec3 rightAngle=crossProduct(normal,vec3(0,1,0));
 		rightAngle.normalize();
 		vec3 rightAngle2=crossProduct(normal,rightAngle);
-		vec3 drawPoint=normal*(planes[i].distanceInChunks-1.0f)*cm->getChunkSize();
+
+#warning "remove hard coded chunk size"
+		vec3 drawPoint=normal*(planes[i].distanceInChunks-1.0f)*16;
 
 		glEnable(GL_TEXTURE_2D);
 		tex->bind();

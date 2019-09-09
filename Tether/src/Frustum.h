@@ -12,7 +12,7 @@
 #include "DivisionPlane.h"
 #include "AABB.h"
 
-class ChunkManager;
+class IWorld;
 class ITexture;
 
 
@@ -33,7 +33,7 @@ public:
 	//5th: distance plane
 	//6th (not used with FRUSTUM_PLANE_COUNT==5): near plane: gain from it would be 0 most of the time, so not included here
 
-	void debugDraw(ITexture * tex,ChunkManager * cm);
+	void debugDraw(ITexture * tex,IWorld * w);
 
 	bool inside(spacelen * bb);
 	bool inside(AABB bb);
