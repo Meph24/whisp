@@ -11,11 +11,9 @@ public:
 	mat4(flt,flt,flt,flt,flt,flt,flt,flt,flt,flt,flt,flt,flt,flt,flt,flt);
 	~mat4();
 
-	//inline
-	flt operator[](int index);
+	flt& operator[](int index);
 };
 
-//inline
 mat4 operator_mat4(flt one);
 
 

@@ -2,7 +2,7 @@
 
 
 ICamera3D::ICamera3D():
-ml(2),alpha(0), beta(0), gamma(0)
+ml(),alpha(0), beta(0), gamma(0)
 {
 }
 

@@ -10,14 +10,8 @@
 #define SRC_MATRIXLIB_H_
 
 #include "vec3.h"
-#include "vec4.h"
-#include "mat3.h"
 #include "mat4.h"
 
-
-vec3 operator*(mat3 a, vec3 b);
-
-vec3 operator*(vec3 b, mat3 a);
 
 vec3 operator*(mat4 a, vec3 b);
 

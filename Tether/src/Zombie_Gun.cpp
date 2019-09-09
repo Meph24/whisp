@@ -57,7 +57,7 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 	float maxSpreadY=0.5f/60.0f*(1+(1.5f*120-1)*shotgun*(1+cheat*3));//9.5f;//1/60.0f;//TODO remove, test only
 	float greater=maxSpreadX>maxSpreadY?maxSpreadX:maxSpreadY;
 
-	MatrixLib2 ml(2);
+	MatrixLib2 ml;
 	ml.loadIdentity();
 
 	ml.rotatef(-cam->beta, 0, 1, 0);

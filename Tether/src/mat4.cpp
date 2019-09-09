@@ -17,8 +17,6 @@ mat4::~mat4()
 
 }
 
-
-//inline
 mat4 operator_mat4(flt one)
 {
 	return mat4
@@ -30,8 +28,7 @@ mat4 operator_mat4(flt one)
 	};
 }
 
-//inline
-flt mat4::operator[](int index)
+flt& mat4::operator[](int index)
 {
 	return mat[index];
 }
