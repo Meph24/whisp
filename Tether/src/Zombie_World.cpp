@@ -90,7 +90,12 @@ Zombie_World::Zombie_World(sf::Window * w):
 			-CONDITION_SELECTION_ACTIVE,
 			STATUS_ID_SELECTION_DOWN,
 			0);
-
+	eMap->registerAction(
+			EVENT_ID_KEY_B,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_DRAW_AABBs,
+			EVENT_VALUE_KEY_PRESSED);
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
 
 	float sensX = *cfg.getFlt("input", "sensitivityX");
@@ -186,11 +191,14 @@ void Zombie_World::render(Timestamp t)
 
 void Zombie_World::loadStandardTex()
 {
-	tps = new TexParamSet(2, 2);
+	tps = new TexParamSet();
 	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	tps->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	tps->addF(GL_TEXTURE_MIN_FILTER, GL_LINEAR);//GL_NEAREST);
+	tps->addF(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);//GL_NEAREST);
 	tps->addF(GL_TEXTURE_MAG_FILTER, GL_LINEAR);//GL_NEAREST);
+	tps->addF(GL_TEXTURE_MAX_ANISOTROPY_EXT,16);//TODO compatibility check
+	tps->addF(GL_TEXTURE_LOD_BIAS,0);
+	tps->enableMipmap();
 
 	zombieTex = new TextureStatic2D(tps, "./res/zombie.png");
 	zombieTex->update();
@@ -200,7 +208,7 @@ void Zombie_World::loadStandardTex()
 	tree->update();
 
 
-	tps2 = new TexParamSet(2, 2);
+	tps2 = new TexParamSet();
 	tps2->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	tps2->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
 	tps2->addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -380,6 +388,7 @@ void Zombie_World::doLogic()
 
 void Zombie_World::doGraphics()
 {
+	cm->drawAABBs=eMap->getStatus(STATUS_ID_DRAW_AABBs)==1;
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
 	if (player->HP < 0)
 	{

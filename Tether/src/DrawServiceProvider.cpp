@@ -81,6 +81,11 @@ void DrawServiceProvider::registerTransparentCallback(float priority,Drawable* c
 	callbackList.push_back(std::make_pair(priority,callbackRequester));
 }
 
+vec3 DrawServiceProvider::getCamPos()
+{
+	return vec3(cam->posX,cam->posY,cam->posZ);//TODO accurate for third person?
+}
+
 void DrawServiceProvider::doTransparentCallbacks(Timestamp t,Frustum * viewFrustum,ChunkManager* cm)
 {
 	std::sort(callbackList.begin(), callbackList.end());

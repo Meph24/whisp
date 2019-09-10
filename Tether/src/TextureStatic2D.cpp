@@ -45,8 +45,8 @@ void TextureStatic2D::update()
 	glGenTextures(1, &texID);		//1st Para: number of TextureIds generated ; 2nd Para array to store IDs
 	bind();
 	std::cout << "Texture " << fName<<" loaded with texID" << texID << std::endl;
-	params->apply();
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	params->apply();
 	//stbi_image_free(data);
 }
 

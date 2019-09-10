@@ -17,7 +17,7 @@
 int Zombie_Enemy::zombieCount=0;
 
 Zombie_Enemy::Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,ChunkManager * chm):
-tex(texture),ml(4),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitionAnim(0.5f,0,1)
+tex(texture),ml(),cm(chm),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitionAnim(0.5f,0,1)
 {
 	fac=FACTION_ZOMBIES;
 	acceptedConversions=FLAG_HIT_TYPE_BULLET_LIKE;
@@ -370,13 +370,13 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 
 	if(legDmg>0.25f*totalHP)
 	{
-		sizeBB.x=characterHeightConv;
+		sizeBB.x=characterHeightConv*0.8f;
 	}
 	else
 	{
-		sizeBB.x=characterHeightConv*0.3f;
+		sizeBB.x=characterHeightConv*0.4f;
 	}
-	sizeBB.y=characterHeightConv*1.5f;
+	sizeBB.y=characterHeightConv*0.9f;
 	sizeBB.z=sizeBB.x;
 
 	v=(pos-prev)/seconds;
@@ -530,7 +530,7 @@ float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, 
 	ml->translatef(xFrom, yFrom, zFrom);
 	ml->scalef(xTo - xFrom, yTo - yFrom, zTo - zFrom);
 	mat4 matOut;
-	ml->invertMatrix(ml->curMatrix, matOut.mat);
+	ml->invertMatrix(ml->curMatrix,matOut);
 
 	vec3 p1 = matOut* (cm->toMeters(projectile.pIF->posOld-pos));
 	vec3 p2 = matOut*(cm->toMeters(projectile.e->pos-pos));

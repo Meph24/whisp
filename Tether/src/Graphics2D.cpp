@@ -9,7 +9,7 @@
 Graphics2D::Graphics2D(int circleSegments,float aspectRatio, ITexture * myFont) :
 segments(circleSegments),
 stack(0),
-tps(myFont==0?2:0, myFont==0?2:0),
+tps(),
 deleteTex(true)
 {
 	if(myFont)
@@ -20,10 +20,10 @@ deleteTex(true)
 	{
 		deleteTex=true;
 
-		if (!tps.addI(GL_TEXTURE_WRAP_S, GL_REPEAT)) std::cout << "fuckshit" << std::endl;//TODO different error
-		if (!tps.addI(GL_TEXTURE_WRAP_T, GL_REPEAT)) std::cout << "fuckshit" << std::endl;
-		if (!tps.addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
-		if (!tps.addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST)) std::cout << "fuckshit" << std::endl;
+		tps.addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		tps.addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		tps.addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		tps.addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		font = new TextureStatic2D(&tps, "./res/font.png");
 		font->update();

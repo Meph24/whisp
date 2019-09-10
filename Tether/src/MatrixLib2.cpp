@@ -1,16 +1,14 @@
 #include "MatrixLib2.h"
 #include <cmath>
 
-MatrixLib2::MatrixLib2(uint8_t stacksize)
+MatrixLib2::MatrixLib2()
 {
-	matStack = new float[stacksize * 16];
 	loadIdentity();
 }
 
 
 MatrixLib2::~MatrixLib2()
 {
-	delete[] matStack;
 }
 
 
@@ -23,9 +21,9 @@ void MatrixLib2::loadIdentity()
 	}
 }
 
-void MatrixLib2::multMatrix(float * mat)
+void MatrixLib2::multMatrix(mat4 mat)
 {
-	float temp[16];
+	mat4 temp;
 	for (int x = 0; x < 4; x++)
 	{
 		for (int y = 0; y < 4; y++)
@@ -38,24 +36,7 @@ void MatrixLib2::multMatrix(float * mat)
 			temp[x * 4 + y] = sum;
 		}
 	}
-	/*
-	for (int x = 0; x < 4; x++)
-	{
-	for (int y = 0; y < 4; y++)
-	{
-	float sum = 0;
-	for (int z = 0; z < 4; z++)
-	{
-	sum += curMatrix[y * 4 + z] * mat[z * 4 + x];
-	}
-	temp[x + y * 4] = sum;
-	}
-	}
-	*/
-	for (int i = 0; i < 16; i++)
-	{
-		curMatrix[i] = temp[i];
-	}
+	curMatrix=temp;
 }
 
 void MatrixLib2::rotatef(float angle, float x, float y, float z)
@@ -68,7 +49,7 @@ void MatrixLib2::rotatef(float angle, float x, float y, float z)
 
 	//TODO normalize x,y,z
 
-	float m[16] = {
+	mat4 m = {
 		c + x*x*v, y*x*v + z*s, z*x*v - y*s, 0,
 		x*y*v - z*s, c + y*y*v, z*y*v + x*s, 0,
 		x*z*v + y*s, y*z*v - x*s, z*z*v + c, 0,
@@ -78,7 +59,7 @@ void MatrixLib2::rotatef(float angle, float x, float y, float z)
 }
 void MatrixLib2::translatef(float x, float y, float z)
 {
-	float mat[16];
+	mat4 mat;
 	//TODO optimize: directly apply to curMatrix
 	for (int i = 0; i < 16; i++)
 	{
@@ -91,15 +72,6 @@ void MatrixLib2::translatef(float x, float y, float z)
 }
 void MatrixLib2::scalef(float x, float y, float z)
 {
-	/*float mat[16];
-	for (int i = 0; i < 16; i++)
-	{
-	mat[i] = ((i % 4) == (i / 4)) ? 1 : 0;
-	}
-	mat[0] = x;
-	mat[5] = y;
-	mat[10] = z;
-	multMatrix(mat);*/
 	for (int i = 0; i < 4; i++)
 		curMatrix[i] *= x;
 
@@ -108,9 +80,8 @@ void MatrixLib2::scalef(float x, float y, float z)
 
 	for (int i = 0; i < 4; i++)
 		curMatrix[i + 8] *= z;
+
 	//TODO check optimization
-
-
 }
 #include <iostream>
 #include <iomanip>
@@ -125,150 +96,134 @@ void MatrixLib2::printMatrix()
 
 void MatrixLib2::pushMatrix()
 {
-	float * stackPtr = matStack + 16 * stack;
-	for (int i = 0; i < 16; i++)
-	{
-		stackPtr[i] = curMatrix[i];
-	}
-	stack++;
+	matStack.push_back(curMatrix);
 }
 
 void MatrixLib2::popMatrix()
 {
-	stack--;
-	float * stackPtr = matStack + 16 * stack;
-	for (int i = 0; i < 16; i++)
-	{
-		curMatrix[i] = stackPtr[i];
-	}
+	curMatrix=matStack.back();
+	matStack.pop_back();
 }
 
-void MatrixLib2::getMatrix(float * targetMem)
+bool MatrixLib2::invertMatrix(mat4 in, mat4& out)
 {
-	for (int i = 0; i < 16; i++)
-	{
-		targetMem[i] = curMatrix[i];
-	}
-}
-
-bool MatrixLib2::invertMatrix(float m[16], float invOut[16])
-{
-	float inv[16], det;
+	mat4 inv;
+	flt det;
 	int i;
 
-	inv[0] = m[5] * m[10] * m[15] -
-		m[5] * m[11] * m[14] -
-		m[9] * m[6] * m[15] +
-		m[9] * m[7] * m[14] +
-		m[13] * m[6] * m[11] -
-		m[13] * m[7] * m[10];
+	inv[0] = in[5] * in[10] * in[15] -
+		in[5] * in[11] * in[14] -
+		in[9] * in[6] * in[15] +
+		in[9] * in[7] * in[14] +
+		in[13] * in[6] * in[11] -
+		in[13] * in[7] * in[10];
 
-	inv[4] = -m[4] * m[10] * m[15] +
-		m[4] * m[11] * m[14] +
-		m[8] * m[6] * m[15] -
-		m[8] * m[7] * m[14] -
-		m[12] * m[6] * m[11] +
-		m[12] * m[7] * m[10];
+	inv[4] = -in[4] * in[10] * in[15] +
+		in[4] * in[11] * in[14] +
+		in[8] * in[6] * in[15] -
+		in[8] * in[7] * in[14] -
+		in[12] * in[6] * in[11] +
+		in[12] * in[7] * in[10];
 
-	inv[8] = m[4] * m[9] * m[15] -
-		m[4] * m[11] * m[13] -
-		m[8] * m[5] * m[15] +
-		m[8] * m[7] * m[13] +
-		m[12] * m[5] * m[11] -
-		m[12] * m[7] * m[9];
+	inv[8] = in[4] * in[9] * in[15] -
+		in[4] * in[11] * in[13] -
+		in[8] * in[5] * in[15] +
+		in[8] * in[7] * in[13] +
+		in[12] * in[5] * in[11] -
+		in[12] * in[7] * in[9];
 
-	inv[12] = -m[4] * m[9] * m[14] +
-		m[4] * m[10] * m[13] +
-		m[8] * m[5] * m[14] -
-		m[8] * m[6] * m[13] -
-		m[12] * m[5] * m[10] +
-		m[12] * m[6] * m[9];
+	inv[12] = -in[4] * in[9] * in[14] +
+		in[4] * in[10] * in[13] +
+		in[8] * in[5] * in[14] -
+		in[8] * in[6] * in[13] -
+		in[12] * in[5] * in[10] +
+		in[12] * in[6] * in[9];
 
-	inv[1] = -m[1] * m[10] * m[15] +
-		m[1] * m[11] * m[14] +
-		m[9] * m[2] * m[15] -
-		m[9] * m[3] * m[14] -
-		m[13] * m[2] * m[11] +
-		m[13] * m[3] * m[10];
+	inv[1] = -in[1] * in[10] * in[15] +
+		in[1] * in[11] * in[14] +
+		in[9] * in[2] * in[15] -
+		in[9] * in[3] * in[14] -
+		in[13] * in[2] * in[11] +
+		in[13] * in[3] * in[10];
 
-	inv[5] = m[0] * m[10] * m[15] -
-		m[0] * m[11] * m[14] -
-		m[8] * m[2] * m[15] +
-		m[8] * m[3] * m[14] +
-		m[12] * m[2] * m[11] -
-		m[12] * m[3] * m[10];
+	inv[5] = in[0] * in[10] * in[15] -
+		in[0] * in[11] * in[14] -
+		in[8] * in[2] * in[15] +
+		in[8] * in[3] * in[14] +
+		in[12] * in[2] * in[11] -
+		in[12] * in[3] * in[10];
 
-	inv[9] = -m[0] * m[9] * m[15] +
-		m[0] * m[11] * m[13] +
-		m[8] * m[1] * m[15] -
-		m[8] * m[3] * m[13] -
-		m[12] * m[1] * m[11] +
-		m[12] * m[3] * m[9];
+	inv[9] = -in[0] * in[9] * in[15] +
+		in[0] * in[11] * in[13] +
+		in[8] * in[1] * in[15] -
+		in[8] * in[3] * in[13] -
+		in[12] * in[1] * in[11] +
+		in[12] * in[3] * in[9];
 
-	inv[13] = m[0] * m[9] * m[14] -
-		m[0] * m[10] * m[13] -
-		m[8] * m[1] * m[14] +
-		m[8] * m[2] * m[13] +
-		m[12] * m[1] * m[10] -
-		m[12] * m[2] * m[9];
+	inv[13] = in[0] * in[9] * in[14] -
+		in[0] * in[10] * in[13] -
+		in[8] * in[1] * in[14] +
+		in[8] * in[2] * in[13] +
+		in[12] * in[1] * in[10] -
+		in[12] * in[2] * in[9];
 
-	inv[2] = m[1] * m[6] * m[15] -
-		m[1] * m[7] * m[14] -
-		m[5] * m[2] * m[15] +
-		m[5] * m[3] * m[14] +
-		m[13] * m[2] * m[7] -
-		m[13] * m[3] * m[6];
+	inv[2] = in[1] * in[6] * in[15] -
+		in[1] * in[7] * in[14] -
+		in[5] * in[2] * in[15] +
+		in[5] * in[3] * in[14] +
+		in[13] * in[2] * in[7] -
+		in[13] * in[3] * in[6];
 
-	inv[6] = -m[0] * m[6] * m[15] +
-		m[0] * m[7] * m[14] +
-		m[4] * m[2] * m[15] -
-		m[4] * m[3] * m[14] -
-		m[12] * m[2] * m[7] +
-		m[12] * m[3] * m[6];
+	inv[6] = -in[0] * in[6] * in[15] +
+		in[0] * in[7] * in[14] +
+		in[4] * in[2] * in[15] -
+		in[4] * in[3] * in[14] -
+		in[12] * in[2] * in[7] +
+		in[12] * in[3] * in[6];
 
-	inv[10] = m[0] * m[5] * m[15] -
-		m[0] * m[7] * m[13] -
-		m[4] * m[1] * m[15] +
-		m[4] * m[3] * m[13] +
-		m[12] * m[1] * m[7] -
-		m[12] * m[3] * m[5];
+	inv[10] = in[0] * in[5] * in[15] -
+		in[0] * in[7] * in[13] -
+		in[4] * in[1] * in[15] +
+		in[4] * in[3] * in[13] +
+		in[12] * in[1] * in[7] -
+		in[12] * in[3] * in[5];
 
-	inv[14] = -m[0] * m[5] * m[14] +
-		m[0] * m[6] * m[13] +
-		m[4] * m[1] * m[14] -
-		m[4] * m[2] * m[13] -
-		m[12] * m[1] * m[6] +
-		m[12] * m[2] * m[5];
+	inv[14] = -in[0] * in[5] * in[14] +
+		in[0] * in[6] * in[13] +
+		in[4] * in[1] * in[14] -
+		in[4] * in[2] * in[13] -
+		in[12] * in[1] * in[6] +
+		in[12] * in[2] * in[5];
 
-	inv[3] = -m[1] * m[6] * m[11] +
-		m[1] * m[7] * m[10] +
-		m[5] * m[2] * m[11] -
-		m[5] * m[3] * m[10] -
-		m[9] * m[2] * m[7] +
-		m[9] * m[3] * m[6];
+	inv[3] = -in[1] * in[6] * in[11] +
+		in[1] * in[7] * in[10] +
+		in[5] * in[2] * in[11] -
+		in[5] * in[3] * in[10] -
+		in[9] * in[2] * in[7] +
+		in[9] * in[3] * in[6];
 
-	inv[7] = m[0] * m[6] * m[11] -
-		m[0] * m[7] * m[10] -
-		m[4] * m[2] * m[11] +
-		m[4] * m[3] * m[10] +
-		m[8] * m[2] * m[7] -
-		m[8] * m[3] * m[6];
+	inv[7] = in[0] * in[6] * in[11] -
+		in[0] * in[7] * in[10] -
+		in[4] * in[2] * in[11] +
+		in[4] * in[3] * in[10] +
+		in[8] * in[2] * in[7] -
+		in[8] * in[3] * in[6];
 
-	inv[11] = -m[0] * m[5] * m[11] +
-		m[0] * m[7] * m[9] +
-		m[4] * m[1] * m[11] -
-		m[4] * m[3] * m[9] -
-		m[8] * m[1] * m[7] +
-		m[8] * m[3] * m[5];
+	inv[11] = -in[0] * in[5] * in[11] +
+		in[0] * in[7] * in[9] +
+		in[4] * in[1] * in[11] -
+		in[4] * in[3] * in[9] -
+		in[8] * in[1] * in[7] +
+		in[8] * in[3] * in[5];
 
-	inv[15] = m[0] * m[5] * m[10] -
-		m[0] * m[6] * m[9] -
-		m[4] * m[1] * m[10] +
-		m[4] * m[2] * m[9] +
-		m[8] * m[1] * m[6] -
-		m[8] * m[2] * m[5];
+	inv[15] = in[0] * in[5] * in[10] -
+		in[0] * in[6] * in[9] -
+		in[4] * in[1] * in[10] +
+		in[4] * in[2] * in[9] +
+		in[8] * in[1] * in[6] -
+		in[8] * in[2] * in[5];
 
-	det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+	det = in[0] * inv[0] + in[1] * inv[4] + in[2] * inv[8] + in[3] * inv[12];
 
 	if (det == 0)
 		return false;
@@ -276,17 +231,7 @@ bool MatrixLib2::invertMatrix(float m[16], float invOut[16])
 	det = 1.0f / det;
 
 	for (i = 0; i < 16; i++)
-		invOut[i] = inv[i] * det;
+		out[i] = inv[i] * det;
 
 	return true;
-}
-
-
-vec3 MatrixLib2::multWith(float * mat, vec3 * inp)
-{
-	vec3 ret;
-	ret.x = mat[0] * inp->x + mat[4] * inp->y + mat[8] * inp->z + mat[12];
-	ret.y = mat[1] * inp->x + mat[5] * inp->y + mat[9] * inp->z + mat[13];
-	ret.z = mat[2] * inp->x + mat[6] * inp->y + mat[10] * inp->z + mat[14];
-	return ret;
 }

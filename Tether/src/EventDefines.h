@@ -13,6 +13,7 @@
 #define EVENT_ID_KEY_F3 1111
 #define EVENT_ID_KEY_R (1024+('R'-'A'))
 #define EVENT_ID_KEY_E (1024+('E'-'A'))
+#define EVENT_ID_KEY_B (1024+('B'-'A'))
 #define EVENT_ID_KEY_ARROW_UP 1097
 #define EVENT_ID_KEY_ARROW_DOWN 1098
 
@@ -24,6 +25,7 @@
 #define CONDITION_SELECTION_ACTIVE 4
 #define STATUS_ID_SELECTION_UP 5
 #define STATUS_ID_SELECTION_DOWN 6
+#define STATUS_ID_DRAW_AABBs 7
 
 //event values
 #define EVENT_VALUE_KEY_PRESSED 1
