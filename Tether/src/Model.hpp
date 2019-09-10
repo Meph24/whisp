@@ -2,7 +2,6 @@
 #     define MODEL_HPP
 
 #include "Mesh.hpp"
-
 #include <GL/glew.h>
 
 class Model

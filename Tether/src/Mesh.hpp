@@ -29,9 +29,8 @@ struct Mesh
 		VertexIterator vertex_begin, VertexIterator vertex_end,
 		IndexIterator index_begin, IndexIterator index_end
 		)
-	:
-		vertices(vertex_begin, vertex_end),
-		indices(index_begin, index_end)
+	: vertices(vertex_begin, vertex_end)
+	, indices(index_begin, index_end)
 	{
 		vertices.shrink_to_fit();
 		indices.shrink_to_fit();
@@ -69,7 +68,6 @@ struct Mesh
 
 	TriangleIterator begin();
 	TriangleIterator end();
-
 
 	vec3 lowestPoint() const;
 

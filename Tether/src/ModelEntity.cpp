@@ -6,6 +6,7 @@
 #include "ChunkManager.h"
 #include "TickServiceProvider.h"
 #include "Frustum.h"
+#include "MatrixLib2.h"
 
 ModelEntity::ModelEntity(const Model& model)
 :
@@ -19,6 +20,35 @@ ModelEntity::ModelEntity(const Model& model)
 ModelEntity::~ModelEntity()
 {}
 
+void ModelEntity::move(spacevec d)
+{
+	this->pos += this->pos;
+}
+
+void ModelEntity::rotate(vec3 rot)
+{
+	this->m_rot += rot;
+}
+
+void ModelEntity::scale(vec3 scale)
+{
+	this->m_scale += scale;
+}
+
+vec3 ModelEntity::getRotation() const
+{
+	return m_rot;
+}
+
+vec3 ModelEntity::getScale() const
+{
+	return m_scale;
+}
+
+spacevec ModelEntity::getPos() const
+{
+	return this->pos;
+}
 
 float ModelEntity::groundedDistance() const
 {
