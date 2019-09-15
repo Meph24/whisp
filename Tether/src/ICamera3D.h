@@ -2,13 +2,16 @@
 #ifndef SRC_ICAMERA3D_H_
 #define SRC_ICAMERA3D_H_
 
+#include <glm/glm.hpp>
+using glm::vec3;
+
 #include "ICamera.h"
 #include "DivisionPlane.h"
-#include "MatrixLib2.h"
+#include "CumulativeMat.hpp"
 
 class ICamera3D: public ICamera
 {
-	MatrixLib2 ml;
+	CumulativeMat ml;
 protected:
 	float leftPart;
 	float rightPart;

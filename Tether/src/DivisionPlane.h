@@ -9,7 +9,9 @@
 #ifndef SRC_DIVISIONPLANE_H_
 #define SRC_DIVISIONPLANE_H_
 #include "Spacevec.h"
-#include "vec3.h"
+#include <iostream>
+#include <glm/glm.hpp>
+using glm::vec3;
 #include "AABB.h"
 //divides space into 2 pieces
 //optimized for telling on which side each of many AABBs are
@@ -27,5 +29,7 @@ public:
 	bool inside(spacelen * bb,spacevec observerPos);
 	bool inside(AABB bb,spacevec observerPos);
 };
+
+std::ostream& operator<< (std::ostream& os, const DivisionPlane& dp);
 
 #endif /* SRC_DIVISIONPLANE_H_ */

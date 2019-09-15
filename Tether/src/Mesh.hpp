@@ -1,7 +1,7 @@
 #ifndef MESH_HPP
 #     define MESH_HPP
 
-#include "vec3.h"
+#include <glm/glm.hpp>
 #include <iostream>
 #include <vector>
 #include <array>
@@ -10,6 +10,7 @@ using std::array;
 using std::vector;
 using std::istream;
 using std::ostream;
+using glm::vec3;
 
 
 struct Mesh

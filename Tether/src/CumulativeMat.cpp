@@ -10,6 +10,22 @@ CumulativeMat::CumulativeMat()
 	loadIdentity();
 }
 
+CumulativeMat::CumulativeMat(const glm::mat4& other)
+	: glm::mat4(other)
+{}
+
+CumulativeMat& CumulativeMat::operator=(const glm::mat4& other)
+{
+	glm::mat4& mr = *this;
+	mr = other;
+	return *this;
+}
+
+mat4& CumulativeMat::current()
+{
+	return *this;
+}
+
 void CumulativeMat::push()
 {
 	m_matstack.push_back(*this);
@@ -17,8 +33,7 @@ void CumulativeMat::push()
 
 void CumulativeMat::pop()
 {
-	mat4& mr = *this;
-	mr = m_matstack.back();
+	*this = m_matstack.back();
 	m_matstack.pop_back();
 }
 

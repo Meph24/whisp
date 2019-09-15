@@ -1,5 +1,10 @@
 #include "Zombie_Enemy.h"
 
+#include <glm/glm.hpp>
+#include "glmutils.hpp"
+using glm::vec3;
+using glm::mat4;
+
 #include "EntitySound.h"
 #include "ChunkManager.h"
 #include "Projectile.h"
@@ -319,7 +324,7 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	if(moved.fLengthSq(cm->getChunkSize())>0.0000000001f)
 	{
 		vec3 norm=cm->toMeters(moved);
-		norm.normalize();
+		glm::normalize(norm);
 		flt speedModA=(vec3(norm.x,0,norm.z).length());
 		vec3 flat=vec3(cm->toMeters(moved.x),0,cm->toMeters(moved.z));
 		flt h=cm->toMeters(moved.y)/flat.length();
@@ -343,7 +348,7 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	vec3 relPos=cm->toMeters(pos-tsp->getTarget(this)->pos);
 
 	vec3 mySpeed=cm->toMeters(v);
-	vec3 xprod=crossProduct(mySpeed,relPos);
+	vec3 xprod=glm::cross(mySpeed,relPos);
 //	float mySpdSq=mySpeed.lengthSq();
 //	if(mySpdSq==0) mySpdSq=1;
 //	facing-=seconds*xprod.y/mySpdSq*20;
@@ -393,30 +398,36 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 	DualPointer<Projectile> projConv=DualPointer<Projectile>((Entity *)projectile,(Projectile *)projectile);
 
 	ml.loadIdentity();
-	ml.rotatef(facing, 0, 1, 0);
-	ml.rotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
-	ml.scalef(size, size, size);
+	ml = ml * glm::rotateDeg(facing, vec3(0.0f, 1.0f, 0.0f))
+		    * glm::rotateDeg(	
+							fallAnim.getCurStep(0)*90, 
+							glm::vec3(1.0f, 0.0f, 0.0f)
+						 )		 
+			* glm::scale(vec3(size, size, size));
 
 
-
-
-	ml.pushMatrix();
+	ml.push();
 	float animStrength=1;
 	if(legDmg>0.25f*totalHP)
 	{
-		ml.translatef(-0.25f*transitionAnim.getCurStep(0)*maxTransition,0.1f*transitionAnim.getCurStep(0)*maxTransition,0);
-		ml.rotatef(-90*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
+		ml = glm::translate(ml, 
+							vec3( 
+								-0.25f*transitionAnim.getCurStep(0)*maxTransition,
+								0.1f*transitionAnim.getCurStep(0)*maxTransition,
+								0.0f
+								));
+		ml = glm::rotateDeg(ml, -90*transitionAnim.getCurStep(0)*maxTransition, vec3(0, 0, 1));
 		animStrength=0.15f*transitionAnim.getCurStep(0)*maxTransition;
 	}
 
-	ml.pushMatrix();//leg
+	ml.push();//leg
 	int loc;
 	float hitTime;
 	loc = 1;
-	ml.translatef(0, 0.6f, loc * 0.1f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
+	ml = glm::translate(ml, vec3(0, 0.6f, loc * 0.1f));
+	ml = glm::rotateDeg(ml, (float)sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, vec3(0, 0, 1));//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
+	ml = glm::translate(ml, vec3(0, -0.6f, 0));
+	ml = glm::scale(ml, vec3(1, 3, 1));
 
 	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if(gotHit(hitTime, 4, projectile))
@@ -425,15 +436,16 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 		cm->requestEntitySpawn(es);
 	}
 
-	ml.popMatrix();
+	ml.pop();
 
 
-	ml.pushMatrix();	//leg
+	ml.push();	//leg
 	loc = -1;
-	ml.translatef(0, 0.6f, loc * 0.1f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, 0, 0, 1);
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
+	ml = ml
+		* glm::translate(vec3(0, 0.6f, loc * 0.1f))
+		* glm::rotateDeg((float) sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, vec3(0, 0, 1))
+		* glm::translate(vec3(0, -0.6f, 0))
+		* glm::scale(vec3(1, 3, 1));
 
 	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if(gotHit(hitTime, 5, projectile))
@@ -442,23 +454,25 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 		cm->requestEntitySpawn(es);
 	}
 
-	ml.popMatrix();
-	ml.popMatrix();
+	ml.pop();
+	ml.pop();
 
 
-	ml.pushMatrix();
+	ml.push();
 
 	if(legDmg>0.25f*totalHP)
 	{
-		ml.translatef(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0);
-		ml.rotatef(-35*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
+		ml = ml
+			* glm::translate(vec3(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0))
+			* glm::rotateDeg((float)-35*transitionAnim.getCurStep(0)*maxTransition, vec3(0, 0, 1));
 	}
 
-	ml.pushMatrix();	//head
+	ml.push();	//head
 
-	ml.translatef(0, 1.2f, 0);
-	ml.scalef(2, 2, 2);
-	ml.rotatef(tilted, 1, 0, 0);
+	ml = ml 
+		* glm::translate(vec3(0, 1.2f, 0))
+		* glm::scale(vec3(2, 2, 2))
+		* glm::rotateDeg(tilted,vec3( 1, 0, 0));
 
 	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 
@@ -471,47 +485,51 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 	gotHit(hitTime, 0, projectile);
 
 
-	ml.popMatrix();
+	ml.pop();
 
 
-	ml.pushMatrix();	//body
-	ml.translatef(0, 0.6f, 0);
-	ml.scalef(1, 3, 2);
+	ml.push();	//body
+	ml = ml
+		* glm::translate(vec3(0.0f, 0.6f, 0.0f))
+		* glm::scale(vec3(1, 3, 2));
 
 	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	gotHit(hitTime, 1, projectile);
 
-	ml.popMatrix();
+	ml.pop();
 
 
 
-	ml.pushMatrix();	//arm
+	ml.push();	//arm
 	loc = 1;
 
-	ml.translatef(0, 1.1f, loc * 0.3f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
+	ml = ml 
+		* glm::translate(vec3(0, 1.1f, loc * 0.3f))
+		* glm::rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, vec3(0, 0, 1))//sin(loc*animStep * 2 *speed/size) * 16 + 90
+
+		* glm::translate(vec3(0, -0.6f, 0))
+		* glm::scale(vec3(1, 3, 1));
 
 	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	gotHit(hitTime, 2, projectile);
 
-	ml.popMatrix();
+	ml.pop();
 
-	ml.pushMatrix();	//arm
+	ml.push();	//arm
 	loc = -1;
 
-	ml.translatef(0, 1.1f, loc * 0.3f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
+	ml = ml 
+		* glm::translate(vec3(0, 1.1f, loc * 0.3f))
+		* glm::rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, vec3(0, 0, 1))
+		* glm::translate(vec3(0, -0.6f, 0))
+		* glm::scale(vec3(1, 3, 1));
 
 	hitTime = checkBox(projConv,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	gotHit(hitTime, 3, projectile);
 
-	ml.popMatrix();
+	ml.pop();
 
-	ml.popMatrix();
+	ml.pop();
 	float after=this->remainingHP;
 	if(before==after)
 	{
@@ -523,15 +541,15 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 
 
 
-float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, float xFrom, float xTo, float yFrom,float yTo, float zFrom, float zTo)
+float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,CumulativeMat* ml, float xFrom, float xTo, float yFrom,float yTo, float zFrom, float zTo)
 {
 	float ret=-1;
-	ml->pushMatrix();
-	ml->translatef(xFrom, yFrom, zFrom);
-	ml->scalef(xTo - xFrom, yTo - yFrom, zTo - zFrom);
-	mat4 matOut;
-	ml->invertMatrix(ml->curMatrix,matOut);
+	ml->push();
+	*ml = *ml 
+		* translate(vec3(xFrom, yFrom, zFrom))
+		* scale(vec3(xTo - xFrom, yTo - yFrom, zTo - zFrom));
 
+	mat4 matOut = glm::inverse( *ml );
 	vec3 p1 = matOut* (cm->toMeters(projectile.pIF->posOld-pos));
 	vec3 p2 = matOut*(cm->toMeters(projectile.e->pos-pos));
 	//projectile now relative to cube, where cube is at 0-1 on all 3 axis
@@ -570,7 +588,7 @@ float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,MatrixLib2* ml, 
 	{
 		ret = minC;
 	}
-	ml->popMatrix();
+	ml->pop();
 	return ret;
 }
 
@@ -623,28 +641,31 @@ bool Zombie_Enemy::gotHit(float time, int part, EntityProjectileBulletLike * pro
 void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm)
 {
 	ml.loadIdentity();
-	ml.rotatef(facing, 0, 1, 0);
-	ml.rotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
-	ml.scalef(size, size, size);
+	ml = ml 
+		* rotateDeg(facing,vec3( 0, 1, 0))
+		* rotateDeg(fallAnim.getCurStep(0)*90,vec3( 1, 0, 0))
+		* scale(vec3(size, size, size));
 
 
-	ml.pushMatrix();
+	ml.push();
 	float animStrength=1;
 	if(legDmg>0.25f*totalHP)
 	{
-		ml.translatef(-0.25f*transitionAnim.getCurStep(0)*maxTransition,0.1f*transitionAnim.getCurStep(0)*maxTransition,0);
-		ml.rotatef(-90*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
+		ml = ml 
+			* translate(vec3(-0.25f*transitionAnim.getCurStep(0)*maxTransition,0.1f*transitionAnim.getCurStep(0)*maxTransition,0))
+			* rotateDeg(-90*transitionAnim.getCurStep(0)*maxTransition, vec3(0, 0, 1));
 		animStrength=0.15f*transitionAnim.getCurStep(0)*maxTransition;
 	}
 
-	ml.pushMatrix();//leg
+	ml.push();//leg
 	int loc;
 	float hitTime;
 	loc = 1;
-	ml.translatef(0, 0.6f, loc * 0.1f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
+	ml = ml 
+		* translate(vec3(0, 0.6f, loc * 0.1f))
+		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength,vec3( 0, 0, 1))//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
+		* translate(vec3(0, -0.6f, 0))
+		* scale(vec3(1, 3, 1));
 
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
@@ -652,15 +673,16 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
-	ml.popMatrix();
+	ml.pop();
 
 
-	ml.pushMatrix();	//leg
+	ml.push();	//leg
 	loc = -1;
-	ml.translatef(0, 0.6f, loc * 0.1f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, 0, 0, 1);
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
+	ml = ml 
+		* translate(vec3(0, 0.6f, loc * 0.1f))
+		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength,vec3( 0, 0, 1))
+		* translate(vec3(0, -0.6f, 0))
+		* scale(vec3(1, 3, 1));
 
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
@@ -668,23 +690,25 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
-	ml.popMatrix();
-	ml.popMatrix();
+	ml.pop();
+	ml.pop();
 
 
-	ml.pushMatrix();
+	ml.push();
 
 	if(legDmg>0.25f*totalHP)
 	{
-		ml.translatef(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0);
-		ml.rotatef(-35*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
+		ml = ml 
+			* translate(vec3(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0))
+			* rotateDeg((float)-35*transitionAnim.getCurStep(0)*maxTransition,vec3( 0, 0, 1));
 	}
 
-	ml.pushMatrix();	//head
+	ml.push();	//head
 
-	ml.translatef(0, 1.2f, 0);
-	ml.scalef(2, 2, 2);
-	ml.rotatef(tilted, 1, 0, 0);
+	ml = ml	
+		* translate(vec3(0, 1.2f, 0))
+		* scale(vec3(2, 2, 2))
+		* rotateDeg(tilted, vec3(1, 0, 0));
 
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
@@ -693,12 +717,13 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	}
 
 
-	ml.popMatrix();
+	ml.pop();
 
 
-	ml.pushMatrix();	//body
-	ml.translatef(0, 0.6f, 0);
-	ml.scalef(1, 3, 2);
+	ml.push();	//body
+	ml = ml 
+		* translate(vec3(0, 0.6f, 0))
+		* scale(vec3(1, 3, 2));
 
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
@@ -706,17 +731,16 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
-	ml.popMatrix();
+	ml.pop();
 
-
-
-	ml.pushMatrix();	//arm
+	ml.push();	//arm
 	loc = 1;
 
-	ml.translatef(0, 1.1f, loc * 0.3f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
+	ml = ml 
+		* translate(vec3(0, 1.1f, loc * 0.3f))
+		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, vec3(0, 0, 1))//sin(loc*animStep * 2 *speed/size) * 16 + 90
+		* translate(vec3(0, -0.6f, 0))
+		* scale(vec3(1, 3, 1));
 
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
@@ -724,15 +748,16 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
-	ml.popMatrix();
+	ml.pop();
 
-	ml.pushMatrix();	//arm
+	ml.push();	//arm
 	loc = -1;
 
-	ml.translatef(0, 1.1f, loc * 0.3f);
-	ml.rotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);
-	ml.translatef(0, -0.6f, 0);
-	ml.scalef(1, 3, 1);
+	ml = ml 
+		* translate(vec3(0, 1.1f, loc * 0.3f))
+		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, vec3(0, 0, 1))
+		* translate(vec3(0, -0.6f, 0))
+		* scale(vec3(1, 3, 1));
 
 	hitTime = checkBox(projectile,&ml,-0.1f, 0.1f, 0, 0.2f, -0.1f, 0.1f);
 	if((hitTime>=0)&&(hitTime<=1))
@@ -740,9 +765,9 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 		collisions->push_back(ProjectileCollision(hitTime,(Entity *)this,(Hittable *) this,type,cm->activeChunk));
 	}
 
-	ml.popMatrix();
+	ml.pop();
 
-	ml.popMatrix();
+	ml.pop();
 }
 
 void Zombie_Enemy::push(spacevec amount, TickServiceProvider* tsp)

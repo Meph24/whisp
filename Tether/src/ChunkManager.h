@@ -23,6 +23,9 @@ class InteractionManager;
 #include <memory>
 #include <vector>
 
+#include <glm/glm.hpp>
+using glm::vec3;
+
 struct chunkChange
 {
 	Entity * e;
@@ -113,8 +116,9 @@ public:
 	spacelen getGravity();//currently a constant
 	flt toMeters(spacelen l);
 	vec3 toMeters(spacevec v);
-	spacelen fromMeters(flt l);
-	spacevec fromMeters(vec3 v);
+	spacelen fromMeters(flt l) const;
+
+	spacevec fromMeters(const glm::vec3& v) const;
 
 	//the partially critical interface: only call from main tick thread
 	//writing:

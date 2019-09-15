@@ -9,11 +9,17 @@
 #include "Timestamp.h"
 #include "CumulativeMat.hpp"
 
+#include <glm/glm.hpp>
+
+using glm::vec3;
+using glm::vec4;
+
 
 class ModelEntity : public Entity
 {
 	Model model;
-	vec3 m_rot, m_scale;
+
+	CumulativeMat cummat;
 public:
 	ModelEntity(const Model& model);
 	~ModelEntity();
@@ -22,9 +28,9 @@ public:
 	void rotate(vec3 rot);
 	void scale(vec3 scale);
 
-	vec3 getRotation() const;
-	vec3 getScale() const;
 	spacevec getPos() const;
+
+	vector<vec4> shape(const vec3& pos = vec3(0.0f)) const;
 
 	//temporary solution to find extent in a certain direction
 	// here the direction is hardcoded to below

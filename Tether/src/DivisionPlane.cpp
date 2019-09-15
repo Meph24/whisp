@@ -61,3 +61,10 @@ bool DivisionPlane::inside(AABB bb,spacevec observerPos)
 DivisionPlane::DivisionPlane()
 {
 }
+
+
+std::ostream& operator<< (std::ostream& os, const DivisionPlane& dp)
+{
+	os << "DivPlane : Normal[" << dp.normal << "], distanceInChunks[" << dp.distanceInChunks << "]";
+	return os;
+}

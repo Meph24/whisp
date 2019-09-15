@@ -6,6 +6,8 @@
  *     Version:	1.0
  */
 
+
+/*
 #ifndef SRC_ITEMGUN_H_
 #define SRC_ITEMGUN_H_
 
@@ -50,3 +52,5 @@ public:
 };
 
 #endif /* SRC_ITEMGUN_H_ */
+
+*/

@@ -13,6 +13,10 @@ class ChunkManager;
 #include "noise/noise.h"
 #include <SFML/Audio.hpp>
 
+#include <glm/glm.hpp>
+
+using glm::vec3;
+
 using namespace noise;
 
 class Zombie_Gun

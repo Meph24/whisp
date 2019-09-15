@@ -8,6 +8,10 @@
 
 #include "EntityPlayer.h"
 
+#include <glm/glm.hpp>
+#include "glmutils.hpp"
+using glm::vec3;
+
 #include "SpeedMod.h"
 #include "TopLevelInventory.h"
 #include "ItemDummy.h"
@@ -262,10 +266,10 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	pos=cm->clip(pos,true);
 	spacevec newPos=pos;
 	vec3 moved=cm->toMeters(newPos-oldPos);
-	if(moved.lengthSq()>0.0000000001f)
+	if(glm::sqlen(moved)>0.0000000001f)
 	{
 		vec3 norm=moved;
-		norm.normalize();
+		glm::normalize(norm);
 		flt speedModA=(vec3(norm.x,0,norm.z).length());
 		vec3 flat=vec3(moved.x,0,moved.z);
 		flt h=moved.y/flat.length();
@@ -287,7 +291,7 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 void EntityPlayer::push(spacevec amount, TickServiceProvider* tsp)
 {
 	pos+=amount;
-	HP -= 15625*(tsp->getChunkManager()->toMeters(amount).lengthSq());
+	HP -= 15625*glm::sqlen(tsp->getChunkManager()->toMeters(amount));
 }
 #include <iostream>
 void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,HittableBulletLike* victim)

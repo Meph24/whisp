@@ -67,7 +67,6 @@ void Zombie_KeyInput::walkLeft(bool enable)
 	clampMovVec();//just safety
 }
 
-#include "MatrixLib2.h"
 vec3 Zombie_KeyInput::getVelocity()
 {
 	float m11 = cos((-cam->beta) / 360 * TAU);

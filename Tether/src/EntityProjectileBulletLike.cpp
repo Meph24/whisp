@@ -15,6 +15,8 @@
 #include "Frustum.h"
 #include "ChunkManager.h"
 
+#include "glmutils.hpp"
+
 ITexture * EntityProjectileBulletLike::tex=new TextureDummy();
 
 
@@ -136,7 +138,7 @@ bool EntityProjectileBulletLike::collide(HittableBulletLike* hittable,Projectile
 	}
 	ze->checkProjectile(this,tsp);//TODO
 	//some calculations
-	float vSqBefore=tsp->getChunkManager()->toMeters(v).lengthSq();
+	float vSqBefore=glm::sqlen(tsp->getChunkManager()->toMeters(v));
 	float vSqAfter=0;//TODO
 	float deltaE=0.5*typeB.mass*(vSqBefore*vSqBefore-vSqAfter*vSqAfter);
 	float dmg=deltaE*(typeB.dmgPerJd0*(1-deformation)+typeB.dmgPerJd1*deformation);

@@ -236,7 +236,7 @@ vec3 ChunkManager::toMeters(spacevec v)
 	return ret;
 }
 
-spacelen ChunkManager::fromMeters(flt l)
+spacelen ChunkManager::fromMeters(flt l) const
 {
 	l/=chunkSize;
 	spacelen ret;
@@ -246,7 +246,7 @@ spacelen ChunkManager::fromMeters(flt l)
 	return ret;
 }
 
-spacevec ChunkManager::fromMeters(vec3 v)
+spacevec ChunkManager::fromMeters(const glm::vec3& v) const
 {
 	spacevec ret;
 	ret.x=fromMeters(v.x);
