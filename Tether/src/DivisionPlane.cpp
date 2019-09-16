@@ -50,8 +50,8 @@ bool DivisionPlane::inside(spacelen * bb,spacevec observerPos,IWorld * w)
 	relevantPoint.x=*(bb+xPtr)-observerPos.x;
 	relevantPoint.y=*(bb+yPtr)-observerPos.y;
 	relevantPoint.z=*(bb+zPtr)-observerPos.z;
-	flt dot=dotProduct(w->toMeters(relevantPoint),normal);
-	return dot<distanceInMeters;
+	flt d=glm::dot(w->toMeters(relevantPoint),normal);
+	return d<distanceInMeters;
 }
 
 bool DivisionPlane::inside(AABB bb,spacevec observerPos,IWorld * w)
@@ -61,4 +61,11 @@ bool DivisionPlane::inside(AABB bb,spacevec observerPos,IWorld * w)
 
 DivisionPlane::DivisionPlane()
 {
+}
+
+
+std::ostream& operator<< (std::ostream& os, const DivisionPlane& dp)
+{
+	os << "DivPlane : Normal[" << dp.normal << "], distanceInMeters[" << dp.distanceInMeters << "]";
+	return os;
 }

@@ -27,8 +27,9 @@ public:
 	//only allowed for RELATIVE positions/velocities:
 	flt toMeters(spacelen l);
 	vec3 toMeters(spacevec v);
-	spacelen fromMeters(flt l);
-	spacevec fromMeters(vec3 v);
+	spacelen fromMeters(flt l) const;
+	spacevec fromMeters(const glm::vec3& v) const;
+
 };
 
 #endif /* SRC_IWORLD_H_ */

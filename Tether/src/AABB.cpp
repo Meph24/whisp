@@ -12,6 +12,7 @@
 #include "ICamera3D.h"
 #include "DrawServiceProvider.h"
 #include <GL/glew.h>
+#include "glmutils.hpp"
 
 u64 AABB::intersectionCounter=0;
 u64 AABB::checkCounter=0;
@@ -167,4 +168,10 @@ vec3 AABB::convert(int bitvec)
 
 AABB::~AABB()
 {}
+
+std::ostream& operator<< (std::ostream& os, const AABB& bb)
+{
+	os << bb.low << "|" << bb.high;
+	return os;
+}
 

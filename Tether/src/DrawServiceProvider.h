@@ -9,7 +9,8 @@
 #ifndef SRC_DRAWSERVICEPROVIDER_H_
 #define SRC_DRAWSERVICEPROVIDER_H_
 
-#include "vec3.h"
+#include <glm/glm.hpp>
+using glm::vec3;
 #include "Timestamp.h"
 
 class Drawable;

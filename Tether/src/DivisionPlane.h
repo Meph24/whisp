@@ -9,7 +9,9 @@
 #ifndef SRC_DIVISIONPLANE_H_
 #define SRC_DIVISIONPLANE_H_
 #include "Spacevec.h"
-#include "vec3.h"
+#include <iostream>
+#include <glm/glm.hpp>
+using glm::vec3;
 #include "AABB.h"
 
 class IWorld;
@@ -30,5 +32,7 @@ public:
 	bool inside(spacelen * bb,spacevec observerPos,IWorld * w);
 	bool inside(AABB bb,spacevec observerPos,IWorld * w);
 };
+
+std::ostream& operator<< (std::ostream& os, const DivisionPlane& dp);
 
 #endif /* SRC_DIVISIONPLANE_H_ */

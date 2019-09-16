@@ -1,7 +1,7 @@
 #ifndef MESH_HPP
 #     define MESH_HPP
 
-#include "vec3.h"
+#include <glm/glm.hpp>
 #include <iostream>
 #include <vector>
 #include <array>
@@ -10,6 +10,7 @@ using std::array;
 using std::vector;
 using std::istream;
 using std::ostream;
+using glm::vec3;
 
 
 struct Mesh
@@ -29,9 +30,8 @@ struct Mesh
 		VertexIterator vertex_begin, VertexIterator vertex_end,
 		IndexIterator index_begin, IndexIterator index_end
 		)
-	:
-		vertices(vertex_begin, vertex_end),
-		indices(index_begin, index_end)
+	: vertices(vertex_begin, vertex_end)
+	, indices(index_begin, index_end)
 	{
 		vertices.shrink_to_fit();
 		indices.shrink_to_fit();
@@ -69,7 +69,6 @@ struct Mesh
 
 	TriangleIterator begin();
 	TriangleIterator end();
-
 
 	vec3 lowestPoint() const;
 

@@ -51,12 +51,12 @@ TEST_F(test_CfgIO, in_file_found)
 	ASSERT_FALSE(in_file.empty());
 }
 
-TEST_F(test_CfgIO, load)
+TEST_F(test_CfgIO, get)
 {
 	std::cout << "Testing on file <" << in_file << ">.\n";
 	CfgIO cfgio_in (in_file);
 	ASSERT_EQ(in_file, cfgio_in.filename());
-	Cfg in_cfg = cfgio_in.load();
+	Cfg in_cfg = cfgio_in.get();
 	{
 		const long* lp = in_cfg.getInt("k_int_0");
 		ASSERT_TRUE(lp);
@@ -113,7 +113,7 @@ TEST_F(test_CfgIO, save)
 	cfgio_out.save(out_cfg);
 
 	//read back in
-	Cfg reread = cfgio_out.load();
+	Cfg reread = cfgio_out.get();
 
 	ASSERT_TRUE(reread.getStr("s0", "k_str_0"));
 	ASSERT_TRUE(reread.getStr("s0", "k_str_1"));

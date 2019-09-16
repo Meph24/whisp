@@ -9,7 +9,13 @@
 #ifndef SRC_SPACEVEC_H_
 #define SRC_SPACEVEC_H_
 #include <cmath>
-#include "MatrixLib.h"
+#include <iostream>
+#include <string>
+#include "MathStuff.h"
+#include <glm/glm.hpp>
+#include "glmutils.hpp"
+using glm::vec3;
+
 //I must be a signed integer type
 //F must be a signed floating point type
 template<typename I,typename F>
@@ -253,10 +259,11 @@ inline double intfloat<I, F>::dSquared(double chunkSize)
 	ret*=chunkSize;
 	return ret*ret;
 }
+
 template<typename I, typename F>
-inline std::ostream& operator <<(std::ostream& out, const struct intfloat<I, F> v)
+inline std::ostream& operator<<(std::ostream& out, const struct intfloat<I, F> v)
 {
-	out<<"[ ch: "<<v.intpart<<", in: "<<v.floatpart<<" ]";
+	out << "[ ch: " << v.intpart << ", in: " << v.floatpart <<" ]";
 	return out;
 }
 

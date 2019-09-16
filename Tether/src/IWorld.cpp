@@ -35,7 +35,7 @@ vec3 IWorld::toMeters(spacevec v)
 	return ret;
 }
 
-spacelen IWorld::fromMeters(flt l)
+spacelen IWorld::fromMeters(flt l) const
 {
 	l/=gridSize;
 	spacelen ret;
@@ -45,7 +45,7 @@ spacelen IWorld::fromMeters(flt l)
 	return ret;
 }
 
-spacevec IWorld::fromMeters(vec3 v)
+spacevec IWorld::fromMeters(const glm::vec3& v) const
 {
 	spacevec ret;
 	ret.x=fromMeters(v.x);

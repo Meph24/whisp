@@ -6,6 +6,7 @@
  *     Version:	1.0
  */
 
+/*
 #include "ItemGun.h"
 
 #include "ICamera3D.h"
@@ -95,3 +96,4 @@ ItemGun::~ItemGun()
 	// TODO Auto-generated destructor stub
 }
 
+*/

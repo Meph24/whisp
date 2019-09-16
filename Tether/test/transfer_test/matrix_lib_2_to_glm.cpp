@@ -1,29 +1,33 @@
-#include "MatrixLib2.h"
-#include <cmath>
+#include "../../src/CumulativeMat.hpp"
 
-MatrixLib2::MatrixLib2()
+#include <gtest/gtest.h>
+
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
+#include <algorithm>
+
+using glm::vec3;
+
+#define TAU (float)(6.283185307179586)
+
+void MatrixLib2_loadIdentity(mat4& m)
 {
-	loadIdentity();
-}
-
-
-MatrixLib2::~MatrixLib2()
-{
-}
-
-
-
-void MatrixLib2::loadIdentity()
-{
+	const float* in = glm::value_ptr(m);
+	float curMatrix [16];
+	std::copy(in, in+16, curMatrix);
 	for (int i = 0; i < 16; i++)
 	{
 		curMatrix[i] = ((i % 4) == (i / 4)) ? 1 : 0;
 	}
+	m = glm::make_mat4x4(curMatrix);
 }
 
-void MatrixLib2::multMatrix(mat4 mat)
+void MatrixLib2_multMatrix(mat4& m1,const mat4& m2)
 {
-	mat4 temp;
+	const float* m1p = glm::value_ptr(m1);
+	const float* m2p = glm::value_ptr(m2);
+	float temp[16];
 	for (int x = 0; x < 4; x++)
 	{
 		for (int y = 0; y < 4; y++)
@@ -31,15 +35,15 @@ void MatrixLib2::multMatrix(mat4 mat)
 			float sum = 0;
 			for (int z = 0; z < 4; z++)
 			{
-				sum += curMatrix[y + z * 4] * mat[z + x * 4];
+				sum += m1p[y + z * 4] * m2p[z + x * 4];
 			}
 			temp[x * 4 + y] = sum;
 		}
 	}
-	curMatrix=temp;
+	m1 = glm::make_mat4x4(temp);
 }
 
-void MatrixLib2::rotatef(float angle, float x, float y, float z)
+void MatrixLib2_rotatef(mat4& m, float angle, float x, float y, float z)
 {
 	float angle_rad = angle * (TAU / 360.0f);//TODO change + change hard coded angles
 
@@ -49,29 +53,34 @@ void MatrixLib2::rotatef(float angle, float x, float y, float z)
 
 	//TODO normalize x,y,z
 
-	mat4 m = {
-		c + x*x*v, y*x*v + z*s, z*x*v - y*s, 0,
-		x*y*v - z*s, c + y*y*v, z*y*v + x*s, 0,
-		x*z*v + y*s, y*z*v - x*s, z*z*v + c, 0,
-		0, 0, 0, 1
-	};
-	multMatrix(m);
+	mat4 mrot (
+		c + x*x*v, y*x*v + z*s, z*x*v - y*s, 0.0f,
+		x*y*v - z*s, c + y*y*v, z*y*v + x*s, 0.0f,
+		x*z*v + y*s, y*z*v - x*s, z*z*v + c, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+		);
+	MatrixLib2_multMatrix(m, mrot);
 }
-void MatrixLib2::translatef(float x, float y, float z)
+void MatrixLib2_translatef(mat4& m, float x, float y, float z)
 {
-	mat4 mat;
+	float mattrans[16];
 	//TODO optimize: directly apply to curMatrix
 	for (int i = 0; i < 16; i++)
 	{
-		mat[i] = ((i % 4) == (i / 4)) ? 1 : 0;
+		mattrans[i] = ((i % 4) == (i / 4)) ? 1 : 0;
 	}
-	mat[12] = x;
-	mat[13] = y;
-	mat[14] = z;
-	multMatrix(mat);
+	mattrans[12] = x;
+	mattrans[13] = y;
+	mattrans[14] = z;
+
+	MatrixLib2_multMatrix(m, glm::make_mat4x4(mattrans));
 }
-void MatrixLib2::scalef(float x, float y, float z)
+
+void MatrixLib2_scalef(mat4& m, float x, float y, float z)
 {
+	const float* mp = glm::value_ptr(m);
+	float curMatrix[16];
+	std::copy(mp, mp+16, curMatrix);
 	for (int i = 0; i < 4; i++)
 		curMatrix[i] *= x;
 
@@ -81,34 +90,32 @@ void MatrixLib2::scalef(float x, float y, float z)
 	for (int i = 0; i < 4; i++)
 		curMatrix[i + 8] *= z;
 
-	//TODO check optimization
+	m = glm::make_mat4x4(curMatrix);
 }
+
 #include <iostream>
 #include <iomanip>
-void MatrixLib2::printMatrix()
+
+void MatrixLib2_printMatrix(mat4& m)
 {
+	float* vp = glm::value_ptr(m);
 	for (int i = 0; i < 4; i++)
 	{
-		std::cout << std::fixed << std::setprecision(3) << curMatrix[i] << "		" << curMatrix[i + 4] << "		" << curMatrix[i + 8] << "		" << curMatrix[i + 12] << std::endl << std::endl;
+		std::cout << std::fixed << std::setprecision(3) <<  vp[i] << " " << ((!(i % 4))? "\n" : "") << std::endl << std::endl;
 	}
-	std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
+	std::cout << std::endl << std::endl;;
 }
 
-void MatrixLib2::pushMatrix()
+bool MatrixLib2_invertMatrix(mat4 inp, mat4& o)
 {
-	matStack.push_back(curMatrix);
-}
+	float in[16];
+	float out[16];
 
-void MatrixLib2::popMatrix()
-{
-	curMatrix=matStack.back();
-	matStack.pop_back();
-}
+	const float* vp = glm::value_ptr(inp);
+	std::copy(vp, vp+16, in);
 
-bool MatrixLib2::invertMatrix(mat4 in, mat4& out)
-{
-	mat4 inv;
-	flt det;
+	float inv[16];
+	float det;
 	int i;
 
 	inv[0] = in[5] * in[10] * in[15] -
@@ -232,6 +239,103 @@ bool MatrixLib2::invertMatrix(mat4 in, mat4& out)
 
 	for (i = 0; i < 16; i++)
 		out[i] = inv[i] * det;
+	o = glm::make_mat4x4(out);
 
 	return true;
+}
+
+
+
+struct test_Transfer_CumulativeMat : public ::testing::Test
+{
+	mat4 m1, m2;
+public:
+	test_Transfer_CumulativeMat()
+		:
+			m1(1.0f),
+			m2(2.0f, 1.0f, 3.0f, 4.0f,
+			   1.0f, 5.0f, 0.5f, 1.0f,
+			   1.5f, -2.0f, 1.0f, 1.0f,
+			   10.0f,2.0f, 3.0f, 4.0f)
+	{
+	}
+	~test_Transfer_CumulativeMat()
+	{
+	}
+};
+
+TEST_F(test_Transfer_CumulativeMat, loadIdentity)
+{
+	MatrixLib2_loadIdentity(m2);
+	ASSERT_EQ(m1, m2);
+}
+
+TEST_F(test_Transfer_CumulativeMat, mult)
+{
+	m1 = mat4(2.0f, 3.0f, 4.0f, 1.5f,
+			  1.0f, 1.0f, 1.0f, 1.0f,
+			  0,0,0,0,
+			  10, 8, 6.5, 8);
+
+	mat4 ret1, ret2;
+	ret1 = m1;
+	MatrixLib2_multMatrix(ret1, m2);
+	
+	ret2 = m1 * m2;
+
+	ASSERT_EQ(ret1, ret2);
+}
+
+TEST_F(test_Transfer_CumulativeMat, rotate)
+{
+	mat4 ret1, ret2;
+
+	ret1 = m2;
+
+	vec3 norm (1,0,1);
+	norm = glm::normalize(norm);
+	MatrixLib2_rotatef(ret1, 90, norm.x, norm.y, norm.z);
+
+	ret2 = m2 * glm::rotate(glm::radians(90.0f), vec3(1, 0, 1));
+
+	ASSERT_EQ(ret1, ret2) << glm::to_string(ret1) << '\n' << glm::to_string(ret2);
+}
+
+TEST_F(test_Transfer_CumulativeMat, transfer)
+{
+	mat4 ret1, ret2;
+	ret1 = m2;
+
+	MatrixLib2_translatef(ret1, 2, 0, 2);
+
+	ret2 = glm::translate(m2, vec3(2, 0, 2));
+	ASSERT_EQ(ret1, ret2);
+}
+
+TEST_F(test_Transfer_CumulativeMat, scale)
+{
+	mat4 ret1, ret2;
+	ret1 = m2;
+
+	MatrixLib2_scalef(ret1, 2, 0, 2);
+
+	ret2 = glm::scale(m2, vec3(2, 0, 2));
+	ASSERT_EQ(ret1, ret2);
+}
+
+TEST_F(test_Transfer_CumulativeMat, inverse)
+{
+	mat4 ret1, ret2;
+	
+	MatrixLib2_invertMatrix(m2, ret1);
+
+	ret2 = glm::inverse(m2);
+
+	ASSERT_EQ(ret1, ret2);
+}
+
+int main (int argc , char** argv)
+{
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }

@@ -11,6 +11,7 @@
 #include "IWorld.h"
 #include "ITexture.h"
 
+#include <iostream>
 
 Frustum::Frustum()
 {}
@@ -34,10 +35,9 @@ void Frustum::debugDraw(ITexture * tex,IWorld * w)
 	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{
 		vec3 normal=planes[i].normal;
-		vec3 rightAngle=crossProduct(normal,vec3(0,1,0));
-		rightAngle.normalize();
-		vec3 rightAngle2=crossProduct(normal,rightAngle);
-
+		vec3 rightAngle=glm::cross(normal,vec3(0,1,0));
+		rightAngle = glm::normalize(rightAngle);
+		vec3 rightAngle2=glm::cross(normal,rightAngle);
 		vec3 drawPoint=normal*(planes[i].distanceInMeters-1.0f);
 
 		glEnable(GL_TEXTURE_2D);
