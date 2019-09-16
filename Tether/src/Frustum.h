@@ -3,7 +3,7 @@
  *
  *  Created on:	20.04.2018
  *      Author:	HL65536
- *     Version:	1.0
+ *     Version:	2.0
  */
 
 #ifndef SRC_FRUSTUM_H_
@@ -35,8 +35,8 @@ public:
 
 	void debugDraw(ITexture * tex,IWorld * w);
 
-	bool inside(spacelen * bb);
-	bool inside(AABB bb);
+	bool inside(spacelen * bb,IWorld * w);
+	bool inside(AABB bb,IWorld * w);
 	Frustum();
 	~Frustum();
 };

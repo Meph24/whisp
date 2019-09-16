@@ -93,7 +93,7 @@ void Zombie_Tree::drawLeaves()
 void Zombie_Tree::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
-	if(!viewFrustum->inside(bb)) return;
+	if(!viewFrustum->inside(bb,cm)) return;
 
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
 	vec3 interPosMeters=cm->toMeters(interPos);

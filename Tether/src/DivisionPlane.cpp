@@ -7,9 +7,10 @@
  */
 
 #include "DivisionPlane.h"
+#include "IWorld.h"
 
 DivisionPlane::DivisionPlane(vec3 Normal,flt Dist):
-normal(Normal),distanceInChunks(Dist)
+normal(Normal),distanceInMeters(Dist)
 {
 	AABB test;
 	spacelen * ref=&(test.low.x);
@@ -43,19 +44,19 @@ DivisionPlane::~DivisionPlane()
 {
 }
 
-bool DivisionPlane::inside(spacelen * bb,spacevec observerPos)
+bool DivisionPlane::inside(spacelen * bb,spacevec observerPos,IWorld * w)
 {
 	spacevec relevantPoint;
 	relevantPoint.x=*(bb+xPtr)-observerPos.x;
 	relevantPoint.y=*(bb+yPtr)-observerPos.y;
 	relevantPoint.z=*(bb+zPtr)-observerPos.z;
-	flt dot=relevantPoint.dot(normal);
-	return dot<distanceInChunks;
+	flt dot=dotProduct(w->toMeters(relevantPoint),normal);
+	return dot<distanceInMeters;
 }
 
-bool DivisionPlane::inside(AABB bb,spacevec observerPos)
+bool DivisionPlane::inside(AABB bb,spacevec observerPos,IWorld * w)
 {
-	return inside(&bb.low.x,observerPos);
+	return inside(&bb.low.x,observerPos,w);
 }
 
 DivisionPlane::DivisionPlane()

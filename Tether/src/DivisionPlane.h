@@ -11,6 +11,9 @@
 #include "Spacevec.h"
 #include "vec3.h"
 #include "AABB.h"
+
+class IWorld;
+
 //divides space into 2 pieces
 //optimized for telling on which side each of many AABBs are
 class DivisionPlane
@@ -20,12 +23,12 @@ class DivisionPlane
 	int zPtr;
 public:
 	vec3 normal;
-	flt distanceInChunks;
+	flt distanceInMeters;
 	DivisionPlane();
 	DivisionPlane(vec3 Normal,flt Dist);
 	~DivisionPlane();
-	bool inside(spacelen * bb,spacevec observerPos);
-	bool inside(AABB bb,spacevec observerPos);
+	bool inside(spacelen * bb,spacevec observerPos,IWorld * w);
+	bool inside(AABB bb,spacevec observerPos,IWorld * w);
 };
 
 #endif /* SRC_DIVISIONPLANE_H_ */

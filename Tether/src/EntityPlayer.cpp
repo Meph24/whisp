@@ -226,10 +226,6 @@ Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestri
 	{
 		ret->planes[5]=cam->getNearPlane();
 	}
-	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
-	{
-		ret->planes[i].distanceInChunks/=cm->getChunkSize();
-	}
 	return ret;
 }
 #include "EventDefines.h"

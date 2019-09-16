@@ -3,7 +3,7 @@
  *
  *  Created on:	20.04.2018
  *      Author:	HL65536
- *     Version:	1.0
+ *     Version:	2.0
  */
 
 #include "Frustum.h"
@@ -15,18 +15,18 @@
 Frustum::Frustum()
 {}
 
-bool Frustum::inside(spacelen* bb)
+bool Frustum::inside(spacelen* bb,IWorld * w)
 {
 	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{
-		if(!planes[i].inside(bb,observerPos)) return false;
+		if(!planes[i].inside(bb,observerPos,w)) return false;
 	}
 	return true;
 }
 
-bool Frustum::inside(AABB bb)
+bool Frustum::inside(AABB bb,IWorld * w)
 {
-	return inside(&bb.low.x);
+	return inside(&bb.low.x,w);
 }
 
 void Frustum::debugDraw(ITexture * tex,IWorld * w)
@@ -38,8 +38,7 @@ void Frustum::debugDraw(ITexture * tex,IWorld * w)
 		rightAngle.normalize();
 		vec3 rightAngle2=crossProduct(normal,rightAngle);
 
-#warning "remove hard coded chunk size"
-		vec3 drawPoint=normal*(planes[i].distanceInChunks-1.0f)*16;
+		vec3 drawPoint=normal*(planes[i].distanceInMeters-1.0f);
 
 		glEnable(GL_TEXTURE_2D);
 		tex->bind();

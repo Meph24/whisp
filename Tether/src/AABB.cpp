@@ -85,7 +85,7 @@ bool AABB::isMultichunk()
 
 void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
 {
-	if(!viewFrustum->inside(*(this))) return;
+	if(!viewFrustum->inside(*(this),cm)) return;
 	float widthOnScreen=1.0f/1024;//apparent size on the screen
 	float maxWidthPortion=0.4f;//max opaque portion (0-1), for distant objects
 
@@ -112,7 +112,7 @@ void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceP
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
 
 	glColor3f(1,1,1);
-	std::cout<<std::endl;
+//	std::cout<<std::endl;
 	for(int i=0;i<3;i++)
 	{
 		int firCoo=1<<i;
@@ -153,7 +153,7 @@ void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceP
 		}
 	}
 
-	std::cout<<"AABB size: "<<distMax<<" "<<distMin<<" "<<width<<" "<<dist<<std::endl;
+//	std::cout<<"AABB size: "<<distMax<<" "<<distMin<<" "<<width<<" "<<dist<<std::endl;
 	glPopMatrix();
 }
 

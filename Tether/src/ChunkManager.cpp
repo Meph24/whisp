@@ -81,7 +81,7 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 		for(int runx = startX ; runx<stopX ; runx++)
 		{
 			int indx=runz*chunksPerAxis+runx;
-			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb))
+			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb,this))
 			{
 				float distX=(runx-midX);
 				if (distX<0) distX=-distX;

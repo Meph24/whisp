@@ -238,7 +238,11 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
-	if(!viewFrustum->inside(bb)) return;
+	if(!viewFrustum->inside(bb,cm))
+	{
+//		std::cout<<"zombie outside view"<<std::endl;//use this to test Frustum Culling
+		return;
+	}
 
 	bodyAnim.updateTemp(tickOffset);
 	if(legDmg>0.25f*totalHP)
