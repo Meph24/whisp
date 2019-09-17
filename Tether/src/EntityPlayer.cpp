@@ -264,11 +264,10 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	vec3 moved=cm->toMeters(newPos-oldPos);
 	if(glm::sqlen(moved)>0.0000000001f)
 	{
-		vec3 norm=moved;
-		glm::normalize(norm);
-		flt speedModA=(vec3(norm.x,0,norm.z).length());
+		vec3 norm=glm::normalize(moved);
+		flt speedModA=(glm::length(vec3(norm.x,0,norm.z)));
 		vec3 flat=vec3(moved.x,0,moved.z);
-		flt h=moved.y/flat.length();
+		flt h=moved.y/glm::length(flat);
 		SpeedMod sm=SpeedMod();
 		flt speedModB=sm.slowdownFromTerrain(h);
 		pos=cm->clip(oldPos+cm->fromMeters(flat*speedModA*speedModB),true);

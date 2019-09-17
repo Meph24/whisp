@@ -2,9 +2,18 @@
 #     define GLMUTILS_HPP
 
 #include <glm/glm.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #include <glm/ext.hpp>
+#pragma GCC diagnostic pop
+//TODO find out why it is throwing lots of warnings with -O3 (instead of just ignoring them)
 
 #include <iostream>
+
+using glm::vec3;
+using glm::mat4;
+using glm::inverse;
 
 namespace glm
 {
@@ -18,12 +27,6 @@ inline float sqlen(const glm::vec3& vec)
 
 inline glm::vec3 operator*(mat4 m,vec3 b)
 {
-	//float* mat = glm::value_ptr(m);
-	//glm::vec3 ret;
-	//ret.x = mat[0] * b.x + mat[4] * b.y + mat[8] * b.z + mat[12];
-	//ret.y = mat[1] * b.x + mat[5] * b.y + mat[9] * b.z + mat[13];
-	//ret.z = mat[2] * b.x + mat[6] * b.y + mat[10] * b.z + mat[14];
-	//return ret
 	vec4 temp = m*vec4(b.x, b.y, b.z, 1.0f);
 	return vec3(temp.x, temp.y, temp.z);
 }

@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include <cmath>
-#include <glm/ext.hpp>
+#include "glmutils.hpp"
 
 using std::cout;
 using std::string;

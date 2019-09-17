@@ -2,8 +2,6 @@
 
 #include <glm/glm.hpp>
 #include "glmutils.hpp"
-using glm::vec3;
-using glm::mat4;
 
 #include "EntitySound.h"
 #include "ChunkManager.h"
@@ -328,10 +326,10 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	if(moved.fLengthSq(cm->getChunkSize())>0.0000000001f)
 	{
 		vec3 norm=cm->toMeters(moved);
-		glm::normalize(norm);
-		flt speedModA=(vec3(norm.x,0,norm.z).length());
+		norm=glm::normalize(norm);
+		flt speedModA=glm::length(vec3(norm.x,0,norm.z));
 		vec3 flat=vec3(cm->toMeters(moved.x),0,cm->toMeters(moved.z));
-		flt h=cm->toMeters(moved.y)/flat.length();
+		flt h=cm->toMeters(moved.y)/glm::length(flat);
 		SpeedMod sm=SpeedMod();
 		flt speedModB=sm.slowdownFromTerrain(h);
 		if(chunkBorder)
@@ -553,7 +551,7 @@ float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,CumulativeMat* m
 		* translate(vec3(xFrom, yFrom, zFrom))
 		* scale(vec3(xTo - xFrom, yTo - yFrom, zTo - zFrom));
 
-	mat4 matOut = glm::inverse( *ml );
+	mat4 matOut = glm::inverse( (mat4)*ml );
 	vec3 p1 = matOut* (cm->toMeters(projectile.pIF->posOld-pos));
 	vec3 p2 = matOut*(cm->toMeters(projectile.e->pos-pos));
 	//projectile now relative to cube, where cube is at 0-1 on all 3 axis

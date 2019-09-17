@@ -1,7 +1,7 @@
 #include "CumulativeMat.hpp"
 
 #include <sstream>
-#include <glm/ext.hpp>
+#include "glmutils.hpp"
 
 using std::stringstream;
 
@@ -10,13 +10,13 @@ CumulativeMat::CumulativeMat()
 	loadIdentity();
 }
 
-CumulativeMat::CumulativeMat(const glm::mat4& other)
-	: glm::mat4(other)
+CumulativeMat::CumulativeMat(const mat4& other)
+	: mat4(other)
 {}
 
-CumulativeMat& CumulativeMat::operator=(const glm::mat4& other)
+CumulativeMat& CumulativeMat::operator=(const mat4& other)
 {
-	glm::mat4& mr = *this;
+	mat4& mr = *this;
 	mr = other;
 	return *this;
 }
@@ -74,6 +74,6 @@ string CumulativeMat::stackString() const
 
 ostream& operator<< (ostream& os, const CumulativeMat& m)
 {
-	os << glm::to_string(m);
+	os << glm::to_string((mat4)m);
 	return os;
 }
