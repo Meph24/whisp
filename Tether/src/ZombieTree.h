@@ -19,18 +19,18 @@ class Zombie_Tree: public Entity
 {
 	void drawLog();
 	void drawLeaves();
-	flt dLeaves = 6;// >=1
-	flt rootSize = 8;
+	float dLeaves = 6;// >=1
+	float rootSize = 8;
 public:
-	flt d;
-	flt h;
+	float d;
+	float h;
 
 	ITexture * tex1;
 	ITexture * tex2;
 
 
 	Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves);
-	Zombie_Tree(spacevec position, flt diameter, flt height, flt diameterLeaves, ITexture* textureLog, ITexture* textureLeaves);
+	Zombie_Tree(spacevec position, float diameter, float height, float diameterLeaves, ITexture* textureLog, ITexture* textureLeaves);
 	~Zombie_Tree();
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);

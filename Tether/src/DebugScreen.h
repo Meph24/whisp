@@ -24,7 +24,7 @@ public:
 	~DebugScreen();
 
 
-	int draw(flt x,flt y,flt z,int lineOffset);
+	int draw(float x,float y,float z,int lineOffset);
 };
 
 #endif /* SRC_DEBUGSCREEN_H_ */

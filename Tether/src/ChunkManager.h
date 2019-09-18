@@ -47,15 +47,15 @@ class ChunkManager: public IWorld
 	Chunk ** chunksBuf1;
 	Chunk ** chunksBuf2;
 
-	chunkNum lowX;//chunk coordinate of first chunk
-	chunkNum lowZ;
+	gridInt lowX;//chunk coordinate of first chunk
+	gridInt lowZ;
 
 	int renderDistanceChunks;
 
 	int lockChunkSizeX;
 	int lockChunkSizeZ;
-	chunkNum lockChunkStartX;
-	chunkNum lockChunkStartZ;
+	gridInt lockChunkStartX;
+	gridInt lockChunkStartZ;
 	int lockChunksPerAxisX;
 	int lockChunksPerAxisZ;
 
@@ -70,8 +70,8 @@ class ChunkManager: public IWorld
 
 	int getIndxOrNeg1(spacevec abs);
 	int getIndx(spacevec abs);
-	int getIndx(chunkNum cx,chunkNum cz);//from absolute chunk coordinates
-	int getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ);//from absolute chunk coordinates
+	int getIndx(gridInt cx,gridInt cz);//from absolute chunk coordinates
+	int getIndx(gridInt cx,gridInt cz,gridInt newLowX,gridInt newLowZ);//from absolute chunk coordinates
 	chunkSearchResult chunkSearch(Entity * e,int chunkIndx);//index -1=not found
 
 	//search results are only valid right after acquisition
@@ -79,11 +79,11 @@ class ChunkManager: public IWorld
 	chunkSearchResult smartSearch(Entity * e,spacevec pos);//index -1=not found
 	chunkSearchResult trySmartSearch(Entity * e,spacevec pos,bool reportWarn);//uses dumb search and report warning (if reportWarn), if not found with smart search; index -1=not found
 
-	bool isValid(chunkNum cx,chunkNum cz);
+	bool isValid(gridInt cx,gridInt cz);
 
 	void correctLockChunks();//does nothing if already correct
 
-	bool tryCreateChunk(chunkNum cx,chunkNum cz);
+	bool tryCreateChunk(gridInt cx,gridInt cz);
 	bool insideLimits(int x,int z,int maxX,int maxZ);
 
 	//TODO void deleteChunk()
@@ -110,7 +110,6 @@ public:
 	///the non-critical interface: you can always safely use these
 
 	bool drawAABBs=false;
-	float getChunkSize();
 	spacelen getGravity();//currently a constant
 
 	//the partially critical interface: only call from main tick thread

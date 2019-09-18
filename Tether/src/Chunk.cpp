@@ -11,7 +11,7 @@
 #include "InteractionManager.h"
 #include "Entity.h"
 
-spacelen Chunk::getHeight(flt xh, flt zh)
+spacelen Chunk::getHeight(float xh, float zh)
 {
 	if(xh<0) return defaultH*2.0f;
 	if(zh<0) return defaultH*2.0f;

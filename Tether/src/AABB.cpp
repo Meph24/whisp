@@ -100,7 +100,7 @@ void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceP
 
 	float width=widthOnScreen*dist;
 	vec3 distMax=cm->toMeters(sizeHalf);
-	flt maxAbsoluteSize=distMax.x;
+	float maxAbsoluteSize=distMax.x;
 	maxAbsoluteSize=distMax.y<maxAbsoluteSize?distMax.y:maxAbsoluteSize;
 	maxAbsoluteSize=distMax.z<maxAbsoluteSize?distMax.z:maxAbsoluteSize;
 	maxAbsoluteSize*=maxWidthPortion;
@@ -160,9 +160,9 @@ void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceP
 
 vec3 AABB::convert(int bitvec)
 {
-	flt x=bitvec&1;
-	flt y=(bitvec&2)/2;
-	flt z=(bitvec&4)/4;
+	float x=bitvec&1;
+	float y=(bitvec&2)/2;
+	float z=(bitvec&4)/4;
 	return vec3(x,y,z);
 }
 

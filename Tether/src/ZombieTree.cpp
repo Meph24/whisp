@@ -19,7 +19,7 @@
 Zombie_Tree::Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves):
 tex1(textureLog),tex2(textureLeaves)
 {
-	surviveClearing=true;
+	surviveClearing=true;//TODO debug despawning
 	bb=AABB(position);
 	pos=position;
 	v.set0();
@@ -27,7 +27,7 @@ tex1(textureLog),tex2(textureLeaves)
 	h = 18;
 }
 
-Zombie_Tree::Zombie_Tree(spacevec position, flt diameter, flt height, flt diameterLeavse,  ITexture* textureLog, ITexture* textureLeaves):
+Zombie_Tree::Zombie_Tree(spacevec position, float diameter, float height, float diameterLeavse,  ITexture* textureLog, ITexture* textureLeaves):
 d(diameter),h(height+8),tex1(textureLog),tex2(textureLeaves)
 {
 	surviveClearing=true;
@@ -39,7 +39,7 @@ d(diameter),h(height+8),tex1(textureLog),tex2(textureLeaves)
 
 void Zombie_Tree::drawLog()
 {
-	flt r = d/2;
+	float r = d/2;
 	glBegin(GL_TRIANGLE_FAN);
 
 	glTexCoord2f(0,0);
@@ -65,7 +65,7 @@ void Zombie_Tree::drawLog()
 
 void Zombie_Tree::drawLeaves()
 {
-	flt r = d*dLeaves;
+	float r = d*dLeaves;
 	glBegin(GL_TRIANGLE_FAN);
 
 	glTexCoord2f(0,0);

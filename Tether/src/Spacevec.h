@@ -8,7 +8,7 @@
 
 #ifndef SRC_SPACEVEC_H_
 #define SRC_SPACEVEC_H_
-#include <cmath>
+
 #include <iostream>
 #include <string>
 #include "MathStuff.h"
@@ -50,9 +50,7 @@ struct intfloat
 	bool operator!=(intfloat<I,F> other);
 	bool operator==(intfloat<I,F> other);
 
-	float fSquared(float chunkSize);
-	double dSquared(double chunkSize);
-
+	bool equalsZero();//tiny epsilon tolerance
 };
 
 template<typename I, typename F>
@@ -95,48 +93,30 @@ template<typename I, typename F>
 inline bool intfloat<I, F>::operator <(intfloat<I, F> other)
 {
 	return (intpart<other.intpart)||((intpart==other.intpart)&&(floatpart<other.floatpart));
-	//if(intpart<other.intpart) return true;
-	//if(intpart==other.intpart)
-	//	if(floatpart<other.floatpart) return true;
-	//return false;
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator <=(intfloat<I, F> other)
 {
 	return (intpart<other.intpart)||((intpart==other.intpart)&&(floatpart<=other.floatpart));
-	//if(intpart<other.intpart) return true;
-	//if(intpart==other.intpart)
-	//	if(floatpart<=other.floatpart) return true;
-	//return false;
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator >(intfloat<I, F> other)
 {
 	return (intpart>other.intpart)||((intpart==other.intpart)&&(floatpart>other.floatpart));
-	//if(intpart>other.intpart) return true;
-	//if(intpart==other.intpart)
-	//	if(floatpart>other.floatpart) return true;
-	//return false;
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator >=(intfloat<I, F> other)
 {
 	return (intpart>other.intpart)||((intpart==other.intpart)&&(floatpart>=other.floatpart));
-	//if(intpart>other.intpart) return true;
-	//if(intpart==other.intpart)
-	//	if(floatpart>=other.floatpart) return true;
-	//return false;
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator !=(intfloat<I, F> other)
 {
 	return (intpart!=other.intpart)||(floatpart!=other.floatpart);
-	//if(intpart!=other.intpart) return true;
-	//return floatpart!=other.floatpart;
 }
 
 template<typename I, typename F>
@@ -213,34 +193,15 @@ template<typename I, typename F>
 inline bool intfloat<I, F>::operator ==(intfloat<I, F> other)
 {
 	return (intpart==other.intpart)&&(floatpart==other.floatpart);
-	//if(intpart!=other.intpart) return false;
-	//return floatpart==other.floatpart;
-}
-
-
-template<typename I, typename F>
-inline float intfloat<I, F>::fSquared(float chunkSize)
-{
-	float ret=intpart;
-	ret+=floatpart;
-	ret*=chunkSize;
-	return ret*ret;
 }
 
 template<typename I, typename F>
 inline void intfloat<I, F>::correct()
 {
-	//intfloat<I, F> debugBefore=*this;
-
 	I change=(I)floatpart;
 	change-=(floatpart<0);
-	//if(floatpart<0) change--;
 	intpart+=change;
 	floatpart-=change;
-
-	//intfloat<I, F> debugAfter=*this;
-	//if(debugBefore.floatpart<-10000 || debugBefore.floatpart>10000 || debugBefore.intpart<-10000 ||debugAfter.intpart<-10000)
-	//	std::cout<<"suspiciously large coordinate, before: "<<debugBefore<<" after:  "<<debugAfter<<std::endl;
 }
 
 template<typename I, typename F>
@@ -252,19 +213,19 @@ inline void intfloat<I, F>::correctPos()
 }
 
 template<typename I, typename F>
-inline double intfloat<I, F>::dSquared(double chunkSize)
-{
-	double ret=intpart;
-	ret+=floatpart;
-	ret*=chunkSize;
-	return ret*ret;
-}
-
-template<typename I, typename F>
 inline std::ostream& operator<<(std::ostream& out, const struct intfloat<I, F> v)
 {
 	out << "[ ch: " << v.intpart << ", in: " << v.floatpart <<" ]";
 	return out;
+}
+
+template<typename I, typename F>
+inline bool intfloat<I, F>::equalsZero()
+{
+	if(intpart!=0) return false;
+	if(floatpart>0.0000000001f) return false;
+	if(floatpart<-0.0000000001f) return false;
+	return true;
 }
 
 template<typename I,typename F>
@@ -295,15 +256,16 @@ struct vec3if
 	unsigned int operator<(vec3if<I,F> other);
 	unsigned int operator>(vec3if<I,F> other);
 
+	bool equalsZero();//tiny epsilon tolerance
+	intfloat<I,F> lengthHP();//gives the length using high precision (currently: double)
+	intfloat<I,F> lengthLP();//gives the length using low precision (currently: float)
 
-	float fLengthSq(float chunkSize);
-	double dLengthSq(double chunkSize);
-	float fLength(float chunkSize);
-	double dLength(double chunkSize);
+	template<typename P>
+	intfloat<I,F> lengthTP();//gives the length using the given precision, as long as sqrt() exists for that precision
 
 	void set0();
 
-	flt dot(vec3 v);//use only if already relativized, otherwise precision problems
+	float dot(vec3 v);//use only if already relativized, otherwise precision problems
 
 };
 
@@ -347,25 +309,41 @@ inline void vec3if<I, F>::operator -=(vec3if<I, F> other)
 	z-=other.z;
 }
 
-
 template<typename I, typename F>
-inline float vec3if<I, F>::fLengthSq(float chunkSize)
+inline bool vec3if<I, F>::equalsZero()
 {
-	return x.fSquared(chunkSize)+y.fSquared(chunkSize)+z.fSquared(chunkSize);
+	return x.equalsZero()&&y.equalsZero()&&z.equalsZero();
 }
 
 template<typename I, typename F>
-inline double vec3if<I, F>::dLengthSq(double chunkSize)
+template<typename P>
+inline intfloat<I,F> vec3if<I,F>::lengthTP()
 {
-	return x.dSquared(chunkSize)+y.dSquared(chunkSize)+z.dSquared(chunkSize);
+	intfloat<I,F> ret;
+	P r=0,
+	temp=(P)x.intpart+(P)x.floatpart;
+	r+=temp*temp;
+	temp=(P)y.intpart+(P)y.floatpart;
+	r+=temp*temp;
+	temp=(P)z.intpart+(P)z.floatpart;
+	r+=temp*temp;
+	r=sqrt(r);
+	ret.intpart=(I)r;
+	ret.floatpart=r-ret.intpart;
+	return ret;
 }
 
 template<typename I, typename F>
-inline float vec3if<I, F>::fLength(float chunkSize)
+inline intfloat<I,F> vec3if<I,F>::lengthHP()
 {
-	return sqrt(fLengthSq(chunkSize));
+	return lengthTP<double>();
 }
 
+template<typename I, typename F>
+inline intfloat<I,F> vec3if<I,F>::lengthLP()
+{
+	return lengthTP<float>();
+}
 template<typename I, typename F>
 inline vec3if<I, F> vec3if<I, F>::operator *(double scalar)
 {
@@ -443,21 +421,15 @@ inline unsigned int vec3if<I, F>::operator >(vec3if<I, F> other)
 }
 
 template<typename I, typename F>
-inline double vec3if<I, F>::dLength(double chunkSize)
-{
-	return sqrt(dLengthSq(chunkSize));
-}
-
-template<typename I, typename F>
 inline std::ostream& operator <<(std::ostream& out, const struct vec3if<I, F> v)
 {
 	out<<"\nx: "<<v.x<<"\ny: "<<v.y<<"\nz: "<<v.z<<"\n";
 	return out;
 }
 
-typedef int chunkNum;
-typedef intfloat<chunkNum,flt> spacelen;
-typedef vec3if<chunkNum, flt> spacevec;
+typedef int gridInt;
+typedef intfloat<gridInt,float> spacelen;
+typedef vec3if<gridInt, float> spacevec;
 
 template<typename I, typename F>
 inline vec3if<I, F> vec3if<I, F>::operator -()
@@ -484,9 +456,9 @@ inline void vec3if<I, F>::set0()
 }
 
 template<typename I, typename F>
-inline flt vec3if<I, F>::dot(vec3 v)
+inline float vec3if<I, F>::dot(vec3 v)
 {
-	flt ret=v.x*x.floatpart;
+	float ret=v.x*x.floatpart;
 	ret+=v.x*x.intpart;
 	ret+=v.y*y.floatpart;
 	ret+=v.y*y.intpart;

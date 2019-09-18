@@ -11,7 +11,6 @@
 IWorld::IWorld()
 {
 	// TODO Auto-generated constructor stub
-
 }
 
 IWorld::~IWorld()
@@ -19,9 +18,16 @@ IWorld::~IWorld()
 	// TODO Auto-generated destructor stub
 }
 
-flt IWorld::toMeters(spacelen l)
+float IWorld::toMeters(spacelen l)
 {
-	flt ret=l.floatpart;
+	float ret=l.floatpart;
+	ret+=l.intpart;
+	ret*=gridSize;
+	return ret;
+}
+double IWorld::toMetersD(spacelen l)
+{
+	double ret=l.floatpart;
 	ret+=l.intpart;
 	ret*=gridSize;
 	return ret;
@@ -35,7 +41,7 @@ vec3 IWorld::toMeters(spacevec v)
 	return ret;
 }
 
-spacelen IWorld::fromMeters(flt l) const
+spacelen IWorld::fromMeters(float l) const
 {
 	l/=gridSize;
 	spacelen ret;
