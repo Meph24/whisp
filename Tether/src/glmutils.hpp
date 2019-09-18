@@ -8,7 +8,7 @@
 #include <glm/ext.hpp>
 #pragma GCC diagnostic pop
 //TODO find out why it is throwing lots of warnings with -O3 (instead of just ignoring them)
-//This warning only happens on windows
+//This only happens with one specific setup (windows, eclipse, mingw)
 
 #include <iostream>
 
