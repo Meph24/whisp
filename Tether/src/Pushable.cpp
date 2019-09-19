@@ -12,6 +12,10 @@
 #include "InteractionManager.h"
 #include "ChunkManager.h"
 
+#include <glm/glm.hpp>
+
+using glm::vec3;
+
 void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, TickServiceProvider* tsp)
 {
 	ChunkManager * cm=tsp->getChunkManager();

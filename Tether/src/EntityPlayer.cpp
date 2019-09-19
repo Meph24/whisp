@@ -8,6 +8,10 @@
 
 #include "EntityPlayer.h"
 
+#include <glm/glm.hpp>
+#include "glmutils.hpp"
+using glm::vec3;
+
 #include "SpeedMod.h"
 #include "TopLevelInventory.h"
 #include "ItemDummy.h"
@@ -226,10 +230,6 @@ Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestri
 	{
 		ret->planes[5]=cam->getNearPlane();
 	}
-	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
-	{
-		ret->planes[i].distanceInChunks/=cm->getChunkSize();
-	}
 	return ret;
 }
 #include "EventDefines.h"
@@ -262,13 +262,12 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	pos=cm->clip(pos,true);
 	spacevec newPos=pos;
 	vec3 moved=cm->toMeters(newPos-oldPos);
-	if(moved.lengthSq()>0.0000000001f)
+	if(glm::sqlen(moved)>0.0000000001f)
 	{
-		vec3 norm=moved;
-		norm.normalize();
-		flt speedModA=(vec3(norm.x,0,norm.z).length());
+		vec3 norm=glm::normalize(moved);
+		flt speedModA=(glm::length(vec3(norm.x,0,norm.z)));
 		vec3 flat=vec3(moved.x,0,moved.z);
-		flt h=moved.y/flat.length();
+		flt h=moved.y/glm::length(flat);
 		SpeedMod sm=SpeedMod();
 		flt speedModB=sm.slowdownFromTerrain(h);
 		pos=cm->clip(oldPos+cm->fromMeters(flat*speedModA*speedModB),true);
@@ -287,7 +286,7 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 void EntityPlayer::push(spacevec amount, TickServiceProvider* tsp)
 {
 	pos+=amount;
-	HP -= 15625*(tsp->getChunkManager()->toMeters(amount).lengthSq());
+	HP -= 15625*glm::sqlen(tsp->getChunkManager()->toMeters(amount));
 }
 #include <iostream>
 void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,HittableBulletLike* victim)

@@ -9,7 +9,9 @@
 #ifndef SRC_RECOILMANAGER_H_
 #define SRC_RECOILMANAGER_H_
 
-#include "vec3.h"
+#include <glm/glm.hpp>
+
+using glm::vec3;
 
 class RecoilManager
 {

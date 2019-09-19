@@ -9,6 +9,8 @@
 #ifndef SRC_AABB_H_
 #define SRC_AABB_H_
 
+#include <iostream>
+
 #include "Drawable.h"
 
 #include "Spacevec.h"
@@ -39,5 +41,7 @@ public:
 	AABB(spacevec pos,spacevec sizeFromMid,spacevec movement);
 	~AABB();
 };
+
+std::ostream& operator<< (std::ostream& os, const AABB& bb);
 
 #endif /* SRC_AABB_H_ */

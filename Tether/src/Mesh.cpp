@@ -2,9 +2,11 @@
 #include <string>
 #include <iostream>
 #include <cmath>
+#include "glmutils.hpp"
 
 using std::cout;
 using std::string;
+
 
 Mesh::Mesh()
 	:
@@ -197,7 +199,7 @@ istream& operator>> (istream& is, Mesh& m)
 			is >> y >> z;
 			vec3 newv (x, y , z);
 			m.vertices.push_back(newv);
-			cout << "vec  " << newv << '\n';
+			cout << "vec  " << glm::to_string(newv) << '\n';
 			if(is.eof()) break;
 			is >> s;
 		}

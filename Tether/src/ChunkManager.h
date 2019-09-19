@@ -9,8 +9,7 @@
 #ifndef SRC_CHUNKMANAGER_H_
 #define SRC_CHUNKMANAGER_H_
 
-#include "Tickable.h"
-#include "Drawable.h"
+#include "IWorld.h"
 
 #include "Spacevec.h"
 #include "LockFast.h"
@@ -22,6 +21,9 @@ class InteractionManager;
 
 #include <memory>
 #include <vector>
+
+#include <glm/glm.hpp>
+using glm::vec3;
 
 struct chunkChange
 {
@@ -35,10 +37,9 @@ struct chunkSearchResult
 	int vectorIndex;
 };
 
-class ChunkManager: public Tickable, public Drawable
+class ChunkManager: public IWorld
 {
 	LockFast dataStructureLock;
-	int chunkSize;//size of one chunk
 	int chunksPerAxis;//width and height in chunks
 	spacelen defaultH;
 
@@ -111,10 +112,6 @@ public:
 	bool drawAABBs=false;
 	float getChunkSize();
 	spacelen getGravity();//currently a constant
-	flt toMeters(spacelen l);
-	vec3 toMeters(spacevec v);
-	spacelen fromMeters(flt l);
-	spacevec fromMeters(vec3 v);
 
 	//the partially critical interface: only call from main tick thread
 	//writing:

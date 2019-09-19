@@ -3,41 +3,42 @@
  *
  *  Created on:	20.04.2018
  *      Author:	HL65536
- *     Version:	1.0
+ *     Version:	2.0
  */
 
 #include "Frustum.h"
 
-#include "ChunkManager.h"
+#include "IWorld.h"
 #include "ITexture.h"
 
+#include <iostream>
 
 Frustum::Frustum()
 {}
 
-bool Frustum::inside(spacelen* bb)
+bool Frustum::inside(spacelen* bb,IWorld * w)
 {
 	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{
-		if(!planes[i].inside(bb,observerPos)) return false;
+		if(!planes[i].inside(bb,observerPos,w)) return false;
 	}
 	return true;
 }
 
-bool Frustum::inside(AABB bb)
+bool Frustum::inside(AABB bb,IWorld * w)
 {
-	return inside(&bb.low.x);
+	return inside(&bb.low.x,w);
 }
 
-void Frustum::debugDraw(ITexture * tex,ChunkManager * cm)
+void Frustum::debugDraw(ITexture * tex,IWorld * w)
 {
 	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{
 		vec3 normal=planes[i].normal;
-		vec3 rightAngle=crossProduct(normal,vec3(0,1,0));
-		rightAngle.normalize();
-		vec3 rightAngle2=crossProduct(normal,rightAngle);
-		vec3 drawPoint=normal*(planes[i].distanceInChunks-1.0f)*cm->getChunkSize();
+		vec3 rightAngle=glm::cross(normal,vec3(0,1,0));
+		rightAngle = glm::normalize(rightAngle);
+		vec3 rightAngle2=glm::cross(normal,rightAngle);
+		vec3 drawPoint=normal*(planes[i].distanceInMeters-1.0f);
 
 		glEnable(GL_TEXTURE_2D);
 		tex->bind();

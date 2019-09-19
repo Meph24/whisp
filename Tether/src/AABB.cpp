@@ -12,6 +12,7 @@
 #include "ICamera3D.h"
 #include "DrawServiceProvider.h"
 #include <GL/glew.h>
+#include "glmutils.hpp"
 
 u64 AABB::intersectionCounter=0;
 u64 AABB::checkCounter=0;
@@ -85,7 +86,7 @@ bool AABB::isMultichunk()
 
 void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
 {
-	if(!viewFrustum->inside(*(this))) return;
+	if(!viewFrustum->inside(*(this),cm)) return;
 	float widthOnScreen=1.0f/1024;//apparent size on the screen
 	float maxWidthPortion=0.4f;//max opaque portion (0-1), for distant objects
 
@@ -95,7 +96,7 @@ void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceP
 	spacevec interPos=mid-viewFrustum->observerPos;
 	vec3 interPosMeters=cm->toMeters(interPos);
 
-	float dist=(interPosMeters-dsp->getCamPos()).length();
+	float dist=glm::length(interPosMeters-dsp->getCamPos());
 
 	float width=widthOnScreen*dist;
 	vec3 distMax=cm->toMeters(sizeHalf);
@@ -112,7 +113,7 @@ void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceP
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
 
 	glColor3f(1,1,1);
-	std::cout<<std::endl;
+//	std::cout<<std::endl;
 	for(int i=0;i<3;i++)
 	{
 		int firCoo=1<<i;
@@ -153,7 +154,7 @@ void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceP
 		}
 	}
 
-	std::cout<<"AABB size: "<<distMax<<" "<<distMin<<" "<<width<<" "<<dist<<std::endl;
+//	std::cout<<"AABB size: "<<distMax<<" "<<distMin<<" "<<width<<" "<<dist<<std::endl;
 	glPopMatrix();
 }
 
@@ -167,4 +168,10 @@ vec3 AABB::convert(int bitvec)
 
 AABB::~AABB()
 {}
+
+std::ostream& operator<< (std::ostream& os, const AABB& bb)
+{
+	os << bb.low << "|" << bb.high;
+	return os;
+}
 

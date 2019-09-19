@@ -15,8 +15,9 @@
 
 
 ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk, float gravityYdir):
-chunkSize(ChunkSize),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
+chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
+	gridSize=ChunkSize;
 	lockChunkSizeX=1;
 	lockChunkSizeZ=1;
 	while(chunksPerLockchunk>3)
@@ -80,7 +81,7 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 		for(int runx = startX ; runx<stopX ; runx++)
 		{
 			int indx=runz*chunksPerAxis+runx;
-			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb))
+			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb,this))
 			{
 				float distX=(runx-midX);
 				if (distX<0) distX=-distX;
@@ -91,7 +92,7 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 				int lod=1;
 				if(dist==0) dist=0.5;
 				dist/=lodQ;
-				if(dist>chunkSize) dist=chunkSize;
+				if(dist>gridSize) dist=gridSize;
 				for(int i=1;i<=dist;i++)
 				{
 					if((lod*2)<=i) lod*=2;
@@ -220,41 +221,6 @@ int ChunkManager::getIndx(spacevec abs)
 	return getIndx(abs.x.intpart,abs.z.intpart);
 }
 
-flt ChunkManager::toMeters(spacelen l)
-{
-	flt ret=l.floatpart;
-	ret+=l.intpart;
-	ret*=chunkSize;
-	return ret;
-}
-
-vec3 ChunkManager::toMeters(spacevec v)
-{
-	vec3 ret=vec3(v.x.floatpart,v.y.floatpart,v.z.floatpart);
-	ret+=vec3(v.x.intpart,v.y.intpart,v.z.intpart);
-	ret=ret*chunkSize;
-	return ret;
-}
-
-spacelen ChunkManager::fromMeters(flt l)
-{
-	l/=chunkSize;
-	spacelen ret;
-	ret.floatpart=l;
-	ret.intpart=0;
-	ret.correct();
-	return ret;
-}
-
-spacevec ChunkManager::fromMeters(vec3 v)
-{
-	spacevec ret;
-	ret.x=fromMeters(v.x);
-	ret.y=fromMeters(v.y);
-	ret.z=fromMeters(v.z);
-	return ret;
-}
-
 spacelen ChunkManager::getGravity()
 {
 	return gravity;
@@ -362,7 +328,7 @@ bool ChunkManager::tryCreateChunk(chunkNum cx, chunkNum cz)
 		chunkBase.z.floatpart=0;
 		chunkBase.x.intpart=cx;
 		chunkBase.z.intpart=cz;
-		chunks[myInd]=new Chunk(chunkBase,chunkSize,this);
+		chunks[myInd]=new Chunk(chunkBase,gridSize,this);
 	}
 	else return false;
 	//TODO lockchunks
@@ -710,7 +676,7 @@ spacevec ChunkManager::getMiddleChunk()
 
 float ChunkManager::getChunkSize()
 {
-	return chunkSize;
+	return gridSize;
 }
 
 bool ChunkManager::isValid(chunkNum cx, chunkNum cz)

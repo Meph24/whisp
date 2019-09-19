@@ -10,7 +10,7 @@
 class ITexture;
 class EntityProjectileBulletLike;
 
-#include "MatrixLib2.h"
+#include "CumulativeMat.hpp"
 #include "AnimationCycle.h"
 
 class Zombie_Enemy: public Entity,public Pushable,public Hittable, public HittableBulletLike
@@ -28,7 +28,7 @@ class Zombie_Enemy: public Entity,public Pushable,public Hittable, public Hittab
 
 	ITexture * tex;
 
-	MatrixLib2 ml;
+	CumulativeMat ml;
 
 	float tilted=10;
 
@@ -70,7 +70,7 @@ public:
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
 	void checkProjectile(EntityProjectileBulletLike * projectile,TickServiceProvider* tsp);
-	float checkBox(DualPointer<Projectile> projectile,MatrixLib2 * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo);//valid hit from 0 to 1, otherwise -1
+	float checkBox(DualPointer<Projectile> projectile,CumulativeMat * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo);//valid hit from 0 to 1, otherwise -1
 
 
 	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm);

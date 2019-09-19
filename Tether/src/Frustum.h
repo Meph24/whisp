@@ -3,7 +3,7 @@
  *
  *  Created on:	20.04.2018
  *      Author:	HL65536
- *     Version:	1.0
+ *     Version:	2.0
  */
 
 #ifndef SRC_FRUSTUM_H_
@@ -12,7 +12,7 @@
 #include "DivisionPlane.h"
 #include "AABB.h"
 
-class ChunkManager;
+class IWorld;
 class ITexture;
 
 
@@ -33,10 +33,10 @@ public:
 	//5th: distance plane
 	//6th (not used with FRUSTUM_PLANE_COUNT==5): near plane: gain from it would be 0 most of the time, so not included here
 
-	void debugDraw(ITexture * tex,ChunkManager * cm);
+	void debugDraw(ITexture * tex,IWorld * w);
 
-	bool inside(spacelen * bb);
-	bool inside(AABB bb);
+	bool inside(spacelen * bb,IWorld * w);
+	bool inside(AABB bb,IWorld * w);
 	Frustum();
 	~Frustum();
 };

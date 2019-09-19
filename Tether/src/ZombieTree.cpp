@@ -14,6 +14,8 @@
 
 #include <GL/glew.h>
 
+#include <iostream>
+
 Zombie_Tree::Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves):
 tex1(textureLog),tex2(textureLeaves)
 {
@@ -59,10 +61,6 @@ void Zombie_Tree::drawLog()
 	glVertex3f(-r,0,r);
 
 	glEnd();
-
-
-
-
 }
 
 void Zombie_Tree::drawLeaves()
@@ -82,18 +80,17 @@ void Zombie_Tree::drawLeaves()
 	glTexCoord2f(0,1);
 	glVertex3f(-r,-r,0);
 
-
-
-
-
 	glEnd();
-
 }
 
 void Zombie_Tree::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
-	if(!viewFrustum->inside(bb)) return;
+
+	if(!viewFrustum->inside(bb,cm))
+	{	
+		return;
+	}
 
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
 	vec3 interPosMeters=cm->toMeters(interPos);

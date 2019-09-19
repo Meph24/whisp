@@ -11,12 +11,15 @@ using std::string;
 using std::ostream;
 using glm::mat4;
 
-class CumulativeMat : public mat4
+class CumulativeMat : public glm::mat4
 {
 	vector<mat4> m_matstack;
 
 public:
 	CumulativeMat();
+	CumulativeMat(const glm::mat4&);
+	CumulativeMat& operator=(const glm::mat4&);
+	mat4& current();
 	void push();
 	void pop();
 	void loadIdentity();
