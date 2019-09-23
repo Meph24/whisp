@@ -25,9 +25,9 @@ class DivisionPlane
 	int zPtr;
 public:
 	vec3 normal;
-	flt distanceInMeters;
+	float distanceInMeters;
 	DivisionPlane();
-	DivisionPlane(vec3 Normal,flt Dist);
+	DivisionPlane(vec3 Normal,float Dist);
 	~DivisionPlane();
 	bool inside(spacelen * bb,spacevec observerPos,IWorld * w);
 	bool inside(AABB bb,spacevec observerPos,IWorld * w);

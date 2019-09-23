@@ -323,15 +323,15 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	spacevec newVec=pos;
 	spacevec moved=(newVec-old);
 	bool chunkBorder=(old.y==cm->fromMeters((defaultHeight*1.0f)))^(newVec.y==cm->fromMeters((defaultHeight*1.0f)));
-	if(moved.fLengthSq(cm->getChunkSize())>0.0000000001f)
+	if(!moved.equalsZero())
 	{
 		vec3 norm=cm->toMeters(moved);
 		norm=glm::normalize(norm);
-		flt speedModA=glm::length(vec3(norm.x,0,norm.z));
+		float speedModA=glm::length(vec3(norm.x,0,norm.z));
 		vec3 flat=vec3(cm->toMeters(moved.x),0,cm->toMeters(moved.z));
-		flt h=cm->toMeters(moved.y)/glm::length(flat);
+		float h=cm->toMeters(moved.y)/glm::length(flat);
 		SpeedMod sm=SpeedMod();
-		flt speedModB=sm.slowdownFromTerrain(h);
+		float speedModB=sm.slowdownFromTerrain(h);
 		if(chunkBorder)
 		{
 			speedModA=1;

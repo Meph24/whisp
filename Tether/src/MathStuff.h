@@ -12,15 +12,11 @@
 
 #include <cmath>
 
+#define TAU (float)(6.283185307179586)
 
-typedef float flt;
-#define TAU (flt)(6.283185307179586)
-
-//flt sqrt(flt f); //need to implement this and others if flt!=float && flt!=double
 
 //float operator "" _degrees(int deg);
 
 //float operator "" _deg(int deg);
 
-//#include "MatrixLib.h"
 #endif /* SRC_MATHSTUFF_H_ */

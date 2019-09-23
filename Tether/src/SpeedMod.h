@@ -14,7 +14,7 @@
 class SpeedMod
 {
 public:
-	flt slowdownFromTerrain(flt h);
+	float slowdownFromTerrain(float h);
 	SpeedMod();
 	~SpeedMod();
 };

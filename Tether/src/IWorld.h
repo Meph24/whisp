@@ -25,10 +25,11 @@ public:
 	virtual ~IWorld();
 
 	//only allowed for RELATIVE positions/velocities:
-	flt toMeters(spacelen l);
+	float toMeters(spacelen l);
+	double toMetersD(spacelen l);
 	vec3 toMeters(spacevec v);
-	spacelen fromMeters(flt l) const;
-	spacevec fromMeters(const glm::vec3& v) const;
+	spacelen fromMeters(float l) const;
+	spacevec fromMeters(const vec3& v) const;
 
 };
 

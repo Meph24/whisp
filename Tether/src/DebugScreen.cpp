@@ -22,7 +22,7 @@ DebugScreen::~DebugScreen()
 }
 
 #include <sstream>
-int DebugScreen::draw(flt x,flt y,flt z,int lineOffset)//TODO drawable + parameter setter function
+int DebugScreen::draw(float x,float y,float z,int lineOffset)//TODO drawable + parameter setter function
 {
 	if(!pm) return lineOffset;
 	int num=pm->getStepCount();

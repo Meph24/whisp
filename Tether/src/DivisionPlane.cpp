@@ -9,7 +9,7 @@
 #include "DivisionPlane.h"
 #include "IWorld.h"
 
-DivisionPlane::DivisionPlane(vec3 Normal,flt Dist):
+DivisionPlane::DivisionPlane(vec3 Normal,float Dist):
 normal(Normal),distanceInMeters(Dist)
 {
 	AABB test;
@@ -50,7 +50,7 @@ bool DivisionPlane::inside(spacelen * bb,spacevec observerPos,IWorld * w)
 	relevantPoint.x=*(bb+xPtr)-observerPos.x;
 	relevantPoint.y=*(bb+yPtr)-observerPos.y;
 	relevantPoint.z=*(bb+zPtr)-observerPos.z;
-	flt d=glm::dot(w->toMeters(relevantPoint),normal);
+	float d=glm::dot(w->toMeters(relevantPoint),normal);
 	return d<distanceInMeters;
 }
 

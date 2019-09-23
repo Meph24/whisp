@@ -44,7 +44,7 @@ public:
 	InteractionManager * interMan;
 	AABB bb;
 	void tick(Timestamp t,TickServiceProvider * tsp);
-	spacelen getHeight(flt x,flt z);//coordinates inside chunk
+	spacelen getHeight(float x,float z);//coordinates inside chunk
 	void render(int lod,spacevec camOffset);//TODO replace
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 	void clearEntities();

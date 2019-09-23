@@ -11,7 +11,7 @@
 SpeedMod::SpeedMod()
 {}
 
-flt SpeedMod::slowdownFromTerrain(flt h)
+float SpeedMod::slowdownFromTerrain(float h)
 {
 	if(h<-2) return 0.5;
 	if(h<-1) return 0.5+(h+2)*0.5;

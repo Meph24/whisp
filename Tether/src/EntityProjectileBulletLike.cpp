@@ -109,18 +109,13 @@ void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
 	posOld = pos;
 	spacevec vOld=v;
 	v.y -= gravity * time;
-	double spd=v.dLength(cm->getChunkSize());
+	double spd=cm->toMetersD(v.lengthHP());
 	double drag=spd*typeB.drag;
 	v*=(1-drag*time);//TODO find exact or at least time-consistent solution (current solution behaves very wrong with high resistance values and is tickrate-dependent)
 	pos+=(v+vOld)*time*0.5f;
 
 	spacevec size;
-	size.x.floatpart=0;
-	size.y.floatpart=0;
-	size.z.floatpart=0;
-	size.x.intpart=0;
-	size.y.intpart=0;
-	size.z.intpart=0;
+	size.set0();
 	bb=AABB(posOld,size,pos-posOld);
 	registerHitCheck((Entity *)this,time,tsp);
 

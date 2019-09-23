@@ -49,8 +49,8 @@ chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 
 spacelen ChunkManager::getHeight(spacevec abs)
 {
-	chunkNum cx=abs.x.intpart;
-	chunkNum cz=abs.z.intpart;
+	gridInt cx=abs.x.intpart;
+	gridInt cz=abs.z.intpart;
 	if(!isValid(cx,cz)) return defaultH;
 	if(chunks[getIndx(cx,cz)])
 		return chunks[getIndx(cx,cz)]->getHeight(abs.x.floatpart,abs.z.floatpart);
@@ -108,11 +108,11 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 #include "WarnErrReporter.h"
 void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 {
-	chunkNum midChunkCoo=chunksPerAxis/2;
-	chunkNum cx=abs.x.intpart;
-	chunkNum cz=abs.z.intpart;
-	chunkNum newLowX=cx-midChunkCoo;
-	chunkNum newLowZ=cz-midChunkCoo;
+	gridInt midChunkCoo=chunksPerAxis/2;
+	gridInt cx=abs.x.intpart;
+	gridInt cz=abs.z.intpart;
+	gridInt newLowX=cx-midChunkCoo;
+	gridInt newLowZ=cz-midChunkCoo;
 
 	if((newLowX!=lowX)||(newLowZ!=lowZ))
 	{
@@ -121,16 +121,16 @@ void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 		{
 			other[i]=0;
 		}
-		chunkNum moveX=(lowX-newLowX);
-		chunkNum moveZ=(lowZ-newLowZ);
+		gridInt moveX=(lowX-newLowX);
+		gridInt moveZ=(lowZ-newLowZ);
 		for(int zrun=0;zrun<chunksPerAxis;zrun++)
 		{
 			for(int xrun=0;xrun<chunksPerAxis;xrun++)
 			{
 				Chunk * curChunk=chunks[zrun*chunksPerAxis+xrun];
 				if(!curChunk) continue;
-				chunkNum znew=zrun+moveZ;
-				chunkNum xnew=xrun+moveX;
+				gridInt znew=zrun+moveZ;
+				gridInt xnew=xrun+moveX;
 				int result=0;
 				if(znew<0) result++;
 				if(znew>=chunksPerAxis) result++;
@@ -166,14 +166,14 @@ void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 	tryCreateChunk(cx,cz);//make sure middle chunk exists so player is always in a loaded chunk
 }
 
-int ChunkManager::getIndx(chunkNum cx,chunkNum cz)
+int ChunkManager::getIndx(gridInt cx,gridInt cz)
 {
 	cx-=lowX;
 	cz-=lowZ;
 	return cz*chunksPerAxis+cx;
 }
 
-int ChunkManager::getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newLowZ)
+int ChunkManager::getIndx(gridInt cx,gridInt cz,gridInt newLowX,gridInt newLowZ)
 {
 	cx-=newLowX;
 	cz-=newLowZ;
@@ -183,8 +183,8 @@ int ChunkManager::getIndx(chunkNum cx,chunkNum cz,chunkNum newLowX,chunkNum newL
 void ChunkManager::generateMissing(int count)
 {
 	int dir=1;
-	chunkNum xrun=chunksPerAxis/2+lowX;
-	chunkNum zrun=chunksPerAxis/2+lowZ;
+	gridInt xrun=chunksPerAxis/2+lowX;
+	gridInt zrun=chunksPerAxis/2+lowZ;
 	for(int j=1;j<chunksPerAxis;j++)
 	{
 		dir=-dir;
@@ -228,10 +228,10 @@ spacelen ChunkManager::getGravity()
 
 void ChunkManager::correctLockChunks()
 {
-	chunkNum highX=lowX+chunksPerAxis;
-	chunkNum highZ=lowZ+chunksPerAxis;
-	chunkNum lockChunkStopX=lockChunkStartX+lockChunksPerAxisX*lockChunkSizeX;
-	chunkNum lockChunkStopZ=lockChunkStartZ+lockChunksPerAxisZ*lockChunkSizeZ;
+	gridInt highX=lowX+chunksPerAxis;
+	gridInt highZ=lowZ+chunksPerAxis;
+	gridInt lockChunkStopX=lockChunkStartX+lockChunksPerAxisX*lockChunkSizeX;
+	gridInt lockChunkStopZ=lockChunkStartZ+lockChunksPerAxisZ*lockChunkSizeZ;
 	if ((lowX-lockChunkStartX>=0)&&
 		(lowZ-lockChunkStartZ>=0)&&
 		(lockChunkStopX-highX>=0)&&
@@ -247,26 +247,26 @@ void ChunkManager::correctLockChunks()
 		tempBuf.push_back(lockChunks[i]);
 	}
 
-	chunkNum newX=lockChunkStartX;
-	chunkNum newZ=lockChunkStartZ;
+	gridInt newX=lockChunkStartX;
+	gridInt newZ=lockChunkStartZ;
 	if(lockChunkStartX-lowX>0)
 	{
-		chunkNum correctionSize=(lockChunkStartX-lowX+lockChunkSizeX-1)/lockChunkSizeX;
+		gridInt correctionSize=(lockChunkStartX-lowX+lockChunkSizeX-1)/lockChunkSizeX;
 		newX-=correctionSize*lockChunkSizeX;
 	}
 	else if(highX-lockChunkStopX>0)
 	{
-		chunkNum correctionSize=(lockChunkStartX-lowX+lockChunkSizeX-1)/lockChunkSizeX;
+		gridInt correctionSize=(lockChunkStartX-lowX+lockChunkSizeX-1)/lockChunkSizeX;
 		newX+=correctionSize*lockChunkSizeX;
 	}
 	if(lockChunkStartZ-lowZ>0)
 	{
-		chunkNum correctionSize=(lockChunkStartZ-lowZ+lockChunkSizeZ-1)/lockChunkSizeZ;
+		gridInt correctionSize=(lockChunkStartZ-lowZ+lockChunkSizeZ-1)/lockChunkSizeZ;
 		newZ-=correctionSize*lockChunkSizeZ;
 	}
 	else if(highZ-lockChunkStopZ>0)
 	{
-		chunkNum correctionSize=(lockChunkStartZ-lowZ+lockChunkSizeZ-1)/lockChunkSizeZ;
+		gridInt correctionSize=(lockChunkStartZ-lowZ+lockChunkSizeZ-1)/lockChunkSizeZ;
 		newZ+=correctionSize*lockChunkSizeZ;
 	}
 
@@ -275,8 +275,8 @@ void ChunkManager::correctLockChunks()
 		for(int xrun=0;xrun<lockChunksPerAxisX;xrun++)
 		{
 			int newInd=zrun*lockChunksPerAxisX+xrun;
-			chunkNum realX=newX+xrun*lockChunkSizeX;
-			chunkNum realZ=newZ+zrun*lockChunkSizeZ;
+			gridInt realX=newX+xrun*lockChunkSizeX;
+			gridInt realZ=newZ+zrun*lockChunkSizeZ;
 			int oldX=realX/lockChunkSizeX-lockChunkStartX;
 			int oldZ=realZ/lockChunkSizeZ-lockChunkStartZ;
 			int oldInd=oldZ*lockChunksPerAxisX+oldX;
@@ -312,7 +312,7 @@ void ChunkManager::correctLockChunks()
 	lockChunks=tempBuf;//TODO replace by non-dummy
 }
 
-bool ChunkManager::tryCreateChunk(chunkNum cx, chunkNum cz)
+bool ChunkManager::tryCreateChunk(gridInt cx, gridInt cz)
 {
 	if(cx<lowX) return false;
 	if(cz<lowZ) return false;
@@ -359,22 +359,19 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 {
 	//TODO make better
 	spacevec dif=endpoint-startpoint;
-	float len=dif.fLength(getChunkSize());
-	//std::cout<<len<<std::endl;
-
-
-	int tries;
-	if(len>MAX_GROUNDHIT_TRIES)
+	spacelen len=dif.lengthLP();
+	unsigned int tries;
+	if(len.intpart>MAX_GROUNDHIT_TRIES)
 	{
 		tries=MAX_GROUNDHIT_TRIES;
 	}
 	else
 	{
-		tries=int(len);
+		tries=len.intpart;
 		if(tries<1) tries=1;
 	}
 	float triesInv=1.0f/tries;
-	for(int i = 0 ; i<tries+1; i++)
+	for(unsigned int i = 0 ; i<tries+1; i++)
 	{
 		spacevec testPos=startpoint+dif*triesInv;
 		if(testPos.y<getHeight(testPos)) return true;
@@ -385,10 +382,10 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 #include "myAssert.h"
 void ChunkManager::giveInteractionManagers(Entity* e,std::vector<InteractionManager*> * managers,TickServiceProvider * tsp)
 {
-	chunkNum minx=e->bb.low.x.intpart;
-	chunkNum maxx=e->bb.high.x.intpart;
-	chunkNum minz=e->bb.low.z.intpart;
-	chunkNum maxz=e->bb.high.z.intpart;
+	gridInt minx=e->bb.low.x.intpart;
+	gridInt maxx=e->bb.high.x.intpart;
+	gridInt minz=e->bb.low.z.intpart;
+	gridInt maxz=e->bb.high.z.intpart;
 
 	if((maxx-minx)>=10 )
 	{
@@ -397,9 +394,9 @@ void ChunkManager::giveInteractionManagers(Entity* e,std::vector<InteractionMana
 	assert((maxx-minx)<10);
 	assert((maxz-minz)<10);
 	int tickID=tsp->tickID;
-	for(chunkNum xrun=minx;xrun<=maxx;xrun++)
+	for(gridInt xrun=minx;xrun<=maxx;xrun++)
 	{
-		for(chunkNum zrun=minz;zrun<=maxz;zrun++)
+		for(gridInt zrun=minz;zrun<=maxz;zrun++)
 		{
 			if(isValid(xrun,zrun))
 			{
@@ -547,8 +544,8 @@ void ChunkManager::requestEntityMove(Entity* e)
 
 int ChunkManager::getIndxOrNeg1(spacevec abs)
 {
-	chunkNum x=abs.x.intpart;
-	chunkNum z=abs.z.intpart;
+	gridInt x=abs.x.intpart;
+	gridInt z=abs.z.intpart;
 	if(isValid(x,z)) return getIndx(x,z);
 	else return -1;
 }
@@ -674,15 +671,10 @@ spacevec ChunkManager::getMiddleChunk()
 	return ret;
 }
 
-float ChunkManager::getChunkSize()
+bool ChunkManager::isValid(gridInt cx, gridInt cz)
 {
-	return gridSize;
-}
-
-bool ChunkManager::isValid(chunkNum cx, chunkNum cz)
-{
-	chunkNum relLowX=cx-lowX;
-	chunkNum relLowZ=cz-lowZ;
+	gridInt relLowX=cx-lowX;
+	gridInt relLowZ=cz-lowZ;
 	if(relLowX<0) return false;
 	if(relLowZ<0) return false;
 	if(relLowX>=chunksPerAxis) return false;
