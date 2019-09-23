@@ -2,7 +2,7 @@
 
 bool rayIntersectsPlane	(	const vec3& pr,
 							const vec3& pn,
-							const vec3& rp,
+							const vec3& rr,
 							const vec3& rv,
 							vec3* pos_out,
 							float* ray_coeff_out
@@ -13,13 +13,13 @@ bool rayIntersectsPlane	(	const vec3& pr,
 	if(divisor == 0.0f)
 		return false;
 
-	float coeff = (glm::dot(rp-pr, pn / divisor);
+	float coeff = -1 * glm::dot(rr-pr, pn) / divisor;
 
 	if(ray_coeff_out)
 		*ray_coeff_out = coeff;
 
 	if(pos_out)
-		*pos_out = rp + rv * coeff;
+		*pos_out = rr + rv * coeff;
 
 	return true;
 }
@@ -27,13 +27,13 @@ bool rayIntersectsPlane	(	const vec3& pr,
 bool rayIntersectsPlane	(	const vec3& pr, 
 							const vec3& p1, 
 							const vec3& p2,
-							const vec3& rp,
+							const vec3& rr,
 							const vec3& rv,
 							vec3* pos_out,
 							float* ray_coeff_out
 						)
 {	
-	intersectsPlane(pr, glm::cross(p1,p2), rp, rv, pos_out, ray_coeff_out);
+	return rayIntersectsPlane(pr, glm::cross(p1,p2), rr, rv, pos_out, ray_coeff_out);
 }
 
 
@@ -41,15 +41,15 @@ bool lineIntersectsPlane	(	const vec3& pr,
 								const vec3& pn,
 								const vec3& lr,
 								const vec3& lv,
-								vec3* pos_out = nullptr,
-								float* line_coeff_out = nullptr
+								vec3* pos_out,
+								float* line_coeff_out
 							)
 {
 	float ray_coeff;
 	if(!rayIntersectsPlane(pr, pn, lr, lv, pos_out, &ray_coeff))
 		return false;
 
-	if (ray_coeff < 0.0f && ray_coeff > 1.0f)
+	if (ray_coeff < 0.0f || ray_coeff > 1.0f)
 		return false;
 	
 	if(line_coeff_out) *line_coeff_out = ray_coeff;
@@ -61,8 +61,8 @@ bool lineIntersectsPlane	(	const vec3& pr,
 								const vec3& p2,
 								const vec3& lr,
 								const vec3& lv,
-								vec3* pos_out = nullptr,
-								float* line_coeff_out = nullptr
+								vec3* pos_out,
+								float* line_coeff_out
 							)
 {
 	return lineIntersectsPlane(pr, glm::cross(p1, p2), lr, lv, pos_out, line_coeff_out);
@@ -77,11 +77,11 @@ vec2 planePointCoefficients(const vec3& pr,
 {
 	vec2 coeff;
 	//solve the equation
-	//pr + x * p1 + y * p2 == intersection_pos
+	//pr + x * p1 + y * p2 == p
 	
 	vec3 pv1 = p1 - pr;
 	vec3 pv2 = p2 - pr;
-	vec3 iv = intersection_pos - pr;
+	vec3 iv = p - pr;
 
 
 	//solve only for x and y
@@ -94,8 +94,9 @@ vec2 planePointCoefficients(const vec3& pr,
 
 
 	float divisor = (pv1.x*pv2.y-pv2.x*pv1.x);
-
-	if(divisor == 0.0f)
+#define MY_EPSILON (0.00001)
+	//TODO cummunicate Epsilon convetions
+	if(fabs(divisor) < MY_EPSILON)
 	{
 		if(solved_out) *solved_out = false;
 		return coeff; //empty return
@@ -124,11 +125,11 @@ bool pointInTriangle(	const vec3& pr,
 					)
 {
 	//solve the equation
-	//pr + a * p1 + b * p2 == intersection_pos 
+	//pr + a * p1 + b * p2 == p 
 	//to get coefficients a and b
 	vec2 coeff;
 	bool equation_solvable = false;
-	coeff = planePointCoefficients(pr, p1, p2, intersection_pos, &equation_solvable);
+	coeff = planePointCoefficients(pr, p1, p2, p, &equation_solvable);
 
 	if(!equation_solvable) return false;	
 
@@ -144,15 +145,15 @@ bool pointInTriangle(	const vec3& pr,
 bool rayIntersectsTriangle(	const vec3& pr,
 							const vec3& p1,
 							const vec3& p2,
-							const vec3& rp,
+							const vec3& rr,
 							const vec3& rv,
 							vec3* pos_out,
 							vec3* coeff_out
 						  )
 {
 	vec3 pos;
-	if(!rayIntersectsPlane	(	pr, p1, p2, rp, rv, &pos,
-								(coeff_out)?(&(coeff_out.z)):nullptr			
+	if(!rayIntersectsPlane	(	pr, p1, p2, rr, rv, &pos,
+								(coeff_out)?(&(coeff_out->z)):nullptr			
 							)
 	  )
 	{
@@ -167,8 +168,8 @@ bool rayIntersectsTriangle(	const vec3& pr,
 
 	if(coeff_out)
 	{
-		coeff_out.x = plane_coeff.x;
-		coeff_out.y = plane_coeff.y;
+		coeff_out->x = plane_coeff.x;
+		coeff_out->y = plane_coeff.y;
 		//coeff_out.y was set by rayIntersectsPlane
 	}
 	return true;
@@ -180,9 +181,8 @@ bool lineIntersectsTriangle(const vec3& pr,
 							const vec3& p2,
 							const vec3& lr,
 							const vec3& lv,
-							vec3* pos_out = nullptr,
+							vec3* pos_out,
 							vec3* coeff_out
-								=nullptr
 							)
 {
 	vec3 coeff;
@@ -198,16 +198,16 @@ bool lineIntersectsTriangle(const vec3& pr,
 bool pointInParallelogram(	const vec3& pr, 
 							const vec3& p1, 
 							const vec3& p2,
-							const vec3& intersection_pos,
+							const vec3& p,
 							vec2* plane_coeff_out
 						 )
 {
 	//solve the equation
-	//pr + a * p1 + b * p2 == intersection_pos 
+	//pr + a * p1 + b * p2 == p 
 	//to get coefficients a and b
 	vec2 coeff;
 	bool equation_solvable = false;
-	coeff = intersectionsCoefficients(pr, p1, p2, intersection_pos, &equation_solvable);
+	coeff = planePointCoefficients(pr, p1, p2, p, &equation_solvable);
 
 	if(!equation_solvable) return false;
 
@@ -216,13 +216,13 @@ bool pointInParallelogram(	const vec3& pr,
 	//the coefficients a and b have to satisfy the Paralellogram property
 	// 0 <= a <= 1 and 0 <= b <= 1
 	return		coeff.x >= 0 && coeff.x <= 1
-			&&	coeff.y >= 0 && coeff.y < 1;
+			&&	coeff.y >= 0 && coeff.y <= 1;
 }
 
 bool rayIntersectsParallelogram(	const vec3& pr,
 									const vec3& p1,
 									const vec3& p2,
-									const vec3& rp,
+									const vec3& rr,
 									const vec3& rv,
 									vec3* pos_out,
 									vec3* coeff_out
@@ -230,7 +230,7 @@ bool rayIntersectsParallelogram(	const vec3& pr,
 {
 	vec3 pos;
 	float ray_coeff;
-	if(!rayIntersectsPlane(pr, p1, p2, rp, rv, &pos, &ray_coeff))
+	if(!rayIntersectsPlane(pr, p1, p2, rr, rv, &pos, &ray_coeff))
 	{
 		return false;
 	}
@@ -257,8 +257,8 @@ bool lineIntersectsParallelogram(	const vec3& pr,
 									const vec3& p2,
 									const vec3& lr,
 									const vec3& lv,
-									vec3* pos_out = nullptr,
-									vec3* coeff_out = nullptr
+									vec3* pos_out,
+									vec3* coeff_out
 								)
 {
 	vec3 coeff;

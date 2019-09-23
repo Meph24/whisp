@@ -2,6 +2,12 @@
 #     define STATIC_INTERSECTION_HPP
 
 
+#include <glm/glm.hpp>
+#include "glmutils.hpp"
+
+using glm::vec2;
+using glm::vec3;
+
 
 /**
  * @brief Calculates, if a Ray intersects with a plane.
@@ -168,7 +174,7 @@ bool pointInTriangle(	const vec3& pr,
 						const vec3& p,
 						vec2* plane_coeff_out
 							= nullptr
-					)
+					);
 
 
 /**
@@ -250,7 +256,7 @@ bool pointInParallelogram(	const vec3& pr,
 						const vec3& p2,
 						const vec3& p,
 						vec2* plane_coeff_out = nullptr
-					)
+					);
 
 
 
@@ -316,7 +322,7 @@ bool lineIntersectsParallelogram(	const vec3& pr,
 									const vec3& lv,
 									vec3* pos_out = nullptr,
 									vec3* coeff_out = nullptr
-							   );
+							    );
 
 
 #endif /* STATIC_INTERSECTION_HPP */
