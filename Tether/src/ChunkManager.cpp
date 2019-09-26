@@ -147,7 +147,7 @@ void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 							WarnErrReporter::doubleErr("entity found in multiple chunks while one of them is destroyed, ignoring it");
 							continue;
 						}
-						curChunk->managedEntities[i]->onLeaveWorld(tsp);
+						leaveWorld(curChunk->managedEntities[i],tsp);
 					}
 					delete curChunk;//TODO managed entities
 				}
@@ -329,6 +329,7 @@ bool ChunkManager::tryCreateChunk(gridInt cx, gridInt cz)
 		chunkBase.x.intpart=cx;
 		chunkBase.z.intpart=cz;
 		chunks[myInd]=new Chunk(chunkBase,gridSize,this);
+		wakeHibernating();//TODO optimize
 	}
 	else return false;
 	//TODO lockchunks
@@ -429,7 +430,7 @@ void ChunkManager::applyEntityChunkChanges(TickServiceProvider * tsp)
 		{
 			if(c.e->refCounter==0)//freshly spawned outside
 			{
-				c.e->onLeaveWorld(tsp);//handle by calling the Entity and letting it decide what to do (save to disk/simple deletion)
+				leaveWorld(c.e,tsp);
 			}
 			continue;
 		}
@@ -475,7 +476,7 @@ void ChunkManager::applyEntityChunkChanges(TickServiceProvider * tsp)
 			c.e->refCounter--;
 			if(c.e->refCounter==0)//moved outside
 			{
-				c.e->onLeaveWorld(tsp);//handle by calling the Entity and letting it decide what to do (save to disk/simple deletion)
+				leaveWorld(c.e,tsp);
 			}
 		}
 	}
@@ -529,11 +530,6 @@ void ChunkManager::applyEntityChunkChanges(TickServiceProvider * tsp)
 void ChunkManager::requestEntitySpawn(Entity* e)
 {
 	addVec.push_back({e,e->pos});//capture the position in this exact moment as the insert location
-}
-
-void ChunkManager::requestEntityDelete(Entity* e)
-{
-	deleteVec.push_back(e);
 }
 
 void ChunkManager::requestEntityMove(Entity* e)

@@ -7,6 +7,7 @@
  */
 
 #include "IWorld.h"
+#include "Entity.h"
 
 IWorld::IWorld()
 {
@@ -58,4 +59,55 @@ spacevec IWorld::fromMeters(const glm::vec3& v) const
 	ret.y=fromMeters(v.y);
 	ret.z=fromMeters(v.z);
 	return ret;
+}
+
+void IWorld::leaveWorld(Entity* e,TickServiceProvider * tsp)
+{
+	e->onLeaveWorld(tsp);//notify entity that it is leaving the world
+	if(e->allowHibernating)
+	{
+		hibernate(e);
+	}
+	else
+	{
+		e->requestDestroy(this);
+	}
+}
+
+void IWorld::hibernate(Entity* e)
+{
+	hibernating.push_back(e);
+}
+
+void IWorld::wakeHibernating(AABB bb)
+{
+	while(hibernating.size()>0)
+	{
+		Entity * e=hibernating.back();
+		if(bb.contains(e->pos))
+		{
+			wakeHibernating(e);
+			hibernating.pop_back();
+		}
+	}
+}
+
+void IWorld::wakeHibernating()
+{
+	while(hibernating.size()>0)
+	{
+		Entity * e=hibernating.back();
+		wakeHibernating(e);
+		hibernating.pop_back();
+	}
+}
+
+void IWorld::wakeHibernating(Entity* e)
+{
+	requestEntitySpawn(e);
+}
+
+void IWorld::requestEntityDelete(Entity* e)
+{
+	deleteVec.push_back(e);
 }

@@ -14,6 +14,7 @@ class DebugScreen;
 class EntityPlayer;
 class Mesh;
 class TexParamSet;
+class IWorld;
 
 #include <SFML/Window.hpp>
 
@@ -82,6 +83,7 @@ public:
 	//TickServiceProvider
 	virtual ICamera3D * getHolderCamera();//can return 0 if currently not held
 	virtual ChunkManager * getChunkManager();
+	IWorld * getIWorld();
 
 	virtual Entity * getTarget(Entity * me);
 

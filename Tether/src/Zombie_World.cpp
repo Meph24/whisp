@@ -430,6 +430,11 @@ ChunkManager* Zombie_World::getChunkManager()
 	return cm;
 }
 
+IWorld* Zombie_World::getIWorld()
+{
+	return (IWorld *)cm;
+}
+
 ITexture* Zombie_World::suggestFont()
 {
 	return g->font;

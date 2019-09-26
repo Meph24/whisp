@@ -19,6 +19,7 @@ class TickServiceProvider;
 class Frustum;
 class ChunkManager;
 class DrawServiceProvider;
+class IWorld;
 
 #include <vector>
 
@@ -31,6 +32,7 @@ class Entity: public Tickable, Drawable
 	bool requestedDelete=false;
 public:
 	bool surviveClearing=false;
+	bool allowHibernating=false;//if true, survives being outside the world, being transferrred to a hibernation state
 
 	int refCounter=0;//DO NOT TOUCH
 
@@ -66,14 +68,14 @@ public:
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
 	virtual void tick(Timestamp t,TickServiceProvider * tsp)=0;
-	virtual void onLeaveWorld(TickServiceProvider * tsp);//called when outside of loaded chunk area, can be overridden to implement saving to disk, ...
+	virtual void onLeaveWorld(TickServiceProvider * tsp);//called when outside of loaded chunk area
 
-	void requestDestroy(ChunkManager * cm);//call this to request delete, do NOT delete any other way
+	void requestDestroy(IWorld * w);//call this to request delete, do NOT delete any other way
 	void reset();
 
 	void follow(Entity * e);
 	void unfollow(Entity * e);
-	virtual void notifyRemoval(Entity * e);
+	virtual void notifyRemoval(Entity * e);//notify followers that the followed entity is being removed
 
 
 

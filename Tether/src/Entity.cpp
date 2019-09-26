@@ -13,7 +13,7 @@
 Entity::Entity()
 {}
 
-void Entity::requestDestroy(ChunkManager * cm)
+void Entity::requestDestroy(IWorld * w)
 {
 	if(requestedDelete) return;
 	requestedDelete=true;
@@ -24,7 +24,7 @@ void Entity::requestDestroy(ChunkManager * cm)
 		follower[i]->notifyRemoval(this);
 	}
 	follower.clear();
-	cm->requestEntityDelete(this);
+	w->requestEntityDelete(this);
 }
 
 
@@ -38,7 +38,7 @@ void Entity::reset()
 
 void Entity::onLeaveWorld(TickServiceProvider* tsp)
 {
-	requestDestroy(tsp->getChunkManager());
+	//default: do nothing.
 }
 
 void Entity::follow(Entity* e)

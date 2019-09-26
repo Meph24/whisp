@@ -30,6 +30,7 @@ public:
 
 	bool doesIntersect(AABB other);
 	bool doesIntersect(AABB * other);
+	bool contains(spacevec s);
 
 	bool isMultichunk();
 

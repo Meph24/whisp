@@ -17,6 +17,7 @@ class InteractionManager;
 class SoundManager;
 class Retickable;
 class ICamera3D;
+class IWorld;
 
 #include <vector>
 
@@ -33,6 +34,7 @@ public:
 	int tickID=0;
 	virtual ICamera3D * getHolderCamera()=0;//can return 0 if currently not held
 	virtual ChunkManager * getChunkManager()=0;
+	virtual IWorld * getIWorld()=0;
 	virtual Entity * getTarget(Entity * me)=0;
 	std::vector<InteractionManager *> * getInterManVector(unsigned int threadID=0);
 

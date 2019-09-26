@@ -19,7 +19,8 @@
 Zombie_Tree::Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves):
 tex1(textureLog),tex2(textureLeaves)
 {
-	surviveClearing=true;//TODO debug despawning
+	surviveClearing=true;
+	allowHibernating=true;
 	bb=AABB(position);
 	pos=position;
 	v.set0();
@@ -128,6 +129,7 @@ void Zombie_Tree::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawS
 Zombie_Tree::~Zombie_Tree()
 {
 	//Textures are not owned by tree
+	std::cout<<"destroy"<<std::endl;
 }
 
 void Zombie_Tree::tick(Timestamp t, TickServiceProvider* tsp)

@@ -64,7 +64,6 @@ class ChunkManager: public IWorld
 
 	std::vector<chunkChange> addVec;//the entities that should be added to chunk[loc] soon
 	std::vector<chunkChange> removeVec;//the entities that should be removed from chunk[loc] soon (without deleting)
-	std::vector<Entity *> deleteVec;//the entities that should be removed from chunk[loc] soon (with deleting)
 
 	std::vector<std::shared_ptr<LockChunk>> lockChunks;
 
@@ -92,7 +91,6 @@ public:
 
 	//magic, do not use yourself:
 
-	void requestEntityDelete(Entity * e);//do not call this yourself, call Entiy.requestDestroy instead
 	void requestEntityMove(Entity * e);//do not call yourself, managed by chunks
 	spacevec activeChunk;//TODO debug only, remove after debugging
 	void tick(Timestamp t,TickServiceProvider * tsp);
@@ -114,7 +112,7 @@ public:
 
 	//the partially critical interface: only call from main tick thread
 	//writing:
-	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!!
+	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks.
 	void giveInteractionManagers(Entity * e,std::vector<InteractionManager *> * managers,TickServiceProvider * tsp);
 	//read-only:
 	spacelen getHeight(spacevec abs);//absolute x,z

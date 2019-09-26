@@ -175,3 +175,7 @@ std::ostream& operator<< (std::ostream& os, const AABB& bb)
 	return os;
 }
 
+bool AABB::contains(spacevec s)
+{
+	return (!(low>s))&&(!(high<s));
+}
