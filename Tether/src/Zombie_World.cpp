@@ -225,12 +225,12 @@ void Zombie_World::loadStandardTex()
 	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
 	cm->requestEntitySpawn(tr);
 
-	diamond_mesh = new Mesh(diamondMesh(9, 0.3f, 2.0f));
+	diamond_mesh = new Mesh(diamondMesh(7, 0.3f, 2.0f));
 	MeshIO meshio("./res/cross.mesh");
 	cross_mesh = new Mesh(meshio.get());
 	ModelEntity* diamond = new ModelEntity
 		(
-			Model(diamond_mesh, 0.8f)
+			Model(diamond_mesh, glm::scale(vec3(0.8f)))
 		);
 	spawnGrounded
 		(
@@ -239,7 +239,7 @@ void Zombie_World::loadStandardTex()
 		);
 	ModelEntity* cross = new ModelEntity
 		(
-			Model(cross_mesh, 2.0f)
+			Model(cross_mesh, glm::scale(vec3(2.0f)))
 		);
 	spawnGrounded
 		(

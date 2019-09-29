@@ -51,20 +51,7 @@ spacevec ModelEntity::getPos() const
 	return this->pos;
 }
 
-vector<vec4> ModelEntity::shape(const vec3& pos) const
-{
-	vector<vec4> v;
-
-	for(auto e : model.mesh().vertices)
-	{
-		glm::vec4 vertex (e.x, e.y, e.z, 1.0f);
-		v.push_back(vertex * (mat4) cummat);
-	}
-
-	return v;
-}
-
-float ModelEntity::groundedDistance() const
+float ModelEntity::groundedDistance()
 {
 	return model.groundDistance();
 }

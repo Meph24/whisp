@@ -1,14 +1,91 @@
 #include "Model.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include "glmutils.hpp"
 
-Model::Model(Mesh* mesh, float scale)
-	:
-	m_scale(scale),
-	m_mesh(mesh)
+Model::Model(Mesh* mesh)
+	: m_mesh(mesh)
+	, current_transformation(1.0f)
+	, transmat(current_transformation)
 {
-	updateDraw();
+	updateVertices();
+	updateExtent();
+}
+
+Model::Model(Mesh* mesh, const mat4& transformation_matrix)
+	: m_mesh(mesh)
+	, current_transformation(transformation_matrix)
+	, transmat (transformation_matrix)
+{
+	updateVertices();
+	updateExtent();
+}
+
+CumulativeMat& Model::transformationMatrix()
+{
+	return transmat;
+}
+
+void Model::updateVertices()
+{
+	m_vertices.clear();
+	m_vertices.reserve(m_mesh->vertices.size());
+	for(const vec3& v : m_mesh->vertices)
+	{
+		Vertex vertex(v.x, v.y, v.x, 1.0f);
+		m_vertices.push_back(vertex*transmat);
+	}
+	current_transformation=transmat;
+}
+
+const vector<Vertex>& Model::vertices()
+{
+	if(transmat!=current_transformation)
+	{
+		updateVertices();
+	}
+	return m_vertices;
+}
+
+vector<EdgeRef> Model::edges()
+{
+	vector<EdgeRef> ret;
+	size_t num_faces = m_mesh->faceCount();
+	for ( size_t i = 0; i < num_faces; ++i )
+	{
+		//guaranteed sorted
+		array<unsigned int, 3> face_indices = m_mesh->faceIndicesByIndex(i);
+		EdgeRef er;
+		er.sortedIn(face_indices[0], face_indices[1]);
+		ret.push_back(er);
+		er.sortedIn(face_indices[1], face_indices[2]);
+		ret.push_back(er);
+		er.sortedIn(face_indices[0], face_indices[2]);
+		ret.push_back(er);
+	}
+
+	std::sort(ret.begin(), ret.end());
+	std::unique(ret.begin(), ret.end());
+	return ret;
+}
+
+vector<FaceRef> Model::faces()
+{
+	vector<FaceRef> ret;
+	size_t num_faces = m_mesh->faceCount();
+	for ( size_t i = 0; i < num_faces; ++i )
+	{
+		array<unsigned int, 3> face_indices = m_mesh->faceIndicesByIndex(i);
+		FaceRef fr;
+		fr.sortedIn(	face_indices[0],
+						face_indices[1],
+						face_indices[2]		);
+		ret.push_back(fr);
+	}
+	return ret;
 }
 
 void Model::updateDraw()
@@ -56,21 +133,32 @@ const Mesh& Model::mesh() const
 	return *m_mesh;
 }
 
-const float& Model::scale() const
+void Model::updateExtent()
 {
-	return m_scale;
+	float max_x, max_y, max_z;
+	max_x = max_y = max_z = 0;
+	auto vert = vertices();
+	for(Vertex v : vert)
+	{
+		max_x = (fabs(v.x) > max_x)? v.x : max_x;
+		max_y = (fabs(v.y) > max_y)? v.y : max_y;
+		max_z = (fabs(v.z) > max_z)? v.z : max_z;
+	}
+	m_extent = vec3(max_x, max_y, max_z);
 }
 
-vec3 Model::extent() const
+const vec3& Model::extent()
 {
-	return m_scale * m_mesh->extent();
+	if(current_transformation!=transmat)
+	{
+		updateExtent();
+	}
+	return m_extent;
 }
 
-float Model::groundDistance() const
+float Model::groundDistance()
 {
-	float f =  m_scale * m_mesh->lowestPoint().y;
-	std::cout << "Model Lowest Point : " << f << '\n';
-	return f;
+	return -1*extent().y;
 }
 
 void Model::drawBuffered()
@@ -83,9 +171,10 @@ void Model::drawBuffered()
 void Model::drawNative()
 {
 	glBegin(GL_TRIANGLES);
-
-	int i = 0;
-	for(array<vec3, 3> triangle : *m_mesh)
+	
+	size_t faces = m_mesh->faceCount();
+	std::cout << "FACES: " << faces << '\n';
+	for(size_t i = 0; i < faces; i++)
 	{
 		//switch color for every triangle
 		//so edges can be seen
@@ -112,22 +201,19 @@ void Model::drawNative()
 		thisblue = thisblue+(0.01f*(i%25));
 
 		glColor3f(1.0f, 0.0f, thisblue);
-		i++;
-		for(vec3 vertex : triangle)
+		for(vec3 vertex : m_mesh->faceByIndex(i))
 		{
 			glVertex3f(vertex.x, vertex.y, vertex.z);
 		}
 	}	
-
 	glEnd();	
 }
 
 void Model::draw()
 {
 	glPushMatrix();
-
-	glScalef(m_scale, m_scale, m_scale);
-
+	//transpose for layout
+	glMultMatrixf((float*) glm::value_ptr(glm::transpose(transmat)));
 	drawNative();
 //	drawBuffered();
 

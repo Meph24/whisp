@@ -30,11 +30,9 @@ public:
 
 	spacevec getPos() const;
 
-	vector<vec4> shape(const vec3& pos = vec3(0.0f)) const;
-
 	//temporary solution to find extent in a certain direction
 	// here the direction is hardcoded to below
-	virtual float groundedDistance() const;
+	virtual float groundedDistance();
 
 	virtual void draw(	Timestamp ts, 
 						Frustum* viewFrustum, 

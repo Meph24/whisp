@@ -12,20 +12,21 @@ Mesh diamondMesh(int facets, float radius, float height)
 	float h = height; //height
 
 	vector<vec3> vertices(facets + 2, vec3(0.0f, 0.0f, 0.0f));
-	vertices[0] = vec3(0.0f, 0.0f, 0.0f);
-	vertices[1] = vec3(0.0f, h, 0.0f);
+	vertices[0] = vec3(0.0f, -(h/2), 0.0f);
+	vertices[1] = vec3(0.0f, h/2, 0.0f);
 
 	// 3 for every triangle
 	// 2 because 2 points of the diamond
 	vector<unsigned int> indices(facets*3*2, 0);
 
+	const float in_between_y = vertices[0].y + ((vertices[1].y - vertices[0].y) / 2);
 	const float segment_constant = TAU / facets;
 	for ( int i = 0; i < facets; ++i )
 	{
 		//vertices
 		float circle_x = sin(segment_constant * i) * r;
 		float circle_y = cos(segment_constant * i) * r;
-		vertices[2+i] = vec3(circle_x, h/2, circle_y);
+		vertices[2+i] = vec3(circle_x, in_between_y, circle_y);
 
 		//0 and 1 are the vertices on the points, top and bottom, respectively
 		//top facet

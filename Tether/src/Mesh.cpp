@@ -1,173 +1,39 @@
 #include "Mesh.hpp"
-#include <string>
-#include <iostream>
+
+#include <algorithm>
 #include <cmath>
+#include <iostream>
+#include <string>
 #include "glmutils.hpp"
 
 using std::cout;
 using std::string;
 
 
-Mesh::Mesh()
-	:
-		m_extent(0.0,0.0,0.0)
-{}
-
-const vec3& Mesh::extent() const
+array<unsigned int, 3> Mesh::faceIndicesByIndex(size_t i) const
 {
-	return m_extent;	
+	if(i >= faceCount())
+		return	{0,0,0};
+
+	return {indices[i*3], indices[i*+1], indices[i*3+2]};
 }
 
-vec3 Mesh::calculateExtent()
+array<vec3, 3> Mesh::faceByIndex(size_t i) const
 {
-	float max_x, max_y, max_z;
-	max_x = max_y = max_z = 0.0;
-	
-	//TODO change with impl of rotation
-	//for now without rotation
-	for(auto v : vertices)
-	{
-		float x = abs(v.x);
-		max_x = (x > max_x)? x : max_x;
-		
-		float y = abs(v.y);
-		max_y = (y > max_y)? y : max_y;
+	if(i >= faceCount())
+		return	{ vec3(0.f), vec3(0.f), vec3(0.f) };
 
-		float z = abs(v.z);
-		max_z = (z > max_z)? z : max_z;
-	}
-	return vec3(max_x, max_y, max_z);
-}
-
-vec3 Mesh::lowestPoint() const
-{
-	vec3 low(0.0,INFINITY,0.0);
-	for (auto v : vertices)
-	{
-		if(v.y < low.y) 
-		{
-			low = v;
-		}
-	}
-	return low;
+	return	{
+				vertices[indices[3*i]], 
+				vertices[indices[3*i+1]],
+				vertices[indices[3*i+2]]
+			};
 }
 
 
-Mesh::TriangleIterator::TriangleIterator()
-	:
-		mesh(nullptr),
-		iter(0),
-		maxcount(0),
-		triangle	{
-						vec3({0.0f,0.0f,0.0f}),
-						vec3({0.0f,0.0f,0.0f}),
-						vec3({0.0f,0.0f,0.0f})
-					},
-		value_loaded(false)
-{}
-
-Mesh::TriangleIterator::TriangleIterator(size_t triangle_count, Mesh* mesh, size_t iter)
-	:
-	mesh(mesh),
-	iter(iter),
-	maxcount(triangle_count),
-	value_loaded(false)
-{
-	if(iter < maxcount)
-		triangle = mesh->triangleByIndex(iter);
-}
-
-
-Mesh::TriangleIterator& Mesh::TriangleIterator::operator++() //prae
-{
-	if(iter >= maxcount)
-		return *this;
-	
-	iter++;
-	value_loaded = false;
-	return *this;
-}
-
-Mesh::TriangleIterator& Mesh::TriangleIterator::operator++(int) //post
-{
-	if(iter >= maxcount)
-	{
-		return *this;
-	}
-	
-	iter++;
-	value_loaded = false;
-	return *this;
-}
-
-array<vec3, 3>& Mesh::TriangleIterator::operator* ()
-{
-	if(!value_loaded)
-	{
-		value_loaded = true;
-		triangle = mesh->triangleByIndex(iter);
-	}
-	return triangle;
-}
-
-array<vec3, 3>* Mesh::TriangleIterator::operator->()
-{
-	if(!value_loaded)
-	{
-		value_loaded = true;
-		triangle = mesh->triangleByIndex(iter);
-	}
-	return &triangle;
-}
-
-bool Mesh::TriangleIterator::operator== (const Mesh::TriangleIterator& other) const
-{
-	return	(
-				iter >= maxcount && 
-				other.iter >= other.maxcount
-			) //both are end iterators
-			||
-			(
-				mesh == other.mesh &&
-				iter == other.iter &&
-				maxcount == other.maxcount
-			);
-}
-
-bool Mesh::TriangleIterator::operator!= (const Mesh::TriangleIterator& other) const
-{
-	return !(*this == other);
-}
-
-array<vec3, 3> Mesh::triangleByIndex(size_t i) const
-{
-	if(i >= triangleCount())
-		return	{
-					vec3{0.0f,0.0f,0.0f}, 
-					vec3{0.0f,0.0f,0.0f}, 
-					vec3{0.0f,0.0f,0.0f}
-				};
-	return {
-			vertices[indices[3*i]], 
-			vertices[indices[3*i+1]],
-			vertices[indices[3*i+2]]
-		   };
-}
-
-
-size_t Mesh::triangleCount() const
+size_t Mesh::faceCount() const
 {
 	return indices.size() / 3;
-}
-
-Mesh::TriangleIterator Mesh::begin()
-{
-	return TriangleIterator(triangleCount(), this, 0);
-}
-
-Mesh::TriangleIterator Mesh::end()
-{
-	return TriangleIterator(triangleCount(), this, triangleCount());
 }
 
 
@@ -189,9 +55,8 @@ istream& operator>> (istream& is, Mesh& m)
 {
 	float x, y ,z;
 	string s;
-	if(!is.eof())
+	if(is >> s)
 	{
-		is >> s;
 		cout << ">>>>" << s << '\n';
 		while(s != "|")
 		{
@@ -204,12 +69,18 @@ istream& operator>> (istream& is, Mesh& m)
 			is >> s;
 		}
 		unsigned int i;	
-		while(!is.eof())
+		while(is >> i)
 		{
-			is >> i;
 			m.indices.push_back(i);
 		}
+	
+
+		//sort indices for every triangle, which means every pair of 3 in indices
+		for(auto iter = m.indices.begin(); iter!=m.indices.end(); iter+=3)
+		{	
+			if(iter+2 == m.indices.end()) break;
+			std::sort(iter, iter+3);
+		}
 	}
-	m.m_extent = m.calculateExtent();
 	return is;
 }
