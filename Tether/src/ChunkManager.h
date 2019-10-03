@@ -112,13 +112,16 @@ public:
 
 	//the partially critical interface: only call from main tick thread
 	//writing:
-	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks.
 	void giveInteractionManagers(Entity * e,std::vector<InteractionManager *> * managers,TickServiceProvider * tsp);
 	//read-only:
 	spacelen getHeight(spacevec abs);//absolute x,z
 	spacevec getMiddleChunk();
 	bool hitsGround(spacevec startpoint,spacevec endpoint);
 	spacevec clip(spacevec pos,bool forceGround);
+
+	//IWorld interface:
+	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks.
+
 
 
 };
