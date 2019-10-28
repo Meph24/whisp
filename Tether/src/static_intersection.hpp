@@ -348,3 +348,8 @@ bool lineIntersectsParallelogram(	const vec3& pr,
 
 #endif /* STATIC_INTERSECTION_HPP */
 
+
+inline float ppop_divisor(const vec3& v0, const vec3& v1, float vec3::* m0, float vec3::* m1)
+{
+	return (v0.*m0 * v1.*m1 - v1.*m0 * v0.*m1);
+}

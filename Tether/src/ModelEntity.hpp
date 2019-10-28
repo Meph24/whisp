@@ -17,12 +17,14 @@ using glm::vec4;
 
 class ModelEntity : public Entity
 {
-	Model model;
+	Model m_model;
 
 	CumulativeMat cummat;
 public:
 	ModelEntity(const Model& model);
 	~ModelEntity();
+
+	Model& model();
 
 	void move(spacevec d);
 	void rotate(vec3 rot);

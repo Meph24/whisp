@@ -77,37 +77,70 @@ bool pointPartOfPlane(	const vec3& pr,
 {
 	//solve the equation
 	//pr + x * p1 + y * p2 == p
-	
-	vec3 pv1 = p1 - pr;
-	vec3 pv2 = p2 - pr;
+	// x*p1 * y*p2 == p - pr == iv	
 	vec3 iv = p - pr;
 
 
 	//solve only for x and y
 	//by solving gauss and following its calculation steps
 	//	we get a formula for x and y
-	//	pv1.x pv2.x | iv.x		1 0 | x 	
-	//	pv1.x pv2.y | iv.y ---> 0 1 | y
-	//	x = (iv.x*pv2.y-pv2.x*iv.y)/(pv1.x*pv2.y-pv2.x*pv1.x)
-	//	y = (pv1.x*iv.y-iv.x*pv1.x)/(pv1.x*pv2.y-pv2.x*pv1.x)
+	//	p1.x p2.x | iv.x		1 0 | x 	
+	//	p1.x p2.y | iv.y ---> 0 1 | y
+	//	x = (iv.x*p2.y-p2.x*iv.y)/(p1.x*p2.y-p2.x*p1.x)
+	//	y = (p1.x*iv.y-iv.x*p1.x)/(p1.x*p2.y-p2.x*p1.x)
 
+	//by leaving out one dimension in the equation
+	//the division of 2 of the 3 members of input-vectors can be zero
+	// while the equation system with 3 members would still be valid
+	// we therefore try all 3 2-pair-combinations of members
+	
+	float vec3::* m0;
+	float vec3::* m1;
+	float vec3::* m_leftover;
 
-	float divisor = (pv1.x*pv2.y-pv2.x*pv1.y);
-#define MY_EPSILON (0.00001)
+#define STATIC_INTERSECTION_PPOP_EPSILON (0.00001)
 	//TODO cummunicate Epsilon convetions
-	if(fabs(divisor) < MY_EPSILON)
-		return false;
+
+	float divisor = 0.0f;
+	m0 = &vec3::x;
+	m1 = &vec3::y;
+	m_leftover = &vec3::z;
+	divisor = ppop_divisor(p1, p2, m0, m1);
+
+	if(divisor < STATIC_INTERSECTION_PPOP_EPSILON)
+	{
+//		m0 = &vec3::x;
+		m1 = &vec3::z;
+		m_leftover = &vec3::y;
+		divisor = ppop_divisor(p1, p2, m0, m1);
+
+		if(divisor < STATIC_INTERSECTION_PPOP_EPSILON)
+		{
+			m0 = &vec3::y;
+//			m1 = &vec3::z;
+			m_leftover = &vec3::x;
+			divisor = ppop_divisor(p1, p2, m0, m1);
+
+			if(divisor < STATIC_INTERSECTION_PPOP_EPSILON)
+			{
+				//if everywhere the divisor is 0 the vectors are 
+				//	parallel and the les is not solvable for 2 coeffs
+				return false;
+			}
+		}
+	}
 
 	vec2 coeff;
-	coeff.x = (iv.x*pv2.y-pv2.x*iv.y)/divisor;
-	coeff.y = (pv1.x*iv.y-iv.x*pv1.y)/divisor;
+	coeff.x = (iv.*m0 * p2.*m1 - p2.*m0 * iv.*m1)/divisor;
+	coeff.y = (p1.*m0 * iv.*m1 - iv.*m0 * p1.*m1)/divisor;
 	
 	if(plane_coeff_out) *plane_coeff_out = coeff;
 
-	//check back with z
-	//if calculated coefficients do not aprly correctly to z
+	//check back with the leftover member
+	//if calculated coefficients do not apply correctly to this member
 	//	then the given intersection point is not on the given plane
-	return (pv1.z * coeff.x + pv2.z * coeff.y == iv.z)
+	float coeff_z = p1.*m_leftover * coeff.x + p2.*m_leftover * coeff.y;
+	return (coeff_z == iv.*m_leftover)
 		? true : false;
 }
 

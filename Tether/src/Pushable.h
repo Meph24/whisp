@@ -11,7 +11,6 @@
 
 class Entity;
 class TickServiceProvider;
-
 #include "Spacevec.h"
 #include "DualPointer.h"
 

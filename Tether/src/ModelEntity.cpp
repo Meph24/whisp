@@ -14,9 +14,14 @@ using glm::vec4;
 using glm::vec3;
 using glm::mat4;
 
+Model& ModelEntity::model()
+{
+	return m_model;
+}
+
 ModelEntity::ModelEntity(const Model& model)
 :
-	model(model)
+	m_model(model)
 {
 	surviveClearing = true;
 
@@ -53,7 +58,7 @@ spacevec ModelEntity::getPos() const
 
 float ModelEntity::groundedDistance()
 {
-	return model.groundDistance();
+	return m_model.groundDistance();
 }
 
 void ModelEntity::draw(	
@@ -75,7 +80,7 @@ void ModelEntity::draw(
 
 	//apply position
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
-	model.draw();
+	m_model.draw();
 
 	glPopMatrix();
 }
@@ -91,6 +96,6 @@ void ModelEntity::tick
 
 	//entity attribute changes go here
 
-	bb = AABB(pos, cm->fromMeters(model.extent()));
+	bb = AABB(pos, cm->fromMeters(m_model.extent()));
 }
 

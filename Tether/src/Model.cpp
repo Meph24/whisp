@@ -35,8 +35,8 @@ void Model::updateVertices()
 	m_vertices.reserve(m_mesh->vertices.size());
 	for(const vec3& v : m_mesh->vertices)
 	{
-		Vertex vertex(v.x, v.y, v.x, 1.0f);
-		m_vertices.push_back(vertex*transmat);
+		Vertex vertex(v.x, v.y, v.z, 1.0f);
+		m_vertices.emplace_back(vertex*transmat);
 	}
 	current_transformation=transmat;
 }
@@ -124,8 +124,8 @@ void Model::updateDraw()
 
 Model::~Model()
 {
-	glDeleteBuffers(V_BUFFERS::NUM, vertexArrayBuffers);
-	glDeleteVertexArrays(1, &vertexArrayObject);
+	//glDeleteBuffers(V_BUFFERS::NUM, vertexArrayBuffers);
+	//glDeleteVertexArrays(1, &vertexArrayObject);
 }
 
 const Mesh& Model::mesh() const
@@ -173,7 +173,6 @@ void Model::drawNative()
 	glBegin(GL_TRIANGLES);
 	
 	size_t faces = m_mesh->faceCount();
-	std::cout << "FACES: " << faces << '\n';
 	for(size_t i = 0; i < faces; i++)
 	{
 		//switch color for every triangle

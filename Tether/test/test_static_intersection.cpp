@@ -579,7 +579,90 @@ TEST_F(test_static_intersection, lineIntersectsParallelogram_out_of_reach_miss)
 	EXPECT_FALSE(lineIntersectsParallelogram(pr, p1, p2, lr2, lv2));
 }
 
+TEST_F(test_static_intersection, z_coeff)
+{
+	vec3 lr(0.2f, 0.2f, -1.0f);
+	vec3 lv(0, 0, 2.0f);
 
+	vec3 out_pos;
+	float out_coeff_z;
+	EXPECT_TRUE(rayIntersectsPlane(pr, p1, p2, lr, lv, &out_pos, &out_coeff_z));
+
+	EXPECT_EQ(vec3(0.2f, 0.2f, 0), out_pos);
+	EXPECT_EQ(0.5f, out_coeff_z);
+}
+
+struct test_static_intersection_parallelogram_stack : public ::testing::Test
+{
+	//input
+	vec3 pr, p1, p2, rr, rv;
+
+	//expectations
+	vec3 expect_pos;
+	vec2 expect_plane_coeff;
+	float expect_ray_coeff;
+	vec3 expect_coeff;
+
+	//return parameters
+	vec3 out_pos;
+	float ray_coeff;
+	vec3 out_coeff;	
+	vec2 out_plane_coeff;
+
+	test_static_intersection_parallelogram_stack()
+		: pr(-1.0f, 0.5f, 0.0f)
+		, p1(2.0f, 0.0f, 0.0f)
+		, p2(0.0f,0.0f,1.0f)
+
+		, rr(1.0f, 0.0f, 0.0f)
+		, rv(-1.0f, 1.0f, 0.0f)
+
+		, expect_pos(0.5f, 0.5f, 0.0f)
+		, expect_plane_coeff(0.75f, 0.0f)
+		, expect_ray_coeff(0.5f)
+	{
+		expect_coeff = vec3(expect_plane_coeff, expect_ray_coeff);
+	}
+};
+
+TEST_F(test_static_intersection_parallelogram_stack, rayIntersectsPlane)
+{
+	EXPECT_TRUE(rayIntersectsPlane(pr, p1, p2, rr, rv, &out_pos, &ray_coeff));
+
+	EXPECT_EQ(expect_pos, out_pos);
+	EXPECT_EQ(expect_ray_coeff, ray_coeff);
+}
+
+
+TEST_F(test_static_intersection_parallelogram_stack, pointPartOfPlane)
+{
+	EXPECT_TRUE(pointPartOfPlane(pr, p1, p2, expect_pos, &out_plane_coeff));
+	EXPECT_EQ(expect_plane_coeff, out_plane_coeff);
+}
+
+TEST_F(test_static_intersection_parallelogram_stack, pointPartOfParallelogram)
+{
+
+	EXPECT_TRUE(pointPartOfParallelogram(pr, p1, p2, expect_pos, &out_plane_coeff));
+
+	EXPECT_EQ(expect_plane_coeff, out_plane_coeff);
+}
+
+TEST_F(test_static_intersection_parallelogram_stack, rayIntersectsParallelogram)
+{
+	EXPECT_TRUE(rayIntersectsParallelogram(pr, p1, p2, rr, rv, &out_pos, &out_coeff));
+
+	EXPECT_EQ(expect_pos, out_pos);
+	EXPECT_EQ(expect_coeff, out_coeff);
+}
+
+TEST_F(test_static_intersection_parallelogram_stack, lineIntersectsParallelogram)
+{
+	EXPECT_TRUE(lineIntersectsParallelogram(pr, p1, p2, rr, rv, &out_pos, &out_coeff));
+
+	EXPECT_EQ(expect_pos, out_pos);
+	EXPECT_EQ(expect_coeff, out_coeff);
+}
 
 int main (int argc , char** argv)
 {

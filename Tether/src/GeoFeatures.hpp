@@ -12,8 +12,28 @@ using glm::mat4x3;
 using std::array;
 
 typedef vec4 Vertex;
-typedef mat4x2 Edge;
-typedef mat4x3 Face;
+
+struct Edge : array<Vertex, 2>
+{
+	using array<Vertex, 2>::array;
+	Edge(Vertex, Vertex);
+	Edge(const array<Vertex, 2>&);
+	mat4x2 matrix() const;	
+	Edge transform(const glm::mat4& transmat) const;
+	Edge operator*(const glm::mat4& transmat) const;
+};
+
+struct Face : array<Vertex, 3>
+{
+	using array<Vertex, 3>::array;
+	Face(Vertex, Vertex, Vertex);
+	Face(const array<Vertex, 3>&);
+	mat4x3 matrix() const;
+	Face transform(const glm::mat4& transmat) const;
+	Face operator*(const glm::mat4& transmat) const;
+};
+
+typedef unsigned int VertexRef;
 
 struct EdgeRef : public array<unsigned int, 2>
 {
@@ -32,13 +52,12 @@ struct EdgeRef : public array<unsigned int, 2>
 	{
 		Index_RandIter iter0, iter1;
 		iter0 = value_container_begin + (*this)[0];
-		if(iter0 = value_container_end) return Edge();
+		if(iter0 == value_container_end) return Edge();
 		iter1 = value_container_begin + (*this)[1];
-		if(iter1 = value_container_end) return Edge();
+		if(iter1 == value_container_end) return Edge();
 		
-		return Edge	(	Vertex((*iter0), 1.0f),
-						Vertex((*iter1), 1.0f)	
-					);
+		return Edge (	Vertex(*iter0),
+						Vertex(*iter1)	);
 	}
 };
 
@@ -59,15 +78,15 @@ struct FaceRef : public array<unsigned int, 3>
 	{
 		Index_RandIter iter0, iter1, iter2;
 		iter0 = value_container_begin + (*this)[0];
-		if(iter0 = value_container_end) return Face();
+		if(iter0 == value_container_end) return Face();
 		iter1 = value_container_begin + (*this)[1];
-		if(iter1 = value_container_end) return Face();
+		if(iter1 == value_container_end) return Face();
 		iter2 = value_container_begin + (*this)[2];
-		if(iter2 = value_container_end) return Face();
+		if(iter2 == value_container_end) return Face();
 
-		return Face	(	Vertex((*iter0), 1.0f),
-						Vertex((*iter1), 1.0f),
-						Vertex((*iter2), 1.0f)	
+		return Face(	Vertex(*iter0),
+						Vertex(*iter1),
+						Vertex(*iter2)
 					);
 	}
 };

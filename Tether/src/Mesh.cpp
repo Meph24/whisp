@@ -15,7 +15,7 @@ array<unsigned int, 3> Mesh::faceIndicesByIndex(size_t i) const
 	if(i >= faceCount())
 		return	{0,0,0};
 
-	return {indices[i*3], indices[i*+1], indices[i*3+2]};
+	return {indices[i*3], indices[i*3+1], indices[i*3+2]};
 }
 
 array<vec3, 3> Mesh::faceByIndex(size_t i) const
