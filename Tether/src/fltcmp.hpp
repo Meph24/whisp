@@ -1,11 +1,13 @@
 #ifndef FLTCMP_HPP
 #     define FLTCMP_HPP
 
+#include <cmath>
+
 #define FLTCMP_DEFAULT_EPSILON 0.00001
 
 inline bool flteqE(float a, float b, float epsilon)
 {
-	return fabs(a-b) < epsilon;
+	return std::fabs(a-b) < epsilon;
 }
 
 
