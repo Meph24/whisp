@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <glm/glm.hpp>
+#include "glmutils.hpp"
 #include <glm/gtx/transform.hpp>
 
 #include "Mesh.hpp"

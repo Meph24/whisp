@@ -12,6 +12,7 @@
 #include "InteractionManager.h"
 #include "ChunkManager.h"
 
+#include "glmutils.hpp"
 #include <glm/glm.hpp>
 
 using glm::vec3;

@@ -1,7 +1,5 @@
 #include "ICamera3D.h"
 
-#include <glm/ext.hpp>
-#include <glm/ext.hpp>
 #include "glmutils.hpp"
 
 #include <iostream>

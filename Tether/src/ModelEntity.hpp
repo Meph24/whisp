@@ -9,6 +9,7 @@
 #include "Timestamp.h"
 #include "CumulativeMat.hpp"
 
+#include "glmutils.hpp"
 #include <glm/glm.hpp>
 
 using glm::vec3;

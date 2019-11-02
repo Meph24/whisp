@@ -2,7 +2,7 @@
 #     define GEOFEATURES_HPP
 
 #include <array>
-#include <glm/glm.hpp>
+#include "glmutils.hpp"
 
 using glm::vec3;
 using glm::vec4;

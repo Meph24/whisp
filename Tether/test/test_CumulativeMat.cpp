@@ -99,7 +99,7 @@ TEST_F(test_CumulativeMat, glm_multiple_multiple_functions)
 		);
 	
 	
-	EXPECT_TRUE(glm::equalsE(ret1, ret2, 0.00001f)) << '\n' << ret1 << '\n' << ret2 << '\n';
+	EXPECT_TRUE(glm::matEqualsE(ret1, ret2, 0.00001f)) << '\n' << ret1 << '\n' << ret2 << '\n';
 }
 
 int main (int argc , char** argv)

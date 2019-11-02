@@ -2,7 +2,7 @@
 #     define COLLISIONL2_HPP
 
 #include<array>
-#include<glm/glm.hpp>
+#include"glmutils.hpp"
 #include<vector>
 
 #include "IWorld.h"

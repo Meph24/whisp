@@ -12,8 +12,8 @@
 #include <iostream>
 #include <string>
 #include "MathStuff.h"
-#include <glm/glm.hpp>
 #include "glmutils.hpp"
+#include <glm/glm.hpp>
 using glm::vec3;
 
 //I must be a signed integer type

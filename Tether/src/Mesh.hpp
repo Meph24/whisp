@@ -1,7 +1,7 @@
 #ifndef MESH_HPP
 #     define MESH_HPP
 
-#include <glm/glm.hpp>
+#include "glmutils.hpp"
 #include <iostream>
 #include <vector>
 #include <array>

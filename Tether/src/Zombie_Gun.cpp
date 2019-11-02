@@ -6,6 +6,7 @@
 #include "EntityPlayer.h"
 #include "ItemAmmo.h"
 #include "CumulativeMat.hpp"
+#include "glmutils.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 

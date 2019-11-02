@@ -2,8 +2,8 @@
 #     define STATIC_INTERSECTION_HPP
 
 
-#include <glm/glm.hpp>
 #include "glmutils.hpp"
+#include <glm/glm.hpp>
 
 using glm::vec2;
 using glm::vec3;
