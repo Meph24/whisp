@@ -85,7 +85,7 @@ else:
 testSources = []
 for root, dirnames, filenames, in os.walk(test_root):
  for file in filenames:
-  if file.endswith(('.c','.cpp')):
+  if os.path.basename(root) == 'test' and file.endswith(('.c','.cpp')):
    testSources.append(os.path.join(root,file))
 
 if not testSources:
