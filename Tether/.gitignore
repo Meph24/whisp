@@ -30,3 +30,8 @@ whisp_debug
 
 /glm/
 /SFML/
+
+#stuff in the test area
+test/logging_test/*.log
+test/logging_test/*.exe
+test/logging_test/*.o

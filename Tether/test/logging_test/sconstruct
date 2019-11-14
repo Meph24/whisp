@@ -1,0 +1,38 @@
+
+import os
+import re
+
+### directory variables ###
+root = "."
+
+
+### Compiler ###
+cxx = 'g++-9'
+cppdefines = []
+cppflags = ['-Wall','-Wpedantic']
+cxxflags = ['-std=c++1z', '-g3']
+
+
+### Dependencies ###
+lib = []
+libpaths = []
+
+### build environment specification ###
+
+env = Environment()
+
+env.Replace(CXX = cxx)
+env.Append(LIBS = lib)
+env.Append(LIBPATH = libpaths)
+env.Append(CPPDEFINES = cppdefines)
+env.Append(CPPFLAGS = cppflags)
+env.Append(CXXFLAGS = cxxflags)
+
+sources = ['../../src/LogStream.cpp', '1.cpp']
+
+objects = [os.path.basename(f).replace('.cpp','.o') for f in sources]
+
+for src, obj in zip(sources, objects):
+	env.Object(obj, src)
+
+env.Program('1.exe', objects)
