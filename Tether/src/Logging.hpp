@@ -5,6 +5,7 @@
 #include <ctime>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <limits>
 #include <memory>
 #include <ostream>
@@ -17,24 +18,27 @@ using std::numeric_limits;
 using std::ofstream;
 using std::ostream;
 using std::string;
+using std::unique_ptr;
+
 
 namespace log
 {
 using SysTp = std::chrono::time_point<std::chrono::system_clock>;
 
+enum TYPE
+{
+	NONE = 0,
+	ERROR = 1,
+	WARNING = 2,
+	INFO = 3,
+	NUM_TYPES	
+};
+
 template<typename clock_type>
 class Logging
 {
-	using tp = std::chrono::time_point<clock_type>;
 public:
-	enum TYPE
-	{
-		NONE = 0,
-		ERROR = 1,
-		WARNING = 2,
-		INFO = 3,
-		NUM_TYPES	
-	};
+	using tp = std::chrono::time_point<clock_type>;
 private:
 	struct StartEventInfo
 	{
@@ -44,7 +48,7 @@ private:
 	unique_ptr<StartEventInfo> start_event_info;
 
 	/* designated initializer list sadly not supported before c++20 :( */
-	static string type_names[NUM_TYPES];
+	static const string type_names[NUM_TYPES];
 	unsigned int levels[NUM_TYPES] =	
 	{
 		/*[NONE] =*/	numeric_limits<unsigned int>::max(),
@@ -54,16 +58,28 @@ private:
 	};
 	LogStream log_stream;
 
+	bool std_out_active;
+	ostream* std_out_mapping [NUM_TYPES]=
+	{
+		/*[NONE] =*/	&std::cout,
+		/*[ERROR] =*/	&std::cerr,
+		/*[WARNING] =*/	&std::cout,
+		/*[INFO] =*/	&std::cout
+	};
 
 public:
 	//for when the logging does not log
 	static LogStream no_log_stream;
 
 	void startLogging();
-	void setMinLevel(Logging::TYPE type, unsigned int lvl);
+	void setMinLevel(TYPE type, unsigned int lvl);
 	void addOfstream(ofstream&& stream);
 
-	LogStream& log(Logging::TYPE tid, unsigned int lvl = 100);
+	void activateStdOut(bool activate = true);
+	void setStdOutMapping(TYPE type, ostream&);
+	bool stdOutActive() const;
+
+	LogStream& log(TYPE tid, unsigned int lvl = 100);
 
 	LogStream& error(unsigned int lvl = 100);
 	LogStream& warning(unsigned int lvl = 100);
