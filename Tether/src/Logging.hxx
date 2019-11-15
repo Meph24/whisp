@@ -87,6 +87,24 @@ LogStream& Logging<clock_type>::log(TYPE tid, unsigned int lvl)
 	return log_stream;
 }
 
+
+template<typename clock_type>
+LogStream& Logging<clock_type>::log(const string& tag)
+{
+	if(!active && !log_stream.noStream()) startLogging();
+
+	;
+	
+	auto t = clock_type::now();
+
+	log_stream	<< '\n'
+				<< "[" << TimeOutputWrapper<clock_type>(t) << ']' 
+				<< ((tag == "NONE") ? "" : (string("[")+tag+string("]")))
+				<< "|";
+
+	return log_stream;
+}
+
 template<typename clock_type>
 LogStream& Logging<clock_type>::error(unsigned int lvl)
 {

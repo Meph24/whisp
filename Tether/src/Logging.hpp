@@ -62,7 +62,7 @@ private:
 	ostream* std_out_mapping [NUM_TYPES]=
 	{
 		/*[NONE] =*/	&std::cout,
-		/*[ERROR] =*/	&std::cerr,
+		/*[ERROR] =*/	&std::clog,
 		/*[WARNING] =*/	&std::cout,
 		/*[INFO] =*/	&std::cout
 	};
@@ -79,7 +79,8 @@ public:
 	void setStdOutMapping(TYPE type, ostream&);
 	bool stdOutActive() const;
 
-	LogStream& log(TYPE tid, unsigned int lvl = 100);
+	LogStream& log(TYPE type, unsigned int lvl = 100);
+	LogStream& log(const string& type_name);
 
 	LogStream& error(unsigned int lvl = 100);
 	LogStream& warning(unsigned int lvl = 100);

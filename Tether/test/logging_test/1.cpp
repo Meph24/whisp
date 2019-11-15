@@ -28,6 +28,7 @@ int main (int argc , char** argv)
 	logging.activateStdOut();
 	logging.setStdOutMapping(log::TYPE::WARNING, std::clog);
 	
+	logging.log("custom tag") << "Meh no type here. :)";
 
 	for ( int i = 25; i < 28; ++i )
 	{
