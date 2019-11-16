@@ -28,11 +28,12 @@ env.Append(CPPDEFINES = cppdefines)
 env.Append(CPPFLAGS = cppflags)
 env.Append(CXXFLAGS = cxxflags)
 
-sources = ['../../src/LogStream.cpp', '1.cpp']
+sources = ['../../src/LogStream.cpp']
+test_sources = ['1.cpp', '2.cpp']
 
 objects = [os.path.basename(f).replace('.cpp','.o') for f in sources]
-
 for src, obj in zip(sources, objects):
-	env.Object(obj, src)
-
-env.Program('1.exe', objects)
+ env.Object(obj, src)
+for main in test_sources:
+ env.Object(main.replace('.cpp', '.o'), main);
+ env.Program(main.replace('.cpp', '.exe'), objects + [main])
