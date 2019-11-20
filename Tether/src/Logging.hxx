@@ -1,7 +1,6 @@
-#ifndef LOGGING_CPP
-#     define LOGGING_CPP
-
 #include <iostream>
+
+#include "TimeOutputWrapper.hpp"
 
 using std::cout;
 
@@ -180,5 +179,3 @@ Logging<clock_type>::Logging()
 {}
 
 } /* namespace log */
-	
-#endif /* LOGGING_CPP */

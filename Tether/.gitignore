@@ -35,3 +35,4 @@ whisp_debug
 test/logging_test/*.log
 test/logging_test/*.exe
 test/logging_test/*.o
+test/logging_test/log_*

@@ -28,8 +28,8 @@ env.Append(CPPDEFINES = cppdefines)
 env.Append(CPPFLAGS = cppflags)
 env.Append(CXXFLAGS = cxxflags)
 
-sources = ['../../src/LogStream.cpp']
-test_sources = ['1.cpp', '2.cpp']
+sources = ['../../src/LogStream.cpp', '../../src/SessionLog.cpp']
+test_sources = ['1.cpp', '2.cpp', '3.cpp']
 
 objects = [os.path.basename(f).replace('.cpp','.o') for f in sources]
 for src, obj in zip(sources, objects):
