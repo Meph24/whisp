@@ -3,6 +3,7 @@
 class Zombie_MouseInput;
 class ICamera3D;
 
+#include "glmutils.hpp"
 #include <glm/glm.hpp>
 using glm::vec3;
 

@@ -4,10 +4,12 @@
 #include "Mesh.hpp"
 #include <GL/glew.h>
 
+#include "CumulativeMat.hpp"
+#include "GeoFeatures.hpp"
+
 class Model
 {
 private:
-	float m_scale;
 	Mesh* m_mesh;
 	
 	enum V_BUFFERS
@@ -22,18 +24,27 @@ private:
 	GLuint vertexArrayBuffers[V_BUFFERS::NUM];
 	unsigned int drawCount;
 
+	mat4 current_transformation;
+	vector<Vertex> m_vertices;
+	CumulativeMat transmat;
+	vec3 m_extent;
 public:
-	Model(Mesh* mesh, float scale = 1.0f);
+	Model(Mesh* mesh);
+	Model(Mesh* mesh, const mat4& transmat);
 	~Model();
 
 	const Mesh& mesh() const;
-	const float& scale() const;
+
+	CumulativeMat& transformationMatrix();
+	const vector<Vertex>& vertices();
+	vector<EdgeRef> edges();
+	vector<FaceRef> faces();
 
 	/**
 	 * @return Vec3 with maximum occupated space in each direction from mid (radial).
 	 */
-	vec3 extent() const;
-	float groundDistance() const;
+	const vec3& extent();
+	float groundDistance();
 
 	void draw();
 	void drawBuffered(); //with buffered objects
@@ -41,5 +52,8 @@ public:
 
 	void updateDraw();
 
+private:
+	void updateExtent();
+	void updateVertices();
 };
 #endif /* MODEL_HPP */

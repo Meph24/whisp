@@ -10,7 +10,7 @@
 #define SRC_DIVISIONPLANE_H_
 #include "Spacevec.h"
 #include <iostream>
-#include <glm/glm.hpp>
+#include"glmutils.hpp"
 using glm::vec3;
 #include "AABB.h"
 

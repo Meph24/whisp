@@ -8,7 +8,6 @@
 
 #include "EntityPlayer.h"
 
-#include <glm/glm.hpp>
 #include "glmutils.hpp"
 using glm::vec3;
 
@@ -265,7 +264,7 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	pos=cm->clip(pos,true);
 	spacevec newPos=pos;
 	vec3 moved=cm->toMeters(newPos-oldPos);
-	if(glm::sqlen(moved)>0.0000000001f)
+	if(glm::sqlen(moved) > 0.0000000001f)
 	{
 		vec3 norm=glm::normalize(moved);
 		float speedModA=(glm::length(vec3(norm.x,0,norm.z)));

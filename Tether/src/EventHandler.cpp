@@ -14,6 +14,7 @@ EventHandler::Filter::Filter()
 		prevValue[i] = 0;
 	}
 }
+
 EventHandler::Filter::~Filter()
 {
 	delete[] prevValue;

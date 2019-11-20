@@ -1,7 +1,7 @@
 #include "Zombie_Enemy.h"
 
-#include <glm/glm.hpp>
 #include "glmutils.hpp"
+#include <glm/glm.hpp>
 
 #include "EntitySound.h"
 #include "ChunkManager.h"

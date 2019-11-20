@@ -9,6 +9,7 @@
 #include "Timestamp.h"
 #include "CumulativeMat.hpp"
 
+#include "glmutils.hpp"
 #include <glm/glm.hpp>
 
 using glm::vec3;
@@ -17,12 +18,14 @@ using glm::vec4;
 
 class ModelEntity : public Entity
 {
-	Model model;
+	Model m_model;
 
 	CumulativeMat cummat;
 public:
 	ModelEntity(const Model& model);
 	~ModelEntity();
+
+	Model& model();
 
 	void move(spacevec d);
 	void rotate(vec3 rot);
@@ -30,11 +33,9 @@ public:
 
 	spacevec getPos() const;
 
-	vector<vec4> shape(const vec3& pos = vec3(0.0f)) const;
-
 	//temporary solution to find extent in a certain direction
 	// here the direction is hardcoded to below
-	virtual float groundedDistance() const;
+	virtual float groundedDistance();
 
 	virtual void draw(	Timestamp ts, 
 						Frustum* viewFrustum, 

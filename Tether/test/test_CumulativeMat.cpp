@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include "../src/glmutils.hpp"
 
 using glm::vec3;
 using glm::mat4;
@@ -97,8 +98,8 @@ TEST_F(test_CumulativeMat, glm_multiple_multiple_functions)
 		* glm::rotate(glm::radians(90.0f), vec3(0, 0, 1))
 		);
 	
-
-	ASSERT_EQ(ret1, ret2) << '\n' << glm::to_string(ret1) << '\n' << glm::to_string(ret2) << '\n';
+	
+	EXPECT_TRUE(glm::matEqualsE(ret1, ret2, 0.00001f)) << '\n' << ret1 << '\n' << ret2 << '\n';
 }
 
 int main (int argc , char** argv)

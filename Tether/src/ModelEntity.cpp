@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <glm/glm.hpp>
+#include "glmutils.hpp"
 #include <glm/gtx/transform.hpp>
 
 #include "Mesh.hpp"
@@ -14,9 +14,14 @@ using glm::vec4;
 using glm::vec3;
 using glm::mat4;
 
+Model& ModelEntity::model()
+{
+	return m_model;
+}
+
 ModelEntity::ModelEntity(const Model& model)
 :
-	model(model)
+	m_model(model)
 {
 	surviveClearing = true;
 
@@ -51,22 +56,9 @@ spacevec ModelEntity::getPos() const
 	return this->pos;
 }
 
-vector<vec4> ModelEntity::shape(const vec3& pos) const
+float ModelEntity::groundedDistance()
 {
-	vector<vec4> v;
-
-	for(auto e : model.mesh().vertices)
-	{
-		glm::vec4 vertex (e.x, e.y, e.z, 1.0f);
-		v.push_back(vertex * (mat4) cummat);
-	}
-
-	return v;
-}
-
-float ModelEntity::groundedDistance() const
-{
-	return model.groundDistance();
+	return m_model.groundDistance();
 }
 
 void ModelEntity::draw(	
@@ -88,7 +80,7 @@ void ModelEntity::draw(
 
 	//apply position
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
-	model.draw();
+	m_model.draw();
 
 	glPopMatrix();
 }
@@ -104,6 +96,6 @@ void ModelEntity::tick
 
 	//entity attribute changes go here
 
-	bb = AABB(pos, cm->fromMeters(model.extent()));
+	bb = AABB(pos, cm->fromMeters(m_model.extent()));
 }
 

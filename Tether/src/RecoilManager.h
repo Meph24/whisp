@@ -9,6 +9,7 @@
 #ifndef SRC_RECOILMANAGER_H_
 #define SRC_RECOILMANAGER_H_
 
+#include "glmutils.hpp"
 #include <glm/glm.hpp>
 
 using glm::vec3;
