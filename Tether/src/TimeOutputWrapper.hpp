@@ -1,6 +1,15 @@
 #ifndef TIMEOUTPUTWRAPPER_HPP
 #     define TIMEOUTPUTWRAPPER_HPP
 
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <string>
+#include <iostream>
+
+using std::ostream;
+using std::string;
+
 template<typename clock_type>
 class TimeOutputWrapper
 {
