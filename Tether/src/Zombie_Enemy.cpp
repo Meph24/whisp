@@ -13,6 +13,8 @@
 #include "ITexture.h"
 #include "SpeedMod.h"
 #include "Chunk.h"
+#include "InteractFilterAlgoSym.h"
+#include "InteractFilterAlgoAsym.h"
 
 #include <cstdlib>
 #include <GL/glew.h>
@@ -298,6 +300,8 @@ void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,Draw
 
 void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 {
+	IWorld * iw=tsp->getIWorld();
+
 	headshot=true;
 	float seconds=t-lastTick;
 	lastTick=t;
@@ -388,8 +392,8 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 
 	v=(pos-prev)/seconds;
 	bb=AABB(pos,sizeBB);
-	registerPushCheck((Entity *)this,seconds,tsp);
-	if(remainingHP>=0) registerHitCheck((Entity *)this,seconds,tsp);
+	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,seconds,*tsp);
+	if(remainingHP>=0) iw->projectileAlgo->doChecks((Hittable *) this,(Entity *)this,seconds,*tsp);
 }
 
 #include "WarnErrReporter.h"
@@ -772,7 +776,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	ml.pop();
 }
 
-void Zombie_Enemy::push(spacevec amount, TickServiceProvider* tsp)
+void Zombie_Enemy::push(spacevec amount, TickServiceProvider& tsp)
 {
 	pos+=amount;
 }

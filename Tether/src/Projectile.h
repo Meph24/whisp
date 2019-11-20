@@ -31,9 +31,9 @@ public:
 	hitType typeH=0;//must have exactly 1 bit set (by implementations)
 
 	spacevec posOld;
-	void interact(Entity * self,DualPointer<Hittable> other, float time, TickServiceProvider* tsp);
+	void interact(Entity * self,DualPointer<Hittable> other, float time, TickServiceProvider& tsp);
 
-	void registerHitCheck(Entity * e,float seconds,TickServiceProvider * tsp);
+//	void registerHitCheck(Entity * e,float seconds,TickServiceProvider * tsp);
 
 	virtual void retick(TickServiceProvider * tsp);
 

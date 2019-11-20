@@ -25,24 +25,24 @@ class InteractionGroup2
 public:
 	std::vector<DualPointer<MasterIF>> firstCalled;
 	std::vector<DualPointer<SlaveIF>> secondCalled;
-	void registerInteractionCheck(MasterIF * pIF,Entity * e, float time,TickServiceProvider* tsp);
-	void registerInteractionCheck(DualPointer<MasterIF> e, float time,TickServiceProvider* tsp);
-	void registerInteractionCheck(SlaveIF * pIF,Entity * e, float time,TickServiceProvider* tsp);
-	void registerInteractionCheck(DualPointer<SlaveIF> e, float time,TickServiceProvider* tsp);
-	void check(DualPointer<MasterIF> f,DualPointer<SlaveIF> s,float time,TickServiceProvider* tsp);
+	void registerInteractionCheck(MasterIF * pIF,Entity * e, float time,TickServiceProvider& tsp);
+	void registerInteractionCheck(DualPointer<MasterIF> e, float time,TickServiceProvider& tsp);
+	void registerInteractionCheck(SlaveIF * pIF,Entity * e, float time,TickServiceProvider& tsp);
+	void registerInteractionCheck(DualPointer<SlaveIF> e, float time,TickServiceProvider& tsp);
+	void check(DualPointer<MasterIF> f,DualPointer<SlaveIF> s,float time,TickServiceProvider& tsp);
 	void reset();
 	InteractionGroup2();
 	~InteractionGroup2();
 };
 
 template<typename MasterIF, typename SlaveIF>
-inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(MasterIF* pIF, Entity* e, float time, TickServiceProvider* tsp)
+inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(MasterIF* pIF, Entity* e, float time, TickServiceProvider& tsp)
 {
 	registerInteractionCheck(DualPointer<MasterIF>(e,pIF),time,tsp);
 }
 
 template<typename MasterIF, typename SlaveIF>
-inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualPointer<MasterIF> e, float time, TickServiceProvider* tsp)
+inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualPointer<MasterIF> e, float time, TickServiceProvider& tsp)
 {
 	int size=secondCalled.size();
 	for(int i=0;i<size;i++)
@@ -54,14 +54,14 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualP
 }
 
 template<typename MasterIF, typename SlaveIF>
-inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(SlaveIF* pIF, Entity* e, float time, TickServiceProvider* tsp)
+inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(SlaveIF* pIF, Entity* e, float time, TickServiceProvider& tsp)
 {
 	registerInteractionCheck(DualPointer<SlaveIF>(e,pIF),time,tsp);
 }
 
 
 template<typename MasterIF, typename SlaveIF>
-inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualPointer<SlaveIF> e, float time, TickServiceProvider* tsp)
+inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualPointer<SlaveIF> e, float time, TickServiceProvider& tsp)
 {
 	int size=firstCalled.size();
 	for(int i=0;i<size;i++)
@@ -74,19 +74,19 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::registerInteractionCheck(DualP
 
 
 template<typename MasterIF, typename SlaveIF>
-inline void InteractionGroup2<MasterIF, SlaveIF>::check(DualPointer<MasterIF> f, DualPointer<SlaveIF> s, float time,TickServiceProvider* tsp)
+inline void InteractionGroup2<MasterIF, SlaveIF>::check(DualPointer<MasterIF> f, DualPointer<SlaveIF> s, float time,TickServiceProvider& tsp)
 {
 	//double code starts here, see InteractionGroup1
 	//TODO simplify for InteractionGroup2
-	if(tsp->tickID!=f.e->lastTickID)
+	if(tsp.tickID!=f.e->lastTickID)
 	{
 		f.e->reset();
-		f.e->lastTickID=tsp->tickID;
+		f.e->lastTickID=tsp.tickID;
 	}
-	if(tsp->tickID!=s.e->lastTickID)
+	if(tsp.tickID!=s.e->lastTickID)
 	{
 		s.e->reset();
-		s.e->lastTickID=tsp->tickID;
+		s.e->lastTickID=tsp.tickID;
 	}
 	if(!f.e->bb.doesIntersect(s.e->bb)) return;
 	AABB::intersectionCounter++;

@@ -73,7 +73,7 @@ public:
 
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
-	virtual void push(spacevec amount, TickServiceProvider* tsp);
+	virtual void push(spacevec amount, TickServiceProvider& tsp);
 
 	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);
 

@@ -27,6 +27,7 @@ using glm::vec3;
 #include "Graphics2D.h"
 #include "Zombie_MouseInput.h"
 #include "ItemAmmo.h"
+#include "InteractFilterAlgoSym.h"
 
 EntityPlayer::EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
 speed(characterSpeed),heldItem(0),inventory(0)
@@ -235,6 +236,8 @@ Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestri
 #include "EventDefines.h"
 void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 {
+	IWorld * iw=tsp->getIWorld();
+
 	EventMapper * eMap=tsp->eMap;
 	if(eMap->getStatusAndReset(STATUS_ID_INVENTORY))
 	{
@@ -280,13 +283,14 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	size.y=characterHeightConv*1.5f;
 	size.z=size.x;
 	bb=AABB(pos,size,v*(-time));
-	registerPushCheck((Entity *)this,time,tsp);
+	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,time,*tsp);
 }
 
-void EntityPlayer::push(spacevec amount, TickServiceProvider* tsp)
+void EntityPlayer::push(spacevec amount, TickServiceProvider& tsp)
 {
 	pos+=amount;
-	HP -= 15625*glm::sqlen(tsp->getChunkManager()->toMeters(amount));
+	std::cout<<"amount"<<amount<<" | "<<tsp.getChunkManager()->toMeters(amount);
+//	HP -= 15625*glm::sqlen(tsp.getChunkManager()->toMeters(amount));
 }
 #include <iostream>
 void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,HittableBulletLike* victim)

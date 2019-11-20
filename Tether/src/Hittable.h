@@ -26,7 +26,7 @@ public:
 	hitType acceptedConversions=0;//can have multiple flags set
 
 	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm);
-	void registerHitCheck(Entity * e,float seconds,TickServiceProvider * tsp);
+	//void registerHitCheck(Entity * e,float seconds,TickServiceProvider * tsp);
 
 	//below are conversions to more concrete forms of Hittables, subclasses override the correct one and return themselves
 	virtual HittableBulletLike * asHittableBulletLike();//default is return null, if not overwritten

@@ -252,7 +252,10 @@ void Zombie_World::loadStandardTex()
 void Zombie_World::doPhysics(Timestamp t)
 {
 	initNextTick();
-	player->tick(t,this);//TODO insert into chunk manager
+
+	cm->preTick();
+
+	player->tick(t,this);//TODO insert into IWorld
 
 	cm->tick(t,this);
 

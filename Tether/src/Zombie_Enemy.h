@@ -75,7 +75,7 @@ public:
 
 	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm);
 
-	virtual void push(spacevec amount, TickServiceProvider* tsp);
+	virtual void push(spacevec amount, TickServiceProvider& tsp);
 
 	virtual HittableBulletLike * asHittableBulletLike();
 

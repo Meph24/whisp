@@ -13,7 +13,18 @@
 #include "Drawable.h"
 
 #include "AABB.h"
-#include "InteractionManager.h"
+#include "Pushable.h"
+#include "Hittable.h"
+#include "Projectile.h"
+
+
+template<typename PhysicsIF>
+class InteractFilterAlgoSym;
+
+
+template<typename MasterIF,typename SlaveIF>
+class InteractFilterAlgoAsym;
+
 
 #include <vector>
 
@@ -28,6 +39,9 @@ protected:
 
 
 public:
+	InteractFilterAlgoSym<Pushable>* pushAlgo=0;
+	InteractFilterAlgoAsym<Projectile,Hittable>* projectileAlgo=0;
+
 	IWorld();
 	virtual ~IWorld();
 
@@ -37,6 +51,8 @@ public:
 	vec3 toMeters(spacevec v);
 	spacelen fromMeters(float l) const;
 	spacevec fromMeters(const vec3& v) const;
+
+	void preTick();
 
 	virtual void leaveWorld(Entity * e,TickServiceProvider * tsp);//is called if Entity is outside loaded area
 	virtual void hibernate(Entity * e);//Entity outside loaded area, but not deleted, does not get ticked
@@ -48,25 +64,7 @@ public:
 
 	virtual void requestEntityDelete(Entity * e);//do not call this yourself, call Entiy.requestDestroy instead
 
-protected:
-	//overriding giveInteractionManagers() enables the default implementation of register[..]InteractionCheck(). You can instead provide them yourself if you cannot provide giveInteractionManagers().
-	virtual void giveInteractionManagers(Entity * e,std::vector<InteractionManager *> * managers,TickServiceProvider * tsp);
-public:
-	template<typename SymIF>
-	virtual void registerSymmetricInteractionCheck(SymIF * me,Entity* e, float seconds,TickServiceProvider* tsp);
 };
 
-template<typename SymIF>
-inline void IWorld::registerSymmetricInteractionCheck(SymIF* me, Entity* e,float seconds, TickServiceProvider* tsp)
-{
-	std::vector<InteractionManager *> * vec = tsp->getInterManVector();
-	tsp->getChunkManager()->giveInteractionManagers(e,vec,tsp);
-	int size=vec->size();
-	if(size<=0) WarnErrReporter::notInitializedErr("no chunks found in interManVec: uninitialized chunk?");
-	for(int i=0;i<size;i++)
-	{
-		(*vec)[i]->push.registerInteractionCheck(this,e,seconds,tsp);
-	}
-}
 
 #endif /* SRC_IWORLD_H_ */

@@ -12,31 +12,29 @@
 DivisionPlane::DivisionPlane(vec3 Normal,float Dist):
 normal(Normal),distanceInMeters(Dist)
 {
-	AABB test;
-	spacelen * ref=&(test.low.x);
 	if(normal.x<0)
 	{
-		xPtr=&(test.high.x)-ref;
+		xPtr=&AABB::high;
 	}
 	else
 	{
-		xPtr=&(test.low.x)-ref;
+		xPtr=&AABB::low;
 	}
 	if(normal.y<0)
 	{
-		yPtr=&(test.high.y)-ref;
+		yPtr=&AABB::high;
 	}
 	else
 	{
-		yPtr=&(test.low.y)-ref;
+		yPtr=&AABB::low;
 	}
 	if(normal.z<0)
 	{
-		zPtr=&(test.high.z)-ref;
+		zPtr=&AABB::high;
 	}
 	else
 	{
-		zPtr=&(test.low.z)-ref;
+		zPtr=&AABB::low;
 	}
 }
 
@@ -44,20 +42,16 @@ DivisionPlane::~DivisionPlane()
 {
 }
 
-bool DivisionPlane::inside(spacelen * bb,spacevec observerPos,IWorld * w)
+bool DivisionPlane::inside(AABB bb,spacevec observerPos,IWorld * w)
 {
 	spacevec relevantPoint;
-	relevantPoint.x=*(bb+xPtr)-observerPos.x;
-	relevantPoint.y=*(bb+yPtr)-observerPos.y;
-	relevantPoint.z=*(bb+zPtr)-observerPos.z;
+	relevantPoint.x=(bb.*xPtr).x-observerPos.x;
+	relevantPoint.y=(bb.*yPtr).y-observerPos.y;
+	relevantPoint.z=(bb.*zPtr).z-observerPos.z;
 	float d=glm::dot(w->toMeters(relevantPoint),normal);
 	return d<distanceInMeters;
 }
 
-bool DivisionPlane::inside(AABB bb,spacevec observerPos,IWorld * w)
-{
-	return inside(&bb.low.x,observerPos,w);
-}
 
 DivisionPlane::DivisionPlane()
 {

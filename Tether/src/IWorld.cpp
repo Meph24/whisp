@@ -8,15 +8,19 @@
 
 #include "IWorld.h"
 #include "Entity.h"
+#include "InteractFilterDefaultSym.h"
+#include "InteractFilterDefaultAsym.h"
 
 IWorld::IWorld()
 {
-	// TODO Auto-generated constructor stub
+	pushAlgo=new InteractFilterDefaultSym<Pushable>();//TODO placeholder
+	projectileAlgo=new InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
 }
 
 IWorld::~IWorld()
 {
-	// TODO Auto-generated destructor stub
+	delete pushAlgo;
+	delete projectileAlgo;
 }
 
 float IWorld::toMeters(spacelen l)
@@ -110,4 +114,12 @@ void IWorld::wakeHibernating(Entity* e)
 void IWorld::requestEntityDelete(Entity* e)
 {
 	deleteVec.push_back(e);
+}
+
+void IWorld::preTick()
+{
+	pushAlgo->reset();
+	projectileAlgo->reset();
+	pushAlgo->doPrecalcs();
+	projectileAlgo->doPrecalcs();
 }

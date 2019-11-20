@@ -22,9 +22,9 @@ class InteractionGroup1
 {
 public:
 	std::vector<DualPointer<PhysicsIF>> registered;
-	void registerInteractionCheck(PhysicsIF * pIF,Entity * e, float time,TickServiceProvider* tsp);
-	void registerInteractionCheck(DualPointer<PhysicsIF>, float time,TickServiceProvider* tsp);
-	void check(DualPointer<PhysicsIF> e,DualPointer<PhysicsIF> r,float time,TickServiceProvider* tsp);
+	void registerInteractionCheck(PhysicsIF * pIF,Entity * e, float time,TickServiceProvider& tsp);
+	void registerInteractionCheck(DualPointer<PhysicsIF>, float time,TickServiceProvider& tsp);
+	void check(DualPointer<PhysicsIF> e,DualPointer<PhysicsIF> r,float time,TickServiceProvider& tsp);
 	void reset();
 
 	InteractionGroup1();
@@ -32,7 +32,7 @@ public:
 };
 
 template<typename PhysicsIF>
-inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(DualPointer<PhysicsIF> e, float time, TickServiceProvider* tsp)
+inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(DualPointer<PhysicsIF> e, float time, TickServiceProvider& tsp)
 {
 	int size=registered.size();
 	for(int i=0;i<size;i++)
@@ -44,18 +44,18 @@ inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(DualPointer<P
 }
 
 template<typename PhysicsIF>
-inline void InteractionGroup1<PhysicsIF>::check(DualPointer<PhysicsIF> e,DualPointer<PhysicsIF> r, float time, TickServiceProvider* tsp)
+inline void InteractionGroup1<PhysicsIF>::check(DualPointer<PhysicsIF> e,DualPointer<PhysicsIF> r, float time, TickServiceProvider& tsp)
 {
 	//double code starts here, see InteractionGroup2
-	if(tsp->tickID!=e.e->lastTickID)
+	if(tsp.tickID!=e.e->lastTickID)
 	{
 		e.e->reset();
-		e.e->lastTickID=tsp->tickID;
+		e.e->lastTickID=tsp.tickID;
 	}
-	if(tsp->tickID!=r.e->lastTickID)
+	if(tsp.tickID!=r.e->lastTickID)
 	{
 		r.e->reset();
-		r.e->lastTickID=tsp->tickID;
+		r.e->lastTickID=tsp.tickID;
 	}
 	if(!e.e->bb.doesIntersect(r.e->bb)) return;
 	AABB::intersectionCounter++;
@@ -80,7 +80,7 @@ inline void InteractionGroup1<PhysicsIF>::reset()
 }
 
 template<typename PhysicsIF>
-inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(PhysicsIF* pIF,Entity* e, float time, TickServiceProvider* tsp)
+inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(PhysicsIF* pIF,Entity* e, float time, TickServiceProvider& tsp)
 {
 	registerInteractionCheck(DualPointer<PhysicsIF>(e,pIF),time,tsp);
 }

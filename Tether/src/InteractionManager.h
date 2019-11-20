@@ -11,6 +11,7 @@
 
 #include "InteractionGroup1.h"
 #include "InteractionGroup2.h"
+#include "WarnErrReporter.h"
 
 class Pushable;
 class Projectile;
@@ -26,8 +27,11 @@ public:
 
 	void resetAll();
 
+
 	InteractionManager(spacevec myChunk);
 	~InteractionManager();
 };
+
+
 
 #endif /* SRC_INTERACTIONMANAGER_H_ */

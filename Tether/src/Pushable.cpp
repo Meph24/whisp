@@ -16,9 +16,9 @@
 
 using glm::vec3;
 
-void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, TickServiceProvider* tsp)
+void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, TickServiceProvider& tsp)
 {
-	ChunkManager * cm=tsp->getChunkManager();
+	ChunkManager * cm=tsp.getChunkManager();
 	spacevec dif=self->pos-other.e->pos;
 	float difX = cm->toMeters(dif.x);
 	float difZ = cm->toMeters(dif.z);
@@ -50,16 +50,16 @@ void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, T
 	}
 }
 
-void Pushable::registerPushCheck(Entity* e,float seconds, TickServiceProvider* tsp)
-{
-	std::vector<InteractionManager *> * vec = tsp->getInterManVector();
-	tsp->getChunkManager()->giveInteractionManagers(e,vec,tsp);
-	int size=vec->size();
-	for(int i=0;i<size;i++)
-	{
-		(*vec)[i]->push.registerInteractionCheck(this,e,seconds,tsp);
-	}
-}
+//void Pushable::registerPushCheck(Entity* e,float seconds, TickServiceProvider* tsp)
+//{
+//	std::vector<InteractionManager *> * vec = tsp->getInterManVector();
+//	tsp->getChunkManager()->giveInteractionManagers(e,vec,tsp);
+//	int size=vec->size();
+//	for(int i=0;i<size;i++)
+//	{
+//		(*vec)[i]->push.registerInteractionCheck(this,e,seconds,tsp);
+//	}
+//}
 
 Pushable::~Pushable()
 {

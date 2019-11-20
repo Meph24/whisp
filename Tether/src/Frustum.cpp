@@ -16,7 +16,7 @@
 Frustum::Frustum()
 {}
 
-bool Frustum::inside(spacelen* bb,IWorld * w)
+bool Frustum::inside(AABB bb,IWorld * w)
 {
 	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{
@@ -25,10 +25,6 @@ bool Frustum::inside(spacelen* bb,IWorld * w)
 	return true;
 }
 
-bool Frustum::inside(AABB bb,IWorld * w)
-{
-	return inside(&bb.low.x,w);
-}
 
 void Frustum::debugDraw(ITexture * tex,IWorld * w)
 {

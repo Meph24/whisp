@@ -20,16 +20,15 @@ class IWorld;
 //optimized for telling on which side each of many AABBs are
 class DivisionPlane
 {
-	int xPtr;
-	int yPtr;
-	int zPtr;
+	spacevec AABB::* xPtr;
+	spacevec AABB::* yPtr;
+	spacevec AABB::* zPtr;
 public:
 	vec3 normal;
 	float distanceInMeters;
 	DivisionPlane();
 	DivisionPlane(vec3 Normal,float Dist);
 	~DivisionPlane();
-	bool inside(spacelen * bb,spacevec observerPos,IWorld * w);
 	bool inside(AABB bb,spacevec observerPos,IWorld * w);
 };
 

@@ -13,7 +13,9 @@
 #include "TextureDummy.h"
 #include "BulletLikeSource.h"
 #include "Frustum.h"
+#include "IWorld.h"
 #include "ChunkManager.h"
+#include "InteractFilterAlgoAsym.h"
 
 #include "glmutils.hpp"
 
@@ -95,6 +97,8 @@ void EntityProjectileBulletLike::draw(Timestamp t,Frustum * viewFrustum,ChunkMan
 }
 void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
 {
+	IWorld * iw=tsp->getIWorld();
+
 	float time=t-lastTick;
 	lastTick=t;
 
@@ -117,7 +121,7 @@ void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
 	spacevec size;
 	size.set0();
 	bb=AABB(posOld,size,pos-posOld);
-	registerHitCheck((Entity *)this,time,tsp);
+	iw->projectileAlgo->doChecks((Projectile *)this, (Entity *)this,time,*tsp);
 
 }
 #include <iostream>
