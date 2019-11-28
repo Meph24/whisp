@@ -31,6 +31,7 @@ public:
 	void rotate(vec3 rot);
 	void scale(vec3 scale);
 
+
 	spacevec getPos() const;
 
 	//temporary solution to find extent in a certain direction

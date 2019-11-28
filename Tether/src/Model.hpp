@@ -31,6 +31,10 @@ private:
 public:
 	Model(Mesh* mesh);
 	Model(Mesh* mesh, const mat4& transmat);
+
+	Model(const Model& other) = default;
+	Model& operator=(const Model& other) = default;
+
 	~Model();
 
 	const Mesh& mesh() const;

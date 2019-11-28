@@ -91,10 +91,14 @@ void ModelEntity::tick
 					TickServiceProvider* tsp
 				)
 {
+	float time = t - lastTick;
 	lastTick = t;
 	ChunkManager* cm = tsp->getChunkManager();
 
 	//entity attribute changes go here
+	if(glm::length(cm->toMeters(pos)) > 100)
+		v = v * -1.0f;
+	pos += v*time;
 
 	bb = AABB(pos, cm->fromMeters(m_model.extent()));
 }
