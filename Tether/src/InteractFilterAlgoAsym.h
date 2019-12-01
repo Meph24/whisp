@@ -36,5 +36,4 @@ template<typename MasterIF, typename SlaveIF>
 inline void InteractFilterAlgoAsym<MasterIF, SlaveIF>::reset()
 {}
 
-
 #endif /* SRC_INTERACTFILTERALGOASYM_H_ */

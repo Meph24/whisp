@@ -15,12 +15,14 @@ IWorld::IWorld()
 {
 	pushAlgo=new InteractFilterDefaultSym<Pushable>();//TODO placeholder
 	projectileAlgo=new InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
+	collideAlgo=new InteractFilterDefaultSym<Collider>();//TODO placeholder
 }
 
 IWorld::~IWorld()
 {
-	delete pushAlgo;
+	delete collideAlgo;
 	delete projectileAlgo;
+	delete pushAlgo;
 }
 
 float IWorld::toMeters(spacelen l)
@@ -120,6 +122,8 @@ void IWorld::preTick()
 {
 	pushAlgo->reset();
 	projectileAlgo->reset();
+	collideAlgo->reset();
 	pushAlgo->doPrecalcs();
 	projectileAlgo->doPrecalcs();
+	collideAlgo->doPrecalcs();
 }

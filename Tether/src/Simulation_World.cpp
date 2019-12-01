@@ -258,6 +258,32 @@ void Simulation_World::loadStandardTex()
 		);
 
 	}
+	
+	{
+		Model rand_model = randomModel(meshes);
+		models.emplace_back( new Model(rand_model) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->v = cm->fromMeters(	vec3( -1.0f, 0.0f, 0.0f));
+		spawn
+		(	me,
+			cm->fromMeters	(vec3(3.0f, 10.0f, 3.0f ))
+		);
+	}
+
+	{
+		Model rand_model = randomModel(meshes);
+		models.emplace_back( new Model(rand_model) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->v = cm->fromMeters(	vec3( 1.0f, 0.0f ,0.0f ));
+		spawn
+		(	me,
+			cm->fromMeters	(	vec3( -3.0f, 10.0f, 3.0f))
+
+		);
+	}
+
 }
 
 void Simulation_World::doPhysics(Timestamp t)

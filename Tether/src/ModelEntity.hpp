@@ -9,6 +9,10 @@
 #include "Timestamp.h"
 #include "CumulativeMat.hpp"
 
+#include "Collider.hpp"
+
+#include "collisionl2.hpp"
+
 #include "glmutils.hpp"
 #include <glm/glm.hpp>
 
@@ -16,7 +20,7 @@ using glm::vec3;
 using glm::vec4;
 
 
-class ModelEntity : public Entity
+class ModelEntity : public Entity , public Collider
 {
 	Model m_model;
 
@@ -47,6 +51,12 @@ public:
 	virtual void tick(	Timestamp t,
 						TickServiceProvider* tsp
 					 );
+
+	//ColliderInterface
+	void colSetRealPos(const spacevec& newpos);
+	void colSetRealV(const spacevec& newv);
+	Model* colModel();
+	void collide(Collider* other, float time, TickServiceProvider& tsp);
 };
 
 #endif /* ENTITYDIAMOND_HPP */

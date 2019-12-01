@@ -16,6 +16,7 @@
 #include "Pushable.h"
 #include "Hittable.h"
 #include "Projectile.h"
+#include "Collider.hpp"
 
 template<typename PhysicsIF>
 class InteractFilterAlgoSym;
@@ -36,6 +37,7 @@ protected:
 public:
 	InteractFilterAlgoSym<Pushable>* pushAlgo=0;
 	InteractFilterAlgoAsym<Projectile,Hittable>* projectileAlgo=0;
+	InteractFilterAlgoSym<Collider>* collideAlgo=0;
 
 	IWorld();
 	virtual ~IWorld();

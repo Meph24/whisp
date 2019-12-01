@@ -84,6 +84,10 @@ vector<SubmodelCollision> linearInterpolation(
 		const vec3& v0, const vec3& v1
 		);
 
+
+//Deprecated !!!
+//not usable with Interaction Management!
+//this uses the pos- values which are not used used with interaction management
 vector<SubmodelCollision> linearInterpolation(	
 		float t0, float t1,
 		IWorld* iworld,
