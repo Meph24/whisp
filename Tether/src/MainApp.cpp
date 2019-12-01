@@ -13,8 +13,6 @@
 
 #define PHYSICS_MAX_TICKLENGTH 20000
 
-
-
 MainApp::MainApp():
 graphics(sfmlHandle)
 {
@@ -37,9 +35,6 @@ graphics(sfmlHandle)
 	int x=*cfg.getInt("graphics", "resolutionX");
 	int y=*cfg.getInt("graphics", "resolutionY");
 
-	
-
-
 	sfmlHandle.createWindow("Test", x,y, settings);
 }
 
@@ -51,9 +46,7 @@ void MainApp::tick(int us)
 
 void MainApp::run()
 {
-	
 	sf::Clock clock;
-
 
 	graphics.start();
 	while (sfmlHandle.window.isOpen())
@@ -71,15 +64,10 @@ void MainApp::run()
 
 		//handle events
 		sfmlHandle.pollEvents();	
-		
 	}
 
 }
 
-
-
-
 MainApp::~MainApp()
 {
-
 }

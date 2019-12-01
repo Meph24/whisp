@@ -52,11 +52,15 @@ void EventHandler::Filter::updateFilter(event e)
 
 #include "Zombie_KeyInput.h"
 #include "Zombie_MouseInput.h"
-#include "Zombie_World.h"
 extern Zombie_KeyInput * keyInput;
 extern Zombie_MouseInput * mouseInput;
 extern int enabledProgram;
-extern Zombie_World * world;
+
+//#include "Zombie_World.h"
+//extern Zombie_World * world;
+
+#include "Simulation_World.h"
+extern Simulation_World * world;
 
 #include "CameraTP.h"
 

@@ -1,5 +1,9 @@
 
-#include "Zombie_World.h"
+#include "Simulation_World.h"
+
+#include "randomModel.hpp"
+
+using randommodel::randomModel;
 
 
 #include <iostream>
@@ -40,24 +44,24 @@ extern Zombie_MouseInput* mouseInput;
 #include "Frustum.h"
 #include "WarnErrReporter.h"
 
-#include <iostream>
+#include "randomModel.hpp"
 
-Zombie_World::Zombie_World(sf::Window * w):
+
+Simulation_World::Simulation_World(sf::Window * w):
 		tm(1,1000,40)//TODO 20/20
 {
+	test=0;
 	CfgIO cfgio( "./res/config.txt" );
 	Cfg cfg = cfgio.get();
 	int physDist=*cfg.getInt("graphics", "physicsDistance");
 	int renderDist=*cfg.getInt("graphics", "renderDistance");
 	chunkLoadRate=*cfg.getInt("graphics", "chunkLoadRate");
 	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
-	std::cout<<"testStart"<<std::endl;
-	cm=new ChunkManager(16,physDist*2,renderDist,16);//TODO make chunksPerLockchunk configurable
-	spawnZombies=true;
-	zCount = *cfg.getInt("test", "zombies");
-	zombieDist = *cfg.getInt("test", "zombieDist");
-	Timestamp timS=tm.getSlaveTimestamp();
+	objects_count=*cfg.getInt("simulation", "objects_count");
 
+	cm = new ChunkManager(16,physDist*2,renderDist,16);//TODO make chunksPerLockchunk configurable
+
+	Timestamp timS=tm.getSlaveTimestamp();
 
 	eMap->registerAction(
 			EVENT_ID_KEY_F3,
@@ -105,7 +109,6 @@ Zombie_World::Zombie_World(sf::Window * w):
 	player->cam->zoom = 1;//TODO better zoom
 	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getFlt("graphics","maxRenderTime")));//TODO not hard code
 
-
 	pmLogic = new PerformanceMeter(PM_LOGIC_CHUNKMOVE+1,1000);
 	pmGraphics = new PerformanceMeter(PM_GRAPHICS_FLUSH+1,1000);
 	pmLogic->roundtripUpdateIndex = 0;
@@ -132,14 +135,13 @@ Zombie_World::Zombie_World(sf::Window * w):
 	pmGraphics->setName("     debug screen",PM_GRAPHICS_DRAWDEBUG);
 	pmGraphics->setName(" GPU work + syncs",PM_GRAPHICS_FLUSH);
 	pmGraphics->setName("            other",PM_GRAPHICS_OUTSIDE);
-	setCam(player->cam);
 
-	std::cout<<"initFin"<<std::endl;
+	setCam(player->cam);
 }
 
-void Zombie_World::restart()
-{
-	spawnZombies=true;
+void Simulation_World::restart()
+{	
+	spawnZombies=false;
 	player->HP = player->maxHP;
 	player->score = 0;
 	cm->clearEntities();
@@ -147,7 +149,7 @@ void Zombie_World::restart()
 }
 
 
-Zombie_World::~Zombie_World()
+Simulation_World::~Simulation_World()
 {
 	//missing deletes (one-time tier 1 code, so who cares)
 	delete cm;
@@ -166,11 +168,11 @@ Zombie_World::~Zombie_World()
 	delete tps;
 	delete tps2;
 
-
 	delete adQ;
 	delete player;
 }
-void Zombie_World::render(Timestamp t)
+
+void Simulation_World::render(Timestamp t)
 {
 	callbackList.clear();
 	player->applyPerspective(t,true,cm);
@@ -189,7 +191,7 @@ void Zombie_World::render(Timestamp t)
 	delete viewFrustum;
 }
 
-void Zombie_World::loadStandardTex()
+void Simulation_World::loadStandardTex()
 {
 	tps = new TexParamSet();
 	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -199,7 +201,6 @@ void Zombie_World::loadStandardTex()
 	tps->addF(GL_TEXTURE_MAX_ANISOTROPY_EXT,16);//TODO compatibility check
 	tps->addF(GL_TEXTURE_LOD_BIAS,0);
 	tps->enableMipmap();
-
 	zombieTex = new TextureStatic2D(tps, "./res/zombie.png");
 	zombieTex->update();
 	grass = new TextureStatic2D(tps, "./res/grass_top.png");
@@ -225,31 +226,66 @@ void Zombie_World::loadStandardTex()
 	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
 	cm->requestEntitySpawn(tr);
 
-	diamond_mesh = new Mesh(diamondMesh(7, 0.3f, 2.0f));
+	meshes.emplace_back( new Mesh(diamondMesh(7, 0.3f, 2.0f)) );
 	MeshIO meshio("./res/cross.mesh");
-	cross_mesh = new Mesh(meshio.get());
-	ModelEntity* diamond = new ModelEntity
-		(
-			Model(diamond_mesh, glm::scale(vec3(0.8f)))
+	meshes.emplace_back( new Mesh(meshio.get()) );
+
+	for ( int i = 0; i < 6; ++i )
+	{
+		//create 6 more meshes by random
+		meshes.emplace_back( new Mesh ( randommodel::randomMesh(20, 3.0f)));
+	}
+
+	for ( int i = 0; i < objects_count; ++i )
+	{
+		Model rand_model = randomModel(meshes);
+		models.emplace_back( new Model(rand_model) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->v = cm->fromMeters(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
+										randommodel::randomFloat(-30.0f, 30.0f),
+										randommodel::randomFloat(-30.0f, 30.0f)
+									)
+							  );
+		spawn
+		(	me,
+			cm->fromMeters	(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
+										randommodel::randomFloat(-30.0f, 30.0f),
+										randommodel::randomFloat(-30.0f, 30.0f))
+							)
+
 		);
-	spawnGrounded
-		(
-			diamond,
-			cm->fromMeters(vec3(3, 0, 3))
+
+	}
+
+	{
+		Model rand_model = randomModel(meshes);
+		models.emplace_back( new Model(rand_model) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->v = cm->fromMeters(	vec3( -1.0f, 0.0f, 0.0f));
+		spawn
+		(	me,
+			cm->fromMeters	(vec3(3.0f, 10.0f, 3.0f ))
 		);
-	ModelEntity* cross = new ModelEntity
-		(
-			Model(cross_mesh, glm::scale(vec3(2.0f)))
+	}
+
+	{
+		Model rand_model = randomModel(meshes);
+		models.emplace_back( new Model(rand_model) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->v = cm->fromMeters(	vec3( 1.0f, 0.0f ,0.0f ));
+		spawn
+		(	me,
+			cm->fromMeters	(	vec3( -3.0f, 10.0f, 3.0f))
+
 		);
-	spawnGrounded
-		(
-			cross,
-			cm->fromMeters(vec3(1, 0, 1))
-		);
+	}
+
 }
 
-
-void Zombie_World::doPhysics(Timestamp t)
+void Simulation_World::doPhysics(Timestamp t)
 {
 	initNextTick();
 
@@ -264,7 +300,7 @@ void Zombie_World::doPhysics(Timestamp t)
 	cm->applyEntityChunkChanges(this);
 }
 
-void Zombie_World::loop()
+void Simulation_World::loop()
 {
 	if (eMap->getStatusAndReset(STATUS_ID_RESTART))
 	{
@@ -279,9 +315,7 @@ void Zombie_World::loop()
 	doGraphics();
 }
 
-
-
-void Zombie_World::trigger(bool pulled)
+void Simulation_World::trigger(bool pulled)
 {
 	if (!pulled)
 	{
@@ -290,56 +324,19 @@ void Zombie_World::trigger(bool pulled)
 	}
 	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,cm);
 }
-void Zombie_World::spawnZombie(Timestamp t)
-{
-	if(!spawnZombies) return;
 
-	if (Zombie_Enemy::zombieCount>=zCount) return;
-	float r1 = (rand()%1024);///500.0f;//TODO change
-	float maxDistMultiplier=1.2f;
-	float r2 = (((rand()%32768)/32768.0f)*(maxDistMultiplier-1)+ 1)*zombieDist;
-	cm->requestEntitySpawn(new Zombie_Enemy(t,zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm));
-	std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
-	for(int i=1;i<32;i++)
-	{
-		if (Zombie_Enemy::zombieCount>=zCount) return;
-		cm->requestEntitySpawn
-			(
-				new Zombie_Enemy
-				(
-					t,
-					zombieTex,
-					player->pos+cm->fromMeters(
-							vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)
-											  ),
-					cm
-				)
-			);
-		
-		//TODO better spawn algorithm: https://www.youtube.com/watch?v=7WcmyxyFO7o
-
-
-		//currently unused
-		//float r3 = (rand()%7)+13;
-		//float r4 = ((rand()%32768)/32768.0f)*4 + 5;
-
-//		cm->requestEntitySpawn(new Zombie_Tree(player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),1.2, r3, r4, tree, leaves));
-		std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
-	}
-}
-
-Entity* Zombie_World::getTarget(Entity* me)
+Entity* Simulation_World::getTarget(Entity* me)
 {
 	return (Entity *)player;
 }
 
-void Zombie_World::spawn(Entity* ep, spacevec pos)
+void Simulation_World::spawn(Entity* ep, spacevec pos)
 {
 	ep->pos = pos;
 	cm->requestEntitySpawn(ep);
 }
 
-void Zombie_World::spawnGrounded(ModelEntity* ep, spacevec pos)
+void Simulation_World::spawnGrounded(ModelEntity* ep, spacevec pos)
 {
 	spacevec thispos = cm->clip(pos, true);
 	cout << "Clipped pos : " << thispos << '\n';
@@ -350,7 +347,7 @@ void Zombie_World::spawnGrounded(ModelEntity* ep, spacevec pos)
 	spawn(ep, thispos);
 }
 
-void Zombie_World::drawGameOver()//TODO find new home
+void Simulation_World::drawGameOver()//TODO find new home
 {
 	transformViewToGUI();
 	glColor3f(1, 0, 0);
@@ -371,15 +368,13 @@ void Zombie_World::drawGameOver()//TODO find new home
 	revertView();
 }
 
-void Zombie_World::doLogic()
+void Simulation_World::doLogic()
 {
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
 	Timestamp t=tm.masterUpdate();
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
 	player->guns[player->currentGun]->tick(t,player->cam,player,shot,cm);
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
-	for(int i=0;i<40;i++)
-		if (0.03f> (rand() % 32768) / 32768.0f) spawnZombie(t);//TODO replace by better spawn mechanic
 	pmLogic->registerTime(PM_LOGIC_SPAWN);
 	doPhysics(t);
 	pmLogic->registerTime(PM_LOGIC_PHYSICS);
@@ -389,7 +384,7 @@ void Zombie_World::doLogic()
 	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);
 }
 
-void Zombie_World::doGraphics()
+void Simulation_World::doGraphics()
 {
 	cm->drawAABBs=eMap->getStatus(STATUS_ID_DRAW_AABBs)==1;
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
@@ -423,22 +418,22 @@ void Zombie_World::doGraphics()
 	pmGraphics->registerTime(PM_GRAPHICS_FLUSH);
 }
 
-ICamera3D* Zombie_World::getHolderCamera()
+ICamera3D* Simulation_World::getHolderCamera()
 {
 	return player->cam;
 }
 
-ChunkManager* Zombie_World::getChunkManager()
+ChunkManager* Simulation_World::getChunkManager()
 {
 	return cm;
 }
 
-IWorld* Zombie_World::getIWorld()
+IWorld* Simulation_World::getIWorld()
 {
 	return (IWorld *)cm;
 }
 
-ITexture* Zombie_World::suggestFont()
+ITexture* Simulation_World::suggestFont()
 {
 	return g->font;
 }

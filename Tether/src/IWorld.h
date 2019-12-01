@@ -16,15 +16,13 @@
 #include "Pushable.h"
 #include "Hittable.h"
 #include "Projectile.h"
-
+#include "Collider.hpp"
 
 template<typename PhysicsIF>
 class InteractFilterAlgoSym;
 
-
 template<typename MasterIF,typename SlaveIF>
 class InteractFilterAlgoAsym;
-
 
 #include <vector>
 
@@ -33,14 +31,13 @@ class IWorld: public Tickable, public Drawable
 	std::vector<Entity *> hibernating;
 
 protected:
-
 	float gridSize;//sacelen.intpart scale in meters
 	std::vector<Entity *> deleteVec;//the entities that should be removed from world
-
 
 public:
 	InteractFilterAlgoSym<Pushable>* pushAlgo=0;
 	InteractFilterAlgoAsym<Projectile,Hittable>* projectileAlgo=0;
+	InteractFilterAlgoSym<Collider>* collideAlgo=0;
 
 	IWorld();
 	virtual ~IWorld();
@@ -63,7 +60,6 @@ public:
 	virtual void requestEntitySpawn(Entity * e)=0;//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks
 
 	virtual void requestEntityDelete(Entity * e);//do not call this yourself, call Entiy.requestDestroy instead
-
 };
 
 

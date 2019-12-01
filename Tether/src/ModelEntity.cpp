@@ -1,6 +1,7 @@
 #include "ModelEntity.hpp"
 
 #include <cmath>
+#include <algorithm>
 
 #include "glmutils.hpp"
 #include <glm/gtx/transform.hpp>
@@ -9,6 +10,8 @@
 #include "ChunkManager.h"
 #include "TickServiceProvider.h"
 #include "Frustum.h"
+
+#include "InteractFilterAlgoSym.h"
 
 using glm::vec4;
 using glm::vec3;
@@ -91,11 +94,68 @@ void ModelEntity::tick
 					TickServiceProvider* tsp
 				)
 {
+	float time = t - lastTick;
 	lastTick = t;
+
+	Collider::State old_state {pos, v};
+	Collider::saveState(old_state);
+
 	ChunkManager* cm = tsp->getChunkManager();
 
 	//entity attribute changes go here
+	if(glm::length(cm->toMeters(pos)) > 100)
+		v = v * -1.0f;
+	pos += v*time;
 
 	bb = AABB(pos, cm->fromMeters(m_model.extent()));
+
+	tsp->getIWorld()->collideAlgo->doChecks(
+			(Collider*) this, (Entity*) this,
+			time, *tsp);
+}
+
+// implementation of the Collider Interface
+void ModelEntity::colSetRealPos(const spacevec& newpos)
+{
+	pos = newpos;
+}
+
+void ModelEntity::colSetRealV(const spacevec& newv)
+{
+	v = newv;
+}
+
+Model* ModelEntity::colModel()
+{
+	return &(model());
+}
+
+void ModelEntity::collide(Collider* other, float time, TickServiceProvider& tsp)
+{
+	vector<collisionl2::SubmodelCollision> collisions = 
+		collisionl2::linearInterpolation(
+				0.0, time,
+				*(colModel()), *(other->colModel()),
+				tsp.getIWorld()->toMeters(colSavedPos()),
+				tsp.getIWorld()->toMeters(other->colSavedPos()),
+				tsp.getIWorld()->toMeters(colSavedV()),
+				tsp.getIWorld()->toMeters(other->colSavedV())
+			);
+
+	if(!collisions.empty()) return;
+
+	//l3 collision resolvance (simple)
+	//get the first collision time
+
+	//move the objects to the time of the first collision
+	// only by percentage to avoid further collisions
+	float step_to_collision = std::min_element(collisions.begin(), collisions.end())->time * 0.9999;
+	this->colSetRealPos(colSavedPos() + colSavedV() * step_to_collision);
+	other->colSetRealPos(other->colSavedPos() + other->colSavedV() * step_to_collision);
+
+	//cancel further movements
+	spacevec vnull; vnull.set0();
+	this->colSetRealV( vnull );
+	other->colSetRealV( vnull );
 }
 
