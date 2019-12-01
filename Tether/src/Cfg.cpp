@@ -156,6 +156,7 @@ const long* Cfg::getInt(const string& section, const string& key) const
 	{
 		return sections.at(section).getInt(key);
 	}
+	cerr << "Cfg: Int for <" << key << "> not found!\n";
 	return nullptr;
 }
 
@@ -165,6 +166,7 @@ const double* Cfg::getFlt(const string& section, const string& key) const
 	{
 		return sections.at(section).getFlt(key);
 	}
+	cerr << "Cfg: Flt for <" << key << "> not found!\n";
 	return nullptr;
 }
 
@@ -174,6 +176,7 @@ const string* Cfg::getStr(const string& section, const string& key) const
 	{
 		return sections.at(section).getStr(key);
 	}
+	cerr << "Cfg: String for <" << key << "> not found!\n";
 	return nullptr;
 }
 
@@ -214,6 +217,7 @@ const long* Cfg::getInt(const string& key) const
 	{
 		return s.second.getInt(key);
 	}
+	cerr << "Cfg: Int for <" << key << "> not found!\n";
 	return nullptr;
 }
 
@@ -223,6 +227,7 @@ const double* Cfg::getFlt(const string& key) const
 	{
 		return s.second.getFlt(key);
 	}
+	cerr << "Cfg: Flt for <" << key << "> not found!\n";
 	return nullptr;
 }
 
@@ -232,6 +237,7 @@ const string* Cfg::getStr(const string& key) const
 	{
 		return s.second.getStr(key);
 	}
+	cerr << "Cfg: String for <" << key << "> not found!\n";
 	return nullptr;
 }
 

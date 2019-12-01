@@ -27,6 +27,7 @@ vec3 randVertex()
 //create a Random Mesh
 Mesh randomMesh(unsigned int vertex_count, float triangle_rate)
 {
+	if(vertex_count < 3) vertex_count = 3;
 	vector<vec3> vertices;
 	for (unsigned int i = 0; i < vertex_count; ++i )
 	{
