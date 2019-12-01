@@ -14,8 +14,8 @@
 #include "Frustum.h"
 
 
-ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk, float gravityYdir):
-chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
+ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk):
+ITerrain((IWorld *) this),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
 	gridSize=ChunkSize;
 	lockChunkSizeX=1;
@@ -43,7 +43,6 @@ chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 	}
 	chunks=chunksBuf1;
 	setMid({{0,0.5f},{0,0.5f},{0,0.5f}},0);
-	gravity=fromMeters(gravityYdir);
 	defaultH=fromMeters(defaultHeight*1.0f);
 }
 
@@ -219,11 +218,6 @@ void ChunkManager::tick(Timestamp t, TickServiceProvider* tsp)
 int ChunkManager::getIndx(spacevec abs)
 {
 	return getIndx(abs.x.intpart,abs.z.intpart);
-}
-
-spacelen ChunkManager::getGravity()
-{
-	return gravity;
 }
 
 void ChunkManager::correctLockChunks()

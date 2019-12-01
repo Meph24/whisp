@@ -103,7 +103,7 @@ void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
 	lastTick=t;
 
 	ChunkManager * cm=tsp->getChunkManager();
-	spacelen gravity=cm->getGravity();
+	spacevec gravity=cm->getGravity(pos);
 	if(cm->hitsGround(posOld,pos))
 	{
 		requestDestroy(cm);
@@ -112,7 +112,7 @@ void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
 
 	posOld = pos;
 	spacevec vOld=v;
-	v.y -= gravity * time;
+	v += gravity * time;
 	double spd=cm->toMetersD(v.lengthHP());
 	double drag=spd*typeB.drag;
 	v*=(1-drag*time);//TODO find exact or at least time-consistent solution (current solution behaves very wrong with high resistance values and is tickrate-dependent)
