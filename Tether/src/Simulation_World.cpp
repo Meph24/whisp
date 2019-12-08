@@ -230,14 +230,14 @@ void Simulation_World::loadStandardTex()
 	meshes.emplace_back( new Mesh(diamondMesh(7, 0.3f, 2.0f)) );
 	MeshIO meshio("./res/cross.mesh");
 	meshes.emplace_back( new Mesh(meshio.get()) );
-/*
+
 	for ( int i = 0; i < 6; ++i )
 	{
 		//create 6 more meshes by random
 		meshes.emplace_back( new Mesh ( randommodel::randomMesh(20, 3.0f)));
 	}
-*/
-/*
+
+
 	for ( int i = 0; i < objects_count; ++i )
 	{
 		Model rand_model = randomModel(meshes);
@@ -259,7 +259,7 @@ void Simulation_World::loadStandardTex()
 		);
 
 	}
-*/	
+	
 	{
 //		Model rand_model = randomModel(meshes);
 		models.emplace_back( new Model(meshes[0].get()) );
