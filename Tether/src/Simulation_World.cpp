@@ -60,7 +60,7 @@ Simulation_World::Simulation_World(sf::Window * w):
 	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
 	objects_count=*cfg.getInt("simulation", "objects_count");
 
-	cm = new ChunkManager(16,physDist*2,renderDist,16,9.81f);//TODO make chunksPerLockchunk configurable
+	cm = new ChunkManager(16,physDist*2,renderDist,16);//TODO make chunksPerLockchunk configurable
 
 	Timestamp timS=tm.getSlaveTimestamp();
 
@@ -202,7 +202,6 @@ void Simulation_World::loadStandardTex()
 	tps->addF(GL_TEXTURE_MAX_ANISOTROPY_EXT,16);//TODO compatibility check
 	tps->addF(GL_TEXTURE_LOD_BIAS,0);
 	tps->enableMipmap();
-
 	zombieTex = new TextureStatic2D(tps, "./res/zombie.png");
 	zombieTex->update();
 	grass = new TextureStatic2D(tps, "./res/grass_top.png");
@@ -246,15 +245,15 @@ void Simulation_World::loadStandardTex()
 		models.emplace_back( new Model(rand_model) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3(	randommodel::randomFloat(-30.0f, 30.0f), 
-										randommodel::randomFloat(-30.0f, 30.0f), 
+		me->v = cm->fromMeters(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
+										randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f)
 									)
 							  );
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3(	randommodel::randomFloat(-30.0f, 30.0f), 
-										randommodel::randomFloat(-30.0f, 30.0f), 
+			cm->fromMeters	(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
+										randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f))
 							)
 

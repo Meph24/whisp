@@ -10,6 +10,7 @@
 #define SRC_CHUNKMANAGER_H_
 
 #include "IWorld.h"
+#include "ITerrain.h"
 
 #include "Spacevec.h"
 #include "LockFast.h"
@@ -37,7 +38,7 @@ struct chunkSearchResult
 	int vectorIndex;
 };
 
-class ChunkManager: public IWorld
+class ChunkManager: public IWorld, public ITerrain
 {
 	LockFast dataStructureLock;
 	int chunksPerAxis;//width and height in chunks
@@ -58,9 +59,6 @@ class ChunkManager: public IWorld
 	gridInt lockChunkStartZ;
 	int lockChunksPerAxisX;
 	int lockChunksPerAxisZ;
-
-
-	spacelen gravity;
 
 	std::vector<chunkChange> addVec;//the entities that should be added to chunk[loc] soon
 	std::vector<chunkChange> removeVec;//the entities that should be removed from chunk[loc] soon (without deleting)
@@ -102,13 +100,12 @@ public:
 	void clearEntities();
 
 	//chunksPerLockchunk must be power of 2, if its not, it will be assigned one
-	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks,int chunksPerLockchunk, float gravityYdir);//render distance should be lower than half of the total chunks per axis
+	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks,int chunksPerLockchunk);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 
 	///the non-critical interface: you can always safely use these
 
 	bool drawAABBs=false;
-	spacelen getGravity();//currently a constant
 
 	//the partially critical interface: only call from main tick thread
 	//writing:

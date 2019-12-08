@@ -52,7 +52,10 @@ Zombie_World::Zombie_World(sf::Window * w):
 	chunkLoadRate=*cfg.getInt("graphics", "chunkLoadRate");
 	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
 	std::cout<<"testStart"<<std::endl;
-	cm=new ChunkManager(16,physDist*2,renderDist,16,9.81f);//TODO make chunksPerLockchunk configurable
+	cm=new ChunkManager(16,physDist*2,renderDist,16);//TODO make chunksPerLockchunk configurable
+	spawnZombies=true;
+	zCount = *cfg.getInt("test", "zombies");
+	zombieDist = *cfg.getInt("test", "zombieDist");
 	Timestamp timS=tm.getSlaveTimestamp();
 
 
