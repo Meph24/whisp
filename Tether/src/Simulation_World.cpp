@@ -224,19 +224,20 @@ void Simulation_World::loadStandardTex()
 
 	g = new Graphics2D(64,getAspectRatio());
 
-	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
-	cm->requestEntitySpawn(tr);
+//	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
+//	cm->requestEntitySpawn(tr);
 
 	meshes.emplace_back( new Mesh(diamondMesh(7, 0.3f, 2.0f)) );
 	MeshIO meshio("./res/cross.mesh");
 	meshes.emplace_back( new Mesh(meshio.get()) );
-
+/*
 	for ( int i = 0; i < 6; ++i )
 	{
 		//create 6 more meshes by random
 		meshes.emplace_back( new Mesh ( randommodel::randomMesh(20, 3.0f)));
 	}
-
+*/
+/*
 	for ( int i = 0; i < objects_count; ++i )
 	{
 		Model rand_model = randomModel(meshes);
@@ -258,28 +259,49 @@ void Simulation_World::loadStandardTex()
 		);
 
 	}
-	
+*/	
 	{
-		Model rand_model = randomModel(meshes);
-		models.emplace_back( new Model(rand_model) );
+//		Model rand_model = randomModel(meshes);
+		models.emplace_back( new Model(meshes[0].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( -1.0f, 0.0f, 0.0f));
+		me->v = cm->fromMeters(	vec3( 0.6f, 0.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(vec3(3.0f, 10.0f, 3.0f ))
+			cm->fromMeters	(vec3(1.0f, 10.0f, 0.0f ))
 		);
 	}
 
 	{
-		Model rand_model = randomModel(meshes);
-		models.emplace_back( new Model(rand_model) );
+//		Model rand_model = randomModel(meshes);
+		models.emplace_back( new Model(meshes[1].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( 1.0f, 0.0f ,0.0f ));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( -3.0f, 10.0f, 3.0f))
+			cm->fromMeters	(	vec3( 12.0f, 10.0f, 0.0f))
+
+		);
+	}
+{
+//		Model rand_model = randomModel(meshes);
+		models.emplace_back( new Model(meshes[0].get()) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		spawn
+		(	me,
+			cm->fromMeters	(vec3(1.0f, 3.0f, 0.0f ))
+		);
+	}
+
+	{
+//		Model rand_model = randomModel(meshes);
+		models.emplace_back( new Model(meshes[1].get()) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		spawn
+		(	me,
+			cm->fromMeters	(	vec3( 12.0f, 3.0f, 0.0f))
 
 		);
 	}

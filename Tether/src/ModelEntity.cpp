@@ -142,7 +142,7 @@ void ModelEntity::collide(Collider* other, float time, TickServiceProvider& tsp)
 				tsp.getIWorld()->toMeters(other->colSavedV())
 			);
 
-	if(!collisions.empty()) return;
+	if(collisions.empty()) return;
 
 	//l3 collision resolvance (simple)
 	//get the first collision time
