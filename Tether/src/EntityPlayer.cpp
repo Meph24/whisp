@@ -33,7 +33,7 @@ speed(characterSpeed),heldItem(0),inventory(0)
 {
 	lastTick=spawnTime;
 	pos=startPos;
-	v={{0,0},{0,0},{0,0}};
+	v.set0();
 	cam=new CameraTP();
 	cam->alpha=0.0001f;
 	cam->beta=0.0001f;
@@ -158,24 +158,6 @@ void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, Draw
 	if(heldItem) heldItem->draw(t,viewFrustum,cm,dsp);
 }
 
-void EntityPlayer::applyPerspective(Timestamp t,bool fresh,ChunkManager * cm)
-{
-	float time=t-lastTick;
-	spacevec relPos=pos+v*time-cm->getMiddleChunk();
-	characterHeightConv=cm->fromMeters(characterHeight);//TODO only in one spot
-	relPos.y+=characterHeightConv;
-	cam->posX=cm->toMeters(relPos.x);
-	cam->posY=cm->toMeters(relPos.y);
-	cam->posZ=cm->toMeters(relPos.z);
-	if(fresh) cam->applyFresh();
-	else cam->apply();
-	vec3 fwd=cam->getForwardVector();
-	sf::Listener::setDirection(fwd.x,fwd.y,fwd.z);
-	vec3 upv=cam->getUpVector();
-	sf::Listener::setUpVector(upv.x,upv.y,upv.z);
-	sf::Listener::setPosition(cam->posX,cam->posY,cam->posZ);
-	isPerspective=true;
-}
 
 void EntityPlayer::setTP(bool on)
 {
@@ -203,15 +185,28 @@ void EntityPlayer::changeTPdist(float amount)
 
 spacevec EntityPlayer::getCamPos()
 {
-	spacevec ret=pos;
-	ret.y+=characterHeightConv;
-	return ret;
+	return pos+characterEyeOffset;
 }
 
-Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestriction)
+Frustum * EntityPlayer::newFrustumApplyPerspective(Timestamp t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction)
 {
+	IWorld * iw=tsp->getIWorld();
+	float time=t-lastTick;
+	spacevec curPos=pos+v*time;
+	cam->posX=iw->toMeters(characterEyeOffset.x);
+	cam->posY=iw->toMeters(characterEyeOffset.y);
+	cam->posZ=iw->toMeters(characterEyeOffset.z);
+	if(fresh) cam->applyFresh();
+	else cam->apply();
+	vec3 fwd=cam->getForwardVector();
+	sf::Listener::setDirection(fwd.x,fwd.y,fwd.z);
+	vec3 upv=cam->getUpVector();
+	sf::Listener::setUpVector(upv.x,upv.y,upv.z);
+	sf::Listener::setPosition(cam->posX,cam->posY,cam->posZ);
+	isPerspective=true;
+
 	Frustum * ret=new Frustum();
-	ret->observerPos=cm->getMiddleChunk();
+	ret->observerPos=curPos;
 	bool lookingUp=cam->alpha<0;
 	if(lookingUp)
 	{
@@ -236,6 +231,7 @@ Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestri
 void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 {
 	IWorld * iw=tsp->getIWorld();
+	ITerrain * it=tsp->getITerrain();
 
 	EventMapper * eMap=tsp->eMap;
 	if(eMap->getStatusAndReset(STATUS_ID_INVENTORY))
@@ -248,8 +244,7 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 
 	if(heldItem) heldItem->tick(t,tsp);
 
-
-	characterHeightConv=tsp->getChunkManager()->fromMeters(characterHeight);//TODO only in one spot
+	characterEyeOffset=iw->toUnitLength(it->getGravity(pos))*(-characterEyeHeight);
 	float time=t-lastTick;
 	lastTick=t;
 	hitmark -= time * 10;
@@ -278,8 +273,8 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 		v=(pos-oldPos)/time;
 
 	spacevec size;
-	size.x=characterHeightConv*0.5f;
-	size.y=characterHeightConv*1.5f;
+	size.x=iw->fromMeters(characterEyeHeight*0.5f);
+	size.y=iw->fromMeters(characterEyeHeight*1.5f);
 	size.z=size.x;
 	bb=AABB(pos,size,v*(-time));
 	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,time,*tsp);

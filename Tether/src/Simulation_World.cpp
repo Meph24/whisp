@@ -151,7 +151,7 @@ void Simulation_World::restart()
 
 Simulation_World::~Simulation_World()
 {
-	//missing deletes (one-time tier 1 code, so who cares)
+	//missing deletes (one-time tier 1 ode, so who cares)
 	delete cm;
 
 	delete dsLogic;
@@ -175,14 +175,12 @@ Simulation_World::~Simulation_World()
 void Simulation_World::render(Timestamp t)
 {
 	callbackList.clear();
-	player->applyPerspective(t,true,cm);
-	spacevec relPos=cm->getMiddleChunk();
 	float renderTime=(pmGraphics->getTime(PM_GRAPHICS_WORLD)+pmGraphics->getTime(PM_GRAPHICS_FLUSH))/1000000.0f;
 	float quality=adQ->getQuality(renderTime);
-	Frustum * viewFrustum=player->newGetViewFrustum(cm,quality);
+	Frustum * viewFrustum=player->newFrustumApplyPerspective(t,true,this,quality);
 
 	grass->bind();
-	cm->render(lodQuality,viewFrustum,relPos);//TODO integrate into draw()?!
+	cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
 
 	cm->draw(t,viewFrustum,cm,this);
 	player->draw(t,viewFrustum,cm,this);//TODO  this is the job of the chunk manager
@@ -289,7 +287,7 @@ void Simulation_World::doPhysics(Timestamp t)
 {
 	initNextTick();
 
-	cm->preTick();
+	cm->preTick(this);
 
 	player->tick(t,this);//TODO insert into IWorld
 
@@ -431,6 +429,10 @@ ChunkManager* Simulation_World::getChunkManager()
 IWorld* Simulation_World::getIWorld()
 {
 	return (IWorld *)cm;
+}
+ITerrain* Simulation_World::getITerrain()
+{
+	return (ITerrain *)cm;
 }
 
 ITexture* Simulation_World::suggestFont()

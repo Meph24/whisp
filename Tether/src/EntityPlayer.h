@@ -43,8 +43,8 @@ public:
 	float minTPdist=2;
 	float maxTPdist=20;
 
-	float characterHeight=1.6f;
-	spacelen characterHeightConv;
+	float characterEyeHeight=1.6f;
+	spacevec characterEyeOffset;
 
 	float HP=-1;
 	float maxHP=100;
@@ -65,9 +65,9 @@ public:
 	void changeTPdist(float amount);
 
 	spacevec getCamPos();
-	Frustum * newGetViewFrustum(ChunkManager * cm,float viewDistRestriction=-1);
+	Frustum * newFrustumApplyPerspective(Timestamp t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction=-1);
 
-	void applyPerspective(Timestamp t,bool fresh,ChunkManager * cm);//returns position that must be used for relative draws
+	//void applyPerspective(Timestamp t,bool fresh,ChunkManager * cm);
 
 	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
 

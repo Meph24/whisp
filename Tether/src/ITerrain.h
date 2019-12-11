@@ -9,19 +9,24 @@
 #ifndef SRC_ITERRAIN_H_
 #define SRC_ITERRAIN_H_
 
+#include "Drawable.h"
+
 #include "Spacevec.h"
 #include "IWorld.h"
 
 
-class ITerrain
+class ITerrain//: public Drawable
 {
-	IWorld * w;
+	//IWorld * w;
 	spacevec defaultGravity;
 public:
 	ITerrain(IWorld * world);
 	virtual ~ITerrain();
 
-	spacevec getGravity(spacevec pos);
+	virtual spacevec getGravity(spacevec pos);
+
+	virtual spacevec clip(spacevec pos,bool forceGround)=0;//If pos is below ground or forceGround, then return position on ground (movement along gravity vector)
+	virtual bool hitsGround(spacevec startpoint,spacevec endpoint)=0;//true if any point in the given line is below ground
 };
 
 #endif /* SRC_ITERRAIN_H_ */

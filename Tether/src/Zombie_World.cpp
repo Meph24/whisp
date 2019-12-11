@@ -173,14 +173,12 @@ Zombie_World::~Zombie_World()
 void Zombie_World::render(Timestamp t)
 {
 	callbackList.clear();
-	player->applyPerspective(t,true,cm);
-	spacevec relPos=cm->getMiddleChunk();
 	float renderTime=(pmGraphics->getTime(PM_GRAPHICS_WORLD)+pmGraphics->getTime(PM_GRAPHICS_FLUSH))/1000000.0f;
 	float quality=adQ->getQuality(renderTime);
-	Frustum * viewFrustum=player->newGetViewFrustum(cm,quality);
+	Frustum * viewFrustum=player->newFrustumApplyPerspective(t,true,this,quality);
 
 	grass->bind();
-	cm->render(lodQuality,viewFrustum,relPos);//TODO integrate into draw()?!
+	cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
 
 	cm->draw(t,viewFrustum,cm,this);
 	player->draw(t,viewFrustum,cm,this);//TODO  this is the job of the chunk manager
@@ -253,7 +251,7 @@ void Zombie_World::doPhysics(Timestamp t)
 {
 	initNextTick();
 
-	cm->preTick();
+	cm->preTick(this);
 
 	player->tick(t,this);//TODO insert into IWorld
 
@@ -436,6 +434,11 @@ ChunkManager* Zombie_World::getChunkManager()
 IWorld* Zombie_World::getIWorld()
 {
 	return (IWorld *)cm;
+}
+
+ITerrain* Zombie_World::getITerrain()
+{
+	return (ITerrain *)cm;
 }
 
 ITexture* Zombie_World::suggestFont()

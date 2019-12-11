@@ -57,9 +57,9 @@ spacelen ChunkManager::getHeight(spacevec abs)
 }
 
 #include <iostream>
-void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
+void ChunkManager::render(float lodQ,Frustum * viewFrustum)
 {
-
+	spacevec camOffset=viewFrustum->observerPos;
 
 	glPushMatrix();
 	glEnable(GL_TEXTURE_2D);
@@ -374,44 +374,7 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 	return false;
 }
 
-#include "myAssert.h"
-void ChunkManager::giveInteractionManagers(Entity* e,std::vector<InteractionManager*> * managers,TickServiceProvider * tsp)
-{
-	gridInt minx=e->bb.low.x.intpart;
-	gridInt maxx=e->bb.high.x.intpart;
-	gridInt minz=e->bb.low.z.intpart;
-	gridInt maxz=e->bb.high.z.intpart;
 
-	if((maxx-minx)>=10 )
-	{
-		std::cout<<"fail: wrong bb; x:"<<minx<<"-"<<maxx<<"z:"<<minz<<"-"<<maxz<<std::endl;
-	}
-	assert((maxx-minx)<10);
-	assert((maxz-minz)<10);
-	int tickID=tsp->tickID;
-	for(gridInt xrun=minx;xrun<=maxx;xrun++)
-	{
-		for(gridInt zrun=minz;zrun<=maxz;zrun++)
-		{
-			if(isValid(xrun,zrun))
-			{
-				int indx=getIndx(xrun,zrun);
-				if(indx<0 || indx>chunksPerAxis*chunksPerAxis)
-					std::cout<<"fail: wrong index: "<<indx<<std::endl;
-				else
-				if(chunks[indx])
-				{
-					if(chunks[indx]->lastTickID!=tickID)
-					{
-						chunks[indx]->interMan->resetAll();
-						chunks[indx]->lastTickID=tickID;
-					}
-					managers->push_back(chunks[indx]->interMan);
-				}
-			}
-		}
-	}
-}
 #include "WarnErrReporter.h"
 void ChunkManager::applyEntityChunkChanges(TickServiceProvider * tsp)
 {
@@ -670,4 +633,9 @@ bool ChunkManager::isValid(gridInt cx, gridInt cz)
 	if(relLowX>=chunksPerAxis) return false;
 	if(relLowZ>=chunksPerAxis) return false;
 	return true;
+}
+
+void ChunkManager::postTick(TickServiceProvider* tsp)
+{
+	//TODO retick, applyEntityChunkChanges
 }

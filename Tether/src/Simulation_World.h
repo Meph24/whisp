@@ -87,7 +87,10 @@ public:
 
 	//TickServiceProvider
 	virtual ICamera3D * getHolderCamera();//can return 0 if currently not held
-	virtual ChunkManager * getChunkManager();
+
+	virtual ChunkManager * getChunkManager();//TODO remove
+
+	ITerrain * getITerrain();
 	IWorld * getIWorld();
 
 	virtual Entity * getTarget(Entity * me);

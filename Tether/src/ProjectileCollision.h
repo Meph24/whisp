@@ -25,12 +25,9 @@ public:
 	hitType type;//TODO evaluate if necessary
 	HitData * data=0;//implementation-specific data, can be used or left 0
 
-	spacevec originChunk;//TODO remove after debugging
-
-
 	bool operator<(const ProjectileCollision& other) const;
 
-	ProjectileCollision(float Location,Entity * asEntity,Hittable * asHittable,hitType myType,spacevec OriginChunk);
+	ProjectileCollision(float Location,Entity * asEntity,Hittable * asHittable,hitType myType);
 	ProjectileCollision(float Location,DualPointer<Hittable> HitVictim,hitType myType);
 	~ProjectileCollision();
 };

@@ -10,8 +10,8 @@
 #include "HitData.h"
 
 
-ProjectileCollision::ProjectileCollision(float Location, Entity* asEntity,Hittable* asHittable,hitType myType,spacevec OriginChunk):
-location(Location),hitVictim(asEntity,asHittable),type(myType),originChunk(OriginChunk)
+ProjectileCollision::ProjectileCollision(float Location, Entity* asEntity,Hittable* asHittable,hitType myType):
+location(Location),hitVictim(asEntity,asHittable),type(myType)
 {
 }
 

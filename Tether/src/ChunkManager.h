@@ -83,6 +83,8 @@ class ChunkManager: public IWorld, public ITerrain
 	bool tryCreateChunk(gridInt cx,gridInt cz);
 	bool insideLimits(int x,int z,int maxX,int maxZ);
 
+	spacelen getHeight(spacevec abs);//absolute x,z
+
 	//TODO void deleteChunk()
 
 public:
@@ -90,14 +92,11 @@ public:
 	//magic, do not use yourself:
 
 	void requestEntityMove(Entity * e);//do not call yourself, managed by chunks
-	spacevec activeChunk;//TODO debug only, remove after debugging
-	void tick(Timestamp t,TickServiceProvider * tsp);
-	void render(float lodQ,Frustum * viewFrustum, spacevec camOffset);//TODO drawable
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	void render(float lodQ,Frustum * viewFrustum);//TODO drawable
+	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);//TODO
 	void generateMissing(int count);
 	void applyEntityChunkChanges(TickServiceProvider * tsp);//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
 	void setMid(spacevec abs,TickServiceProvider * tsp);//absolute x,z
-	void clearEntities();
 
 	//chunksPerLockchunk must be power of 2, if its not, it will be assigned one
 	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks,int chunksPerLockchunk);//render distance should be lower than half of the total chunks per axis
@@ -108,19 +107,18 @@ public:
 	bool drawAABBs=false;
 
 	//the partially critical interface: only call from main tick thread
-	//writing:
-	void giveInteractionManagers(Entity * e,std::vector<InteractionManager *> * managers,TickServiceProvider * tsp);
 	//read-only:
-	spacelen getHeight(spacevec abs);//absolute x,z
-	spacevec getMiddleChunk();
-	bool hitsGround(spacevec startpoint,spacevec endpoint);
+	spacevec getMiddleChunk();//TODO remove
+
+	//from ITerrain interface:
 	spacevec clip(spacevec pos,bool forceGround);
+	bool hitsGround(spacevec startpoint,spacevec endpoint);
 
-	//IWorld interface:
+	//from IWorld interface:
+	void clearEntities();
+	void tick(Timestamp t,TickServiceProvider * tsp);
+	void postTick(TickServiceProvider * tsp);
 	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks.
-
-
-
 };
 
 #endif /* SRC_CHUNKMANAGER_H_ */

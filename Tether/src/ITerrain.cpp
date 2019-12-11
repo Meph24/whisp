@@ -8,10 +8,10 @@
 
 #include "ITerrain.h"
 
-ITerrain::ITerrain(IWorld * world):
-w(world)
+ITerrain::ITerrain(IWorld * world)//:
+//w(world)
 {
-	defaultGravity=w->fromMeters({0,-9.81f,0});
+	defaultGravity=world->fromMeters({0,-9.81f,0});
 }
 
 ITerrain::~ITerrain()

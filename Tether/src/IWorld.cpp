@@ -118,7 +118,12 @@ void IWorld::requestEntityDelete(Entity* e)
 	deleteVec.push_back(e);
 }
 
-void IWorld::preTick()
+void IWorld::preTick(TickServiceProvider * tsp)
+{
+	resetAlgos();
+}
+
+void IWorld::resetAlgos()
 {
 	pushAlgo->reset();
 	projectileAlgo->reset();
@@ -126,4 +131,10 @@ void IWorld::preTick()
 	pushAlgo->doPrecalcs();
 	projectileAlgo->doPrecalcs();
 	collideAlgo->doPrecalcs();
+}
+
+spacevec IWorld::toUnitLength(spacevec v)
+{
+	vec3 conv=toMeters(v);
+	return fromMeters(conv/glm::length(conv));
 }
