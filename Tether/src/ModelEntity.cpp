@@ -13,6 +13,10 @@
 
 #include "InteractFilterAlgoSym.h"
 
+#include <iostream>
+
+using std::cerr;
+
 using glm::vec4;
 using glm::vec3;
 using glm::mat4;
@@ -121,16 +125,24 @@ Model* ModelEntity::colModel()
 	return &(model());
 }
 
-void ModelEntity::collide(DualPointer<Collider> other, float time, TickServiceProvider& tsp)
+void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
+	vec3 o0_pos, o1_pos, o0_v, o1_v;
+	o0_pos = vec3(0.0f, 0.0f, 0.0f);
+
+	//rel
+	o1_pos = tsp.getIWorld()->toMeters( other.pIF->colSavedPos() - colSavedPos());
+	o0_v = vec3(0.0f, 0.0f, 0.0f);
+
+	//rel
+	o1_v = tsp.getIWorld()->toMeters( other.pIF->colSavedV() - colSavedV() );
+
+
 	vector<collisionl2::SubmodelCollision> collisions = 
 		collisionl2::linearInterpolation(
-				0.0, time,
+				0.0, delta_time,
 				*(colModel()), *(other.pIF->colModel()),
-				tsp.getIWorld()->toMeters(colSavedPos()),
-				tsp.getIWorld()->toMeters(other.pIF->colSavedPos()),
-				tsp.getIWorld()->toMeters(colSavedV()),
-				tsp.getIWorld()->toMeters(other.pIF->colSavedV())
+				o0_pos, o1_pos, o0_v, o1_v
 			);
 
 	if(collisions.empty()) return;
@@ -140,7 +152,16 @@ void ModelEntity::collide(DualPointer<Collider> other, float time, TickServicePr
 
 	//move the objects to the time of the first collision
 	// only by percentage to avoid further collisions
-	float step_to_collision = std::min_element(collisions.begin(), collisions.end())->time * 0.9999;
+	auto min_e = std::min_element(collisions.begin(), collisions.end());
+
+	if(min_e->time > delta_time)
+	{
+		cerr << "ERROR : Collision to later time than tick!\n";
+	}
+
+	float step_to_collision =min_e->time * 0.9999;
+	
+
 	this->pos = colSavedPos() + colSavedV() * step_to_collision;
 	other.e->pos = other.pIF->colSavedPos() + other.pIF->colSavedV() * step_to_collision;
 

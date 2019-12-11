@@ -266,10 +266,10 @@ void Simulation_World::loadStandardTex()
 		models.emplace_back( new Model(meshes[0].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( 0.6f, 0.0f, 0.0f));
+		me->v = cm->fromMeters(	vec3( 0.3f, 0.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(vec3(1.0f, 10.0f, 0.0f ))
+			cm->fromMeters	(vec3(2.0f, 9.0f, 1.0f ))
 		);
 	}
 	
@@ -278,10 +278,10 @@ void Simulation_World::loadStandardTex()
 		models.emplace_back( new Model(meshes[1].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( -0.6f, 0.0f, 0.0f));
+		me->v = cm->fromMeters(	vec3( -0.3f, 0.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( 12.0f, 10.0f, 0.0f))
+			cm->fromMeters	(	vec3( 11.0f, 9.0f, 1.0f) )
 
 		);
 	}
@@ -292,7 +292,7 @@ void Simulation_World::loadStandardTex()
 		ModelEntity* me = new ModelEntity(*(models.back()));
 		spawn
 		(	me,
-			cm->fromMeters	(vec3(1.0f, 3.0f, 0.0f ))
+			cm->fromMeters	(vec3(2.0f, 3.0f, 1.0f ))
 		);
 	}
 	
@@ -303,7 +303,7 @@ void Simulation_World::loadStandardTex()
 		ModelEntity* me = new ModelEntity(*(models.back()));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( 12.0f, 3.0f, 0.0f))
+			cm->fromMeters	(	vec3( 11.0f, 3.0f, 1.0f))
 
 		);
 	}
@@ -325,6 +325,7 @@ void Simulation_World::loadStandardTex()
 		models.emplace_back( new Model(meshes[0].get()) );
 	//TODO move the diamond 
 		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->v = cm->fromMeters(	vec3( 0.0f, -0.2f, 0.0f));
 		spawn
 		(	me,
 			cm->fromMeters	(	vec3( 12.0f, 10.0f, 12.0f))

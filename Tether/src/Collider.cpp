@@ -14,10 +14,10 @@
 
 #include "collisionl2.hpp"
 
-void Collider::interact(Entity * self,DualPointer<Collider> other, float time, TickServiceProvider& tsp)
+void Collider::interact(Entity * self,DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
 	//l2 collision detection
-	collide(other, time, tsp);
+	collide(other, delta_time, tsp);
 }
 
 void Collider::saveState(const State& state)

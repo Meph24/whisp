@@ -21,7 +21,7 @@ private:
 	State old_state;
 public:
 //	void registerPushCheck(Entity * e,float seconds,TickServiceProvider * tsp);
-	void interact(Entity * self,DualPointer<Collider> other, float time, TickServiceProvider& tsp);
+	void interact(Entity * self,DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
 
 	void saveState(const State& state);
 
