@@ -27,6 +27,7 @@ extern Zombie_MouseInput* mouseInput;
 #include "CfgIO.hpp"
 #include "Mesh.hpp"
 #include "diamondMesh.hpp"
+#include "torusMesh.hpp"
 #include "ModelEntity.hpp"
 #include "MeshIO.hpp"
 
@@ -221,18 +222,20 @@ void Simulation_World::loadStandardTex()
 
 	g = new Graphics2D(64,getAspectRatio());
 
-	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
-	cm->requestEntitySpawn(tr);
+//	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
+//	cm->requestEntitySpawn(tr);
 
 	meshes.emplace_back( new Mesh(diamondMesh(7, 0.3f, 2.0f)) );
 	MeshIO meshio("./res/cross.mesh");
 	meshes.emplace_back( new Mesh(meshio.get()) );
+	meshes.emplace_back( new Mesh(torusMesh(1.5f, 9, 0.3f, 5)) );
 
-	for ( int i = 0; i < 6; ++i )
+	for ( int i = 0; i < 5; ++i )
 	{
 		//create 6 more meshes by random
 		meshes.emplace_back( new Mesh ( randommodel::randomMesh(20, 3.0f)));
 	}
+
 
 	for ( int i = 0; i < objects_count; ++i )
 	{
@@ -255,31 +258,78 @@ void Simulation_World::loadStandardTex()
 		);
 
 	}
-
+	
+	//moving diamond
 	{
-		Model rand_model = randomModel(meshes);
-		models.emplace_back( new Model(rand_model) );
+		models.emplace_back( new Model(meshes[0].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( -1.0f, 0.0f, 0.0f));
+		me->v = cm->fromMeters(	vec3( 0.6f, 0.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(vec3(3.0f, 10.0f, 3.0f ))
+			cm->fromMeters	(vec3(1.0f, 10.0f, 0.0f ))
+		);
+	}
+	
+	//moving cross
+	{
+		models.emplace_back( new Model(meshes[1].get()) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->v = cm->fromMeters(	vec3( -0.6f, 0.0f, 0.0f));
+		spawn
+		(	me,
+			cm->fromMeters	(	vec3( 12.0f, 10.0f, 0.0f))
+
+		);
+	}
+	//still diamond
+	{
+		models.emplace_back( new Model(meshes[0].get()) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		spawn
+		(	me,
+			cm->fromMeters	(vec3(1.0f, 3.0f, 0.0f ))
+		);
+	}
+	
+	//still cross
+	{
+		models.emplace_back( new Model(meshes[1].get()) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		spawn
+		(	me,
+			cm->fromMeters	(	vec3( 12.0f, 3.0f, 0.0f))
+
 		);
 	}
 
+	//donut
+	//TODO turn the donut
 	{
-		Model rand_model = randomModel(meshes);
-		models.emplace_back( new Model(rand_model) );
+		models.emplace_back( new Model(meshes[2].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( 1.0f, 0.0f ,0.0f ));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( -3.0f, 10.0f, 3.0f))
+			cm->fromMeters	(vec3(12.0f, 5.0f, 12.0f ))
+		);
+	}
+
+	//diamond moving through donut
+	{
+		models.emplace_back( new Model(meshes[0].get()) );
+	//TODO move the diamond 
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		spawn
+		(	me,
+			cm->fromMeters	(	vec3( 12.0f, 10.0f, 12.0f))
 
 		);
 	}
+
 
 }
 
