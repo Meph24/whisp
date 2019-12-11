@@ -17,7 +17,7 @@
 void Collider::interact(Entity * self,DualPointer<Collider> other, float time, TickServiceProvider& tsp)
 {
 	//l2 collision detection
-	collide(other.pIF, time, tsp);
+	collide(other, time, tsp);
 }
 
 void Collider::saveState(const State& state)

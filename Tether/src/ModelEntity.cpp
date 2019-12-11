@@ -115,31 +115,22 @@ void ModelEntity::tick
 }
 
 // implementation of the Collider Interface
-void ModelEntity::colSetRealPos(const spacevec& newpos)
-{
-	pos = newpos;
-}
-
-void ModelEntity::colSetRealV(const spacevec& newv)
-{
-	v = newv;
-}
 
 Model* ModelEntity::colModel()
 {
 	return &(model());
 }
 
-void ModelEntity::collide(Collider* other, float time, TickServiceProvider& tsp)
+void ModelEntity::collide(DualPointer<Collider> other, float time, TickServiceProvider& tsp)
 {
 	vector<collisionl2::SubmodelCollision> collisions = 
 		collisionl2::linearInterpolation(
 				0.0, time,
-				*(colModel()), *(other->colModel()),
+				*(colModel()), *(other.pIF->colModel()),
 				tsp.getIWorld()->toMeters(colSavedPos()),
-				tsp.getIWorld()->toMeters(other->colSavedPos()),
+				tsp.getIWorld()->toMeters(other.pIF->colSavedPos()),
 				tsp.getIWorld()->toMeters(colSavedV()),
-				tsp.getIWorld()->toMeters(other->colSavedV())
+				tsp.getIWorld()->toMeters(other.pIF->colSavedV())
 			);
 
 	if(collisions.empty()) return;
@@ -150,12 +141,12 @@ void ModelEntity::collide(Collider* other, float time, TickServiceProvider& tsp)
 	//move the objects to the time of the first collision
 	// only by percentage to avoid further collisions
 	float step_to_collision = std::min_element(collisions.begin(), collisions.end())->time * 0.9999;
-	this->colSetRealPos(colSavedPos() + colSavedV() * step_to_collision);
-	other->colSetRealPos(other->colSavedPos() + other->colSavedV() * step_to_collision);
+	this->pos = colSavedPos() + colSavedV() * step_to_collision;
+	other.e->pos = other.pIF->colSavedPos() + other.pIF->colSavedV() * step_to_collision;
 
 	//cancel further movements
 	spacevec vnull; vnull.set0();
-	this->colSetRealV( vnull );
-	other->colSetRealV( vnull );
+	this->v =  vnull;
+	other.e->v =  vnull;
 }
 
