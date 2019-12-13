@@ -336,7 +336,7 @@ void Simulation_World::loadStandardTex()
 	{
 		models.emplace_back( new Model(meshes[1].get()) );
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->spin(vec3(0.0f, 0.1f, 0.0f));
+		me->spin(vec3(0.0f, 10.0f, 0.0f));
 		spawn
 		(	me,
 			cm->fromMeters	(	vec3( 0.0f, 3.0f, 12.0f))
