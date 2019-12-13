@@ -24,7 +24,10 @@ class ModelEntity : public Entity , public Collider
 {
 	Model m_model;
 
-	CumulativeMat cummat;
+	vec3 m_rot;
+	vec3 m_rotv;
+
+	mat4 transmat;
 public:
 	ModelEntity(const Model& model);
 	~ModelEntity();
@@ -32,9 +35,12 @@ public:
 	Model& model();
 
 	void move(spacevec d);
-	void rotate(vec3 rot);
-	void scale(vec3 scale);
 
+	vec3 rot() const;
+	vec3 rotv() const;
+	
+	void rotate(vec3 rot);
+	void spin(vec3 rot);
 
 	spacevec getPos() const;
 

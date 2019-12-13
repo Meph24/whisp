@@ -24,7 +24,10 @@ Model& ModelEntity::model()
 
 ModelEntity::ModelEntity(const Model& model)
 :
-	m_model(model)
+	m_model(model),
+	m_rot(0.0f, 0.0f, 0.0f),
+	m_rotv(0.0f, 0.0f, 0.0f),
+	transmat(1.0f)
 {
 	surviveClearing = true;
 
@@ -34,24 +37,20 @@ ModelEntity::ModelEntity(const Model& model)
 ModelEntity::~ModelEntity()
 {}
 
-void ModelEntity::move(spacevec d)
+void ModelEntity::move(spacevec distance)
 {
-	this->pos += this->pos;
+	this->pos += distance;
 }
 
-void ModelEntity::rotate(vec3 rot)
+void ModelEntity::rotate(vec3 rotation)
 {
-	cummat = cummat * 
+	m_rot = rot;
+	transmat = transmat * 
 		(
 		  glm::rotateDeg(rot.x, glm::vec3(1, 0, 0))
 		* glm::rotateDeg(rot.y, glm::vec3(0, 1, 0))
 		* glm::rotateDeg(rot.z, glm::vec3(0, 0, 1))
 		);
-}
-
-void ModelEntity::scale(vec3 scale)
-{
-	cummat = glm::scale(cummat, scale);
 }
 
 spacevec ModelEntity::getPos() const
@@ -83,6 +82,9 @@ void ModelEntity::draw(
 
 	//apply position
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
+	glRotatef(m_rot.x, 1.0f, 0.0f, 0.0f);
+	glRotatef(m_rot.y, 0.0f, 1.0f, 0.0f);
+	glRotatef(m_rot.z, 0.0f, 0.0f, 1.0f);
 	m_model.draw();
 
 	glPopMatrix();
