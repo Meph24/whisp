@@ -24,7 +24,7 @@ Model::Model(Mesh* mesh, const mat4& transformation_matrix)
 	updateExtent();
 }
 
-CumulativeMat& Model::transformationMatrix()
+CumulativeMat& Model::transMat()
 {
 	return transmat;
 }

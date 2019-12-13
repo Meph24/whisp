@@ -26,8 +26,6 @@ class ModelEntity : public Entity , public Collider
 
 	vec3 m_rot;
 	vec3 m_rotv;
-
-	mat4 transmat;
 public:
 	ModelEntity(const Model& model);
 	~ModelEntity();
@@ -36,11 +34,13 @@ public:
 
 	void move(spacevec d);
 
-	vec3 rot() const;
-	vec3 rotv() const;
+	const vec3& rot() const;
+	const vec3& rotv() const;
 	
-	void rotate(vec3 rot);
-	void spin(vec3 rot);
+	void rotate(vec3 rotation);
+	void spin(vec3 rotational_velocity);
+
+	void resetRotation(bool reset_rotv = true);
 
 	spacevec getPos() const;
 

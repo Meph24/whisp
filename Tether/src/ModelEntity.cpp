@@ -30,8 +30,7 @@ ModelEntity::ModelEntity(const Model& model)
 :
 	m_model(model),
 	m_rot(0.0f, 0.0f, 0.0f),
-	m_rotv(0.0f, 0.0f, 0.0f),
-	transmat(1.0f)
+	m_rotv(0.0f, 0.0f, 0.0f)
 {
 	surviveClearing = true;
 
@@ -46,15 +45,36 @@ void ModelEntity::move(spacevec distance)
 	this->pos += distance;
 }
 
+const vec3& ModelEntity::rot() const
+{
+	return m_rot;
+}
+
+const vec3& ModelEntity::rotv() const
+{
+	return m_rotv;
+}
+
+void ModelEntity::resetRotation(bool reset_rotv)
+{
+	if(reset_rotv) m_rotv = vec3(0.0f, 0.0f, 0.0f);
+	rotate(-1 * m_rot);
+}
+
 void ModelEntity::rotate(vec3 rotation)
 {
-	m_rot = rot;
-	transmat = transmat * 
+	m_rot += rotation;
+	m_model.transMat() = m_model.transMat() * 
 		(
-		  glm::rotateDeg(rot.x, glm::vec3(1, 0, 0))
-		* glm::rotateDeg(rot.y, glm::vec3(0, 1, 0))
-		* glm::rotateDeg(rot.z, glm::vec3(0, 0, 1))
+		  glm::rotateDeg(rotation.x, glm::vec3(1, 0, 0))
+		* glm::rotateDeg(rotation.y, glm::vec3(0, 1, 0))
+		* glm::rotateDeg(rotation.z, glm::vec3(0, 0, 1))
 		);
+}
+
+void ModelEntity::spin(vec3 rotational_velocity)
+{
+	m_rotv += rotational_velocity;
 }
 
 spacevec ModelEntity::getPos() const
@@ -86,9 +106,10 @@ void ModelEntity::draw(
 
 	//apply position
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
-	glRotatef(m_rot.x, 1.0f, 0.0f, 0.0f);
-	glRotatef(m_rot.y, 0.0f, 1.0f, 0.0f);
-	glRotatef(m_rot.z, 0.0f, 0.0f, 1.0f);
+	//rotation already done by matrixmult in model.draw()
+	//glRotatef(m_rot.x, 1.0f, 0.0f, 0.0f);
+	//glRotatef(m_rot.y, 0.0f, 1.0f, 0.0f);
+	//glRotatef(m_rot.z, 0.0f, 0.0f, 1.0f);
 	m_model.draw();
 
 	glPopMatrix();
@@ -103,15 +124,24 @@ void ModelEntity::tick
 	float time = t - lastTick;
 	lastTick = t;
 
+	//the collider needs to save the old state of the entity
+	//to use it for its calculations
 	Collider::State old_state {pos, v};
 	Collider::saveState(old_state);
 
 	ChunkManager* cm = tsp->getChunkManager();
 
 	//entity attribute changes go here
+	//this is code for collision simulation
+	//entities turn around after flying away too far
 	if(glm::length(cm->toMeters(pos)) > 100)
 		v = v * -1.0f;
-	pos += v*time;
+
+	//apply pos by velocity
+	move(v*time);
+
+	//apply rotation by rotational velocity
+	rotate(m_rotv * time);
 
 	bb = AABB(pos, cm->fromMeters(m_model.extent()));
 

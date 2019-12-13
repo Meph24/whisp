@@ -309,11 +309,11 @@ void Simulation_World::loadStandardTex()
 	}
 
 	//donut
-	//TODO turn the donut
 	{
 		models.emplace_back( new Model(meshes[2].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->rotate(vec3(90.0f, 0.0f, 0.0f));
 		spawn
 		(	me,
 			cm->fromMeters	(vec3(12.0f, 5.0f, 12.0f ))
@@ -323,7 +323,6 @@ void Simulation_World::loadStandardTex()
 	//diamond moving through donut
 	{
 		models.emplace_back( new Model(meshes[0].get()) );
-	//TODO move the diamond 
 		ModelEntity* me = new ModelEntity(*(models.back()));
 		me->v = cm->fromMeters(	vec3( 0.0f, -0.2f, 0.0f));
 		spawn
@@ -332,7 +331,18 @@ void Simulation_World::loadStandardTex()
 
 		);
 	}
+	
+	//rotating cross
+	{
+		models.emplace_back( new Model(meshes[1].get()) );
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->spin(vec3(0.0f, 0.1f, 0.0f));
+		spawn
+		(	me,
+			cm->fromMeters	(	vec3( 0.0f, 3.0f, 12.0f))
 
+		);
+	}
 
 }
 

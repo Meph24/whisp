@@ -39,7 +39,7 @@ public:
 
 	const Mesh& mesh() const;
 
-	CumulativeMat& transformationMatrix();
+	CumulativeMat& transMat();
 	const vector<Vertex>& vertices();
 	vector<EdgeRef> edges();
 	vector<FaceRef> faces();
