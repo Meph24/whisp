@@ -59,10 +59,8 @@ public:
 					 );
 
 	//ColliderInterface
-	void colSetRealPos(const spacevec& newpos);
-	void colSetRealV(const spacevec& newv);
 	Model* colModel();
-	void collide(Collider* other, float time, TickServiceProvider& tsp);
+	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
 };
 
 #endif /* ENTITYDIAMOND_HPP */
