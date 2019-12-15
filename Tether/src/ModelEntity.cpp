@@ -198,8 +198,13 @@ void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickSer
 	other.e->pos = other.pIF->colSavedPos() + other.pIF->colSavedV() * step_to_collision;
 
 	//cancel further movements
-	spacevec vnull; vnull.set0();
-	this->v =  vnull;
-	other.e->v =  vnull;
+	this->colReact();
+	other.pIF->colReact();
+}
+
+void ModelEntity::colReact()
+{
+	v.set0();
+	spin(-1*rotv());
 }
 

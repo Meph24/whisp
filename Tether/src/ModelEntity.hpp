@@ -61,6 +61,7 @@ public:
 	//ColliderInterface
 	Model* colModel();
 	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
+	void colReact();
 };
 
 #endif /* ENTITYDIAMOND_HPP */

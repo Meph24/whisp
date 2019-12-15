@@ -44,6 +44,13 @@ public:
 	 */
 	virtual void collide(DualPointer<Collider> other, float time, TickServiceProvider& tsp) = 0;
 
+	/**
+	 * @brief React to when a collision happens.
+	 *
+	 * This part of the interface will most likely change in the future to accomodate parameters like the position of the collision and whatever.
+	 */
+	virtual void colReact() = 0;
+
 	virtual ~Collider() = default;
 };
 
