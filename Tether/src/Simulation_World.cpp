@@ -231,7 +231,7 @@ void Simulation_World::loadStandardTex()
 	meshes.emplace_back( new Mesh(diamondMesh(7, 0.3f, 2.0f)) );
 	MeshIO meshio("./res/cross.mesh");
 	meshes.emplace_back( new Mesh(meshio.get()) );
-	meshes.emplace_back( new Mesh(torusMesh(1.5f, 9, 0.3f, 5)) );
+	meshes.emplace_back( new Mesh(torusMesh(1.0f, 9, 0.3f, 5)) );
 
 	for ( int i = 0; i < 5; ++i )
 	{
@@ -239,6 +239,16 @@ void Simulation_World::loadStandardTex()
 		meshes.emplace_back( new Mesh ( randommodel::randomMesh(20, 3.0f)));
 	}
 
+	float fi = 0.0;
+	for(auto& m_uptr : meshes)
+	{
+		Model model(m_uptr.get());
+		models.emplace_back( new Model(m_uptr.get()) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		spawn(me, cm->fromMeters(vec3(20.0f, 4.0f, fi*2.5f)));
+		fi += 1.0f;
+	}
 
 	for ( int i = 0; i < objects_count; ++i )
 	{
