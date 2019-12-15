@@ -46,6 +46,7 @@ extern Zombie_MouseInput* mouseInput;
 #include "WarnErrReporter.h"
 
 #include "randomModel.hpp"
+#include <glm/gtc/random.hpp>
 
 
 Simulation_World::Simulation_World(sf::Window * w):
@@ -342,6 +343,42 @@ void Simulation_World::loadStandardTex()
 			cm->fromMeters	(	vec3( 0.0f, 3.0f, 12.0f))
 
 		);
+	}
+
+	//orrery
+	{
+		vec3 pos(15.0f, 15.0f, 15.0f);
+		float factor = 2.0f;
+		models.emplace_back( new Model(meshes[2].get()) );
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->spin(glm::linearRand
+					(	vec3(-360.0f, -360.0f, -360.0f), 
+						vec3(360.0f, 360.0f, 360.0f))
+				);
+		me->model().transMat() = glm::scale(me->model().transMat(), vec3(factor, factor, factor));
+		spawn(me, cm->fromMeters( pos ));
+
+
+		factor = 1.0f;
+		models.emplace_back( new Model(meshes[2].get()) );
+		me = new ModelEntity(*(models.back()));
+		me->spin(glm::linearRand
+					(	vec3(-360.0f, -360.0f, -360.0f), 
+						vec3(360.0f, 360.0f, 360.0f))
+				);
+		me->model().transMat() = glm::scale(me->model().transMat(), vec3(factor, factor, factor));
+		spawn(me, cm->fromMeters( pos ));
+
+
+		factor = 0.5f;
+		models.emplace_back( new Model(meshes[2].get()) );
+		me = new ModelEntity(*(models.back()));
+		me->spin(glm::linearRand
+					(	vec3(-360.0f, -360.0f, -360.0f), 
+						vec3(360.0f, 360.0f, 360.0f))
+				);
+		me->model().transMat() = glm::scale(me->model().transMat(), vec3(factor, factor, factor));
+		spawn(me, cm->fromMeters( pos ));
 	}
 
 }
