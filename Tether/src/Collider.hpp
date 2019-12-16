@@ -21,33 +21,14 @@ private:
 	State old_state;
 public:
 //	void registerPushCheck(Entity * e,float seconds,TickServiceProvider * tsp);
-	void interact(Entity * self,DualPointer<Collider> other, float time, TickServiceProvider& tsp);
+	void interact(Entity * self,DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
 
 	void saveState(const State& state);
 
 	spacevec colSavedPos() const;
 	spacevec colSavedV() const;
 	
-	/**
-	 * @brief Set the persistent position of the collider.
-	 *
-	 * Implementations have to persist the by the interaction 
-	 *  calculated pos in the derived class.
-	 *
-	 * @param newpos position to set
-	 */
-	virtual void colSetRealPos(const spacevec& newpos) = 0;
-
-	/**
-	 * @brief Set the persistent velocity of the collider.
-	 *
-	 * Implementations have to persist the by the interaction 
-	 *	calculated v in the derived class.
-	 *
-	 * @param newv velocity to set
-	 */
-	virtual void colSetRealV(const spacevec& newv) = 0;
-
+	//Setting the pos and velocity of the entity via the pointers of the parameters
 
 	/**
 	 * @brief Gets the model from implementing class.
@@ -61,7 +42,14 @@ public:
 	 *
 	 * @param other the other collider to collide with
 	 */
-	virtual void collide(Collider* other, float time, TickServiceProvider& tsp) = 0;
+	virtual void collide(DualPointer<Collider> other, float time, TickServiceProvider& tsp) = 0;
+
+	/**
+	 * @brief React to when a collision happens.
+	 *
+	 * This part of the interface will most likely change in the future to accomodate parameters like the position of the collision and whatever.
+	 */
+	virtual void colReact() = 0;
 
 	virtual ~Collider() = default;
 };

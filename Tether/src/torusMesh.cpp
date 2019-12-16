@@ -4,8 +4,6 @@
 #include "glmutils.hpp"
 #include "MathStuff.h"
 
-#include <iostream>
-
 float torusX(	float torus_radius, float torus_angle, 
 				float tube_radius, float tube_angle	)
 {
@@ -110,13 +108,6 @@ Mesh torusMesh(	float torus_radius, unsigned int torus_samples,
 		vi_01 = torus_offset + next_tube_index;
 		vi_10 = next_torus_offset + tube_index;
 		vi_11 = next_torus_offset + last_tube_index;
-
-		std::cout << "DEBUG : TORUS INDICES : " 
-		<< vi_00 << '|'
-		<< vi_01 << '|'
-		<< vi_10 << '|'
-		<< vi_11 << '\n';
-		
 		
 		indices.push_back(vi_00);
 		indices.push_back(vi_01);

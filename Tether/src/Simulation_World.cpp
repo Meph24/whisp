@@ -46,6 +46,7 @@ extern Zombie_MouseInput* mouseInput;
 #include "WarnErrReporter.h"
 
 #include "randomModel.hpp"
+#include <glm/gtc/random.hpp>
 
 
 Simulation_World::Simulation_World(sf::Window * w)
@@ -227,7 +228,7 @@ void Simulation_World::loadStandardTex()
 	meshes.emplace_back( new Mesh(diamondMesh(7, 0.3f, 2.0f)) );
 	MeshIO meshio("./res/cross.mesh");
 	meshes.emplace_back( new Mesh(meshio.get()) );
-	meshes.emplace_back( new Mesh(torusMesh(1.5f, 9, 0.3f, 5)) );
+	meshes.emplace_back( new Mesh(torusMesh(1.0f, 9, 0.3f, 5)) );
 
 	for ( int i = 0; i < 5; ++i )
 	{
@@ -235,6 +236,16 @@ void Simulation_World::loadStandardTex()
 		meshes.emplace_back( new Mesh ( randommodel::randomMesh(20, 3.0f)));
 	}
 
+	float fi = 0.0;
+	for(auto& m_uptr : meshes)
+	{
+		Model model(m_uptr.get());
+		models.emplace_back( new Model(m_uptr.get()) );
+
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		spawn(me, cm->fromMeters(vec3(20.0f, 4.0f, fi*2.5f)));
+		fi += 1.0f;
+	}
 
 	for ( int i = 0; i < objects_count; ++i )
 	{
@@ -263,10 +274,10 @@ void Simulation_World::loadStandardTex()
 		models.emplace_back( new Model(meshes[0].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( 0.6f, 0.0f, 0.0f));
+		me->v = cm->fromMeters(	vec3( 0.3f, 0.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(vec3(1.0f, 10.0f, 0.0f ))
+			cm->fromMeters	(vec3(2.0f, 9.0f, 1.0f ))
 		);
 	}
 	
@@ -275,10 +286,14 @@ void Simulation_World::loadStandardTex()
 		models.emplace_back( new Model(meshes[1].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( -0.6f, 0.0f, 0.0f));
+		//TODO because of some fucking reason the cross vanishes
+		// when the velocity vector gets a negative x
+		// so i guess its not moving
+		// the test still works with only 1 moving part so duh, but this needs to be fixed
+		me->v = cm->fromMeters(	vec3( 0.0f, 0.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( 12.0f, 10.0f, 0.0f))
+			cm->fromMeters	(	vec3( 10.0f, 9.0f, 1.0f) )
 
 		);
 	}
@@ -289,7 +304,7 @@ void Simulation_World::loadStandardTex()
 		ModelEntity* me = new ModelEntity(*(models.back()));
 		spawn
 		(	me,
-			cm->fromMeters	(vec3(1.0f, 3.0f, 0.0f ))
+			cm->fromMeters	(vec3(2.0f, 3.0f, 1.0f ))
 		);
 	}
 	
@@ -300,17 +315,17 @@ void Simulation_World::loadStandardTex()
 		ModelEntity* me = new ModelEntity(*(models.back()));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( 12.0f, 3.0f, 0.0f))
+			cm->fromMeters	(	vec3( 10.0f, 3.0f, 1.0f))
 
 		);
 	}
 
 	//donut
-	//TODO turn the donut
 	{
 		models.emplace_back( new Model(meshes[2].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->rotate(vec3(90.0f, 0.0f, 0.0f));
 		spawn
 		(	me,
 			cm->fromMeters	(vec3(12.0f, 5.0f, 12.0f ))
@@ -320,15 +335,116 @@ void Simulation_World::loadStandardTex()
 	//diamond moving through donut
 	{
 		models.emplace_back( new Model(meshes[0].get()) );
-	//TODO move the diamond 
 		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->v = cm->fromMeters(	vec3( 0.0f, -0.2f, 0.0f));
 		spawn
 		(	me,
 			cm->fromMeters	(	vec3( 12.0f, 10.0f, 12.0f))
 
 		);
 	}
+	
+	//rotating cross
+	{
+		models.emplace_back( new Model(meshes[1].get()) );
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->spin(vec3(0.0f, 10.0f, 0.0f));
+		spawn
+		(	me,
+			cm->fromMeters	(	vec3( 0.0f, 3.0f, 12.0f))
 
+		);
+	}
+
+	//orrery
+	{
+		vec3 pos(15.0f, 15.0f, 15.0f);
+		float factor = 2.0f;
+		models.emplace_back( new Model(meshes[2].get()) );
+		ModelEntity* me = new ModelEntity(*(models.back()));
+		me->spin(glm::linearRand
+					(	vec3(-360.0f, -360.0f, -360.0f), 
+						vec3(360.0f, 360.0f, 360.0f))
+				);
+		me->model().transMat() = glm::scale(me->model().transMat(), vec3(factor, factor, factor));
+		spawn(me, cm->fromMeters( pos ));
+
+
+		factor = 1.0f;
+		models.emplace_back( new Model(meshes[2].get()) );
+		me = new ModelEntity(*(models.back()));
+		me->spin(glm::linearRand
+					(	vec3(-360.0f, -360.0f, -360.0f), 
+						vec3(360.0f, 360.0f, 360.0f))
+				);
+		me->model().transMat() = glm::scale(me->model().transMat(), vec3(factor, factor, factor));
+		spawn(me, cm->fromMeters( pos ));
+
+
+		factor = 0.5f;
+		models.emplace_back( new Model(meshes[2].get()) );
+		me = new ModelEntity(*(models.back()));
+		me->spin(glm::linearRand
+					(	vec3(-360.0f, -360.0f, -360.0f), 
+						vec3(360.0f, 360.0f, 360.0f))
+				);
+		me->model().transMat() = glm::scale(me->model().transMat(), vec3(factor, factor, factor));
+		spawn(me, cm->fromMeters( pos ));
+	}
+
+	//cogged crosses
+	{
+		models.emplace_back( new Model(meshes[1].get()) );
+		ModelEntity* me0 = new ModelEntity(*(models.back()));
+		models.emplace_back( new Model(meshes[1].get()) );
+		ModelEntity* me1 = new ModelEntity(*(models.back()));
+
+		vec3 pos0(16.0f, 3.0f, 0.0f);
+
+		//the cross mesh is 1.0 units wide and high
+		//its model per default is upright, with the arms pointing in y and z directions
+		// so only moving it in x direction for 0.9 will cause collision on arms
+		vec3 pos1 = pos0; pos1.x -= 0.8;
+
+		//offset one by rotation	
+		me1->rotate(vec3(0.0f, 0.0f, 45.0f));
+
+		//and spin them both at the same speed in respective directions
+		//clockwise and counter clockwise
+		float vel = randommodel::randomFloat(-360.0f, 360.0f);
+		vec3 rotational_velocity0(0.0f, 0.0f, vel);
+		vec3 rotational_velocity1(0.0f, 0.0f, -1*vel);
+		me0->spin(rotational_velocity0);
+		me1->spin(rotational_velocity1);
+		spawn(me0, cm->fromMeters(pos0));
+		spawn(me1, cm->fromMeters(pos1));
+
+	}
+
+	//cogged crosses intersecting
+	{
+		models.emplace_back( new Model(meshes[1].get()) );
+		ModelEntity* me0 = new ModelEntity(*(models.back()));
+		models.emplace_back( new Model(meshes[1].get()) );
+		ModelEntity* me1 = new ModelEntity(*(models.back()));
+
+		vec3 pos0(16.0f, 5.0f, 0.0f);
+
+		//the cross mesh is 1.0 units wide and high
+		//its model per default is upright, with the arms pointing in y and z directions
+		// so only moving it in x direction for 0.9 will cause collision on arms
+		vec3 pos1 = pos0; pos1.x -= 0.8;
+
+		me0->rotate(vec3(0.0f, 0.0f, 45.0f));
+
+		//we this time spin only one of the crosses
+		float vel = randommodel::randomFloat(-360.0f, 360.0f);
+		vec3 rotational_velocity0(0.0f, 0.0f, vel);
+		me0->spin(rotational_velocity0);
+		spawn(me0, cm->fromMeters(pos0));
+		spawn(me1, cm->fromMeters(pos1));
+
+	}
 
 }
 

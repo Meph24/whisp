@@ -26,7 +26,7 @@ private:
 
 	mat4 current_transformation;
 	vector<Vertex> m_vertices;
-	CumulativeMat transmat;
+	mat4 transmat;
 	vec3 m_extent;
 public:
 	Model(Mesh* mesh);
@@ -39,7 +39,7 @@ public:
 
 	const Mesh& mesh() const;
 
-	CumulativeMat& transformationMatrix();
+	mat4& transMat();
 	const vector<Vertex>& vertices();
 	vector<EdgeRef> edges();
 	vector<FaceRef> faces();

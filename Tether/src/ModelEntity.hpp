@@ -24,7 +24,8 @@ class ModelEntity : public Entity , public Collider
 {
 	Model m_model;
 
-	CumulativeMat cummat;
+	vec3 m_rot;
+	vec3 m_rotv;
 public:
 	ModelEntity(const Model& model);
 	~ModelEntity();
@@ -32,9 +33,14 @@ public:
 	Model& model();
 
 	void move(spacevec d);
-	void rotate(vec3 rot);
-	void scale(vec3 scale);
 
+	const vec3& rot() const;
+	const vec3& rotv() const;
+	
+	void rotate(vec3 rotation);
+	void spin(vec3 rotational_velocity);
+
+	void resetRotation(bool reset_rotv = true);
 
 	spacevec getPos() const;
 
@@ -53,10 +59,9 @@ public:
 					 );
 
 	//ColliderInterface
-	void colSetRealPos(const spacevec& newpos);
-	void colSetRealV(const spacevec& newv);
 	Model* colModel();
-	void collide(Collider* other, float time, TickServiceProvider& tsp);
+	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
+	void colReact();
 };
 
 #endif /* ENTITYDIAMOND_HPP */
