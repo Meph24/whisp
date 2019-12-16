@@ -60,7 +60,7 @@ extern int enabledProgram;
 //extern Zombie_World * world;
 
 #include "Simulation_World.h"
-extern Simulation_World * world;
+extern IGameMode * world;
 
 #include "CameraTP.h"
 

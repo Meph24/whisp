@@ -245,6 +245,10 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	if(heldItem) heldItem->tick(t,tsp);
 
 	characterEyeOffset=iw->toUnitLength(it->getGravity(pos))*(-characterEyeHeight);
+	//std::cout<<"pos"<<pos<<std::endl;
+	//std::cout<<"gravity"<<it->getGravity(pos)<<std::endl;
+	//std::cout<<"characterEyeHeight"<<characterEyeHeight<<std::endl;
+	//std::cout<<"iw->toUnitLength(it->getGravity(pos))"<<iw->toUnitLength(it->getGravity(pos))<<std::endl;
 	float time=t-lastTick;
 	lastTick=t;
 	hitmark -= time * 10;

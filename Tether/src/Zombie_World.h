@@ -2,8 +2,7 @@
 
 #include "TickServiceProvider.h"
 #include "DrawServiceProvider.h"
-
-#include "ModelEntity.hpp"
+#include "IGameMode.h"
 
 #include "TimestampManager.h"
 #include "Spacevec.h"
@@ -12,7 +11,6 @@ class AdaptiveQuality;
 class PerformanceMeter;
 class DebugScreen;
 class EntityPlayer;
-class Mesh;
 class TexParamSet;
 class IWorld;
 
@@ -33,7 +31,7 @@ class IWorld;
 #define PM_LOGIC_CHUNKMOVE 6
 
 
-class Zombie_World: public TickServiceProvider, DrawServiceProvider
+class Zombie_World: public DrawServiceProvider, public IGameMode
 {
 	bool spawnZombies;
 	int zCount;//max number of zombies
@@ -44,9 +42,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 	DebugScreen * dsGraphics;
 
 	ChunkManager * cm;
-
-	Mesh * diamond_mesh;
-	Mesh * cross_mesh;
 
 	ITexture * zombieTex;
 	ITexture * grass;
@@ -73,8 +68,6 @@ class Zombie_World: public TickServiceProvider, DrawServiceProvider
 public:
 
 
-	EntityPlayer * player;
-	TimestampManager tm;
 	Zombie_World(sf::Window * w);
 	~Zombie_World();
 
@@ -89,7 +82,6 @@ public:
 	virtual Entity * getTarget(Entity * me);
 
 	void spawn(Entity*, spacevec);
-	void spawnGrounded(ModelEntity* ep, spacevec pos);
 
 	void loadStandardTex();
 

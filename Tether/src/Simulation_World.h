@@ -6,6 +6,7 @@ using std::unique_ptr;
 
 #include "TickServiceProvider.h"
 #include "DrawServiceProvider.h"
+#include "IGameMode.h"
 
 #include "ModelEntity.hpp"
 
@@ -37,7 +38,7 @@ class IWorld;
 #define PM_LOGIC_CHUNKMOVE 6
 
 
-class Simulation_World: public TickServiceProvider, DrawServiceProvider
+class Simulation_World: public DrawServiceProvider, public IGameMode
 {
 	bool spawnZombies;
 
@@ -80,8 +81,6 @@ class Simulation_World: public TickServiceProvider, DrawServiceProvider
 	int test;//TODO remove
 
 public:
-	EntityPlayer * player;
-	TimestampManager tm;
 	Simulation_World(sf::Window * w);
 	~Simulation_World();
 

@@ -48,6 +48,9 @@ DivisionPlane CameraTP::getUpperPlane()
 {
 	vec3 normal=getUpperNormal();
 	DivisionPlane ret(normal,minView-dist+glm::dot(normal,vec3(posX,posY,posZ)));//TODO
+	//std::cout<<"minView: "<<minView<<"; dist: "<<dist<<"; dot: "<<glm::dot(normal,vec3(posX,posY,posZ))<<std::endl;
+	//std::cout<<"normal: "<<normal<<std::endl;
+	//std::cout<<"pos: "<<vec3(posX,posY,posZ)<<std::endl;
 	return ret;
 }
 

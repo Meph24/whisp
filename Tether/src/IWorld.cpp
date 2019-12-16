@@ -13,9 +13,7 @@
 
 IWorld::IWorld()
 {
-	pushAlgo=new InteractFilterDefaultSym<Pushable>();//TODO placeholder
-	projectileAlgo=new InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
-	collideAlgo=new InteractFilterDefaultSym<Collider>();//TODO placeholder
+	initAlgos();
 }
 
 IWorld::~IWorld()
@@ -23,6 +21,13 @@ IWorld::~IWorld()
 	delete collideAlgo;
 	delete projectileAlgo;
 	delete pushAlgo;
+}
+
+void IWorld::initAlgos()
+{
+	pushAlgo=new InteractFilterDefaultSym<Pushable>();//TODO placeholder
+	projectileAlgo=new InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
+	collideAlgo=new InteractFilterDefaultSym<Collider>();//TODO placeholder
 }
 
 float IWorld::toMeters(spacelen l)
@@ -123,8 +128,13 @@ void IWorld::preTick(TickServiceProvider * tsp)
 	resetAlgos();
 }
 
+#include "myAssert.h"
 void IWorld::resetAlgos()
 {
+	assert(pushAlgo!=0);
+	assert(projectileAlgo!=0);
+	assert(collideAlgo!=0);
+
 	pushAlgo->reset();
 	projectileAlgo->reset();
 	collideAlgo->reset();
@@ -138,3 +148,10 @@ spacevec IWorld::toUnitLength(spacevec v)
 	vec3 conv=toMeters(v);
 	return fromMeters(conv/glm::length(conv));
 }
+
+IWorld::IWorld(float GridSize):
+gridSize(GridSize)
+{
+	initAlgos();
+}
+

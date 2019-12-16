@@ -42,8 +42,7 @@ extern Zombie_MouseInput* mouseInput;
 
 #include <iostream>
 
-Zombie_World::Zombie_World(sf::Window * w):
-		tm(1,1000,40)//TODO 20/20
+Zombie_World::Zombie_World(sf::Window * w)
 {
 	CfgIO cfgio( "./res/config.txt" );
 	Cfg cfg = cfgio.get();
@@ -219,31 +218,8 @@ void Zombie_World::loadStandardTex()
 	leaves->update();
 
 	g = new Graphics2D(64,getAspectRatio());
-
 	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
 	cm->requestEntitySpawn(tr);
-
-	diamond_mesh = new Mesh(diamondMesh(7, 0.3f, 2.0f));
-	MeshIO meshio("./res/cross.mesh");
-	cross_mesh = new Mesh(meshio.get());
-	ModelEntity* diamond = new ModelEntity
-		(
-			Model(diamond_mesh, glm::scale(vec3(0.8f)))
-		);
-	spawnGrounded
-		(
-			diamond,
-			cm->fromMeters(vec3(3, 0, 3))
-		);
-	ModelEntity* cross = new ModelEntity
-		(
-			Model(cross_mesh, glm::scale(vec3(2.0f)))
-		);
-	spawnGrounded
-		(
-			cross,
-			cm->fromMeters(vec3(1, 0, 1))
-		);
 }
 
 
@@ -337,16 +313,6 @@ void Zombie_World::spawn(Entity* ep, spacevec pos)
 	cm->requestEntitySpawn(ep);
 }
 
-void Zombie_World::spawnGrounded(ModelEntity* ep, spacevec pos)
-{
-	spacevec thispos = cm->clip(pos, true);
-	cout << "Clipped pos : " << thispos << '\n';
-	spacelen ground_distance = cm->fromMeters(ep->groundedDistance());
-	cout << "Ground distance " << ground_distance << '\n';
-	thispos.y -= ground_distance;
-	cout << "Spawn Grounded on location " << thispos << '\n';
-	spawn(ep, thispos);
-}
 
 void Zombie_World::drawGameOver()//TODO find new home
 {

@@ -28,6 +28,10 @@ class InteractFilterAlgoAsym;
 
 class IWorld: public Tickable, public Drawable
 {
+private:
+
+	void initAlgos();
+
 protected:
 	std::vector<Entity *> hibernating;
 
@@ -41,6 +45,7 @@ public:
 	InteractFilterAlgoSym<Collider>* collideAlgo=0;
 
 	IWorld();
+	IWorld(float GridSize);
 	virtual ~IWorld();
 
 	//only allowed for RELATIVE positions/velocities:

@@ -48,8 +48,7 @@ extern Zombie_MouseInput* mouseInput;
 #include "randomModel.hpp"
 
 
-Simulation_World::Simulation_World(sf::Window * w):
-		tm(1,1000,40)//TODO 20/20
+Simulation_World::Simulation_World(sf::Window * w)
 {
 	test=0;
 	CfgIO cfgio( "./res/config.txt" );

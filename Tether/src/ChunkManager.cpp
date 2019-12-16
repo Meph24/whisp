@@ -15,9 +15,9 @@
 
 
 ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk):
-ITerrain((IWorld *) this),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
+IWorld(ChunkSize),ITerrain((IWorld *) this),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
-	gridSize=ChunkSize;
+	std::cout<<"(IWorld *) this: "<<(IWorld *)this<<std::endl;
 	lockChunkSizeX=1;
 	lockChunkSizeZ=1;
 	while(chunksPerLockchunk>3)
@@ -82,6 +82,9 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum)
 			int indx=runz*chunksPerAxis+runx;
 			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb,this))
 			{
+				//std::cout<<"rendering chunk "<<runz<<"|"<<runx<<std::endl;
+				//std::cout<<"chunk bb: \n"<<chunks[indx]->bb.low<<"\n"<<chunks[indx]->bb.high<<std::endl;
+				//std::cout<<"observerPos: "<<viewFrustum->observerPos<<std::endl;
 				float distX=(runx-midX);
 				if (distX<0) distX=-distX;
 				int distZ=(runz-midZ);

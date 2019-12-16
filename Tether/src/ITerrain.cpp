@@ -7,11 +7,14 @@
  */
 
 #include "ITerrain.h"
-
-ITerrain::ITerrain(IWorld * world)//:
-//w(world)
+#include <iostream>
+ITerrain::ITerrain(IWorld * world)
 {
-	defaultGravity=world->fromMeters({0,-9.81f,0});
+	vec3 grav(0,-9.81f,0);
+	std::cout<<"grav: "<<grav<<std::endl;
+	std::cout<<"world*: "<<world<<std::endl;
+	defaultGravity=world->fromMeters(grav);
+	std::cout<<"converted: "<<defaultGravity<<std::endl;
 }
 
 ITerrain::~ITerrain()

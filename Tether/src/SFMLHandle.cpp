@@ -32,8 +32,7 @@ SFMLHandle::~SFMLHandle()
 #include "Zombie_World.h"
 #include "Simulation_World.h"
 
-//extern Zombie_World * world;
-extern Simulation_World * world;
+extern IGameMode * world;
 void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
 {
 	contextSettings.depthBits = settings.depth;
@@ -48,7 +47,7 @@ void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMe
 	//important because of the ability to activate the context in another thread
 	window.setActive(false);
 
-	//world = new Zombie_World(&window);
+//	world = new Zombie_World(&window);
 	world = new Simulation_World(&window);
 }
 
