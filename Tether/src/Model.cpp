@@ -140,9 +140,9 @@ void Model::updateExtent()
 	auto vert = vertices();
 	for(Vertex v : vert)
 	{
-		max_x = (fabs(v.x) > max_x)? v.x : max_x;
-		max_y = (fabs(v.y) > max_y)? v.y : max_y;
-		max_z = (fabs(v.z) > max_z)? v.z : max_z;
+		if(fabs(v.x) > max_x) max_x = v.x;
+		if(fabs(v.y) > max_y) max_y = v.y;
+		if(fabs(v.z) > max_z) max_z = v.z;
 	}
 	m_extent = vec3(max_x, max_y, max_z);
 }

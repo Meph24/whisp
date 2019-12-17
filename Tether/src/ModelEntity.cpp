@@ -124,12 +124,15 @@ void ModelEntity::tick
 	float time = t - lastTick;
 	lastTick = t;
 
+	ChunkManager* cm = tsp->getChunkManager();
+
+	bb = AABB(pos, cm->fromMeters(m_model.extent()), v);
+
 	//the collider needs to save the old state of the entity
 	//to use it for its calculations
 	Collider::State old_state {pos, v};
 	Collider::saveState(old_state);
 
-	ChunkManager* cm = tsp->getChunkManager();
 
 	//entity attribute changes go here
 	//this is code for collision simulation
@@ -143,7 +146,6 @@ void ModelEntity::tick
 	//apply rotation by rotational velocity
 	rotate(m_rotv * time);
 
-	bb = AABB(pos, cm->fromMeters(m_model.extent()));
 
 	tsp->getIWorld()->collideAlgo->doChecks(
 			(Collider*) this, (Entity*) this,
