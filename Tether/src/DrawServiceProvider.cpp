@@ -86,13 +86,13 @@ vec3 DrawServiceProvider::getCamPos()
 	return vec3(cam->posX,cam->posY,cam->posZ);//TODO accurate for third person?
 }
 
-void DrawServiceProvider::doTransparentCallbacks(Timestamp t,Frustum * viewFrustum,ChunkManager* cm)
+void DrawServiceProvider::doTransparentCallbacks(Timestamp t,Frustum * viewFrustum,IWorld& iw)
 {
 	std::sort(callbackList.begin(), callbackList.end());
 	isTransparentPass=true;
 	for(auto e : callbackList)
 	{
-		e.second->draw(t,viewFrustum,cm,this);
+		e.second->draw(t,viewFrustum,iw,this);
 	}
 	isTransparentPass=false;
 }

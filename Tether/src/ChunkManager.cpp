@@ -14,8 +14,8 @@
 #include "Frustum.h"
 
 
-ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk):
-IWorld(ChunkSize),ITerrain((IWorld *) this),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
+ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk,int ChunkLoadRate):
+IWorld(ChunkSize),ITerrain((IWorld *) this),chunkLoadRate(ChunkLoadRate),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
 	std::cout<<"(IWorld *) this: "<<(IWorld *)this<<std::endl;
 	lockChunkSizeX=1;
@@ -80,7 +80,7 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum)
 		for(int runx = startX ; runx<stopX ; runx++)
 		{
 			int indx=runz*chunksPerAxis+runx;
-			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb,this))
+			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb,*this))
 			{
 				//std::cout<<"rendering chunk "<<runz<<"|"<<runx<<std::endl;
 				//std::cout<<"chunk bb: \n"<<chunks[indx]->bb.low<<"\n"<<chunks[indx]->bb.high<<std::endl;
@@ -534,7 +534,7 @@ chunkSearchResult ChunkManager::smartSearch(Entity* e, spacevec pos)
 	return chunkSearch(e,ret.chunkIndex);
 }
 
-void ChunkManager::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+void ChunkManager::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
 {
 	int startX=chunksPerAxis/2-renderDistanceChunks;
 	int startZ=chunksPerAxis/2-renderDistanceChunks;
@@ -552,7 +552,7 @@ void ChunkManager::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,Draw
 			int indx=runz*chunksPerAxis+runx;
 			if(chunks[indx])
 			{
-				chunks[indx]->draw(t,viewFrustum,cm,dsp);
+				chunks[indx]->draw(t,viewFrustum,iw,dsp);
 			}
 		}
 	}
@@ -640,5 +640,12 @@ bool ChunkManager::isValid(gridInt cx, gridInt cz)
 
 void ChunkManager::postTick(TickServiceProvider* tsp)
 {
-	//TODO retick, applyEntityChunkChanges
+	//TODO find out how to exactly do this stuff, previously: "//TODO retick, applyEntityChunkChanges"
+	applyEntityChunkChanges(tsp);
+}
+
+void ChunkManager::postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos)
+{
+	generateMissing(chunkLoadRate);//TODO load rate refactor
+	setMid(playerPos,tsp);
 }

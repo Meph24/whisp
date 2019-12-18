@@ -15,7 +15,7 @@ using glm::vec3;
 
 class Drawable;
 class Frustum;
-class ChunkManager;
+class IWorld;
 class Graphics2D;
 class ICamera3D;
 class ITexture;
@@ -48,6 +48,8 @@ public:
 	bool isTransparentPass=false;
 
 
+	bool drawAABBs=false;//toggles drawing AABBs
+
 	DrawServiceProvider();//set camera after init!!!!!
 	virtual ~DrawServiceProvider();
 
@@ -66,7 +68,7 @@ public:
 	virtual ITexture * suggestFont();//returns 0 if no suggestion is made
 
 	void registerTransparentCallback(float priority,Drawable * callbackRequester);
-	void doTransparentCallbacks(Timestamp t,Frustum * viewFrustum,ChunkManager* cm);
+	void doTransparentCallbacks(Timestamp t,Frustum * viewFrustum,IWorld& it);
 
 
 };

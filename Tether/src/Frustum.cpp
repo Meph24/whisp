@@ -16,7 +16,7 @@
 Frustum::Frustum()
 {}
 
-bool Frustum::inside(AABB bb,IWorld * w)
+bool Frustum::inside(AABB bb,IWorld& w)
 {
 	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{

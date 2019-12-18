@@ -137,7 +137,7 @@ int fuck (int argc , char** argv)
 #include "WarnErrReporter.h"
 #include <iostream>
 
-void ItemContainer::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+void ItemContainer::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
 {
 	std::cout<<"selected: "<<selected<<std::endl;
 	dsp->transformViewToGUI(0.75f);

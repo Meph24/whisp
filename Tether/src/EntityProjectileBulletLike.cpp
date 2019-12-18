@@ -38,11 +38,11 @@ EntityProjectileBulletLike::~EntityProjectileBulletLike()
 //	delete fromItem;
 }
 
-void EntityProjectileBulletLike::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
+void EntityProjectileBulletLike::draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;//TODO frustum culling?
-	vec3 interPosMeters=cm->toMeters(interPos);
+	vec3 interPosMeters=iw.toMeters(interPos);
 	tex->bind();
 	glColor3f(1.0f,1.0f, 0.1f);
 	glEnable(GL_TEXTURE_2D);
@@ -102,18 +102,19 @@ void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
 	float time=t-lastTick;
 	lastTick=t;
 
-	ChunkManager * cm=tsp->getChunkManager();
-	spacevec gravity=cm->getGravity(pos);
-	if(cm->hitsGround(posOld,pos))
+	ITerrain * it=tsp->getITerrain();
+
+	spacevec gravity=it->getGravity(pos);
+	if(it->hitsGround(posOld,pos))
 	{
-		requestDestroy(cm);
+		requestDestroy(iw);
 		return;
 	}
 
 	posOld = pos;
 	spacevec vOld=v;
 	v += gravity * time;
-	double spd=cm->toMetersD(v.lengthHP());
+	double spd=iw->toMetersD(v.lengthHP());
 	double drag=spd*typeB.drag;
 	v*=(1-drag*time);//TODO find exact or at least time-consistent solution (current solution behaves very wrong with high resistance values and is tickrate-dependent)
 	pos+=(v+vOld)*time*0.5f;
@@ -135,9 +136,9 @@ bool EntityProjectileBulletLike::collide(HittableBulletLike* hittable,Projectile
 		WarnErrReporter::wrongTypeErr("hard-coded cast to zombie failed");
 		return true;
 	}
-	ze->checkProjectile(this,tsp);//TODO
+	ze->checkProjectile(this,*tsp);//TODO
 	//some calculations
-	float vSqBefore=glm::sqlen(tsp->getChunkManager()->toMeters(v));
+	float vSqBefore=glm::sqlen(tsp->getIWorld()->toMeters(v));
 	float vSqAfter=0;//TODO
 	float deltaE=0.5*typeB.mass*(vSqBefore*vSqBefore-vSqAfter*vSqAfter);
 	float dmg=deltaE*(typeB.dmgPerJd0*(1-deformation)+typeB.dmgPerJd1*deformation);

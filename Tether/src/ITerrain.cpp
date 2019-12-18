@@ -22,6 +22,11 @@ ITerrain::~ITerrain()
 	// TODO Auto-generated destructor stub
 }
 
+void ITerrain::postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos)
+{
+	//default: no calculations needed
+}
+
 spacevec ITerrain::getGravity(spacevec pos)
 {
 	return defaultGravity;

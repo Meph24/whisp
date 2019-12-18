@@ -46,7 +46,7 @@ public:
 	void tick(Timestamp t,TickServiceProvider * tsp);
 	spacelen getHeight(float x,float z);//coordinates inside chunk
 	void render(int lod,spacevec camOffset);//TODO replace
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 	void clearEntities();
 
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1

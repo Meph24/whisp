@@ -23,6 +23,7 @@ public:
 	ITerrain(IWorld * world);
 	virtual ~ITerrain();
 
+	virtual void postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos);
 	virtual spacevec getGravity(spacevec pos);
 
 	virtual spacevec clip(spacevec pos,bool forceGround)=0;//If pos is below ground or forceGround, then return position on ground (movement along gravity vector)

@@ -7,6 +7,7 @@
  */
 
 #include "Chunk.h"
+#include "DrawServiceProvider.h"
 #include "ChunkManager.h"
 #include "InteractionManager.h"
 #include "Entity.h"
@@ -213,21 +214,21 @@ void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 		if((managedEntities[i]->pos.x.intpart!=managedEntities[i]->residentPos.x.intpart)||
 			(managedEntities[i]->pos.z.intpart!=managedEntities[i]->residentPos.z.intpart))
 		{
-			tsp->getChunkManager()->requestEntityMove(managedEntities[i]);
+			parent->requestEntityMove(managedEntities[i]);
 		}
 		managedEntities[i]->tick(t,tsp);
 	}
 }
 
-void Chunk::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+void Chunk::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
 {
 	int size=managedEntities.size();
 	for(int i=0;i<size;i++)
 	{
 		if(managedEntities[i]->exists)
 		{
-			managedEntities[i]->draw(t,viewFrustum,cm,dsp);
-			if(cm->drawAABBs) managedEntities[i]->bb.draw(t,viewFrustum,cm,dsp);
+			managedEntities[i]->draw(t,viewFrustum,iw,dsp);
+			if(dsp->drawAABBs) managedEntities[i]->bb.draw(t,viewFrustum,iw,dsp);
 		}
 	}
 }

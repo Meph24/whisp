@@ -69,7 +69,7 @@ public:
 
 	//void applyPerspective(Timestamp t,bool fresh,ChunkManager * cm);
 
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 

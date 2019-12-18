@@ -64,7 +64,7 @@ public:
 	virtual void move(float time,ChunkManager * cm);
 */
 
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)=0;
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
 	virtual void tick(Timestamp t,TickServiceProvider * tsp)=0;

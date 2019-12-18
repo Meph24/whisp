@@ -38,7 +38,7 @@ Hittable::~Hittable()
 {
 }
 
-void Hittable::testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm)
+void Hittable::testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,TickServiceProvider& tsp)
 {
 	//default: do nothing
 	//override this to enable collision checks

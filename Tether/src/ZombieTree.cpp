@@ -84,17 +84,17 @@ void Zombie_Tree::drawLeaves()
 	glEnd();
 }
 
-void Zombie_Tree::draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)
+void Zombie_Tree::draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
 {
 	float tickOffset=t-lastTick;
 
-	if(!viewFrustum->inside(bb,cm))
+	if(!viewFrustum->inside(bb,iw))
 	{	
 		return;
 	}
 
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
-	vec3 interPosMeters=cm->toMeters(interPos);
+	vec3 interPosMeters=iw.toMeters(interPos);
 
 	tex1->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -137,11 +137,12 @@ void Zombie_Tree::tick(Timestamp t, TickServiceProvider* tsp)
 //	float seconds=t-lastTick;
 	lastTick=t;
 
-	ChunkManager * cm=tsp->getChunkManager();
+	IWorld * iw=tsp->getIWorld();
+	ITerrain * it=tsp->getITerrain();
 
-	pos=cm->clip(pos,true);
+	pos=it->clip(pos,true);
 
 	int temp = (h - rootSize) + (d * dLeaves);
 	if(temp<rootSize) temp=rootSize;
-	bb=AABB(pos, cm->fromMeters(vec3(d*dLeaves,temp,d*dLeaves)));
+	bb=AABB(pos, iw->fromMeters(vec3(d*dLeaves,temp,d*dLeaves)));
 }

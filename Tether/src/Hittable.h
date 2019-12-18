@@ -15,7 +15,6 @@
 
 class HittableBulletLike;
 class Projectile;
-class ChunkManager;
 class TickServiceProvider;
 
 #include <vector>
@@ -25,7 +24,7 @@ class Hittable
 public:
 	hitType acceptedConversions=0;//can have multiple flags set
 
-	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm);
+	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,TickServiceProvider& tsp);
 	//void registerHitCheck(Entity * e,float seconds,TickServiceProvider * tsp);
 
 	//below are conversions to more concrete forms of Hittables, subclasses override the correct one and return themselves

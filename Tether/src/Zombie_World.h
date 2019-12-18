@@ -52,7 +52,6 @@ class Zombie_World: public DrawServiceProvider, public IGameMode
 
 	TexParamSet * tps2;
 
-	int chunkLoadRate;
 	float lodQuality;
 	int zombieDist;
 	AdaptiveQuality * adQ;
@@ -74,14 +73,10 @@ public:
 	//TickServiceProvider
 	virtual ICamera3D * getHolderCamera();//can return 0 if currently not held
 
-	virtual ChunkManager * getChunkManager();//TODO remove
-
 	ITerrain * getITerrain();
 	IWorld * getIWorld();
 
 	virtual Entity * getTarget(Entity * me);
-
-	void spawn(Entity*, spacevec);
 
 	void loadStandardTex();
 

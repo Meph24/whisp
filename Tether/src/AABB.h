@@ -32,9 +32,9 @@ public:
 	bool doesIntersect(AABB * other);
 	bool contains(spacevec s);
 
-	bool isMultichunk();
+	bool isMultichunk();//TODO still needed? Correct location? ChunkManager specific?
 
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 
 	AABB();//uninitialized
 	AABB(spacevec pos);//point-like stationary object

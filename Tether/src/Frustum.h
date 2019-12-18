@@ -35,7 +35,7 @@ public:
 
 	void debugDraw(ITexture * tex,IWorld * w);
 
-	bool inside(AABB bb,IWorld * w);
+	bool inside(AABB bb,IWorld& w);
 	Frustum();
 	~Frustum();
 };

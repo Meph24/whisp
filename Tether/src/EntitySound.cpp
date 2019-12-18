@@ -47,11 +47,11 @@ void EntitySound::notifyRemoval(Entity* e)
 	v=e->v;
 }
 
-void EntitySound::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+void EntitySound::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
 {
 	float tickOffset=t-lastTick;
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
-	vec3 interPosMeters=cm->toMeters(interPos);
+	vec3 interPosMeters=iw.toMeters(interPos);
 	sound.setPosition(interPosMeters.x,interPosMeters.y,interPosMeters.z);
 	if(playSoon)
 	{
@@ -72,7 +72,7 @@ void EntitySound::tick(Timestamp t, TickServiceProvider* tsp)
 	if((!playSoon)&&sound.getStatus()==sf::Sound::Status::Stopped)
 	{
 		std::cout<<"sound request destroy"<<std::endl;
-		requestDestroy(tsp->getChunkManager());
+		requestDestroy(tsp->getIWorld());
 	}
 }
 

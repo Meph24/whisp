@@ -20,6 +20,7 @@ class EntityPlayer;
 class Mesh;
 class TexParamSet;
 class IWorld;
+class TerrainDummy;
 
 #include <SFML/Window.hpp>
 
@@ -40,8 +41,6 @@ class IWorld;
 
 class Simulation_World: public DrawServiceProvider, public IGameMode
 {
-	bool spawnZombies;
-
 	int objects_count;
 
 
@@ -52,6 +51,7 @@ class Simulation_World: public DrawServiceProvider, public IGameMode
 	DebugScreen * dsGraphics;
 
 	ChunkManager * cm;
+	TerrainDummy * td;
 
 	vector<unique_ptr<Mesh>> meshes;
 	vector<unique_ptr<Model>> models;
@@ -65,14 +65,12 @@ class Simulation_World: public DrawServiceProvider, public IGameMode
 
 	TexParamSet * tps2;
 
-	int chunkLoadRate;
 	float lodQuality;
 	int zombieDist;
 	AdaptiveQuality * adQ;
 
 	void render(Timestamp t);
 	void doPhysics(Timestamp t);
-	void spawnZombie(Timestamp t);
 	void restart();
 	void drawGameOver();
 	void doLogic();
@@ -87,14 +85,12 @@ public:
 	//TickServiceProvider
 	virtual ICamera3D * getHolderCamera();//can return 0 if currently not held
 
-	virtual ChunkManager * getChunkManager();//TODO remove
-
 	ITerrain * getITerrain();
 	IWorld * getIWorld();
 
 	virtual Entity * getTarget(Entity * me);
 
-	void spawn(Entity*, spacevec);
+	void spawn(Entity *, spacevec);
 	void spawnGrounded(ModelEntity* ep, spacevec pos);
 
 	void loadStandardTex();

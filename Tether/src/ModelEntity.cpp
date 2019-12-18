@@ -89,8 +89,8 @@ float ModelEntity::groundedDistance()
 
 void ModelEntity::draw(	
 					Timestamp ts, 
-					Frustum* viewFrustum, 
-					ChunkManager* cm, 
+					Frustum* viewFrustum,
+					IWorld& iw,
 					DrawServiceProvider* dsp
 				 )
 {
@@ -98,7 +98,7 @@ void ModelEntity::draw(
 	//if(!viewFrustum->inside(bb)) return;
 	
 	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;
-	vec3 interPosMeters = cm->toMeters(interPos);
+	vec3 interPosMeters = iw.toMeters(interPos);
 
 	glColor3f(1.0f, 0.0f, 0.0f);
 
@@ -129,12 +129,12 @@ void ModelEntity::tick
 	Collider::State old_state {pos, v};
 	Collider::saveState(old_state);
 
-	ChunkManager* cm = tsp->getChunkManager();
+	IWorld* iw = tsp->getIWorld();
 
 	//entity attribute changes go here
 	//this is code for collision simulation
 	//entities turn around after flying away too far
-	if(glm::length(cm->toMeters(pos)) > 100)
+	if(glm::length(iw->toMeters(pos)) > 100)
 		v = v * -1.0f;
 
 	//apply pos by velocity
@@ -143,7 +143,7 @@ void ModelEntity::tick
 	//apply rotation by rotational velocity
 	rotate(m_rotv * time);
 
-	bb = AABB(pos, cm->fromMeters(m_model.extent()));
+	bb = AABB(pos, iw->fromMeters(m_model.extent()));
 
 	tsp->getIWorld()->collideAlgo->doChecks(
 			(Collider*) this, (Entity*) this,

@@ -5,7 +5,7 @@ class ItemAmmo;
 class ICamera3D;
 class EntityPlayer;
 class ITexture;
-class ChunkManager;
+class IWorld;
 
 #include "Timestamp.h"
 #include "RecoilReturning.h"
@@ -46,8 +46,8 @@ public:
 
 	Zombie_Gun(Timestamp initTimestamp,std::string weaponName,float ReloadTime,const std::string& filename,float pitchModifier,ItemAmmo * pType,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread);
 	~Zombie_Gun();
-	void tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm);
-	void tick(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm);//TODO tsp
+	void tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw);
+	void tick(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw);//TODO tsp
 	void stopShooting();
 };
 

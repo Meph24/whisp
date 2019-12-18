@@ -40,6 +40,7 @@ struct chunkSearchResult
 
 class ChunkManager: public IWorld, public ITerrain
 {
+	int chunkLoadRate;
 	LockFast dataStructureLock;
 	int chunksPerAxis;//width and height in chunks
 	spacelen defaultH;
@@ -93,18 +94,18 @@ public:
 
 	void requestEntityMove(Entity * e);//do not call yourself, managed by chunks
 	void render(float lodQ,Frustum * viewFrustum);//TODO drawable
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);//TODO
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);//TODO
 	void generateMissing(int count);
 	void applyEntityChunkChanges(TickServiceProvider * tsp);//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
 	void setMid(spacevec abs,TickServiceProvider * tsp);//absolute x,z
 
 	//chunksPerLockchunk must be power of 2, if its not, it will be assigned one
-	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks,int chunksPerLockchunk);//render distance should be lower than half of the total chunks per axis
+	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks,int chunksPerLockchunk,int ChunkLoadRate);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 
 	///the non-critical interface: you can always safely use these
 
-	bool drawAABBs=false;
+
 
 	//the partially critical interface: only call from main tick thread
 	//read-only:
@@ -113,6 +114,7 @@ public:
 	//from ITerrain interface:
 	spacevec clip(spacevec pos,bool forceGround);
 	bool hitsGround(spacevec startpoint,spacevec endpoint);
+	void postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos);//centers chunks on player
 
 	//from IWorld interface:
 	void clearEntities();

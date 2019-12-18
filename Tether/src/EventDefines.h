@@ -16,6 +16,8 @@
 #define EVENT_ID_KEY_B (1024+('B'-'A'))
 #define EVENT_ID_KEY_ARROW_UP 1097
 #define EVENT_ID_KEY_ARROW_DOWN 1098
+#define EVENT_ID_KEY_SHIFT 1062
+#define EVENT_ID_KEY_CTRL 1061
 
 
 //status/condition IDs
@@ -26,6 +28,8 @@
 #define STATUS_ID_SELECTION_UP 5
 #define STATUS_ID_SELECTION_DOWN 6
 #define STATUS_ID_DRAW_AABBs 7
+#define STATUS_ID_GO_UP 8
+#define STATUS_ID_GO_DOWN 9
 
 //event values
 #define EVENT_VALUE_KEY_PRESSED 1

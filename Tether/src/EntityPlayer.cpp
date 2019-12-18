@@ -99,7 +99,7 @@ void EntityPlayer::switchWeapon(int dir)
 }
 
 
-void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, DrawServiceProvider* dsp)
+void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,IWorld& iw, DrawServiceProvider* dsp)
 {
 	//float tickOffset=t-lastTick;
 	if(isPerspective || cam->dist>minTPdist)
@@ -155,7 +155,7 @@ void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, Draw
 	glPopMatrix();
 	dsp->revertView();
 
-	if(heldItem) heldItem->draw(t,viewFrustum,cm,dsp);
+	if(heldItem) heldItem->draw(t,viewFrustum,iw,dsp);
 }
 
 
@@ -253,16 +253,15 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	lastTick=t;
 	hitmark -= time * 10;
 	if (hitmark < 0) hitmark = 0;
-	ChunkManager * cm=tsp->getChunkManager();
 	HP += maxHP*time / 200;
 	if (HP > maxHP) HP = maxHP;
 
 	spacevec oldPos=pos;
 	vec3 wantedV=keyInp->getVelocity()*speed;
-	pos+=cm->fromMeters(wantedV)*time;
-	pos=cm->clip(pos,true);
+	pos+=iw->fromMeters(wantedV)*time;
+	pos=it->clip(pos,true);
 	spacevec newPos=pos;
-	vec3 moved=cm->toMeters(newPos-oldPos);
+	vec3 moved=iw->toMeters(newPos-oldPos);
 	if(glm::sqlen(moved) > 0.0000000001f)
 	{
 		vec3 norm=glm::normalize(moved);
@@ -271,7 +270,7 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 		float h=moved.y/glm::length(flat);
 		SpeedMod sm=SpeedMod();
 		float speedModB=sm.slowdownFromTerrain(h);
-		pos=cm->clip(oldPos+cm->fromMeters(flat*speedModA*speedModB),true);
+		pos=it->clip(oldPos+iw->fromMeters(flat*speedModA*speedModB),true);
 	}
 	if(time>0.0000000001f)
 		v=(pos-oldPos)/time;
@@ -287,7 +286,7 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 void EntityPlayer::push(spacevec amount, TickServiceProvider& tsp)
 {
 	pos+=amount;
-	std::cout<<"amount"<<amount<<" | "<<tsp.getChunkManager()->toMeters(amount);
+	std::cout<<"amount"<<amount<<" | "<<tsp.getIWorld()->toMeters(amount);
 //	HP -= 15625*glm::sqlen(tsp.getChunkManager()->toMeters(amount));
 }
 #include <iostream>
