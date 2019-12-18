@@ -12,7 +12,7 @@
 #include "Timestamp.h"
 
 class DrawServiceProvider;
-class ChunkManager;
+class IWorld;
 class Frustum;
 
 class Drawable
@@ -20,7 +20,7 @@ class Drawable
 public:
 	Drawable() = default;
 	virtual ~Drawable() = default;
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
 };
 
 

@@ -33,7 +33,7 @@ speed(characterSpeed),heldItem(0),inventory(0)
 {
 	lastTick=spawnTime;
 	pos=startPos;
-	v={{0,0},{0,0},{0,0}};
+	v.set0();
 	cam=new CameraTP();
 	cam->alpha=0.0001f;
 	cam->beta=0.0001f;
@@ -99,7 +99,7 @@ void EntityPlayer::switchWeapon(int dir)
 }
 
 
-void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, DrawServiceProvider* dsp)
+void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,IWorld& iw, DrawServiceProvider* dsp)
 {
 	//float tickOffset=t-lastTick;
 	if(isPerspective || cam->dist>minTPdist)
@@ -155,27 +155,9 @@ void EntityPlayer::draw(Timestamp t,Frustum * viewFrustum,ChunkManager* cm, Draw
 	glPopMatrix();
 	dsp->revertView();
 
-	if(heldItem) heldItem->draw(t,viewFrustum,cm,dsp);
+	if(heldItem) heldItem->draw(t,viewFrustum,iw,dsp);
 }
 
-void EntityPlayer::applyPerspective(Timestamp t,bool fresh,ChunkManager * cm)
-{
-	float time=t-lastTick;
-	spacevec relPos=pos+v*time-cm->getMiddleChunk();
-	characterHeightConv=cm->fromMeters(characterHeight);//TODO only in one spot
-	relPos.y+=characterHeightConv;
-	cam->posX=cm->toMeters(relPos.x);
-	cam->posY=cm->toMeters(relPos.y);
-	cam->posZ=cm->toMeters(relPos.z);
-	if(fresh) cam->applyFresh();
-	else cam->apply();
-	vec3 fwd=cam->getForwardVector();
-	sf::Listener::setDirection(fwd.x,fwd.y,fwd.z);
-	vec3 upv=cam->getUpVector();
-	sf::Listener::setUpVector(upv.x,upv.y,upv.z);
-	sf::Listener::setPosition(cam->posX,cam->posY,cam->posZ);
-	isPerspective=true;
-}
 
 void EntityPlayer::setTP(bool on)
 {
@@ -203,15 +185,28 @@ void EntityPlayer::changeTPdist(float amount)
 
 spacevec EntityPlayer::getCamPos()
 {
-	spacevec ret=pos;
-	ret.y+=characterHeightConv;
-	return ret;
+	return pos+characterEyeOffset;
 }
 
-Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestriction)
+Frustum * EntityPlayer::newFrustumApplyPerspective(Timestamp t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction)
 {
+	IWorld * iw=tsp->getIWorld();
+	float time=t-lastTick;
+	spacevec curPos=pos+v*time;
+	cam->posX=iw->toMeters(characterEyeOffset.x);
+	cam->posY=iw->toMeters(characterEyeOffset.y);
+	cam->posZ=iw->toMeters(characterEyeOffset.z);
+	if(fresh) cam->applyFresh();
+	else cam->apply();
+	vec3 fwd=cam->getForwardVector();
+	sf::Listener::setDirection(fwd.x,fwd.y,fwd.z);
+	vec3 upv=cam->getUpVector();
+	sf::Listener::setUpVector(upv.x,upv.y,upv.z);
+	sf::Listener::setPosition(cam->posX,cam->posY,cam->posZ);
+	isPerspective=true;
+
 	Frustum * ret=new Frustum();
-	ret->observerPos=cm->getMiddleChunk();
+	ret->observerPos=curPos;
 	bool lookingUp=cam->alpha<0;
 	if(lookingUp)
 	{
@@ -236,6 +231,7 @@ Frustum * EntityPlayer::newGetViewFrustum(ChunkManager * cm,float viewDistRestri
 void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 {
 	IWorld * iw=tsp->getIWorld();
+	ITerrain * it=tsp->getITerrain();
 
 	EventMapper * eMap=tsp->eMap;
 	if(eMap->getStatusAndReset(STATUS_ID_INVENTORY))
@@ -248,22 +244,24 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 
 	if(heldItem) heldItem->tick(t,tsp);
 
-
-	characterHeightConv=tsp->getChunkManager()->fromMeters(characterHeight);//TODO only in one spot
+	characterEyeOffset=iw->toUnitLength(it->getGravity(pos))*(-characterEyeHeight);
+	//std::cout<<"pos"<<pos<<std::endl;
+	//std::cout<<"gravity"<<it->getGravity(pos)<<std::endl;
+	//std::cout<<"characterEyeHeight"<<characterEyeHeight<<std::endl;
+	//std::cout<<"iw->toUnitLength(it->getGravity(pos))"<<iw->toUnitLength(it->getGravity(pos))<<std::endl;
 	float time=t-lastTick;
 	lastTick=t;
 	hitmark -= time * 10;
 	if (hitmark < 0) hitmark = 0;
-	ChunkManager * cm=tsp->getChunkManager();
 	HP += maxHP*time / 200;
 	if (HP > maxHP) HP = maxHP;
 
 	spacevec oldPos=pos;
 	vec3 wantedV=keyInp->getVelocity()*speed;
-	pos+=cm->fromMeters(wantedV)*time;
-	pos=cm->clip(pos,true);
+	pos+=iw->fromMeters(wantedV)*time;
+	pos=it->clip(pos,true);
 	spacevec newPos=pos;
-	vec3 moved=cm->toMeters(newPos-oldPos);
+	vec3 moved=iw->toMeters(newPos-oldPos);
 	if(glm::sqlen(moved) > 0.0000000001f)
 	{
 		vec3 norm=glm::normalize(moved);
@@ -272,14 +270,14 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 		float h=moved.y/glm::length(flat);
 		SpeedMod sm=SpeedMod();
 		float speedModB=sm.slowdownFromTerrain(h);
-		pos=cm->clip(oldPos+cm->fromMeters(flat*speedModA*speedModB),true);
+		pos=it->clip(oldPos+iw->fromMeters(flat*speedModA*speedModB),true);
 	}
 	if(time>0.0000000001f)
 		v=(pos-oldPos)/time;
 
 	spacevec size;
-	size.x=characterHeightConv*0.5f;
-	size.y=characterHeightConv*1.5f;
+	size.x=iw->fromMeters(characterEyeHeight*0.5f);
+	size.y=iw->fromMeters(characterEyeHeight*1.5f);
 	size.z=size.x;
 	bb=AABB(pos,size,v*(-time));
 	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,time,*tsp);
@@ -288,7 +286,7 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 void EntityPlayer::push(spacevec amount, TickServiceProvider& tsp)
 {
 	pos+=amount;
-	std::cout<<"amount"<<amount<<" | "<<tsp.getChunkManager()->toMeters(amount);
+	std::cout<<"amount"<<amount<<" | "<<tsp.getIWorld()->toMeters(amount);
 //	HP -= 15625*glm::sqlen(tsp.getChunkManager()->toMeters(amount));
 }
 #include <iostream>

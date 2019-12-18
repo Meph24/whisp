@@ -19,10 +19,10 @@ using glm::vec3;
 
 void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, TickServiceProvider& tsp)
 {
-	ChunkManager * cm=tsp.getChunkManager();
+	IWorld * iw=tsp.getIWorld();
 	spacevec dif=self->pos-other.e->pos;
-	float difX = cm->toMeters(dif.x);
-	float difZ = cm->toMeters(dif.z);
+	float difX = iw->toMeters(dif.x);
+	float difZ = iw->toMeters(dif.z);
 	float dist;
 
 	float totRad =  pushRadius + other.pIF->pushRadius;
@@ -45,7 +45,7 @@ void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, T
 		float xP = f*difX;
 		float zP = f*difZ;
 
-		spacevec move=cm->fromMeters(vec3(xP,0,zP)*time);//amplification factor here
+		spacevec move=iw->fromMeters(vec3(xP,0,zP)*time);//amplification factor here
 		push(move,tsp);
 		other.pIF->push(-move,tsp);
 	}

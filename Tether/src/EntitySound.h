@@ -16,7 +16,7 @@ class EntitySound: public Entity
 	sf::Sound sound;
 	bool playSoon;
 public:
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 

@@ -28,18 +28,24 @@ class InteractFilterAlgoAsym;
 
 class IWorld: public Tickable, public Drawable
 {
-	std::vector<Entity *> hibernating;
+private:
+
+	void initAlgos();
 
 protected:
+	std::vector<Entity *> hibernating;
+
 	float gridSize;//sacelen.intpart scale in meters
 	std::vector<Entity *> deleteVec;//the entities that should be removed from world
 
+	void resetAlgos();
 public:
 	InteractFilterAlgoSym<Pushable>* pushAlgo=0;
 	InteractFilterAlgoAsym<Projectile,Hittable>* projectileAlgo=0;
 	InteractFilterAlgoSym<Collider>* collideAlgo=0;
 
 	IWorld();
+	IWorld(float GridSize);
 	virtual ~IWorld();
 
 	//only allowed for RELATIVE positions/velocities:
@@ -49,7 +55,11 @@ public:
 	spacelen fromMeters(float l) const;
 	spacevec fromMeters(const vec3& v) const;
 
-	void preTick();
+	spacevec toUnitLength(spacevec v);//returns a vector of length 1m in the direction of the passed vector
+
+
+	virtual void preTick(TickServiceProvider * tsp);
+	virtual void postTick(TickServiceProvider * tsp)=0;
 
 	virtual void leaveWorld(Entity * e,TickServiceProvider * tsp);//is called if Entity is outside loaded area
 	virtual void hibernate(Entity * e);//Entity outside loaded area, but not deleted, does not get ticked
@@ -60,6 +70,8 @@ public:
 	virtual void requestEntitySpawn(Entity * e)=0;//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks
 
 	virtual void requestEntityDelete(Entity * e);//do not call this yourself, call Entiy.requestDestroy instead
+
+	virtual void clearEntities()=0;
 };
 
 

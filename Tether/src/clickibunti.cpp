@@ -11,7 +11,7 @@ int enabledProgram = 1;
 //Zombie_World * world;
 
 #include "Simulation_World.h"
-Simulation_World * world;
+IGameMode * world;
 
 int test1 = 0;
 void clickibunti()

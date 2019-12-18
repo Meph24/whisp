@@ -55,7 +55,7 @@ Zombie_Gun::~Zombie_Gun()
 
 #include <iostream>
 #define recoilDampeningTime 0.5f
-void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
+void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw)
 {
 	trigger=true;
 	if (timer <= 0)
@@ -111,8 +111,8 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 		vec3 velvec(velX, velY, velZ);
 		v = ml * velvec;	
 
-		EntityProjectileBulletLike * zp= new EntityProjectileBulletLike(player,pType->bulletData,callTimestamp,player->getCamPos(),cm->fromMeters(v)+player->v);
-		cm->requestEntitySpawn((Entity *)zp);
+		EntityProjectileBulletLike * zp= new EntityProjectileBulletLike(player,pType->bulletData,callTimestamp,player->getCamPos(),iw.fromMeters(v)+player->v);
+		iw.requestEntitySpawn((Entity *)zp);
 
 		ml.pop();
 	}
@@ -123,7 +123,7 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 	recoilM.registerRecoil(recoil,recoilRand,{0,0,0});
 }
 
-void Zombie_Gun::tick(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,ChunkManager * cm)
+void Zombie_Gun::tick(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw)
 {
 	float sec=callTimestamp-lastTimestamp;
 	vec3 recoilMod=recoilM.getRecoilDiff(sec);
@@ -141,7 +141,7 @@ void Zombie_Gun::tick(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * pla
 	{
 		if(trigger)
 		{
-			tryShoot(callTimestamp,cam,player,tex, cm);
+			tryShoot(callTimestamp,cam,player,tex, iw);
 		}
 	}
 	lastTimestamp=callTimestamp;

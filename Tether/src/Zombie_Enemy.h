@@ -44,8 +44,6 @@ public:
 
 	static int zombieCount;
 
-
-	ChunkManager * cm;
 	float facing;
 	float speed;
 	float size;
@@ -63,17 +61,17 @@ public:
 
 
 	//spawns a random zombie at the given location
-	Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,ChunkManager * cm);
+	Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,TickServiceProvider * tsp);
 	~Zombie_Enemy();
 
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 
-	void checkProjectile(EntityProjectileBulletLike * projectile,TickServiceProvider* tsp);
-	float checkBox(DualPointer<Projectile> projectile,CumulativeMat * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo);//valid hit from 0 to 1, otherwise -1
+	void checkProjectile(EntityProjectileBulletLike * projectile,TickServiceProvider& tsp);
+	float checkBox(DualPointer<Projectile> projectile,CumulativeMat * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo,TickServiceProvider& tsp);//valid hit from 0 to 1, otherwise -1
 
 
-	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile,ChunkManager * cm);
+	virtual void testHit(std::vector<ProjectileCollision> * collisions,hitType type,DualPointer<Projectile> projectile, TickServiceProvider& tsp);
 
 	virtual void push(spacevec amount, TickServiceProvider& tsp);
 

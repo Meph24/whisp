@@ -12,7 +12,6 @@
 #include "EntityProjectileBulletLike.h"
 #include "TickServiceProvider.h"
 #include "InteractionManager.h"
-#include "ChunkManager.h"
 #include "Hittable.h"
 
 #include <algorithm>
@@ -33,7 +32,7 @@ void Projectile::interact(Entity* self, DualPointer<Hittable> other, float time,
 	hitType match=typeH&other.pIF->acceptedConversions;//per definition only 0 or 1 bits can be set
 	if(match==0) return;
 	int before=collisions.size();
-	other.pIF->testHit(&collisions,match,DualPointer<Projectile>(self,this),tsp.getChunkManager());
+	other.pIF->testHit(&collisions,match,DualPointer<Projectile>(self,this),tsp);
 	int after=collisions.size();
 	if(after) if(!before) tsp.requestRetick((Retickable *)this);
 }
@@ -43,16 +42,16 @@ void Projectile::retick(TickServiceProvider* tsp)
 {
 	int size=collisions.size();
 	std::cout<<"before:"<<std::endl;
-	for(int i=0;i<size;i++)
-	{
-		std::cout<<collisions[i].location<<"  "<<collisions[i].originChunk.x.intpart<<";"<<collisions[i].originChunk.z.intpart<<"    "<<collisions[i].hitVictim.e<<std::endl;
-	}
+	//for(int i=0;i<size;i++)
+	//{
+	//	std::cout<<collisions[i].location<<"  "<<collisions[i].originChunk.x.intpart<<";"<<collisions[i].originChunk.z.intpart<<"    "<<collisions[i].hitVictim.e<<std::endl;
+	//}
 	std::stable_sort(collisions.begin(), collisions.end());
-	std::cout<<"after:"<<std::endl;
-	for(int i=0;i<size;i++)
-	{
-		std::cout<<collisions[i].location<<"  "<<collisions[i].originChunk.x.intpart<<";"<<collisions[i].originChunk.z.intpart<<"    "<<collisions[i].hitVictim.e<<std::endl;
-	}
+	//std::cout<<"after:"<<std::endl;
+	//for(int i=0;i<size;i++)
+	//{
+	//	std::cout<<collisions[i].location<<"  "<<collisions[i].originChunk.x.intpart<<";"<<collisions[i].originChunk.z.intpart<<"    "<<collisions[i].hitVictim.e<<std::endl;
+	//}
 	for(int i=0;i<size;i++)
 	{
 		bool cont;

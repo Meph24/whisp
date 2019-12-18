@@ -42,17 +42,15 @@ extern Zombie_MouseInput* mouseInput;
 
 #include <iostream>
 
-Zombie_World::Zombie_World(sf::Window * w):
-		tm(1,1000,40)//TODO 20/20
+Zombie_World::Zombie_World(sf::Window * w)
 {
 	CfgIO cfgio( "./res/config.txt" );
 	Cfg cfg = cfgio.get();
 	int physDist=*cfg.getInt("graphics", "physicsDistance");
 	int renderDist=*cfg.getInt("graphics", "renderDistance");
-	chunkLoadRate=*cfg.getInt("graphics", "chunkLoadRate");
 	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
 	std::cout<<"testStart"<<std::endl;
-	cm=new ChunkManager(16,physDist*2,renderDist,16);//TODO make chunksPerLockchunk configurable
+	cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
 	spawnZombies=true;
 	zCount = *cfg.getInt("test", "zombies");
 	zombieDist = *cfg.getInt("test", "zombieDist");
@@ -142,7 +140,7 @@ void Zombie_World::restart()
 	spawnZombies=true;
 	player->HP = player->maxHP;
 	player->score = 0;
-	cm->clearEntities();
+	getIWorld()->clearEntities();
 	//TODO clean chunks
 }
 
@@ -172,25 +170,27 @@ Zombie_World::~Zombie_World()
 }
 void Zombie_World::render(Timestamp t)
 {
+	IWorld& iw=*getIWorld();
+
 	callbackList.clear();
-	player->applyPerspective(t,true,cm);
-	spacevec relPos=cm->getMiddleChunk();
 	float renderTime=(pmGraphics->getTime(PM_GRAPHICS_WORLD)+pmGraphics->getTime(PM_GRAPHICS_FLUSH))/1000000.0f;
 	float quality=adQ->getQuality(renderTime);
-	Frustum * viewFrustum=player->newGetViewFrustum(cm,quality);
+	Frustum * viewFrustum=player->newFrustumApplyPerspective(t,true,this,quality);
 
 	grass->bind();
-	cm->render(lodQuality,viewFrustum,relPos);//TODO integrate into draw()?!
+	cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
 
-	cm->draw(t,viewFrustum,cm,this);
-	player->draw(t,viewFrustum,cm,this);//TODO  this is the job of the chunk manager
-	doTransparentCallbacks(t,viewFrustum,cm);//TODO bugs here
+	iw.draw(t,viewFrustum,iw,this);
+	player->draw(t,viewFrustum,iw,this);//TODO  this is the job of an instance of IWorld
+	doTransparentCallbacks(t,viewFrustum,iw);//TODO bugs here
 
 	delete viewFrustum;
 }
 
 void Zombie_World::loadStandardTex()
 {
+	IWorld * iw=getIWorld();
+
 	tps = new TexParamSet();
 	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	tps->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -221,47 +221,26 @@ void Zombie_World::loadStandardTex()
 	leaves->update();
 
 	g = new Graphics2D(64,getAspectRatio());
-
-	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
-	cm->requestEntitySpawn(tr);
-
-	diamond_mesh = new Mesh(diamondMesh(7, 0.3f, 2.0f));
-	MeshIO meshio("./res/cross.mesh");
-	cross_mesh = new Mesh(meshio.get());
-	ModelEntity* diamond = new ModelEntity
-		(
-			Model(diamond_mesh, glm::scale(vec3(0.8f)))
-		);
-	spawnGrounded
-		(
-			diamond,
-			cm->fromMeters(vec3(3, 0, 3))
-		);
-	ModelEntity* cross = new ModelEntity
-		(
-			Model(cross_mesh, glm::scale(vec3(2.0f)))
-		);
-	spawnGrounded
-		(
-			cross,
-			cm->fromMeters(vec3(1, 0, 1))
-		);
+	Zombie_Tree * tr=new Zombie_Tree(iw->fromMeters(vec3(5,0,5)),tree, leaves);
+	iw->requestEntitySpawn(tr);
 }
 
 
 void Zombie_World::doPhysics(Timestamp t)
 {
+	IWorld * iw=getIWorld();
+
 	initNextTick();
 
-	cm->preTick();
+	iw->preTick(this);
 
 	player->tick(t,this);//TODO insert into IWorld
 
-	cm->tick(t,this);
+	iw->tick(t,this);
 
 	doReticks();
 
-	cm->applyEntityChunkChanges(this);
+	iw->postTick(this);
 }
 
 void Zombie_World::loop()
@@ -288,31 +267,33 @@ void Zombie_World::trigger(bool pulled)
 		player->guns[player->currentGun]->stopShooting();
 		return;
 	}
-	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,cm);
+	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,*getIWorld());
 }
 void Zombie_World::spawnZombie(Timestamp t)
 {
+	IWorld * iw=getIWorld();
+
 	if(!spawnZombies) return;
 
 	if (Zombie_Enemy::zombieCount>=zCount) return;
 	float r1 = (rand()%1024);///500.0f;//TODO change
 	float maxDistMultiplier=1.2f;
 	float r2 = (((rand()%32768)/32768.0f)*(maxDistMultiplier-1)+ 1)*zombieDist;
-	cm->requestEntitySpawn(new Zombie_Enemy(t,zombieTex, player->pos+cm->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),cm));
+	iw->requestEntitySpawn(new Zombie_Enemy(t,zombieTex, player->pos+iw->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),this));
 	std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
 	for(int i=1;i<32;i++)
 	{
 		if (Zombie_Enemy::zombieCount>=zCount) return;
-		cm->requestEntitySpawn
+		iw->requestEntitySpawn
 			(
 				new Zombie_Enemy
 				(
 					t,
 					zombieTex,
-					player->pos+cm->fromMeters(
+					player->pos+iw->fromMeters(
 							vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)
 											  ),
-					cm
+					this
 				)
 			);
 		
@@ -331,23 +312,6 @@ void Zombie_World::spawnZombie(Timestamp t)
 Entity* Zombie_World::getTarget(Entity* me)
 {
 	return (Entity *)player;
-}
-
-void Zombie_World::spawn(Entity* ep, spacevec pos)
-{
-	ep->pos = pos;
-	cm->requestEntitySpawn(ep);
-}
-
-void Zombie_World::spawnGrounded(ModelEntity* ep, spacevec pos)
-{
-	spacevec thispos = cm->clip(pos, true);
-	cout << "Clipped pos : " << thispos << '\n';
-	spacelen ground_distance = cm->fromMeters(ep->groundedDistance());
-	cout << "Ground distance " << ground_distance << '\n';
-	thispos.y -= ground_distance;
-	cout << "Spawn Grounded on location " << thispos << '\n';
-	spawn(ep, thispos);
 }
 
 void Zombie_World::drawGameOver()//TODO find new home
@@ -376,22 +340,23 @@ void Zombie_World::doLogic()
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
 	Timestamp t=tm.masterUpdate();
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
-	player->guns[player->currentGun]->tick(t,player->cam,player,shot,cm);
+	player->guns[player->currentGun]->tick(t,player->cam,player,shot,*getIWorld());
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
 	for(int i=0;i<40;i++)
 		if (0.03f> (rand() % 32768) / 32768.0f) spawnZombie(t);//TODO replace by better spawn mechanic
 	pmLogic->registerTime(PM_LOGIC_SPAWN);
 	doPhysics(t);
 	pmLogic->registerTime(PM_LOGIC_PHYSICS);
-	cm->generateMissing(chunkLoadRate);
+	getITerrain()->postTickTerrainCalcs(this,player->pos);
 	pmLogic->registerTime(PM_LOGIC_CHUNKGEN);
-	cm->setMid(player->pos,this);
-	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);
+	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);//TODO fix perf measurements
 }
 
 void Zombie_World::doGraphics()
 {
-	cm->drawAABBs=eMap->getStatus(STATUS_ID_DRAW_AABBs)==1;
+	IWorld * iw=getIWorld();
+
+	drawAABBs=eMap->getStatus(STATUS_ID_DRAW_AABBs)==1;
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
 	if (player->HP < 0)
 	{
@@ -408,7 +373,7 @@ void Zombie_World::doGraphics()
 			transformViewToGUI(1);
 			glColor3f(1, 0, 1);
 			glEnable(GL_TEXTURE_2D);
-			vec3 ppos=cm->toMeters(player->pos);
+			vec3 ppos=iw->toMeters(player->pos);
 			int offset=dsGraphics->draw(ppos.x,ppos.y,ppos.z,0);
 			dsLogic->draw(player->pos.x.intpart,player->pos.y.intpart,player->pos.z.intpart,offset);
 			glDisable(GL_TEXTURE_2D);
@@ -428,14 +393,14 @@ ICamera3D* Zombie_World::getHolderCamera()
 	return player->cam;
 }
 
-ChunkManager* Zombie_World::getChunkManager()
-{
-	return cm;
-}
-
 IWorld* Zombie_World::getIWorld()
 {
 	return (IWorld *)cm;
+}
+
+ITerrain* Zombie_World::getITerrain()
+{
+	return (ITerrain *)cm;
 }
 
 ITexture* Zombie_World::suggestFont()

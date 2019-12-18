@@ -84,9 +84,9 @@ bool AABB::isMultichunk()
 	return (low.x.intpart!=high.x.intpart)||(low.z.intpart!=high.z.intpart);
 }
 
-void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+void AABB::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
 {
-	if(!viewFrustum->inside(*(this),cm)) return;
+	if(!viewFrustum->inside(*(this),iw)) return;
 	float widthOnScreen=1.0f/1024;//apparent size on the screen
 	float maxWidthPortion=0.4f;//max opaque portion (0-1), for distant objects
 
@@ -94,12 +94,12 @@ void AABB::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceP
 	spacevec mid=low+sizeHalf;
 
 	spacevec interPos=mid-viewFrustum->observerPos;
-	vec3 interPosMeters=cm->toMeters(interPos);
+	vec3 interPosMeters=iw.toMeters(interPos);
 
 	float dist=glm::length(interPosMeters-dsp->getCamPos());
 
 	float width=widthOnScreen*dist;
-	vec3 distMax=cm->toMeters(sizeHalf);
+	vec3 distMax=iw.toMeters(sizeHalf);
 	float maxAbsoluteSize=distMax.x;
 	maxAbsoluteSize=distMax.y<maxAbsoluteSize?distMax.y:maxAbsoluteSize;
 	maxAbsoluteSize=distMax.z<maxAbsoluteSize?distMax.z:maxAbsoluteSize;

@@ -14,10 +14,10 @@
 #include "Frustum.h"
 
 
-ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk):
-ITerrain((IWorld *) this),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
+ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk,int ChunkLoadRate):
+IWorld(ChunkSize),ITerrain((IWorld *) this),chunkLoadRate(ChunkLoadRate),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
 {
-	gridSize=ChunkSize;
+	std::cout<<"(IWorld *) this: "<<(IWorld *)this<<std::endl;
 	lockChunkSizeX=1;
 	lockChunkSizeZ=1;
 	while(chunksPerLockchunk>3)
@@ -57,9 +57,9 @@ spacelen ChunkManager::getHeight(spacevec abs)
 }
 
 #include <iostream>
-void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
+void ChunkManager::render(float lodQ,Frustum * viewFrustum)
 {
-
+	spacevec camOffset=viewFrustum->observerPos;
 
 	glPushMatrix();
 	glEnable(GL_TEXTURE_2D);
@@ -80,8 +80,11 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum, spacevec camOffset)
 		for(int runx = startX ; runx<stopX ; runx++)
 		{
 			int indx=runz*chunksPerAxis+runx;
-			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb,this))
+			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb,*this))
 			{
+				//std::cout<<"rendering chunk "<<runz<<"|"<<runx<<std::endl;
+				//std::cout<<"chunk bb: \n"<<chunks[indx]->bb.low<<"\n"<<chunks[indx]->bb.high<<std::endl;
+				//std::cout<<"observerPos: "<<viewFrustum->observerPos<<std::endl;
 				float distX=(runx-midX);
 				if (distX<0) distX=-distX;
 				int distZ=(runz-midZ);
@@ -374,44 +377,7 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 	return false;
 }
 
-#include "myAssert.h"
-void ChunkManager::giveInteractionManagers(Entity* e,std::vector<InteractionManager*> * managers,TickServiceProvider * tsp)
-{
-	gridInt minx=e->bb.low.x.intpart;
-	gridInt maxx=e->bb.high.x.intpart;
-	gridInt minz=e->bb.low.z.intpart;
-	gridInt maxz=e->bb.high.z.intpart;
 
-	if((maxx-minx)>=10 )
-	{
-		std::cout<<"fail: wrong bb; x:"<<minx<<"-"<<maxx<<"z:"<<minz<<"-"<<maxz<<std::endl;
-	}
-	assert((maxx-minx)<10);
-	assert((maxz-minz)<10);
-	int tickID=tsp->tickID;
-	for(gridInt xrun=minx;xrun<=maxx;xrun++)
-	{
-		for(gridInt zrun=minz;zrun<=maxz;zrun++)
-		{
-			if(isValid(xrun,zrun))
-			{
-				int indx=getIndx(xrun,zrun);
-				if(indx<0 || indx>chunksPerAxis*chunksPerAxis)
-					std::cout<<"fail: wrong index: "<<indx<<std::endl;
-				else
-				if(chunks[indx])
-				{
-					if(chunks[indx]->lastTickID!=tickID)
-					{
-						chunks[indx]->interMan->resetAll();
-						chunks[indx]->lastTickID=tickID;
-					}
-					managers->push_back(chunks[indx]->interMan);
-				}
-			}
-		}
-	}
-}
 #include "WarnErrReporter.h"
 void ChunkManager::applyEntityChunkChanges(TickServiceProvider * tsp)
 {
@@ -568,7 +534,7 @@ chunkSearchResult ChunkManager::smartSearch(Entity* e, spacevec pos)
 	return chunkSearch(e,ret.chunkIndex);
 }
 
-void ChunkManager::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+void ChunkManager::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
 {
 	int startX=chunksPerAxis/2-renderDistanceChunks;
 	int startZ=chunksPerAxis/2-renderDistanceChunks;
@@ -586,7 +552,7 @@ void ChunkManager::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,Draw
 			int indx=runz*chunksPerAxis+runx;
 			if(chunks[indx])
 			{
-				chunks[indx]->draw(t,viewFrustum,cm,dsp);
+				chunks[indx]->draw(t,viewFrustum,iw,dsp);
 			}
 		}
 	}
@@ -670,4 +636,16 @@ bool ChunkManager::isValid(gridInt cx, gridInt cz)
 	if(relLowX>=chunksPerAxis) return false;
 	if(relLowZ>=chunksPerAxis) return false;
 	return true;
+}
+
+void ChunkManager::postTick(TickServiceProvider* tsp)
+{
+	//TODO find out how to exactly do this stuff, previously: "//TODO retick, applyEntityChunkChanges"
+	applyEntityChunkChanges(tsp);
+}
+
+void ChunkManager::postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos)
+{
+	generateMissing(chunkLoadRate);//TODO load rate refactor
+	setMid(playerPos,tsp);
 }

@@ -16,11 +16,13 @@
 Frustum::Frustum()
 {}
 
-bool Frustum::inside(AABB bb,IWorld * w)
+bool Frustum::inside(AABB bb,IWorld& w)
 {
 	for(int i=0;i<FRUSTUM_PLANE_COUNT;i++)
 	{
-		if(!planes[i].inside(bb,observerPos,w)) return false;
+		bool ret=planes[i].inside(bb,observerPos,w);
+		//if(!ret) std::cout<<i<<" "<<ret<<planes[i].normal<<" "<<planes[i].distanceInMeters<<std::endl;
+		if(!ret) return false;
 	}
 	return true;
 }

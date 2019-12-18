@@ -44,24 +44,24 @@ extern Zombie_MouseInput* mouseInput;
 #include "EntityProjectileBulletLike.h"
 #include "Frustum.h"
 #include "WarnErrReporter.h"
+#include "TerrainDummy.h"
 
 #include "randomModel.hpp"
 #include <glm/gtc/random.hpp>
 
 
-Simulation_World::Simulation_World(sf::Window * w):
-		tm(1,1000,40)//TODO 20/20
+Simulation_World::Simulation_World(sf::Window * w)
 {
 	test=0;
 	CfgIO cfgio( "./res/config.txt" );
 	Cfg cfg = cfgio.get();
 	int physDist=*cfg.getInt("graphics", "physicsDistance");
 	int renderDist=*cfg.getInt("graphics", "renderDistance");
-	chunkLoadRate=*cfg.getInt("graphics", "chunkLoadRate");
 	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
 	objects_count=*cfg.getInt("simulation", "objects_count");
 
-	cm = new ChunkManager(16,physDist*2,renderDist,16);//TODO make chunksPerLockchunk configurable
+	cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
+	td=new TerrainDummy(getIWorld(),getIWorld()->fromMeters(0));
 
 	Timestamp timS=tm.getSlaveTimestamp();
 
@@ -101,8 +101,20 @@ Simulation_World::Simulation_World(sf::Window * w):
 			CONDITION_ALWAYS_TRUE,
 			STATUS_ID_DRAW_AABBs,
 			EVENT_VALUE_KEY_PRESSED);
+	eMap->registerAction(
+			EVENT_ID_KEY_SHIFT,
+			MAPPER_MODE_HOLD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_GO_UP,
+			1);
+	eMap->registerAction(
+			EVENT_ID_KEY_CTRL,
+			MAPPER_MODE_HOLD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_GO_DOWN,
+			1);
 
-	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
+	float characterSpeed=7.6f;
 
 	float sensX = *cfg.getFlt("input", "sensitivityX");
 	float sensY = *cfg.getFlt("input", "sensitivityY");
@@ -143,17 +155,16 @@ Simulation_World::Simulation_World(sf::Window * w):
 
 void Simulation_World::restart()
 {	
-	spawnZombies=false;
 	player->HP = player->maxHP;
 	player->score = 0;
-	cm->clearEntities();
+	getIWorld()->clearEntities();
 	//TODO clean chunks
 }
 
 
 Simulation_World::~Simulation_World()
 {
-	//missing deletes (one-time tier 1 code, so who cares)
+	//missing deletes (one-time tier 1 ode, so who cares)
 	delete cm;
 
 	delete dsLogic;
@@ -176,25 +187,27 @@ Simulation_World::~Simulation_World()
 
 void Simulation_World::render(Timestamp t)
 {
+	IWorld& iw=*getIWorld();
+
 	callbackList.clear();
-	player->applyPerspective(t,true,cm);
-	spacevec relPos=cm->getMiddleChunk();
 	float renderTime=(pmGraphics->getTime(PM_GRAPHICS_WORLD)+pmGraphics->getTime(PM_GRAPHICS_FLUSH))/1000000.0f;
 	float quality=adQ->getQuality(renderTime);
-	Frustum * viewFrustum=player->newGetViewFrustum(cm,quality);
+	Frustum * viewFrustum=player->newFrustumApplyPerspective(t,true,this,quality);
 
 	grass->bind();
-	cm->render(lodQuality,viewFrustum,relPos);//TODO integrate into draw()?!
+	//cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
 
-	cm->draw(t,viewFrustum,cm,this);
-	player->draw(t,viewFrustum,cm,this);//TODO  this is the job of the chunk manager
-	doTransparentCallbacks(t,viewFrustum,cm);//TODO bugs here
+	iw.draw(t,viewFrustum,iw,this);
+	player->draw(t,viewFrustum,iw,this);//TODO  this is the job of an instance of IWorld
+	doTransparentCallbacks(t,viewFrustum,iw);//TODO bugs here
 
 	delete viewFrustum;
 }
 
 void Simulation_World::loadStandardTex()
 {
+	IWorld * iw=getIWorld();
+
 	tps = new TexParamSet();
 	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
 	tps->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -225,8 +238,6 @@ void Simulation_World::loadStandardTex()
 
 	g = new Graphics2D(64,getAspectRatio());
 
-//	Zombie_Tree * tr=new Zombie_Tree(cm->fromMeters(vec3(5,0,5)),tree, leaves);
-//	cm->requestEntitySpawn(tr);
 
 	meshes.emplace_back( new Mesh(diamondMesh(7, 0.3f, 2.0f)) );
 	MeshIO meshio("./res/cross.mesh");
@@ -246,7 +257,7 @@ void Simulation_World::loadStandardTex()
 		models.emplace_back( new Model(m_uptr.get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		spawn(me, cm->fromMeters(vec3(20.0f, 4.0f, fi*2.5f)));
+		spawn(me, iw->fromMeters(vec3(20.0f, 4.0f, fi*2.5f)));
 		fi += 1.0f;
 	}
 
@@ -256,14 +267,14 @@ void Simulation_World::loadStandardTex()
 		models.emplace_back( new Model(rand_model) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
+		me->v = iw->fromMeters(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f)
 									)
 							  );
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
+			iw->fromMeters	(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f))
 							)
@@ -277,10 +288,10 @@ void Simulation_World::loadStandardTex()
 		models.emplace_back( new Model(meshes[0].get()) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( 0.3f, 0.0f, 0.0f));
+		me->v = iw->fromMeters(	vec3( 0.3f, 0.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(vec3(2.0f, 9.0f, 1.0f ))
+			iw->fromMeters	(vec3(2.0f, 9.0f, 1.0f ))
 		);
 	}
 	
@@ -293,10 +304,10 @@ void Simulation_World::loadStandardTex()
 		// when the velocity vector gets a negative x
 		// so i guess its not moving
 		// the test still works with only 1 moving part so duh, but this needs to be fixed
-		me->v = cm->fromMeters(	vec3( 0.0f, 0.0f, 0.0f));
+		me->v = iw->fromMeters(	vec3( 0.0f, 0.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( 10.0f, 9.0f, 1.0f) )
+			iw->fromMeters	(	vec3( 10.0f, 9.0f, 1.0f) )
 
 		);
 	}
@@ -307,7 +318,7 @@ void Simulation_World::loadStandardTex()
 		ModelEntity* me = new ModelEntity(*(models.back()));
 		spawn
 		(	me,
-			cm->fromMeters	(vec3(2.0f, 3.0f, 1.0f ))
+			iw->fromMeters	(vec3(2.0f, 3.0f, 1.0f ))
 		);
 	}
 	
@@ -318,7 +329,7 @@ void Simulation_World::loadStandardTex()
 		ModelEntity* me = new ModelEntity(*(models.back()));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( 10.0f, 3.0f, 1.0f))
+			iw->fromMeters	(	vec3( 10.0f, 3.0f, 1.0f))
 
 		);
 	}
@@ -331,7 +342,7 @@ void Simulation_World::loadStandardTex()
 		me->rotate(vec3(90.0f, 0.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(vec3(12.0f, 5.0f, 12.0f ))
+			iw->fromMeters	(vec3(12.0f, 5.0f, 12.0f ))
 		);
 	}
 
@@ -339,10 +350,10 @@ void Simulation_World::loadStandardTex()
 	{
 		models.emplace_back( new Model(meshes[0].get()) );
 		ModelEntity* me = new ModelEntity(*(models.back()));
-		me->v = cm->fromMeters(	vec3( 0.0f, -0.2f, 0.0f));
+		me->v = iw->fromMeters(	vec3( 0.0f, -0.2f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( 12.0f, 10.0f, 12.0f))
+			iw->fromMeters	(	vec3( 12.0f, 10.0f, 12.0f))
 
 		);
 	}
@@ -354,7 +365,7 @@ void Simulation_World::loadStandardTex()
 		me->spin(vec3(0.0f, 10.0f, 0.0f));
 		spawn
 		(	me,
-			cm->fromMeters	(	vec3( 0.0f, 3.0f, 12.0f))
+			iw->fromMeters	(	vec3( 0.0f, 3.0f, 12.0f))
 
 		);
 	}
@@ -370,7 +381,7 @@ void Simulation_World::loadStandardTex()
 						vec3(360.0f, 360.0f, 360.0f))
 				);
 		me->model().transMat() = glm::scale(me->model().transMat(), vec3(factor, factor, factor));
-		spawn(me, cm->fromMeters( pos ));
+		spawn(me, iw->fromMeters( pos ));
 
 
 		factor = 1.0f;
@@ -381,7 +392,7 @@ void Simulation_World::loadStandardTex()
 						vec3(360.0f, 360.0f, 360.0f))
 				);
 		me->model().transMat() = glm::scale(me->model().transMat(), vec3(factor, factor, factor));
-		spawn(me, cm->fromMeters( pos ));
+		spawn(me, iw->fromMeters( pos ));
 
 
 		factor = 0.5f;
@@ -392,7 +403,7 @@ void Simulation_World::loadStandardTex()
 						vec3(360.0f, 360.0f, 360.0f))
 				);
 		me->model().transMat() = glm::scale(me->model().transMat(), vec3(factor, factor, factor));
-		spawn(me, cm->fromMeters( pos ));
+		spawn(me, iw->fromMeters( pos ));
 	}
 
 	//cogged crosses
@@ -419,8 +430,8 @@ void Simulation_World::loadStandardTex()
 		vec3 rotational_velocity1(0.0f, 0.0f, -1*vel);
 		me0->spin(rotational_velocity0);
 		me1->spin(rotational_velocity1);
-		spawn(me0, cm->fromMeters(pos0));
-		spawn(me1, cm->fromMeters(pos1));
+		spawn(me0, iw->fromMeters(pos0));
+		spawn(me1, iw->fromMeters(pos1));
 
 	}
 
@@ -444,8 +455,8 @@ void Simulation_World::loadStandardTex()
 		float vel = randommodel::randomFloat(-360.0f, 360.0f);
 		vec3 rotational_velocity0(0.0f, 0.0f, vel);
 		me0->spin(rotational_velocity0);
-		spawn(me0, cm->fromMeters(pos0));
-		spawn(me1, cm->fromMeters(pos1));
+		spawn(me0, iw->fromMeters(pos0));
+		spawn(me1, iw->fromMeters(pos1));
 
 	}
 
@@ -453,17 +464,19 @@ void Simulation_World::loadStandardTex()
 
 void Simulation_World::doPhysics(Timestamp t)
 {
+	IWorld * iw=getIWorld();
+
 	initNextTick();
 
-	cm->preTick();
+	iw->preTick(this);
 
 	player->tick(t,this);//TODO insert into IWorld
 
-	cm->tick(t,this);
+	iw->tick(t,this);
 
 	doReticks();
 
-	cm->applyEntityChunkChanges(this);
+	iw->postTick(this);
 }
 
 void Simulation_World::loop()
@@ -488,7 +501,7 @@ void Simulation_World::trigger(bool pulled)
 		player->guns[player->currentGun]->stopShooting();
 		return;
 	}
-	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,cm);
+	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,*getIWorld());
 }
 
 Entity* Simulation_World::getTarget(Entity* me)
@@ -496,21 +509,14 @@ Entity* Simulation_World::getTarget(Entity* me)
 	return (Entity *)player;
 }
 
-void Simulation_World::spawn(Entity* ep, spacevec pos)
-{
-	ep->pos = pos;
-	cm->requestEntitySpawn(ep);
-}
-
 void Simulation_World::spawnGrounded(ModelEntity* ep, spacevec pos)
 {
-	spacevec thispos = cm->clip(pos, true);
+	spacevec thispos = getITerrain()->clip(pos, true);
 	cout << "Clipped pos : " << thispos << '\n';
-	spacelen ground_distance = cm->fromMeters(ep->groundedDistance());
+	spacelen ground_distance = getIWorld()->fromMeters(ep->groundedDistance());
 	cout << "Ground distance " << ground_distance << '\n';
 	thispos.y -= ground_distance;
 	cout << "Spawn Grounded on location " << thispos << '\n';
-	spawn(ep, thispos);
 }
 
 void Simulation_World::drawGameOver()//TODO find new home
@@ -536,23 +542,32 @@ void Simulation_World::drawGameOver()//TODO find new home
 
 void Simulation_World::doLogic()
 {
+	IWorld * iw=getIWorld();
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
 	Timestamp t=tm.masterUpdate();
+
+	static Timestamp last=t;
+
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
-	player->guns[player->currentGun]->tick(t,player->cam,player,shot,cm);
+	player->guns[player->currentGun]->tick(t,player->cam,player,shot,*getIWorld());
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
 	pmLogic->registerTime(PM_LOGIC_SPAWN);
 	doPhysics(t);
 	pmLogic->registerTime(PM_LOGIC_PHYSICS);
-	cm->generateMissing(chunkLoadRate);
+	getITerrain()->postTickTerrainCalcs(this,player->pos);
 	pmLogic->registerTime(PM_LOGIC_CHUNKGEN);
-	cm->setMid(player->pos,this);
-	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);
+	td->height+=iw->fromMeters(eMap->getStatus(STATUS_ID_GO_UP)*(t-last)*player->speed);
+	td->height-=iw->fromMeters(eMap->getStatus(STATUS_ID_GO_DOWN)*(t-last)*player->speed);
+	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);//TODO fix perf measurements
+
+	last=t;
 }
 
 void Simulation_World::doGraphics()
 {
-	cm->drawAABBs=eMap->getStatus(STATUS_ID_DRAW_AABBs)==1;
+	IWorld * iw=getIWorld();
+
+	drawAABBs=eMap->getStatus(STATUS_ID_DRAW_AABBs)==1;
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
 	if (player->HP < 0)
 	{
@@ -569,7 +584,7 @@ void Simulation_World::doGraphics()
 			transformViewToGUI(1);
 			glColor3f(1, 0, 1);
 			glEnable(GL_TEXTURE_2D);
-			vec3 ppos=cm->toMeters(player->pos);
+			vec3 ppos=iw->toMeters(player->pos);
 			int offset=dsGraphics->draw(ppos.x,ppos.y,ppos.z,0);
 			dsLogic->draw(player->pos.x.intpart,player->pos.y.intpart,player->pos.z.intpart,offset);
 			glDisable(GL_TEXTURE_2D);
@@ -589,14 +604,20 @@ ICamera3D* Simulation_World::getHolderCamera()
 	return player->cam;
 }
 
-ChunkManager* Simulation_World::getChunkManager()
-{
-	return cm;
-}
 
 IWorld* Simulation_World::getIWorld()
 {
 	return (IWorld *)cm;
+}
+ITerrain* Simulation_World::getITerrain()
+{
+	return (ITerrain *)td;//(ITerrain *)cm;
+}
+
+void Simulation_World::spawn(Entity* e, spacevec pos)
+{
+	e->pos=pos;
+	getIWorld()->requestEntitySpawn(e);
 }
 
 ITexture* Simulation_World::suggestFont()

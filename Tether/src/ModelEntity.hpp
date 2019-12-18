@@ -50,7 +50,7 @@ public:
 
 	virtual void draw(	Timestamp ts, 
 						Frustum* viewFrustum, 
-						ChunkManager* cm, 
+						IWorld& iw,
 						DrawServiceProvider* dsp
 					 );
 

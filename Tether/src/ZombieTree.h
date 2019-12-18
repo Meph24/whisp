@@ -32,7 +32,7 @@ public:
 	Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves);
 	Zombie_Tree(spacevec position, float diameter, float height, float diameterLeaves, ITexture* textureLog, ITexture* textureLeaves);
 	~Zombie_Tree();
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 	virtual void tick(Timestamp t,TickServiceProvider * tsp);
 };
 

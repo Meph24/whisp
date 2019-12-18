@@ -42,13 +42,13 @@ DivisionPlane::~DivisionPlane()
 {
 }
 
-bool DivisionPlane::inside(AABB bb,spacevec observerPos,IWorld * w)
+bool DivisionPlane::inside(AABB bb,spacevec observerPos,IWorld& w)
 {
 	spacevec relevantPoint;
 	relevantPoint.x=(bb.*xPtr).x-observerPos.x;
 	relevantPoint.y=(bb.*yPtr).y-observerPos.y;
 	relevantPoint.z=(bb.*zPtr).z-observerPos.z;
-	float d=glm::dot(w->toMeters(relevantPoint),normal);
+	float d=glm::dot(w.toMeters(relevantPoint),normal);
 	return d<distanceInMeters;
 }
 

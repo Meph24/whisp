@@ -23,7 +23,7 @@ Item* Item::newClone()
 	return 0;
 }
 
-void Item::draw(Timestamp t, Frustum* viewFrustum, ChunkManager* cm,DrawServiceProvider* dsp)
+void Item::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
 {
 
 }

@@ -39,7 +39,7 @@ public:
 	std::string getDisplayString();
 
 	virtual Item * newClone();
-	virtual void draw(Timestamp t,Frustum * viewFrustum,ChunkManager * cm,DrawServiceProvider * dsp);//when held by player: must draw GUI and/or the physical item
+	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);//when held by player: must draw GUI and/or the physical item
 
 	Item();
 	virtual ~Item();

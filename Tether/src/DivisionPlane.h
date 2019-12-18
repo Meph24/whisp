@@ -29,7 +29,7 @@ public:
 	DivisionPlane();
 	DivisionPlane(vec3 Normal,float Dist);
 	~DivisionPlane();
-	bool inside(AABB bb,spacevec observerPos,IWorld * w);
+	bool inside(AABB bb,spacevec observerPos,IWorld& w);
 };
 
 std::ostream& operator<< (std::ostream& os, const DivisionPlane& dp);
