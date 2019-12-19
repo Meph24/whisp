@@ -56,9 +56,9 @@ low(pos-sizeFromMid),high(pos+sizeFromMid)
 	if(sizeFromMid.x.intpart>=10||sizeFromMid.z.intpart>=10||movement.z.intpart>=10||movement.x.intpart>=10)//TODO find the bug that causes this and remove afterwards
 	{
 		std::cout<<"REPORT THIS BUG, IT IS RARE AND NEEDS TO BE FIXED:"<<std::endl;
-		std::cout<<sizeFromMid<<std::endl;
-		std::cout<<pos<<std::endl;
-		std::cout<<movement<<std::endl;
+		std::cout<< "pos:\n" << pos<<std::endl;
+		std::cout<< "fromMid:\n" << sizeFromMid<<std::endl;
+		std::cout<< "movement:\n" << movement<<std::endl;
 
 		assert(sizeFromMid.x.intpart<10);
 		assert(sizeFromMid.z.intpart<10);

@@ -63,7 +63,7 @@ Simulation_World::Simulation_World(sf::Window * w)
 	cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
 	td=new TerrainDummy(getIWorld(),getIWorld()->fromMeters(0));
 
-	Timestamp timS=tm.getSlaveTimestamp();
+	Timestamp timS=tm.masterUpdate();
 
 	eMap->registerAction(
 			EVENT_ID_KEY_F3,
@@ -272,6 +272,7 @@ void Simulation_World::loadStandardTex()
 										randommodel::randomFloat(-30.0f, 30.0f)
 									)
 							  );
+
 		spawn
 		(	me,
 			iw->fromMeters	(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
@@ -604,7 +605,6 @@ ICamera3D* Simulation_World::getHolderCamera()
 	return player->cam;
 }
 
-
 IWorld* Simulation_World::getIWorld()
 {
 	return (IWorld *)cm;
@@ -617,6 +617,7 @@ ITerrain* Simulation_World::getITerrain()
 void Simulation_World::spawn(Entity* e, spacevec pos)
 {
 	e->pos=pos;
+	e->lastTick = tm.getSlaveTimestamp();
 	getIWorld()->requestEntitySpawn(e);
 }
 
