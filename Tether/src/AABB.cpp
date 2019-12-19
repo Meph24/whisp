@@ -185,9 +185,9 @@ AABB::AABB(spacevec posT0, spacevec posT1, spacevec negDirExtent,spacevec posDir
 	spacelen zero;
 	zero.floatpart=0;
 	zero.intpart=0;
-	if(negDirExtent.x<0) negDirExtent.x=zero-negDirExtent.x;
-	if(negDirExtent.y<0) negDirExtent.y=zero-negDirExtent.y;
-	if(negDirExtent.z<0) negDirExtent.z=zero-negDirExtent.z;
+	if(negDirExtent.x<zero) negDirExtent.x=zero-negDirExtent.x;
+	if(negDirExtent.y<zero) negDirExtent.y=zero-negDirExtent.y;
+	if(negDirExtent.z<zero) negDirExtent.z=zero-negDirExtent.z;
 	assert(posDirExtent.x>=zero);
 	assert(posDirExtent.y>=zero);
 	assert(posDirExtent.z>=zero);
