@@ -115,18 +115,13 @@ void ModelEntity::draw(
 	glPopMatrix();
 }
 
-void ModelEntity::tick
-				(
-					Timestamp t,
-					TickServiceProvider* tsp
-				)
+void ModelEntity::tick	(
+							Timestamp t,
+							TickServiceProvider* tsp
+						)
 {
-	float time = t - lastTick;
+	float tick_seconds = t - lastTick;
 	lastTick = t;
-
-	ChunkManager* cm = tsp->getChunkManager();
-
-	bb = AABB(pos, cm->fromMeters(m_model.extent()), v);
 
 	//the collider needs to save the old state of the entity
 	//to use it for its calculations
@@ -134,6 +129,7 @@ void ModelEntity::tick
 	Collider::saveState(old_state);
 
 	IWorld* iw = tsp->getIWorld();
+	bb = AABB(pos, iw->fromMeters(m_model.extent()), v * tick_seconds);
 
 	//entity attribute changes go here
 	//this is code for collision simulation
@@ -142,16 +138,14 @@ void ModelEntity::tick
 		v = v * -1.0f;
 
 	//apply pos by velocity
-	move(v*time);
+	move(v*tick_seconds);
 
 	//apply rotation by rotational velocity
-	rotate(m_rotv * time);
+	rotate(m_rotv * tick_seconds);
 
-	bb = AABB(pos, iw->fromMeters(m_model.extent()));
-
-	tsp->getIWorld()->collideAlgo->doChecks(
+	iw->collideAlgo->doChecks(
 			(Collider*) this, (Entity*) this,
-			time, *tsp);
+			tick_seconds, *tsp);
 }
 
 // implementation of the Collider Interface
