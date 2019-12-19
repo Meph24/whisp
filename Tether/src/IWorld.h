@@ -37,6 +37,7 @@ protected:
 
 	float gridSize;//sacelen.intpart scale in meters
 	std::vector<Entity *> deleteVec;//the entities that should be removed from world
+	//TODO addVec
 
 	void resetAlgos();
 public:

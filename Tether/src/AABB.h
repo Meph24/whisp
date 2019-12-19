@@ -40,6 +40,7 @@ public:
 	AABB(spacevec pos);//point-like stationary object
 	AABB(spacevec pos,spacevec sizeFromMid);//stationary object
 	AABB(spacevec pos,spacevec sizeFromMid,spacevec movement);
+	AABB(spacevec posT0,spacevec posT1,spacevec negDirExtent,spacevec posDirExtent);//extent is measured from pos at T0 and T1 time intervals; extent in negative direction can be given as positive or negative number
 	~AABB();
 };
 

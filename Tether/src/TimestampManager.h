@@ -27,9 +27,9 @@ public:
 
 	float targetRate;//can be changed freely at runtime
 
-	Timestamp masterUpdate();
+	Timestamp masterUpdate();//update for the next tick, get timestamp for new tick
 
-	Timestamp getSlaveTimestamp();
+	Timestamp getSlaveTimestamp();//get time elapsed since last tick
 
 
 

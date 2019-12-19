@@ -95,7 +95,7 @@ void ModelEntity::draw(
 				 )
 {
 	float tickOffset = ts-lastTick;
-	//if(!viewFrustum->inside(bb)) return;
+	if(!viewFrustum->inside(bb,iw)) return;
 	
 	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;
 	vec3 interPosMeters = iw.toMeters(interPos);
