@@ -254,7 +254,9 @@ struct vec3if
 
 	//returns bit vector of comparison lsb=x
 	unsigned int operator<(vec3if<I,F> other);
+	unsigned int operator<=(vec3if<I,F> other);
 	unsigned int operator>(vec3if<I,F> other);
+	unsigned int operator>=(vec3if<I,F> other);
 
 	bool equalsZero();//tiny epsilon tolerance
 	intfloat<I,F> lengthHP();//gives the length using high precision (currently: double)
@@ -267,6 +269,7 @@ struct vec3if
 
 	float dot(vec3 v);//use only if already relativized, otherwise precision problems
 
+	vec3if<I, F> selectWhere(int boolvec);
 };
 
 template<typename I,typename F>
@@ -415,9 +418,21 @@ inline unsigned int vec3if<I, F>::operator <(vec3if<I, F> other)
 }
 
 template<typename I, typename F>
+inline unsigned int vec3if<I, F>::operator <=(vec3if<I, F> other)
+{
+	return (x<=other.x)*1+(y<=other.y)*2+(z<=other.z)*4;
+}
+
+template<typename I, typename F>
 inline unsigned int vec3if<I, F>::operator >(vec3if<I, F> other)
 {
 	return (x>other.x)*1+(y>other.y)*2+(z>other.z)*4;
+}
+
+template<typename I, typename F>
+inline unsigned int vec3if<I, F>::operator >=(vec3if<I, F> other)
+{
+	return (x>=other.x)*1+(y>=other.y)*2+(z>=other.z)*4;
 }
 
 template<typename I, typename F>
@@ -464,6 +479,18 @@ inline float vec3if<I, F>::dot(vec3 v)
 	ret+=v.y*y.intpart;
 	ret+=v.z*z.floatpart;
 	ret+=v.z*z.intpart;
+	return ret;
+}
+
+
+template<typename I, typename F>
+inline vec3if<I, F> vec3if<I, F>::selectWhere(int boolvec)
+{
+	vec3if<I, F> ret;
+	ret.set0();
+	if(boolvec&1) ret.x=x;
+	if(boolvec&2) ret.y=y;
+	if(boolvec&4) ret.z=z;
 	return ret;
 }
 
