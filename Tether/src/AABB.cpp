@@ -48,15 +48,16 @@ low(pos-sizeFromMid),high(pos+sizeFromMid)
 		assert(sizeFromMid.x.intpart<10);
 		assert(sizeFromMid.z.intpart<10);
 	}
+	assert(!(low>high));
 }
 
-AABB::AABB(spacevec pos, spacevec sizeFromMid, spacevec movement):
-low(pos-sizeFromMid),high(pos+sizeFromMid)
+AABB::AABB(spacevec posT1, spacevec sizeFromMid, spacevec movement):
+low(posT1-sizeFromMid),high(posT1+sizeFromMid)
 {
 	if(sizeFromMid.x.intpart>=10||sizeFromMid.z.intpart>=10||movement.z.intpart>=10||movement.x.intpart>=10)//TODO find the bug that causes this and remove afterwards
 	{
 		std::cout<<"REPORT THIS BUG, IT IS RARE AND NEEDS TO BE FIXED:"<<std::endl;
-		std::cout<< "pos:\n" << pos<<std::endl;
+		std::cout<< "pos_t1:\n" << posT1<<std::endl;
 		std::cout<< "fromMid:\n" << sizeFromMid<<std::endl;
 		std::cout<< "movement:\n" << movement<<std::endl;
 
@@ -65,18 +66,11 @@ low(pos-sizeFromMid),high(pos+sizeFromMid)
 		assert(movement.z.intpart<10);//Assertion failed! Expression: movement.z.intpart<10
 		assert(movement.x.intpart<10);
 	}
-	spacelen zero;
-	zero.floatpart=0;
-	zero.intpart=0;
-	bool xbig=movement.x>zero;
-	bool ybig=movement.y>zero;
-	bool zbig=movement.z>zero;
-	if(xbig) high.x+=movement.x;
-	else low.x+=movement.x;
-	if(ybig) high.y+=movement.y;
-	else low.y+=movement.y;
-	if(zbig) high.z+=movement.z;
-	else low.z+=movement.z;
+	spacevec zero;
+	zero.set0();
+	low-=movement.selectWhere(movement>zero);//if moved in + direction, posT0 was in - direction before
+	high-=movement.selectWhere(movement<zero);//if moved in - direction, posT0 was in + direction before
+	assert(!(low>high));
 }
 
 bool AABB::isMultichunk()
@@ -180,15 +174,14 @@ bool AABB::contains(spacevec s)
 	return (!(low>s))&&(!(high<s));
 }
 
-AABB::AABB(spacevec posT0, spacevec posT1, spacevec negDirExtent,spacevec posDirExtent)
+AABB::AABB(spacevec posT0, spacevec posT1, spacevec lowBorderOffset,spacevec highBorderOffset)
 {
-	spacelen zero;
-	zero.floatpart=0;
-	zero.intpart=0;
-	if(negDirExtent.x<zero) negDirExtent.x=zero-negDirExtent.x;
-	if(negDirExtent.y<zero) negDirExtent.y=zero-negDirExtent.y;
-	if(negDirExtent.z<zero) negDirExtent.z=zero-negDirExtent.z;
-	assert(posDirExtent.x>=zero);
-	assert(posDirExtent.y>=zero);
-	assert(posDirExtent.z>=zero);
+	assert(highBorderOffset.x>=lowBorderOffset.x);
+	assert(highBorderOffset.y>=lowBorderOffset.y);
+	assert(highBorderOffset.z>=lowBorderOffset.z);
+	low=posT0.selectWhere(posT0<posT1)+posT1.selectWhere(posT1<=posT0);
+	high=posT0.selectWhere(posT0>posT1)+posT1.selectWhere(posT1>=posT0);
+	low+=lowBorderOffset;
+	high+=highBorderOffset;
+	assert(!(low>high));
 }

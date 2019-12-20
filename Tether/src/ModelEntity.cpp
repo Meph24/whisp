@@ -113,10 +113,11 @@ void ModelEntity::draw(
 AABB ModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)
 {
 	Model::Extent ext = m_model.extent();	
+
 	return AABB(pos , 
 				pos + v*tick_seconds, 
 				tsp->getIWorld()->fromMeters(ext.min),
-				tsp->getIWorld()->fromMeters(ext.min)
+				tsp->getIWorld()->fromMeters(ext.max)
 				);
 }
 

@@ -145,9 +145,9 @@ void Model::updateExtent()
 	{
 		if(v.x > m_extent.max.x) m_extent.max.x = v.x;
 		else if( v.x < m_extent.min.x) m_extent.min.x = v.x;
-		if(fabs(v.y) > m_extent.max.y) m_extent.max.y = v.y;
+		if(v.y > m_extent.max.y) m_extent.max.y = v.y;
 		else if( v.y < m_extent.min.y) m_extent.min.y = v.y;
-		if(fabs(v.z) > m_extent.max.z) m_extent.max.z = v.z;
+		if(v.z > m_extent.max.z) m_extent.max.z = v.z;
 		else if( v.z < m_extent.min.z) m_extent.min.z = v.z;
 	}
 }

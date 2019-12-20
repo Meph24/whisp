@@ -279,7 +279,7 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	size.x=iw->fromMeters(characterEyeHeight*0.5f);
 	size.y=iw->fromMeters(characterEyeHeight*1.5f);
 	size.z=size.x;
-	bb=AABB(pos,size,v*(-time));
+	bb=AABB(pos,size,v*time);
 	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,time,*tsp);
 }
 

@@ -121,7 +121,7 @@ void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
 
 	spacevec size;
 	size.set0();
-	bb=AABB(posOld,size,pos-posOld);
+	bb=AABB(pos,size,pos-posOld);
 	iw->projectileAlgo->doChecks((Projectile *)this, (Entity *)this,time,*tsp);
 
 }
