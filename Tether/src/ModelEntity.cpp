@@ -82,11 +82,6 @@ spacevec ModelEntity::getPos() const
 	return this->pos;
 }
 
-float ModelEntity::groundedDistance()
-{
-	return m_model.groundDistance();
-}
-
 void ModelEntity::draw(	
 					Timestamp ts, 
 					Frustum* viewFrustum,
@@ -115,6 +110,16 @@ void ModelEntity::draw(
 	glPopMatrix();
 }
 
+AABB ModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)
+{
+	Model::Extent ext = m_model.extent();	
+	return AABB(pos , 
+				pos + v*tick_seconds, 
+				tsp->getIWorld()->fromMeters(ext.min),
+				tsp->getIWorld()->fromMeters(ext.min)
+				);
+}
+
 void ModelEntity::tick	(
 							Timestamp t,
 							TickServiceProvider* tsp
@@ -129,7 +134,7 @@ void ModelEntity::tick	(
 	Collider::saveState(old_state);
 
 	IWorld* iw = tsp->getIWorld();
-	bb = AABB(pos, iw->fromMeters(m_model.extent()), v * tick_seconds);
+	bb = aabb(tick_seconds, tsp);
 
 	//entity attribute changes go here
 	//this is code for collision simulation
@@ -205,4 +210,5 @@ void ModelEntity::colReact()
 	v.set0();
 	spin(-1*rotv());
 }
+
 

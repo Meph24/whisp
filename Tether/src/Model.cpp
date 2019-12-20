@@ -135,30 +135,30 @@ const Mesh& Model::mesh() const
 
 void Model::updateExtent()
 {
-	float max_x, max_y, max_z;
-	max_x = max_y = max_z = 0;
 	auto vert = vertices();
+
+	if(vert.empty()) return;	
+	m_extent.min = vec3(vert.front());
+	m_extent.max = vec3(vert.front());
+
 	for(Vertex v : vert)
 	{
-		if(fabs(v.x) > max_x) max_x = v.x;
-		if(fabs(v.y) > max_y) max_y = v.y;
-		if(fabs(v.z) > max_z) max_z = v.z;
+		if(v.x > m_extent.max.x) m_extent.max.x = v.x;
+		else if( v.x < m_extent.min.x) m_extent.min.x = v.x;
+		if(fabs(v.y) > m_extent.max.y) m_extent.max.y = v.y;
+		else if( v.y < m_extent.min.y) m_extent.min.y = v.y;
+		if(fabs(v.z) > m_extent.max.z) m_extent.max.z = v.z;
+		else if( v.z < m_extent.min.z) m_extent.min.z = v.z;
 	}
-	m_extent = vec3(max_x, max_y, max_z);
 }
 
-const vec3& Model::extent()
+const Model::Extent& Model::extent()
 {
 	if(current_transformation!=transmat)
 	{
 		updateExtent();
 	}
 	return m_extent;
-}
-
-float Model::groundDistance()
-{
-	return -1*extent().y;
 }
 
 void Model::drawBuffered()

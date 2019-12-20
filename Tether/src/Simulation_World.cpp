@@ -510,16 +510,6 @@ Entity* Simulation_World::getTarget(Entity* me)
 	return (Entity *)player;
 }
 
-void Simulation_World::spawnGrounded(ModelEntity* ep, spacevec pos)
-{
-	spacevec thispos = getITerrain()->clip(pos, true);
-	cout << "Clipped pos : " << thispos << '\n';
-	spacelen ground_distance = getIWorld()->fromMeters(ep->groundedDistance());
-	cout << "Ground distance " << ground_distance << '\n';
-	thispos.y -= ground_distance;
-	cout << "Spawn Grounded on location " << thispos << '\n';
-}
-
 void Simulation_World::drawGameOver()//TODO find new home
 {
 	transformViewToGUI();

@@ -91,7 +91,6 @@ public:
 	virtual Entity * getTarget(Entity * me);
 
 	void spawn(Entity *, spacevec);
-	void spawnGrounded(ModelEntity* ep, spacevec pos);
 
 	void loadStandardTex();
 

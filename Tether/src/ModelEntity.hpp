@@ -26,6 +26,8 @@ class ModelEntity : public Entity , public Collider
 
 	vec3 m_rot;
 	vec3 m_rotv;
+
+	bool model_properties_need_update;
 public:
 	ModelEntity(const Model& model);
 	~ModelEntity();
@@ -44,15 +46,26 @@ public:
 
 	spacevec getPos() const;
 
-	//temporary solution to find extent in a certain direction
-	// here the direction is hardcoded to below
-	virtual float groundedDistance();
-
+	
 	virtual void draw(	Timestamp ts, 
 						Frustum* viewFrustum, 
 						IWorld& iw,
 						DrawServiceProvider* dsp
 					 );
+
+	/**
+	 * @brief Calculates the AABB for the managed Model in Space.
+	 * 
+	 * This calculation only is successfull, if changes on pos and v
+	 *	of this ModelEntity have not been done already in the current
+	 *	tick!
+	 *
+	 * @param tick_seconds The time-length of the current tick in seconds.
+	 * @param tsp A Tick Service Provider for relativation.
+	 *
+	 * @return AABB for the current tick.
+	 */
+	AABB aabb(float tick_seconds, TickServiceProvider* tsp);
 
 	virtual void tick(	Timestamp t,
 						TickServiceProvider* tsp

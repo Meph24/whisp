@@ -27,7 +27,13 @@ private:
 	mat4 current_transformation;
 	vector<Vertex> m_vertices;
 	mat4 transmat;
-	vec3 m_extent;
+public:
+	struct Extent
+	{
+		vec3 min, max;
+	};
+private:
+	Extent m_extent;
 public:
 	Model(Mesh* mesh);
 	Model(Mesh* mesh, const mat4& transmat);
@@ -44,11 +50,7 @@ public:
 	vector<EdgeRef> edges();
 	vector<FaceRef> faces();
 
-	/**
-	 * @return Vec3 with maximum occupated space in each direction from mid (radial).
-	 */
-	const vec3& extent();
-	float groundDistance();
+	const Extent& extent();
 
 	void draw();
 	void drawBuffered(); //with buffered objects
