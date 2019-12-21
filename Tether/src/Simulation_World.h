@@ -73,8 +73,8 @@ class Simulation_World: public DrawServiceProvider, public IGameMode
 	void doPhysics(Timestamp t);
 	void restart();
 	void drawGameOver();
-	void doLogic();
-	void doGraphics();
+	void doLogic(Timestamp t);
+	void doGraphics(Timestamp t);
 
 	int test;//TODO remove
 

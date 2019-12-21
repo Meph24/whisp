@@ -486,13 +486,14 @@ void Simulation_World::loop()
 	{
 		restart();
 	}
+	Timestamp t=tm.masterUpdate();
 	if (!(player->HP < 0))
 	{
 		//test=(test+1)%4;
 		//if(!test)
-			doLogic();
+			doLogic(t);
 	}
-	doGraphics();
+	doGraphics(t);
 }
 
 void Simulation_World::trigger(bool pulled)
@@ -531,11 +532,11 @@ void Simulation_World::drawGameOver()//TODO find new home
 	revertView();
 }
 
-void Simulation_World::doLogic()
+void Simulation_World::doLogic(Timestamp t)
 {
 	IWorld * iw=getIWorld();
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
-	Timestamp t=tm.masterUpdate();
+	//Timestamp t=tm.masterUpdate();
 
 	static Timestamp last=t;
 
@@ -554,7 +555,7 @@ void Simulation_World::doLogic()
 	last=t;
 }
 
-void Simulation_World::doGraphics()
+void Simulation_World::doGraphics(Timestamp t)
 {
 	IWorld * iw=getIWorld();
 
@@ -566,7 +567,7 @@ void Simulation_World::doGraphics()
 	}
 	else
 	{
-		Timestamp t=tm.getSlaveTimestamp();
+		//Timestamp t=tm.getSlaveTimestamp();
 		pmGraphics->registerTime(PM_GRAPHICS_OUTSIDE);
 		render(t);
 		pmGraphics->registerTime(PM_GRAPHICS_WORLD);
