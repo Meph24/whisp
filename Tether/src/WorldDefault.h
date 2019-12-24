@@ -15,12 +15,16 @@
 
 class WorldDefault: public IWorld
 {
-	std::vector<Entity *> entities;
+	std::vector<Entity *> managedEntities;
 public:
 	WorldDefault();
 	virtual ~WorldDefault();
 
-	virtual void requestEntitySpawn(Entity * e);
+	void requestEntitySpawn(Entity * e);
+	void clearEntities();
+	void tick(Timestamp t,TickServiceProvider * tsp);
+	void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void postTick(TickServiceProvider * tsp);
 };
 
 #endif /* SRC_WORLDDEFAULT_H_ */

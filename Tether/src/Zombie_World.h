@@ -13,6 +13,7 @@ class DebugScreen;
 class EntityPlayer;
 class TexParamSet;
 class IWorld;
+class WorldDefault;
 
 #include <SFML/Window.hpp>
 
@@ -41,6 +42,7 @@ class Zombie_World: public DrawServiceProvider, public IGameMode
 	DebugScreen * dsLogic;
 	DebugScreen * dsGraphics;
 
+	WorldDefault * wd;
 	ChunkManager * cm;
 
 	ITexture * zombieTex;
@@ -61,8 +63,8 @@ class Zombie_World: public DrawServiceProvider, public IGameMode
 	void spawnZombie(Timestamp t);
 	void restart();
 	void drawGameOver();
-	void doLogic();
-	void doGraphics();
+	void doLogic(Timestamp t);
+	void doGraphics(Timestamp t);
 
 public:
 

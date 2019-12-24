@@ -21,6 +21,7 @@ class Mesh;
 class TexParamSet;
 class IWorld;
 class TerrainDummy;
+class WorldDefault;
 
 #include <SFML/Window.hpp>
 
@@ -50,7 +51,8 @@ class Simulation_World: public DrawServiceProvider, public IGameMode
 	DebugScreen * dsLogic;
 	DebugScreen * dsGraphics;
 
-	ChunkManager * cm;
+	WorldDefault * wd;
+//	ChunkManager * cm;
 	TerrainDummy * td;
 
 	vector<unique_ptr<Mesh>> meshes;

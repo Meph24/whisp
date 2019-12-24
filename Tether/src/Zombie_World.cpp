@@ -39,6 +39,7 @@ extern Zombie_MouseInput* mouseInput;
 #include "EntityProjectileBulletLike.h"
 #include "Frustum.h"
 #include "WarnErrReporter.h"
+#include "WorldDefault.h"
 
 #include <iostream>
 
@@ -51,6 +52,7 @@ Zombie_World::Zombie_World(sf::Window * w)
 	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
 	std::cout<<"testStart"<<std::endl;
 	cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
+	wd=new WorldDefault();
 	spawnZombies=true;
 	zCount = *cfg.getInt("test", "zombies");
 	zombieDist = *cfg.getInt("test", "zombieDist");
@@ -149,6 +151,7 @@ Zombie_World::~Zombie_World()
 {
 	//missing deletes (one-time tier 1 code, so who cares)
 	delete cm;
+	delete wd;
 
 	delete dsLogic;
 	delete dsGraphics;
@@ -249,13 +252,14 @@ void Zombie_World::loop()
 	{
 		restart();
 	}
+	Timestamp t=tm.masterUpdate();
 	if (!(player->HP < 0))
 	{
 		//test=(test+1)%4;
 		//if(!test)
-			doLogic();
+			doLogic(t);
 	}
-	doGraphics();
+	doGraphics(t);
 }
 
 
@@ -335,10 +339,10 @@ void Zombie_World::drawGameOver()//TODO find new home
 	revertView();
 }
 
-void Zombie_World::doLogic()
+void Zombie_World::doLogic(Timestamp t)
 {
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
-	Timestamp t=tm.masterUpdate();
+//	Timestamp t=tm.masterUpdate();
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
 	player->guns[player->currentGun]->tick(t,player->cam,player,shot,*getIWorld());
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
@@ -352,7 +356,7 @@ void Zombie_World::doLogic()
 	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);//TODO fix perf measurements
 }
 
-void Zombie_World::doGraphics()
+void Zombie_World::doGraphics(Timestamp t)
 {
 	IWorld * iw=getIWorld();
 
@@ -364,7 +368,7 @@ void Zombie_World::doGraphics()
 	}
 	else
 	{
-		Timestamp t=tm.getSlaveTimestamp();
+//		Timestamp t=tm.getSlaveTimestamp();
 		pmGraphics->registerTime(PM_GRAPHICS_OUTSIDE);
 		render(t);
 		pmGraphics->registerTime(PM_GRAPHICS_WORLD);
@@ -395,7 +399,7 @@ ICamera3D* Zombie_World::getHolderCamera()
 
 IWorld* Zombie_World::getIWorld()
 {
-	return (IWorld *)cm;
+	return (IWorld *)wd;//cm;
 }
 
 ITerrain* Zombie_World::getITerrain()
