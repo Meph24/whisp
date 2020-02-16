@@ -176,7 +176,7 @@ base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 	size.z.intpart=0;
 	size.y=(maxConv-minConv)*0.5f;
 	bb=AABB(middle,size);
-	interMan=new InteractionManager(base);
+	interMan=new InteractionManager(base,cm);
 
 	/*int smallSize=size-1;
 	int vertices=3*4*smallSize*smallSize;

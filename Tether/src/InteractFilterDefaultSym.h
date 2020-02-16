@@ -27,7 +27,8 @@ public:
 };
 
 template<typename PhysicsIF>
-inline InteractFilterDefaultSym<PhysicsIF>::InteractFilterDefaultSym()
+inline InteractFilterDefaultSym<PhysicsIF>::InteractFilterDefaultSym():
+group(this)
 {}
 
 template<typename PhysicsIF>

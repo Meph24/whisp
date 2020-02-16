@@ -60,6 +60,25 @@ void WorldDefault::tick(Timestamp t, TickServiceProvider* tsp)
 
 void WorldDefault::postTick(TickServiceProvider* tsp)
 {
+	auto size=managedEntities.size();
+	for(auto i=size*0;i<size;i++)
+	{
+		auto size2=deleteVec.size();
+		for(auto j=size2*0;j<size2;j++)
+		{
+			if(deleteVec[j]==managedEntities[i])
+			{
+				delete managedEntities[i];
+				managedEntities[i]=managedEntities[size-1];
+				managedEntities.pop_back();
+				deleteVec[j]=deleteVec[size2-1];
+				deleteVec.pop_back();
+				i--;
+				break;
+			}
+		}
+		size=managedEntities.size();
+	}
 }
 
 void WorldDefault::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
