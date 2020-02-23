@@ -24,10 +24,6 @@ class ModelEntity : public Entity , public Collider
 {
 	Model m_model;
 
-	vec3 m_rot;
-	vec3 m_rotv;
-
-	bool model_properties_need_update;
 public:
 	ModelEntity(const Model& model);
 	~ModelEntity();
@@ -35,17 +31,7 @@ public:
 	Model& model();
 
 	void move(spacevec d);
-
-	const vec3& rot() const;
-	const vec3& rotv() const;
-	
-	void rotate(vec3 rotation);
-	void spin(vec3 rotational_velocity);
-
-	void resetRotation(bool reset_rotv = true);
-
 	spacevec getPos() const;
-
 	
 	virtual void draw(	Timestamp ts, 
 						Frustum* viewFrustum, 
@@ -72,9 +58,19 @@ public:
 					 );
 
 	//ColliderInterface
-	Model* colModel();
-	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
-	void colReact();
+	Collider::TYPE colliderType() const; 
+
+	unsigned int numVertices() const;
+	
+	vector<Vertex> vertices (float tick_time, const vector<unsigned int>* indices = nullptr) const;
+
+	vector<EdgeRef> (float tick_time, const vector<unsigned int>* indices = nullptr) const;
+
+	vector<FaceRef> (float tick_time, const vector<unsigned int>* indices = nullptr) const;
+
+	spacevec getPosition(float tick_time) const;
+
+	void collisionReaction(float tick_time, const vec3& pos);
 };
 
 #endif /* ENTITYDIAMOND_HPP */

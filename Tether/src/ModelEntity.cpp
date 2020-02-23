@@ -156,60 +156,113 @@ void ModelEntity::tick	(
 
 // implementation of the Collider Interface
 
-Model* ModelEntity::colModel()
-{
-	return &(model());
-}
-
-void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
+void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
 	vec3 o0_pos, o1_pos, o0_v, o1_v;
+	//rel
 	o0_pos = vec3(0.0f, 0.0f, 0.0f);
+	o1_pos = tsp.getIWorld()->toMeters( other.pIF->getPosition(0.0f) - getPosition(0.0f));
+
+	o0_v = tsp.getIWorld()->toMeters(getPosition(delta_time) - getPosition(0.0f)) / delta_time;
+	o1_v = tsp.getIWorld()->toMeters(other.pIF->getPosition(delta_time) - other.pIF->getPosition(0.0f)) / delta_time;
 
 	//rel
-	o1_pos = tsp.getIWorld()->toMeters( other.pIF->colSavedPos() - colSavedPos());
+	o1_v = o1_v - o0_v;
 	o0_v = vec3(0.0f, 0.0f, 0.0f);
-
+ 
 	//rel
-	o1_v = tsp.getIWorld()->toMeters( other.pIF->colSavedV() - colSavedV() );
+	vec3 o1_v = (o0)
+	o1_v = tsp.getIWorld()->toMeters( );
 
 
 	vector<collisionl2::SubmodelCollision> collisions = 
-		collisionl2::linearInterpolation(
-				0.0, delta_time,
-				*(colModel()), *(other.pIF->colModel()),
-				o0_pos, o1_pos, o0_v, o1_v
-			);
+		collisionl2::linearInterpolation( delta_time, tsp.getIWorld(), (Collider*) this, other.pIF);
+}
 
-	if(collisions.empty()) return;
 
-	//l3 collision resolvance (simple)
-	//get the first collision time
+Collider::TYPE ModelEntity::colliderType() const { return Collider::TYPE::rigid; }
 
-	//move the objects to the time of the first collision
-	// only by percentage to avoid further collisions
-	auto min_e = std::min_element(collisions.begin(), collisions.end());
+unsigned int ModelEntity::numVertices() const {return m_model.mesh().vertices.size();}
 
-	if(min_e->time > delta_time)
+vector<Vertex> ModelEntity::vertices (float tick_time, const vector<unsigned int>* indices = nullptr) const
+{
+	if(!indices)
 	{
-		cerr << "ERROR : Collision to later time than tick!\n";
+		vertices = m_model.mesh().vertices;
+	}
+	else
+	{
+		vector<Vertex> vertices;
+vertices.reserve(indices->size());
+		for(unsigned int i : *indices)
+		{
+			vertices.push_back(m_model.mesh().vertices[i];
+		}
+	}
+	return vertices;
+}
+
+
+vector<EdgeRef> ModelEntity::edges(float tick_time, const vector<unsigned int>* indices = nullptr) const
+{
+	if(!indices)
+	{
+		return m_model.edges();
+	}
+	else
+	{
+		std::set<unsigned int> inclusion (indices.begin(), indices.end());
+		for(auto& e : m_model.edges())
+		{
+			vector<EdgeRef> edges;
+			if(inclusion.find(e[0]) == inclusion.end() || inclusion.find(e[1] == inclusion.end()))
+				continue;
+			else
+			{
+				edges.push_back(e);
+			}
+		}
+
+		return edges;
 	}
 
-	float step_to_collision =min_e->time * 0.9999;
-	
-
-	this->pos = colSavedPos() + colSavedV() * step_to_collision;
-	other.e->pos = other.pIF->colSavedPos() + other.pIF->colSavedV() * step_to_collision;
-
-	//cancel further movements
-	this->colReact();
-	other.pIF->colReact();
 }
 
-void ModelEntity::colReact()
+vector<FaceRef> ModelEntity::faces(float tick_time, const vector<unsigned int>* indices = nullptr) const
 {
-	v.set0();
-	spin(-1*rotv());
+	if(!indices)
+	{
+		return m_model.faces();
+	}
+	else
+	{
+		std::set<unsigned int> inclusion (indices.begin(), indices.end());
+		for(auto& e : m_model.faces())
+		{
+			vector<FaceRef> faces;
+			if(	inclusion.find(e[0]) == inclusion.end() || 
+				inclusion.find(e[1]) == inclusion.end() || 
+				inclusion.find(e[2]) == inclusion.end()	)
+				continue;
+			else
+			{
+				faces.push_back(e);
+			}
+		}
+
+		return faces;
+	}
 }
 
 
+void spacevec ModelEntity::getPosition(float tick_time) const
+{
+	return oldPos + tick_time * oldV
+}
+
+
+virtual void ModelEntity::collisionReaction(float tick_time, const vec3& pos)
+{
+	pos = getPosition(tick_time);
+	v.set0();
+}

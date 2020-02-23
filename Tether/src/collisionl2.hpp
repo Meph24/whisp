@@ -63,37 +63,23 @@ struct SubmodelCollision
 
 void linearInterpolationFaceVertex(
 		vector<SubmodelCollision>& colls_out,
-		float t0, float dt,
-		Model& m0, Model& m1,
-		const vec3& pos1_t0, const vec3& pos1_t1,
-		bool reverse = false
+		float delta_time,
+		Collider* c0, Collider* c1,
+		vec3 o0_pos, vec3 o1_pos, vec3 o0_dpos, vec3 o1_dpos;
 	);
-
 
 void linearInterpolationEdgeEdge(
 		vector<SubmodelCollision>& colls_out,
-		float t0, float dt,
-		Model& m0, Model& m1,
-		const vec3& pos1_t0, const vec3& pos1_t1
+		float delta_time,
+		Collider* c0, Collider* c1,
+		vec3 o0_pos, vec3 o1_pos, vec3 o0_dpos, vec3 o1_dpos;
 	);
 
-vector<SubmodelCollision> linearInterpolation(
-		float t0, float t1,
-		Model& m0, Model& m1,
-		const vec3& pos0, const vec3& pos1,
-		const vec3& v0, const vec3& v1
-		);
-
-
-//Deprecated !!!
-//not usable with Interaction Management!
-//this uses the pos- values which are not used used with interaction management
 vector<SubmodelCollision> linearInterpolation(	
-		float t0, float t1,
+		float delta_time;,
 		IWorld* iworld,
-		ModelEntity& m0, ModelEntity& m1
+		Collider* c0, Collider* c1
 	);
-
 
 }/* namespace collisionl2 */
 #endif /* COLLISIONL2_HPP */

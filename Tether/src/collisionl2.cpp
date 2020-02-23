@@ -196,27 +196,21 @@ void linearInterpolationEdgeEdge(
 }
 
 vector<SubmodelCollision> linearInterpolation(
-		float t0, float t1,
-		Model& m0, Model& m1,
-		const vec3& pos0, const vec3& pos1,
-		const vec3& v0, const vec3& v1
+		float dt, IWorld* iworld,	
+		const Collider& c0, const Collider& c1
 		)
 {
 	vector<SubmodelCollision> colls;
 
-	float dt = t1 - t0;
+	vec3 o0_pos, o1_pos, o0_dpos, o1_dpos;
+	o0_pos = vec3(0.0f, 0.0f, 0.0f);
 
-	// r0 here means we're relative to m0, while it resides at 0
-	vec3 r0_pos1_t0 = pos1 - pos0;
-	vec3 r0_v1 = v1 - v0;
-	
-	vec3 r0_pos1_t1 = r0_pos1_t0 + dt * r0_v1;
+	//relativate position of the second object to the first
+	o1_pos = tsp.getIWorld()->toMeters( other.pIF->getPosition(0.0f) - getPosition(0.0f));
 
-	//same is needed relative to m1, for the second face_vertex step	
-	vec3 r1_pos0_t0 = pos0 - pos1;
-	vec3 r1_v0 = v0 - v1;
+	o0_dpos = tsp.getIWorld()->toMeters(getPosition(dt) - getPosition(0.0f));
+	o1_dpos = tsp.getIWorld()->toMeters(other.pIF->getPosition(dt) - other.pID->getPosition(0.0f)); 
 
-	vec3 r1_pos0_t1 = r1_pos0_t0 + dt* r1_v0;
 
 	
 	linearInterpolationEdgeEdge	(	colls, 
@@ -236,21 +230,6 @@ vector<SubmodelCollision> linearInterpolation(
 									);
 	
 	return colls;
-}
-
-vector<SubmodelCollision> linearInterpolation(	
-		float t0, float t1,
-		IWorld* iworld,
-		ModelEntity& m0, ModelEntity& m1
-	)
-{
-	return linearInterpolation	(	t0, t1,
-									m0.model(), m1.model(),
-									iworld->toMeters(m0.pos),
-									iworld->toMeters(m1.pos),
-									iworld->toMeters(m0.v),
-									iworld->toMeters(m1.v)
-								);
 }
 
 } /* namespace collisionl2 */
