@@ -69,54 +69,34 @@ bool SubmodelCollision::operator<=(const SubmodelCollision& other)
 	return !((*this)>other);
 }
 
-bool SubmodelCollision::isVertexFace() const
-{
-	return	(	feat0.type == CollisionFeature::TYPE::Face
-			&&	feat1.type == CollisionFeature::TYPE::Vertex
-			)
-			||
-			(	feat1.type == CollisionFeature::TYPE::Face
-			&&	feat0.type == CollisionFeature::TYPE::Vertex
-			);
-}
-
-bool SubmodelCollision::isEdgeEdge() const
-{
-	return	(	feat0.type == CollisionFeature::TYPE::Edge
-			&&	feat1.type == CollisionFeature::TYPE::Edge
-			);
-}
-
-
-void linearInterpolationFaceVertex(
+void linearInterpolation_R0_FaceVertex(
 		vector<SubmodelCollision>& colls_out,
-		float t0, float dt,
-		Model& m0, Model& m1,
-		const vec3& pos1_t0, const vec3& pos1_t1,
-		bool reverse
+		float t0, float t1,
+		const Collider& c0, const Collider& c1,
+		const vec3& r0_c1_pos_t0, const vec3& r0_c1_pos_t1
 	)
 {
+	float dt = t1 - t0;
 	vec3 pos, coeff;
-	auto m0_faces = m0.faces();
-	if(!m0_faces.size()) return;
-	auto& m1_vertices = m1.vertices();
-	if(!m1_vertices.size()) return;
-	for(FaceRef fr0 : m0_faces)
+	const auto c0_faces = c0.faces(t0);
+	if(c0_faces.empty()) return;
+	const auto c1_vertices = c1.vertices(t0);
+	if(!c1_vertices.empty()) return;
+
+	const auto& c0_vertices = c0.vertices(t0);
+	for(FaceRef fr0 : c0_faces)
 	{
-		Face f = fr0.face(m0.vertices().begin(), m0.vertices().end());
+		Face f = fr0.face(c0_vertices.begin(), c0_vertices.end());
 
 		unsigned int vertex_index = 0;
-		for(Vertex p : m1_vertices)
+		for(Vertex p : c1_vertices)
 		{
 			//Vertex is dragged trhough time resuting in
 			//	a Line of swept space
-			Vertex p_t0 = p + pos1_t0;
-			Vertex p_t1 = p + pos1_t1;
-
 			if	(lineIntersectsTriangle
 					(
 						vec3(f[0]), vec3(f[1] - f[0]), vec3(f[2] - f[0]),
-						vec3(p_t0), vec3(p_t1 - p_t0),
+						vec3(p + r0_c1_pos_t0), vec3(p + r0_c1_pos_t1),
 						&pos, &coeff
 					)
 				)
@@ -130,8 +110,8 @@ void linearInterpolationFaceVertex(
 				(	
 					t0 + coeff.z*dt,	//time
 					pos,				//pos
-					(reverse)? CollisionFeature(vertex_index) : CollisionFeature(fr0),
-					(reverse)? CollisionFeature(fr0) : CollisionFeature(vertex_index)
+					CollisionFeature(fr0),
+				   	CollisionFeature(vertex_index)
 				);
 			}
 			vertex_index++;
@@ -139,36 +119,41 @@ void linearInterpolationFaceVertex(
 	}
 }
 
-void linearInterpolationEdgeEdge(
+void linearInterpolation_R0_EdgeEdge(
 		vector<SubmodelCollision>& colls_out,
-		float t0, float dt,
-		Model& m0, Model& m1,
-		const vec3& pos1_t0, const vec3& pos1_t1
+		float t0, float t1,
+		const Collider& c0, const Collider& c1,
+		const vec3& r0_c1_pos_t0, const vec3& r0_c1_pos_t1
 	)
 {
+	float dt = t1 - t0;
 	vec3 pos, coeff;
-	auto m0_edges = m0.edges();
-	if(!m0_edges.size()) return;
-	auto m1_edges = m1.edges();
-	if(!m1_edges.size()) return;
 
-	for(EdgeRef er0 : m0_edges)
+	const auto c0_edges = c0.edges(t0);
+	if(c0_edges.empty()) return;
+	const auto c1_edges = c1.edges(t0);
+	if(c1_edges.empty()) return;
+
+	const auto c0_vertices = c0.vertices(t0);
+	const auto c1_vertices = c1.vertices(t0);
+
+	for(EdgeRef er0 : c0_edges)
 	{
-		Edge e0 = er0.edge(m0.vertices().begin(), m0.vertices().end());
+		Edge e0 = er0.edge(c0_vertices.begin(), c0_vertices.end());
 
-		for(EdgeRef er1 : m1_edges)
+		for(EdgeRef er1 : c1_edges)
 		{
 			//edge of m1 is dragged through time, resulting in
 			//	a parallelogram of swept space
 			//	with a base Edge of:
 			Edge e1_t0 = 
-				er1.edge(m1.vertices().begin(), m1.vertices().end())
-				* glm::translate(pos1_t0);
+				er1.edge(c1_vertices.begin(), c1_vertices.end())
+				* glm::translate(r0_c1_pos_t0);
 
 			//and a translated vertex defining the opposite edge
 			Vertex v1_t1 = 
-				er1.edge(m1.vertices().begin(), m1.vertices().end())[0]
-				+ pos1_t1;
+				er1.edge(c1_vertices.begin(), c1_vertices.end())[0]
+				+ r0_c1_pos_t1;
 
 			if	(	lineIntersectsParallelogram
 					(	vec3(e1_t0[0]),
@@ -195,39 +180,58 @@ void linearInterpolationEdgeEdge(
 	}
 }
 
-vector<SubmodelCollision> linearInterpolation(
-		float dt, IWorld* iworld,	
+vector<SubmodelCollision> linearInterpolation_R0(
+		float t0, float t1, IWorld* iworld,	
 		const Collider& c0, const Collider& c1
 		)
 {
 	vector<SubmodelCollision> colls;
 
-	vec3 o0_pos, o1_pos, o0_dpos, o1_dpos;
-	o0_pos = vec3(0.0f, 0.0f, 0.0f);
+	spacevec c0_pos, c1_pos;
+	vec3 c0_dpos, c1_dpos;
 
-	//relativate position of the second object to the first
-	o1_pos = tsp.getIWorld()->toMeters( other.pIF->getPosition(0.0f) - getPosition(0.0f));
+	c0_pos = c0.getPosition(t0);
+	c1_pos = c1.getPosition(t0);
 
-	o0_dpos = tsp.getIWorld()->toMeters(getPosition(dt) - getPosition(0.0f));
-	o1_dpos = tsp.getIWorld()->toMeters(other.pIF->getPosition(dt) - other.pID->getPosition(0.0f)); 
+	c0_dpos = iworld->toMeters(c0.getPosition(t1) - c0_pos);
+	c1_dpos = iworld->toMeters(c1.getPosition(t1) - c1_pos);
+
+
+	//relative r[Relative collider number]_c[Collider]_[Collider member]_[at time]
+	vec3 r0_c1_pos_t0 = iworld->toMeters(c1_pos - c0_pos);
+	vec3 r0_c1_pos_t1 =	r0_c1_pos_t0 + c1_dpos;
+
+	vec3 r1_c0_pos_t0 = iworld->toMeters(c0_pos - c1_pos);
+	vec3 r1_c0_pos_t1 = r1_c0_pos_t0 + c0_dpos;
 
 
 	
-	linearInterpolationEdgeEdge	(	colls, 
-									t0, dt, m0, m1, 
-									r0_pos1_t0, r0_pos1_t1
+	linearInterpolation_R0_EdgeEdge	(	colls, 
+									t0, t1, c0, c1, 
+									r0_c1_pos_t0, r0_c1_pos_t1
 								);
 
-	linearInterpolationFaceVertex	(	colls, 
-										t0, dt, m0, m1, 
-										r0_pos1_t0, r0_pos1_t1
+	linearInterpolation_R0_FaceVertex(	colls, 
+										t0, t1, c0, c1, 
+										r0_c1_pos_t0, r0_c1_pos_t1
+									);
+
+	vector<SubmodelCollision> temp_colls;	
+	linearInterpolation_R0_FaceVertex	(	temp_colls, 
+										t0, t1, c1, c0,
+										r1_c0_pos_t0, r1_c0_pos_t1
 									);
 	
-	linearInterpolationFaceVertex	(	colls, 
-										t0, dt, m1, m0, 
-										r1_pos0_t0, r1_pos0_t1,
-										true //give out features in reverse as m0 is m1 and m1 is m0 
-									);
+	//swap the features in the output of the call with switched out Colliders
+	for(SubmodelCollision& sc : temp_colls)
+	{
+		//the positions are stored relative to c1, while function demands relativity to c0 => rerelativate to c0
+		sc.pos = r0_c1_pos_t0 + sc.pos;
+		//Collision features are stored in reverse in this last call to FaceVertex Interpolation
+		std::swap(sc.feat0, sc.feat1);
+	}
+	//append vector
+	colls.insert(colls.end(), temp_colls.begin(), temp_colls.end());
 	
 	return colls;
 }

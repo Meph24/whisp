@@ -22,13 +22,15 @@ using glm::vec4;
 
 class ModelEntity : public Entity , public Collider
 {
-	Model m_model;
+	const Model& m_model;
+
+	spacevec tick_begin_pos, tick_begin_v;
 
 public:
 	ModelEntity(const Model& model);
 	~ModelEntity();
 
-	Model& model();
+	const Model& model();
 
 	void move(spacevec d);
 	spacevec getPos() const;
@@ -58,19 +60,22 @@ public:
 					 );
 
 	//ColliderInterface
+	
+	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
+
 	Collider::TYPE colliderType() const; 
 
 	unsigned int numVertices() const;
 	
 	vector<Vertex> vertices (float tick_time, const vector<unsigned int>* indices = nullptr) const;
 
-	vector<EdgeRef> (float tick_time, const vector<unsigned int>* indices = nullptr) const;
+	vector<EdgeRef> edges(float tick_time, const vector<unsigned int>* indices = nullptr) const;
 
-	vector<FaceRef> (float tick_time, const vector<unsigned int>* indices = nullptr) const;
+	vector<FaceRef> faces(float tick_time, const vector<unsigned int>* indices = nullptr) const;
 
 	spacevec getPosition(float tick_time) const;
 
-	void collisionReaction(float tick_time, const vec3& pos);
+	void collisionReaction(float tick_time);
 };
 
 #endif /* ENTITYDIAMOND_HPP */

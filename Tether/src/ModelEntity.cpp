@@ -21,66 +21,21 @@ using glm::vec4;
 using glm::vec3;
 using glm::mat4;
 
-Model& ModelEntity::model()
+const Model& ModelEntity::model()
 {
 	return m_model;
 }
 
 ModelEntity::ModelEntity(const Model& model)
 :
-	m_model(model),
-	m_rot(0.0f, 0.0f, 0.0f),
-	m_rotv(0.0f, 0.0f, 0.0f)
+	m_model(model)
 {
 	surviveClearing = true;
-
 	v.set0();
 }
 
 ModelEntity::~ModelEntity()
 {}
-
-void ModelEntity::move(spacevec distance)
-{
-	this->pos += distance;
-}
-
-const vec3& ModelEntity::rot() const
-{
-	return m_rot;
-}
-
-const vec3& ModelEntity::rotv() const
-{
-	return m_rotv;
-}
-
-void ModelEntity::resetRotation(bool reset_rotv)
-{
-	if(reset_rotv) m_rotv = vec3(0.0f, 0.0f, 0.0f);
-	rotate(-1 * m_rot);
-}
-
-void ModelEntity::rotate(vec3 rotation)
-{
-	m_rot += rotation;
-	m_model.transMat() = m_model.transMat() * 
-		(
-		  glm::rotateDeg(rotation.x, glm::vec3(1, 0, 0))
-		* glm::rotateDeg(rotation.y, glm::vec3(0, 1, 0))
-		* glm::rotateDeg(rotation.z, glm::vec3(0, 0, 1))
-		);
-}
-
-void ModelEntity::spin(vec3 rotational_velocity)
-{
-	m_rotv += rotational_velocity;
-}
-
-spacevec ModelEntity::getPos() const
-{
-	return this->pos;
-}
 
 void ModelEntity::draw(	
 					Timestamp ts, 
@@ -129,10 +84,11 @@ void ModelEntity::tick	(
 	float tick_seconds = t - lastTick;
 	lastTick = t;
 
+	tick_begin_pos = pos;
+	tick_begin_v = v;
+
 	//the collider needs to save the old state of the entity
 	//to use it for its calculations
-	Collider::State old_state {pos, v};
-	Collider::saveState(old_state);
 
 	IWorld* iw = tsp->getIWorld();
 	bb = aabb(tick_seconds, tsp);
@@ -144,10 +100,7 @@ void ModelEntity::tick	(
 		v = v * -1.0f;
 
 	//apply pos by velocity
-	move(v*tick_seconds);
-
-	//apply rotation by rotational velocity
-	rotate(m_rotv * tick_seconds);
+	pos += v*tick_seconds;
 
 	iw->collideAlgo->doChecks(
 			(Collider*) this, (Entity*) this,
@@ -156,27 +109,20 @@ void ModelEntity::tick	(
 
 // implementation of the Collider Interface
 
-void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
+void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
-	vec3 o0_pos, o1_pos, o0_v, o1_v;
-	//rel
-	o0_pos = vec3(0.0f, 0.0f, 0.0f);
-	o1_pos = tsp.getIWorld()->toMeters( other.pIF->getPosition(0.0f) - getPosition(0.0f));
-
-	o0_v = tsp.getIWorld()->toMeters(getPosition(delta_time) - getPosition(0.0f)) / delta_time;
-	o1_v = tsp.getIWorld()->toMeters(other.pIF->getPosition(delta_time) - other.pIF->getPosition(0.0f)) / delta_time;
-
-	//rel
-	o1_v = o1_v - o0_v;
-	o0_v = vec3(0.0f, 0.0f, 0.0f);
- 
-	//rel
-	vec3 o1_v = (o0)
-	o1_v = tsp.getIWorld()->toMeters( );
-
-
 	vector<collisionl2::SubmodelCollision> collisions = 
-		collisionl2::linearInterpolation( delta_time, tsp.getIWorld(), (Collider*) this, other.pIF);
+		collisionl2::linearInterpolation_R0(0.0f, delta_time, tsp.getIWorld(), (Collider*) this, other.pIF);
+
+	if(collisions.empty()) return;
+
+	auto min_e = std::min_element(collisions.begin(), collisions.end());
+	
+	if (min_e->time > delta_time)
+		cerr << "ERROR : Collision to later time than tick!\n";
+
+	collisionReaction(min_e->time);
+	other.pIF->collisionReaction(min_e->time);
 }
 
 
@@ -257,12 +203,12 @@ vector<FaceRef> ModelEntity::faces(float tick_time, const vector<unsigned int>* 
 
 void spacevec ModelEntity::getPosition(float tick_time) const
 {
-	return oldPos + tick_time * oldV
+	return tick_begin_pos + tick_time * tick_begin_v;
 }
 
 
-virtual void ModelEntity::collisionReaction(float tick_time, const vec3& pos)
+virtual void ModelEntity::collisionReaction(float tick_time)
 {
-	pos = getPosition(tick_time);
+	pos = getPosition(tick_time*0.9999);
 	v.set0();
 }

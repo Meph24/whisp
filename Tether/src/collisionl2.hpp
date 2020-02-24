@@ -56,30 +56,26 @@ struct SubmodelCollision
 	bool operator>(const SubmodelCollision& other);
 	bool operator<=(const SubmodelCollision& other);
 	bool operator>=(const SubmodelCollision& other);
-
-	bool isVertexFace() const;
-	bool isEdgeEdge() const;
 };
 
-void linearInterpolationFaceVertex(
+void linearInterpolation_R0_FaceVertex(
 		vector<SubmodelCollision>& colls_out,
-		float delta_time,
-		Collider* c0, Collider* c1,
-		vec3 o0_pos, vec3 o1_pos, vec3 o0_dpos, vec3 o1_dpos;
+		float t0, float t1,
+		const Collider& c0, const Collider& c1,
+		const vec3& r0_c1_pos_t0, const vec3& r0_c1_pos_t1
 	);
 
-void linearInterpolationEdgeEdge(
+void linearInterpolation_R0_EdgeEdge(
 		vector<SubmodelCollision>& colls_out,
-		float delta_time,
-		Collider* c0, Collider* c1,
-		vec3 o0_pos, vec3 o1_pos, vec3 o0_dpos, vec3 o1_dpos;
+		float t0, float t1,
+		const Collider& c0, const Collider& c1,
+		const vec3& r0_c1_pos_t0, const vec3& r0_c1_pos_t1
 	);
 
-vector<SubmodelCollision> linearInterpolation(	
-		float delta_time;,
-		IWorld* iworld,
-		Collider* c0, Collider* c1
-	);
+vector<SubmodelCollision> linearInterpolation_R0(
+		float t0, float t1, IWorld* iworld,	
+		const Collider& c0, const Collider& c1
+		);
 
 }/* namespace collisionl2 */
 #endif /* COLLISIONL2_HPP */

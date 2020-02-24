@@ -1,10 +1,15 @@
 #ifndef SRC_COLLIDER_H_
 #define SRC_COLLIDER_H_
 
+#include <vector>
+
 class Entity;
 class TickServiceProvider;
 #include "Spacevec.h"
 #include "DualPointer.h"
+#include "GeoFeatures.hpp"
+
+using std::vector;
 
 /**
  * @brief This is the Interface for any Entity that wants to be a Collider.
@@ -58,11 +63,12 @@ public:
 	 */
 	virtual vector<FaceRef> faces (float tick_time, const vector<unsigned int>* indices = nullptr) const = 0;
 
-	spacevec getPosition(float tick_time) const = 0;
+	virtual spacevec getPosition(float tick_time) const = 0;
 
 	//TODO add metadata support or metadata support interface to the collision Reaction Call
-	//metadata would include collision force, materials invoved, etc. in a more advanced version of this project
-	virtual void collisionReaction(float tick_time,const vec3& pos) = 0;
+	//metadata would include collision force, materials invoved, etc. in a more advanced version of this project also position
+	//currently only time is important ... this part of the interface is therefor especially subject to change
+	virtual void collisionReaction(float tick_time) = 0;
 
 	virtual ~Collider() = default;
 };
