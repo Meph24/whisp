@@ -6,7 +6,6 @@
 #include "Mesh.hpp"
 #include <GL/glew.h>
 
-#include "CumulativeMat.hpp"
 #include "GeoFeatures.hpp"
 
 using std::pair;

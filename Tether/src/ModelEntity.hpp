@@ -7,7 +7,6 @@
 
 #include "Model.hpp"
 #include "Timestamp.h"
-#include "CumulativeMat.hpp"
 
 #include "Collider.hpp"
 
@@ -62,11 +61,11 @@ public:
 
 	Collider::TYPE type() const; 
 	
-	vector<Vertex> vertices (float tick_time, const vector<unsigned int>* indices = nullptr) const;
+	vector<Vertex> vertices (float tick_time) const;
 
-	vector<EdgeRef> edges(float tick_time, const vector<unsigned int>* indices = nullptr) const;
+	vector<EdgeRef> edges(float tick_time) const;
 
-	vector<FaceRef> faces(float tick_time, const vector<unsigned int>* indices = nullptr) const;
+	vector<FaceRef> faces(float tick_time) const;
 
 	spacevec position(float tick_time) const;
 

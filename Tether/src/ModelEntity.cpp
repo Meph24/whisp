@@ -47,7 +47,6 @@ void ModelEntity::draw(
 {
 	float tickOffset = ts-lastTick;
 	if(!viewFrustum->inside(bb,iw)) return;
-	std::cout<<"tickOffset: "<<tickOffset<<std::endl;
 	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;
 	vec3 interPosMeters = iw.toMeters(interPos);
 
@@ -129,73 +128,19 @@ void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickSer
 
 Collider::TYPE ModelEntity::type() const { return Collider::TYPE::rigid; }
 
-vector<Vertex> ModelEntity::vertices (float tick_time, const vector<unsigned int>* indices) const
+vector<Vertex> ModelEntity::vertices (float tick_time) const
 {
-	if(!indices)
-	{
-		return m_model.vertices();
-	}
-	else
-	{
-		vector<Vertex> out_vertices;
-		out_vertices.reserve(indices->size());
-		for(unsigned int i : *indices)
-		{
-			out_vertices.push_back(m_model.vertices()[i]);
-		}
-		return out_vertices;
-	}
+	return m_model.vertices();
 }
 
-
-vector<EdgeRef> ModelEntity::edges(float tick_time, const vector<unsigned int>* indices) const
+vector<EdgeRef> ModelEntity::edges(float tick_time) const
 {
-	if(!indices)
-	{
-		return m_model.edges();
-	}
-	else
-	{
-		std::set<unsigned int> inclusion (indices->begin(), indices->end());
-		vector<EdgeRef> edges;
-		for(auto& e : m_model.edges())
-		{
-			if(inclusion.find(e[0]) == inclusion.end() || inclusion.find(e[1]) == inclusion.end())
-				continue;
-			else
-			{
-				edges.push_back(e);
-			}
-		}
-		return edges;
-	}
-
+	return m_model.edges();
 }
 
-vector<FaceRef> ModelEntity::faces(float tick_time, const vector<unsigned int>* indices) const
+vector<FaceRef> ModelEntity::faces(float tick_time) const
 {
-	if(!indices)
-	{
-		return m_model.faces();
-	}
-	else
-	{
-		std::set<unsigned int> inclusion (indices->begin(), indices->end());
-		vector<FaceRef> faces;
-		for(auto& e : m_model.faces())
-		{
-			if(	inclusion.find(e[0]) == inclusion.end() || 
-				inclusion.find(e[1]) == inclusion.end() || 
-				inclusion.find(e[2]) == inclusion.end()	)
-				continue;
-			else
-			{
-				faces.push_back(e);
-			}
-		}
-
-		return faces;
-	}
+	return m_model.faces();
 }
 
 
