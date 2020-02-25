@@ -35,9 +35,7 @@ public:
 	 * @brief Returns the type of representation underlying the collider.
 	 * This is done to limit expectations of the caller to certain calls to this interface.
 	 */
-	virtual TYPE colliderType() const = 0;
-
-	virtual unsigned int numVertices() const = 0;
+	virtual TYPE type() const = 0;
 
 	//TODO optimize copys in vertices() (shared_ptr idea, custom smart pointer idea)
 	/**
@@ -63,12 +61,12 @@ public:
 	 */
 	virtual vector<FaceRef> faces (float tick_time, const vector<unsigned int>* indices = nullptr) const = 0;
 
-	virtual spacevec getPosition(float tick_time) const = 0;
+	virtual spacevec position(float tick_time) const = 0;
 
 	//TODO add metadata support or metadata support interface to the collision Reaction Call
 	//metadata would include collision force, materials invoved, etc. in a more advanced version of this project also position
 	//currently only time is important ... this part of the interface is therefor especially subject to change
-	virtual void collisionReaction(float tick_time) = 0;
+	virtual void react(float tick_time) = 0;
 
 	virtual ~Collider() = default;
 };

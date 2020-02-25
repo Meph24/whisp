@@ -253,8 +253,7 @@ void Simulation_World::loadStandardTex()
 	float fi = 0.0;
 	for(auto& m_uptr : meshes)
 	{
-		Model model(m_uptr.get());
-		models.emplace_back( new Model(m_uptr.get()) );
+		models.emplace_back( new Model(*(m_uptr.get())) );
 
 		ModelEntity* me = new ModelEntity(*(models.back()));
 		spawn(me, iw->fromMeters(vec3(20.0f, 4.0f, fi*2.5f)));

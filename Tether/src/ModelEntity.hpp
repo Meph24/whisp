@@ -31,9 +31,6 @@ public:
 	~ModelEntity();
 
 	const Model& model();
-
-	void move(spacevec d);
-	spacevec getPos() const;
 	
 	virtual void draw(	Timestamp ts, 
 						Frustum* viewFrustum, 
@@ -63,9 +60,7 @@ public:
 	
 	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
 
-	Collider::TYPE colliderType() const; 
-
-	unsigned int numVertices() const;
+	Collider::TYPE type() const; 
 	
 	vector<Vertex> vertices (float tick_time, const vector<unsigned int>* indices = nullptr) const;
 
@@ -73,9 +68,9 @@ public:
 
 	vector<FaceRef> faces(float tick_time, const vector<unsigned int>* indices = nullptr) const;
 
-	spacevec getPosition(float tick_time) const;
+	spacevec position(float tick_time) const;
 
-	void collisionReaction(float tick_time);
+	void react(float tick_time);
 };
 
 #endif /* ENTITYDIAMOND_HPP */

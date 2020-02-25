@@ -190,11 +190,11 @@ vector<SubmodelCollision> linearInterpolation_R0(
 	spacevec c0_pos, c1_pos;
 	vec3 c0_dpos, c1_dpos;
 
-	c0_pos = c0.getPosition(t0);
-	c1_pos = c1.getPosition(t0);
+	c0_pos = c0.position(t0);
+	c1_pos = c1.position(t0);
 
-	c0_dpos = iworld->toMeters(c0.getPosition(t1) - c0_pos);
-	c1_dpos = iworld->toMeters(c1.getPosition(t1) - c1_pos);
+	c0_dpos = iworld->toMeters(c0.position(t1) - c0_pos);
+	c1_dpos = iworld->toMeters(c1.position(t1) - c1_pos);
 
 
 	//relative r[Relative collider number]_c[Collider]_[Collider member]_[at time]

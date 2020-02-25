@@ -42,9 +42,6 @@ struct Mesh
 	array<vec3, 3> faceByIndex(size_t i) const;
 	size_t faceCount() const;
 
-private:
-	vec3 calculateExtent();
-
 public:
 	friend ostream& operator<< (ostream& os, const Mesh& m);
 	friend istream& operator>> (istream& os, Mesh& m);

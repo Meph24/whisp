@@ -1,42 +1,25 @@
 #ifndef MODEL_HPP
 #     define MODEL_HPP
 
+#include <utility>
+#include <vector>
 #include "Mesh.hpp"
 #include <GL/glew.h>
 
 #include "CumulativeMat.hpp"
 #include "GeoFeatures.hpp"
 
+using std::pair;
+
 class Model
 {
 private:
-	Mesh* m_mesh;
-	
-	enum V_BUFFERS
-	{
-		POSITION = 0,
-		INDEX,
+	vector<Vertex> m_vertices;	
+	vector<unsigned int> m_indices;
 
-		NUM
-	};
-
-	GLuint vertexArrayObject;
-	GLuint vertexArrayBuffers[V_BUFFERS::NUM];
-	unsigned int drawCount;
-
-	mat4 current_transformation;
-	vector<Vertex> m_vertices;
-	mat4 transmat;
+	pair<vec3, vec3> m_extent;
 public:
-	struct Extent
-	{
-		vec3 min, max;
-	};
-private:
-	Extent m_extent;
-public:
-	Model(Mesh* mesh);
-	Model(Mesh* mesh, const mat4& transmat);
+	Model(const Mesh& mesh);
 
 	Model(const Model& other) = default;
 	Model& operator=(const Model& other) = default;
@@ -45,16 +28,15 @@ public:
 
 	const Mesh& mesh() const;
 
-	mat4& transMat();
-	const vector<Vertex>& vertices();
-	vector<EdgeRef> edges();
-	vector<FaceRef> faces();
+	const vector<Vertex>& vertices() const;
+	vector<EdgeRef> edges() const;
+	vector<FaceRef> faces() const;
 
-	const Extent& extent();
+	const pair<vec3, vec3>& extent() const;
 
-	void draw();
-	void drawBuffered(); //with buffered objects
-	void drawNative();	//native gl calls
+	void drawHere() const;
+	void drawBuffered() const; //with buffered objects
+	void drawNative() const;	//native gl calls
 
 	void updateDraw();
 

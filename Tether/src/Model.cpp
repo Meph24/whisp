@@ -6,64 +6,39 @@
 #include <glm/glm.hpp>
 #include "glmutils.hpp"
 
-Model::Model(Mesh* mesh)
-	: m_mesh(mesh)
-	, current_transformation(1.0f)
-	, transmat(current_transformation)
+Model::Model(const Mesh& mesh)
 {
-	updateVertices();
+	for(const vec3& v : mesh.vertices)
+	{
+		m_vertices.push_back(Vertex(v.x, v.y, v.z, 1.0f));
+	}
+
+	m_indices = mesh.indices;
+
+	m_vertices.shrink_to_fit();
+	m_indices.shrink_to_fit();
+
 	updateExtent();
 }
 
-Model::Model(Mesh* mesh, const mat4& transformation_matrix)
-	: m_mesh(mesh)
-	, current_transformation(transformation_matrix)
-	, transmat (transformation_matrix)
+const vector<Vertex>& Model::vertices() const
 {
-	updateVertices();
-	updateExtent();
-}
-
-mat4& Model::transMat()
-{
-	return transmat;
-}
-
-void Model::updateVertices()
-{
-	m_vertices.clear();
-	m_vertices.reserve(m_mesh->vertices.size());
-	for(const vec3& v : m_mesh->vertices)
-	{
-		Vertex vertex(v.x, v.y, v.z, 1.0f);
-		m_vertices.emplace_back(vertex*transmat);
-	}
-	current_transformation=transmat;
-}
-
-const vector<Vertex>& Model::vertices()
-{
-	if(transmat!=current_transformation)
-	{
-		updateVertices();
-	}
 	return m_vertices;
 }
 
-vector<EdgeRef> Model::edges()
+vector<EdgeRef> Model::edges() const
 {
 	vector<EdgeRef> ret;
-	size_t num_faces = m_mesh->faceCount();
-	for ( size_t i = 0; i < num_faces; ++i )
+
+	for ( const FaceRef& fr : faces() )
 	{
 		//guaranteed sorted
-		array<unsigned int, 3> face_indices = m_mesh->faceIndicesByIndex(i);
 		EdgeRef er;
-		er.sortedIn(face_indices[0], face_indices[1]);
+		er.sortedIn(fr[0], fr[1]);
 		ret.push_back(er);
-		er.sortedIn(face_indices[1], face_indices[2]);
+		er.sortedIn(fr[1], fr[2]);
 		ret.push_back(er);
-		er.sortedIn(face_indices[0], face_indices[2]);
+		er.sortedIn(fr[0], fr[2]);
 		ret.push_back(er);
 	}
 
@@ -72,54 +47,17 @@ vector<EdgeRef> Model::edges()
 	return ret;
 }
 
-vector<FaceRef> Model::faces()
+vector<FaceRef> Model::faces() const
 {
 	vector<FaceRef> ret;
-	size_t num_faces = m_mesh->faceCount();
-	for ( size_t i = 0; i < num_faces; ++i )
+	size_t num_faces = m_indices.size() / 3;
+	for ( size_t i = 0; i < num_faces; i+=3 )
 	{
-		array<unsigned int, 3> face_indices = m_mesh->faceIndicesByIndex(i);
 		FaceRef fr;
-		fr.sortedIn(	face_indices[0],
-						face_indices[1],
-						face_indices[2]		);
+		fr.sortedIn( i, i+1, i+2 );
 		ret.push_back(fr);
 	}
 	return ret;
-}
-
-void Model::updateDraw()
-{
-	glGenVertexArrays(1, &vertexArrayObject);
-	glBindVertexArray(vertexArrayObject);
-
-
-	glGenBuffers(V_BUFFERS::NUM, vertexArrayBuffers);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffers[V_BUFFERS::POSITION]);
-	glBufferData(	GL_ARRAY_BUFFER, 
-					m_mesh->vertices.size()*sizeof(m_mesh->vertices[0]), 
-					m_mesh->vertices.data(),//&(m_mesh.vertices)[0], 
-					GL_STATIC_DRAW
-				);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	
-	//glBindBuffer(GL_ARRAY_BUFFER, vertexArrayBuffers[TEXCOORD_VB]);
-	//glBufferData(GL_ARRAY_BUFFER, numVertices*sizeof(texCoords[0]), &texCoords[0], GL_STATIC_DRAW);
-	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-	//add for index stuff
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexArrayBuffers[V_BUFFERS::INDEX]);
-	glBufferData(	GL_ELEMENT_ARRAY_BUFFER, 
-					m_mesh->indices.size()*sizeof(m_mesh->indices[0]),
-				   	m_mesh->indices.data(),
-				   	GL_STATIC_DRAW
-				);
-	//index stuff end
-
-	glBindVertexArray(0);
 }
 
 Model::~Model()
@@ -128,52 +66,38 @@ Model::~Model()
 	//glDeleteVertexArrays(1, &vertexArrayObject);
 }
 
-const Mesh& Model::mesh() const
-{
-	return *m_mesh;
-}
-
 void Model::updateExtent()
 {
 	auto vert = vertices();
 
 	if(vert.empty()) return;	
-	m_extent.min = vec3(vert.front());
-	m_extent.max = vec3(vert.front());
+	vec3& min = m_extent.first;
+	min = vec3(vert.front());
+	vec3& max = m_extent.second;
+	max = vec3(vert.front());
 
 	for(Vertex v : vert)
 	{
-		if(v.x > m_extent.max.x) m_extent.max.x = v.x;
-		else if( v.x < m_extent.min.x) m_extent.min.x = v.x;
-		if(v.y > m_extent.max.y) m_extent.max.y = v.y;
-		else if( v.y < m_extent.min.y) m_extent.min.y = v.y;
-		if(v.z > m_extent.max.z) m_extent.max.z = v.z;
-		else if( v.z < m_extent.min.z) m_extent.min.z = v.z;
+		if(v.x > max.x) max.x = v.x;
+		else if( v.x < min.x) min.x = v.x;
+		if(v.y > max.y) max.y = v.y;
+		else if( v.y < min.y) min.y = v.y;
+		if(v.z > max.z) max.z = v.z;
+		else if( v.z < min.z) min.z = v.z;
 	}
 }
 
-const Model::Extent& Model::extent()
+const pair<vec3, vec3>& Model::extent() const
 {
-	if(current_transformation!=transmat)
-	{
-		updateExtent();
-	}
 	return m_extent;
 }
 
-void Model::drawBuffered()
-{
-	glBindVertexArray(vertexArrayObject);
-	glDrawElements(GL_TRIANGLES, m_mesh->indices.size(), GL_UNSIGNED_INT,0);
-	glBindVertexArray(0);
-}
-
-void Model::drawNative()
+void Model::drawNative() const
 {
 	glBegin(GL_TRIANGLES);
-	
-	size_t faces = m_mesh->faceCount();
-	for(size_t i = 0; i < faces; i++)
+
+	unsigned int i = 0;
+	for(const FaceRef& fr : faces())	
 	{
 		//switch color for every triangle
 		//so edges can be seen
@@ -196,25 +120,21 @@ void Model::drawNative()
 				thisblue = 0.75f;
 			break;
 		}
-
 		thisblue = thisblue+(0.01f*(i%25));
-
 		glColor3f(1.0f, 0.0f, thisblue);
-		for(vec3 vertex : m_mesh->faceByIndex(i))
+
+
+		for(VertexRef vr: fr)
 		{
+			const Vertex& vertex = m_vertices[vr];
 			glVertex3f(vertex.x, vertex.y, vertex.z);
 		}
+		i++;
 	}	
 	glEnd();	
 }
 
-void Model::draw()
+void Model::drawHere() const
 {
-	glPushMatrix();
-	//transpose for layout
-	glMultMatrixf((float*) glm::value_ptr(glm::transpose(transmat)));
 	drawNative();
-//	drawBuffered();
-
-	glPopMatrix();
 }

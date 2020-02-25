@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <set>
 
 #include "glmutils.hpp"
 #include <glm/gtx/transform.hpp>
@@ -60,19 +61,19 @@ void ModelEntity::draw(
 	//glRotatef(m_rot.x, 1.0f, 0.0f, 0.0f);
 	//glRotatef(m_rot.y, 0.0f, 1.0f, 0.0f);
 	//glRotatef(m_rot.z, 0.0f, 0.0f, 1.0f);
-	m_model.draw();
+	m_model.drawHere();
 
 	glPopMatrix();
 }
 
 AABB ModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)
 {
-	Model::Extent ext = m_model.extent();	
+	const pair<vec3, vec3>& ext = m_model.extent();	
 
 	return AABB(pos , 
 				pos + v*tick_seconds, 
-				tsp->getIWorld()->fromMeters(ext.min),
-				tsp->getIWorld()->fromMeters(ext.max)
+				tsp->getIWorld()->fromMeters(ext.first),
+				tsp->getIWorld()->fromMeters(ext.second)
 				);
 }
 
@@ -112,7 +113,7 @@ void ModelEntity::tick	(
 void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
 	vector<collisionl2::SubmodelCollision> collisions = 
-		collisionl2::linearInterpolation_R0(0.0f, delta_time, tsp.getIWorld(), (Collider*) this, other.pIF);
+		collisionl2::linearInterpolation_R0(0.0f, delta_time, tsp.getIWorld(), *this, *(other.pIF));
 
 	if(collisions.empty()) return;
 
@@ -121,35 +122,33 @@ void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickSer
 	if (min_e->time > delta_time)
 		cerr << "ERROR : Collision to later time than tick!\n";
 
-	collisionReaction(min_e->time);
-	other.pIF->collisionReaction(min_e->time);
+	react(min_e->time);
+	other.pIF->react(min_e->time);
 }
 
 
-Collider::TYPE ModelEntity::colliderType() const { return Collider::TYPE::rigid; }
+Collider::TYPE ModelEntity::type() const { return Collider::TYPE::rigid; }
 
-unsigned int ModelEntity::numVertices() const {return m_model.mesh().vertices.size();}
-
-vector<Vertex> ModelEntity::vertices (float tick_time, const vector<unsigned int>* indices = nullptr) const
+vector<Vertex> ModelEntity::vertices (float tick_time, const vector<unsigned int>* indices) const
 {
 	if(!indices)
 	{
-		vertices = m_model.mesh().vertices;
+		return m_model.vertices();
 	}
 	else
 	{
-		vector<Vertex> vertices;
-vertices.reserve(indices->size());
+		vector<Vertex> out_vertices;
+		out_vertices.reserve(indices->size());
 		for(unsigned int i : *indices)
 		{
-			vertices.push_back(m_model.mesh().vertices[i];
+			out_vertices.push_back(m_model.vertices()[i]);
 		}
+		return out_vertices;
 	}
-	return vertices;
 }
 
 
-vector<EdgeRef> ModelEntity::edges(float tick_time, const vector<unsigned int>* indices = nullptr) const
+vector<EdgeRef> ModelEntity::edges(float tick_time, const vector<unsigned int>* indices) const
 {
 	if(!indices)
 	{
@@ -157,24 +156,23 @@ vector<EdgeRef> ModelEntity::edges(float tick_time, const vector<unsigned int>* 
 	}
 	else
 	{
-		std::set<unsigned int> inclusion (indices.begin(), indices.end());
+		std::set<unsigned int> inclusion (indices->begin(), indices->end());
+		vector<EdgeRef> edges;
 		for(auto& e : m_model.edges())
 		{
-			vector<EdgeRef> edges;
-			if(inclusion.find(e[0]) == inclusion.end() || inclusion.find(e[1] == inclusion.end()))
+			if(inclusion.find(e[0]) == inclusion.end() || inclusion.find(e[1]) == inclusion.end())
 				continue;
 			else
 			{
 				edges.push_back(e);
 			}
 		}
-
 		return edges;
 	}
 
 }
 
-vector<FaceRef> ModelEntity::faces(float tick_time, const vector<unsigned int>* indices = nullptr) const
+vector<FaceRef> ModelEntity::faces(float tick_time, const vector<unsigned int>* indices) const
 {
 	if(!indices)
 	{
@@ -182,10 +180,10 @@ vector<FaceRef> ModelEntity::faces(float tick_time, const vector<unsigned int>* 
 	}
 	else
 	{
-		std::set<unsigned int> inclusion (indices.begin(), indices.end());
+		std::set<unsigned int> inclusion (indices->begin(), indices->end());
+		vector<FaceRef> faces;
 		for(auto& e : m_model.faces())
 		{
-			vector<FaceRef> faces;
 			if(	inclusion.find(e[0]) == inclusion.end() || 
 				inclusion.find(e[1]) == inclusion.end() || 
 				inclusion.find(e[2]) == inclusion.end()	)
@@ -201,14 +199,14 @@ vector<FaceRef> ModelEntity::faces(float tick_time, const vector<unsigned int>* 
 }
 
 
-void spacevec ModelEntity::getPosition(float tick_time) const
+spacevec ModelEntity::position(float tick_time) const
 {
-	return tick_begin_pos + tick_time * tick_begin_v;
+	return tick_begin_pos + tick_begin_v * tick_time;
 }
 
 
-virtual void ModelEntity::collisionReaction(float tick_time)
+void ModelEntity::react(float tick_time)
 {
-	pos = getPosition(tick_time*0.9999);
+	pos = position(tick_time*0.9999);
 	v.set0();
 }
