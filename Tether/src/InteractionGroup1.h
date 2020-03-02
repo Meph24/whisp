@@ -20,6 +20,8 @@ class Entity;
 template<typename PhysicsIF>
 class InteractionGroup1
 {
+	void * filterAlgo;
+	bool multichunkInitValue;
 public:
 	std::vector<DualPointer<PhysicsIF>> registered;
 	void registerInteractionCheck(PhysicsIF * pIF,Entity * e, float time,TickServiceProvider& tsp);
@@ -27,7 +29,7 @@ public:
 	void check(DualPointer<PhysicsIF> e,DualPointer<PhysicsIF> r,float time,TickServiceProvider& tsp);
 	void reset();
 
-	InteractionGroup1();
+	InteractionGroup1(void * FilterAlgo,bool MultichunkInitValue=false);
 	~InteractionGroup1();
 };
 
@@ -49,12 +51,12 @@ inline void InteractionGroup1<PhysicsIF>::check(DualPointer<PhysicsIF> e,DualPoi
 	//double code starts here, see InteractionGroup2
 	if(tsp.tickID!=e.e->lastTickID)
 	{
-		e.e->reset();
+		e.e->prepareForPartitionAlgo(filterAlgo,multichunkInitValue);//->reset();
 		e.e->lastTickID=tsp.tickID;
 	}
 	if(tsp.tickID!=r.e->lastTickID)
 	{
-		r.e->reset();
+		r.e->prepareForPartitionAlgo(filterAlgo,multichunkInitValue);
 		r.e->lastTickID=tsp.tickID;
 	}
 	if(!e.e->bb.doesIntersect(r.e->bb)) return;
@@ -86,7 +88,8 @@ inline void InteractionGroup1<PhysicsIF>::registerInteractionCheck(PhysicsIF* pI
 }
 
 template<typename PhysicsIF>
-inline InteractionGroup1<PhysicsIF>::InteractionGroup1()
+inline InteractionGroup1<PhysicsIF>::InteractionGroup1(void * FilterAlgo,bool MultichunkInitValue):
+filterAlgo(FilterAlgo),multichunkInitValue(MultichunkInitValue)
 {}
 
 template<typename PhysicsIF>

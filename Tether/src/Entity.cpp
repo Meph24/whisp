@@ -28,10 +28,27 @@ void Entity::requestDestroy(IWorld * w)
 }
 
 
-void Entity::reset()
+void Entity::prepareForPartitionAlgo(void * filterAlgo,bool multichunkInitValue)
 {
-	if(multichunk) alreadyChecked.clear();
-	multichunk=bb.isMultichunk();
+	if(alreadyChecked.size()) alreadyChecked.clear();
+	multichunk=multichunkInitValue;
+}
+
+bool Entity::hasCheckedAlready(Entity* other, void* filterAlgo)
+{
+}
+
+void Entity::registerAlreadyChecked(Entity* other, void* filterAlgo)
+{
+}
+
+unsigned int Entity::getUselessChecksNumber(void* filterAlgo)
+{
+}
+
+void Entity::ignoreAlreadyChecked(IgnoreCondition* condition, void* filterAlgo)
+{
+	//if(condition->evaluateCondition(e))
 }
 
 #include "WarnErrReporter.h"
@@ -71,6 +88,7 @@ void Entity::notifyRemoval(Entity* e)
 {
 	WarnErrReporter::noOverrideErr("Someone requested notifyRemoval and did not override the method");
 }
+
 
 Entity::~Entity()
 {

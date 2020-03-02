@@ -20,6 +20,7 @@ class Frustum;
 class ChunkManager;
 class DrawServiceProvider;
 class IWorld;
+class IgnoreCondition;
 
 #include <vector>
 
@@ -48,13 +49,13 @@ public:
 	Timestamp lastTick;//used for timing
 	int lastTickID=0;//used for resets
 
-	std::vector<void *> alreadyChecked;
+	std::vector<void *> alreadyChecked;//TODO
 
 
 	bool exists=true;//if exists is false, memory will be freed soon
 
-	bool multichunk=false;//must be set when updating aabb for collision to work correctly
-	//TODO include into AABB class?
+	bool multichunk=false;//can be used by spatial partitioning algorithms (in conjunction with "alreadyChecked")
+
 
 	/*
 	bool isInAir=false;//if true, subject to gravity
@@ -71,7 +72,15 @@ public:
 	virtual void onLeaveWorld(TickServiceProvider * tsp);//called when outside of loaded chunk area
 
 	void requestDestroy(IWorld * w);//call this to request delete, do NOT delete any other way
-	void reset();
+
+
+	//methods used by spatial partitioning algorithms
+	void prepareForPartitionAlgo(void * filterAlgo,bool multichunkInitValue=false);//must be called upon entry in spatial partitioning algorithm (the algorithms is responsible for doing it as the first step)-
+	bool hasCheckedAlready(Entity * other,void * filterAlgo);//the spatial partitioning algorithm calls this to ensure every check is done exactly once
+	void registerAlreadyChecked(Entity * other,void * filterAlgo);//the spatial partitioning algorithm calls this when checking other has finished
+	unsigned int getUselessChecksNumber(void * filterAlgo);//gets the number of times that a useless check had to be performed due to the Entity being in multiple chunks
+	void ignoreAlreadyChecked(IgnoreCondition * condition,void * filterAlgo);
+
 
 	void follow(Entity * e);
 	void unfollow(Entity * e);

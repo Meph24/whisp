@@ -392,8 +392,9 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 	}
 	sizeBB.y=characterHeightConv*0.9f;
 	sizeBB.z=sizeBB.x;
-
-	v=(pos-prev)/seconds;
+	if(seconds)
+		v=(pos-prev)/seconds;
+	//std::cout<<pos<<"|"<<prev<<"|"<<seconds<<"|"<<v<<std::endl;
 	bb=AABB(pos,sizeBB);
 	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,seconds,*tsp);
 	if(remainingHP>=0) iw->projectileAlgo->doChecks((Hittable *) this,(Entity *)this,seconds,*tsp);

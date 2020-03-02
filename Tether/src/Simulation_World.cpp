@@ -43,6 +43,7 @@ extern Zombie_MouseInput* mouseInput;
 #include "Frustum.h"
 #include "WarnErrReporter.h"
 #include "TerrainDummy.h"
+#include "WorldDefault.h"
 
 #include "randomModel.hpp"
 #include <glm/gtc/random.hpp>
@@ -58,7 +59,8 @@ Simulation_World::Simulation_World(sf::Window * w)
 	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
 	objects_count=*cfg.getInt("simulation", "objects_count");
 
-	cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
+	wd=new WorldDefault();
+	//cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
 	td=new TerrainDummy(getIWorld(),getIWorld()->fromMeters(0));
 
 	Timestamp timS=tm.masterUpdate();
@@ -163,7 +165,8 @@ void Simulation_World::restart()
 Simulation_World::~Simulation_World()
 {
 	//missing deletes (one-time tier 1 ode, so who cares)
-	delete cm;
+//	delete cm;
+	delete wd;
 
 	delete dsLogic;
 	delete dsGraphics;
@@ -557,7 +560,7 @@ ICamera3D* Simulation_World::getHolderCamera()
 
 IWorld* Simulation_World::getIWorld()
 {
-	return (IWorld *)cm;
+	return (IWorld *)wd;//cm;
 }
 ITerrain* Simulation_World::getITerrain()
 {

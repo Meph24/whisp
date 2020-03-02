@@ -26,7 +26,8 @@ public:
 };
 
 template<typename MasterIF, typename SlaveIF>
-inline InteractFilterDefaultAsym<MasterIF, SlaveIF>::InteractFilterDefaultAsym()
+inline InteractFilterDefaultAsym<MasterIF, SlaveIF>::InteractFilterDefaultAsym():
+group(this)
 {}
 
 template<typename MasterIF, typename SlaveIF>

@@ -28,7 +28,7 @@ public:
 	void resetAll();
 
 
-	InteractionManager(spacevec myChunk);
+	InteractionManager(spacevec myChunk,void * filterAlgo,bool multichunkInitValue=false);
 	~InteractionManager();
 };
 

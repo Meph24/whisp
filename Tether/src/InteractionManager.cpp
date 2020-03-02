@@ -8,8 +8,8 @@
 
 #include "InteractionManager.h"
 
-InteractionManager::InteractionManager(spacevec myChunk):
-chunk(myChunk)
+InteractionManager::InteractionManager(spacevec myChunk,void * filterAlgo,bool multichunkInitValue):
+push(filterAlgo,multichunkInitValue),collide(filterAlgo,multichunkInitValue),chunk(myChunk)
 {
 }
 

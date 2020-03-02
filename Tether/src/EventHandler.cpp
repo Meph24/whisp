@@ -74,7 +74,7 @@ void EventHandler::sendOn(EventHandler::event e)
 		std::cout << e.ID << "/" << e.value << std::endl;
 		return;
 	}
-	std::cout << e.ID << "/" << e.value << std::endl;
+//	std::cout << e.ID << "/" << e.value << std::endl;
 	if (enabledProgram==1)//zombie
 	{
 		world->eMap->event(e);

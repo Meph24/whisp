@@ -42,7 +42,7 @@ low(pos-sizeFromMid),high(pos+sizeFromMid)
 {
 	if(sizeFromMid.x.intpart>=10||sizeFromMid.z.intpart>=10)//TODO find the bug that causes this and remove afterwards
 	{
-		std::cout<<"REPORT THIS BUG, IT IS RARE AND NEEDS TO BE FIXED:"<<std::endl;
+		std::cout<<"REPORT THIS BUG, IT WAS BELIEVED TO BE FIXED AND APPARENTLY IS NOT:"<<std::endl;
 		std::cout<<sizeFromMid<<std::endl;
 		std::cout<<pos<<std::endl;
 		assert(sizeFromMid.x.intpart<10);
@@ -56,7 +56,7 @@ low(posT1-sizeFromMid),high(posT1+sizeFromMid)
 {
 	if(sizeFromMid.x.intpart>=10||sizeFromMid.z.intpart>=10||movement.z.intpart>=10||movement.x.intpart>=10)//TODO find the bug that causes this and remove afterwards
 	{
-		std::cout<<"REPORT THIS BUG, IT IS RARE AND NEEDS TO BE FIXED:"<<std::endl;
+		std::cout<<"REPORT THIS BUG, IT WAS BELIEVED TO BE FIXED AND APPARENTLY IS NOT:"<<std::endl;
 		std::cout<< "pos_t1:\n" << posT1<<std::endl;
 		std::cout<< "fromMid:\n" << sizeFromMid<<std::endl;
 		std::cout<< "movement:\n" << movement<<std::endl;
@@ -70,6 +70,10 @@ low(posT1-sizeFromMid),high(posT1+sizeFromMid)
 	zero.set0();
 	low-=movement.selectWhere(movement>zero);//if moved in + direction, posT0 was in - direction before
 	high-=movement.selectWhere(movement<zero);//if moved in - direction, posT0 was in + direction before
+	if(low>high)
+	{
+		std::cout<<posT1<<","<<sizeFromMid<<","<<movement<<","<<low<<","<<high<<std::endl;
+	}
 	assert(!(low>high));
 }
 

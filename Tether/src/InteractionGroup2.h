@@ -22,6 +22,8 @@ class TickServiceProvider;
 template<typename MasterIF,typename SlaveIF>
 class InteractionGroup2
 {
+	void * filterAlgo;
+	bool multichunkInitValue;
 public:
 	std::vector<DualPointer<MasterIF>> firstCalled;
 	std::vector<DualPointer<SlaveIF>> secondCalled;
@@ -31,7 +33,7 @@ public:
 	void registerInteractionCheck(DualPointer<SlaveIF> e, float time,TickServiceProvider& tsp);
 	void check(DualPointer<MasterIF> f,DualPointer<SlaveIF> s,float time,TickServiceProvider& tsp);
 	void reset();
-	InteractionGroup2();
+	InteractionGroup2(void * FilterAlgo,bool MultichunkInitValue=false);
 	~InteractionGroup2();
 };
 
@@ -80,12 +82,12 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::check(DualPointer<MasterIF> f,
 	//TODO simplify for InteractionGroup2
 	if(tsp.tickID!=f.e->lastTickID)
 	{
-		f.e->reset();
+		f.e->prepareForPartitionAlgo(filterAlgo,multichunkInitValue);//->reset();
 		f.e->lastTickID=tsp.tickID;
 	}
 	if(tsp.tickID!=s.e->lastTickID)
 	{
-		s.e->reset();
+		s.e->prepareForPartitionAlgo(filterAlgo,multichunkInitValue);
 		s.e->lastTickID=tsp.tickID;
 	}
 	if(!f.e->bb.doesIntersect(s.e->bb)) return;
@@ -113,7 +115,8 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::reset()
 }
 
 template<typename MasterIF, typename SlaveIF>
-inline InteractionGroup2<MasterIF, SlaveIF>::InteractionGroup2()
+inline InteractionGroup2<MasterIF, SlaveIF>::InteractionGroup2(void * FilterAlgo,bool MultichunkInitValue):
+filterAlgo(FilterAlgo),multichunkInitValue(MultichunkInitValue)
 {}
 
 template<typename MasterIF, typename SlaveIF>
