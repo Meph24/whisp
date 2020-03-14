@@ -5,8 +5,6 @@
 
 #include <iostream>
 
-using std::cout;
-
 //dirty
 #include "Zombie_KeyInput.h"
 #include "Zombie_MouseInput.h"
@@ -239,22 +237,38 @@ void Simulation_World::loadStandardTex()
 
 	g = new Graphics2D(64,getAspectRatio());
 
+	{
+		Mesh m (diamondMesh(7, 0.3f, 2.0f));
+		models.emplace_back(new Model (Mesh()) );
+		
+	}
+	{
+		MeshIO meshio("./res/cross.mesh");
+		Mesh m (meshio.get());
+		models.emplace_back(new Model( m ) );
+	}
 
-	models.emplace_back(new Model (Mesh(diamondMesh(7, 0.3f, 2.0f))) );
-	MeshIO meshio("./res/cross.mesh");
-	models.emplace_back(new Model( Mesh(meshio.get())) );
-	models.emplace_back(new Model( Mesh(torusMesh(1.0f, 9, 0.3f, 5)) ));
+	{
+		Mesh m (torusMesh(1.0f, 9, 0.3f, 5));
+		models.emplace_back(new Model( m ));
+		
+	}
 
-	for ( int i = 0; i < 5; ++i )
+/*	
+ *	for ( int i = 0; i < 5; ++i )
 	{
 		//create 6 more models by random
 		models.emplace_back(new Model(Mesh ( randommodel::randomMesh(20, 3.0f))));
+		
 	}
+	*/
 
 	float fi = 0.0;
 	for(auto& m_uptr : models)
 	{
 		ModelEntity* me = new ModelEntity(*m_uptr);
+
+
 		spawn(me, iw->fromMeters(vec3(20.0f, 4.0f, fi*2.5f)));
 		fi += 1.0f;
 	}
@@ -422,6 +436,7 @@ void Simulation_World::loadStandardTex()
 		spawn(me1, iw->fromMeters(pos1));
 
 	}
+
 
 }
 

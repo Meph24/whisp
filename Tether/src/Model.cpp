@@ -6,10 +6,16 @@
 #include <glm/glm.hpp>
 #include "glmutils.hpp"
 
+#include <iostream>
+
+
 Model::Model(const Mesh& mesh)
 {
+	m_vertices.clear();
+	m_vertices.reserve(mesh.vertices.size());
 	for(const vec3& v : mesh.vertices)
 	{
+		Vertex newv (v.x, v.y, v.z, 1.0f);
 		m_vertices.push_back(Vertex(v.x, v.y, v.z, 1.0f));
 	}
 
@@ -51,10 +57,9 @@ vector<FaceRef> Model::faces() const
 {
 	vector<FaceRef> ret;
 	size_t num_faces = m_indices.size() / 3;
-	for ( size_t i = 0; i < num_faces; i+=3 )
+	for ( size_t i = 0; i < m_indices.size(); i+=3 )
 	{
-		FaceRef fr;
-		fr.sortedIn( i, i+1, i+2 );
+		FaceRef fr ( m_indices[i], m_indices[i+1], m_indices[i+2] );
 		ret.push_back(fr);
 	}
 	return ret;
@@ -97,6 +102,7 @@ void Model::drawNative() const
 	glBegin(GL_TRIANGLES);
 
 	unsigned int i = 0;
+
 	for(const FaceRef& fr : faces())	
 	{
 		//switch color for every triangle
@@ -122,7 +128,6 @@ void Model::drawNative() const
 		}
 		thisblue = thisblue+(0.01f*(i%25));
 		glColor3f(1.0f, 0.0f, thisblue);
-
 
 		for(VertexRef vr: fr)
 		{
