@@ -73,14 +73,6 @@ istream& operator>> (istream& is, Mesh& m)
 		{
 			m.indices.push_back(i);
 		}
-	
-
-		//sort indices for every triangle, which means every pair of 3 in indices
-		for(auto iter = m.indices.begin(); iter!=m.indices.end(); iter+=3)
-		{	
-			if(iter+2 == m.indices.end()) break;
-			std::sort(iter, iter+3);
-		}
 	}
 	return is;
 }
