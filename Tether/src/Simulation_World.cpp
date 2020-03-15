@@ -239,7 +239,7 @@ void Simulation_World::loadStandardTex()
 
 	{
 		Mesh m (diamondMesh(7, 0.3f, 2.0f));
-		models.emplace_back(new Model (Mesh()) );
+		models.emplace_back(new Model (m) );
 		
 	}
 	{
