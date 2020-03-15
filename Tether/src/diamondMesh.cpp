@@ -29,14 +29,17 @@ Mesh diamondMesh(int facets, float radius, float height)
 		vertices[2+i] = vec3(circle_x, in_between_y, circle_y);
 
 		//0 and 1 are the vertices on the points, top and bottom, respectively
-		//top facet
+		//bottom facet
 		indices[6*i+0] = 0;
 		indices[6*i+1] = 2 + (i+1)%facets;
 		indices[6*i+2] = 2 + i;
-		//botom facet
+
+		//top facet
 		indices[6*i+3] = 1;
-		indices[6*i+4] = 2 + (i+1)%facets;
-		indices[6*i+5] = 2 + i;
+		//the next2 are flipped for consistent counter clockwise winding
+		indices[6*i+4] = 2 + i;
+		indices[6*i+5] = 2 + (i+1)%facets;
+
 	}
 
 	return Mesh(	vertices.begin(), vertices.end(),
