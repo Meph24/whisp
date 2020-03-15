@@ -36,7 +36,7 @@ Mesh diamondMesh(int facets, float radius, float height)
 
 		//top facet
 		indices[6*i+3] = 1;
-		//the next2 are flipped for consistent counter clockwise winding
+		//the next2 are flipped for consistent winding
 		indices[6*i+4] = 2 + i;
 		indices[6*i+5] = 2 + (i+1)%facets;
 
