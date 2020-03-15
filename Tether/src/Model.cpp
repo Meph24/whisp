@@ -99,6 +99,8 @@ const pair<vec3, vec3>& Model::extent() const
 
 void Model::drawNative() const
 {
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glBegin(GL_TRIANGLES);
 
 	unsigned int i = 0;
