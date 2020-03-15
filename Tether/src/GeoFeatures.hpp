@@ -42,9 +42,6 @@ struct EdgeRef : public array<unsigned int, 2>
 	EdgeRef(unsigned int,unsigned int);
 	EdgeRef& operator=(const array<unsigned int, 2>& other);
 
-	void sortedIn(unsigned int, unsigned int);
-	void sortedIn(const array<unsigned int, 2>& other);
-
 	template<typename Index_RandIter>
 	Edge edge	(	Index_RandIter value_container_begin,
 					Index_RandIter value_container_end
@@ -67,9 +64,6 @@ struct FaceRef : public array<unsigned int, 3>
 	FaceRef(const array<unsigned int, 3>& other);
 	FaceRef(unsigned int,unsigned int,unsigned int);
 	FaceRef& operator=(const array<unsigned int, 3>& other);
-
-	void sortedIn(unsigned int, unsigned int, unsigned int);
-	void sortedIn(const array<unsigned int, 3>& other);
 
 	template<typename Index_RandIter>
 	Face face	(	Index_RandIter value_container_begin,

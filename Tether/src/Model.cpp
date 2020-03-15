@@ -39,13 +39,9 @@ vector<EdgeRef> Model::edges() const
 	for ( const FaceRef& fr : faces() )
 	{
 		//guaranteed sorted
-		EdgeRef er;
-		er.sortedIn(fr[0], fr[1]);
-		ret.push_back(er);
-		er.sortedIn(fr[1], fr[2]);
-		ret.push_back(er);
-		er.sortedIn(fr[0], fr[2]);
-		ret.push_back(er);
+		ret.push_back(EdgeRef(fr[0], fr[1]));
+		ret.push_back(EdgeRef(fr[1], fr[2]));
+		ret.push_back(EdgeRef(fr[0], fr[2]));
 	}
 
 	std::sort(ret.begin(), ret.end());
@@ -56,7 +52,6 @@ vector<EdgeRef> Model::edges() const
 vector<FaceRef> Model::faces() const
 {
 	vector<FaceRef> ret;
-	size_t num_faces = m_indices.size() / 3;
 	for ( size_t i = 0; i < m_indices.size(); i+=3 )
 	{
 		FaceRef fr ( m_indices[i], m_indices[i+1], m_indices[i+2] );
