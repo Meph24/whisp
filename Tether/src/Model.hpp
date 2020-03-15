@@ -13,6 +13,8 @@ using std::pair;
 class Model
 {
 private:
+	static array<vec3, 24 > color_list;
+
 	vector<Vertex> m_vertices;	
 	vector<unsigned int> m_indices;
 

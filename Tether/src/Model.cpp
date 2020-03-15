@@ -9,6 +9,38 @@
 #include <iostream>
 
 
+
+array<vec3, 24 > Model::color_list = 
+{
+	vec3(1.0f,0.0f,0.0f), //red
+	vec3(0.0f,1.0f,0.0f), //green
+	vec3(1.0f,1.0f,0.0f), //yellow
+	vec3(1.0f,0.0f,1.0f), //magenta
+	vec3(0.0f,1.0f,1.0f), //cyan
+	vec3(1.0f,1.0f,1.0f), //white
+
+	vec3(0.75f,0.0f,0.0f), //red
+	vec3(0.0f,0.75f,0.0f), //green
+	vec3(0.75f,0.75f,0.0f), //yellow
+	vec3(0.75f,0.0f,0.75f), //magenta
+	vec3(0.0f,0.75f,0.75f), //cyan
+	vec3(0.75f,0.75f,0.75f), //white
+
+	vec3(0.5f,0.0f,0.0f), //red
+	vec3(0.0f,0.5f,0.0f), //green
+	vec3(0.5f,0.5f,0.0f), //yellow
+	vec3(0.5f,0.0f,0.5f), //magenta
+	vec3(0.0f,0.5f,0.5f), //cyan
+	vec3(0.5f,0.5f,0.5f), //white
+
+	vec3(0.25f,0.0f,0.0f), //red
+	vec3(0.0f,0.25f,0.0f), //green
+	vec3(0.25f,0.25f,0.0f), //yellow
+	vec3(0.25f,0.0f,0.25f), //magenta
+	vec3(0.0f,0.25f,0.25f), //cyan
+	vec3(0.25f,0.25f,0.25f), //white
+};
+
 Model::Model(const Mesh& mesh)
 {
 	m_vertices.clear();
@@ -102,6 +134,7 @@ void Model::drawNative() const
 
 	for(const FaceRef& fr : faces())	
 	{
+		/*
 		//switch color for every triangle
 		//so edges can be seen
 		float thisblue;
@@ -125,6 +158,9 @@ void Model::drawNative() const
 		}
 		thisblue = thisblue+(0.01f*(i%25));
 		glColor3f(1.0f, 0.0f, thisblue);
+		*/
+		const vec3& color = color_list[i%color_list.size()];
+		glColor3f(color.x, color.y, color.z);
 
 		for(VertexRef vr: fr)
 		{
