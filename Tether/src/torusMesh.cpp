@@ -108,14 +108,15 @@ Mesh torusMesh(	float torus_radius, unsigned int torus_samples,
 		vi_01 = torus_offset + next_tube_index;
 		vi_10 = next_torus_offset + tube_index;
 		vi_11 = next_torus_offset + last_tube_index;
-		
+	
+		//the ordering stems from winding conventions	
 		indices.push_back(vi_00);
-		indices.push_back(vi_01);
 		indices.push_back(vi_10);
+		indices.push_back(vi_01);
 
 		indices.push_back(vi_00);
-		indices.push_back(vi_10);
 		indices.push_back(vi_11);
+		indices.push_back(vi_10);
 	}
 
 	return Mesh(vertices.begin(), vertices.end(),
