@@ -20,6 +20,8 @@ struct Mesh
 	//Traversal Rule is TRIANGLES, which just means
 	//indices come in groups of 3, which describe a triangle
 	vector<unsigned int> indices;
+
+	vector<vector<unsigned int>> convex_colliders;
 	
 	Mesh() = default;
 

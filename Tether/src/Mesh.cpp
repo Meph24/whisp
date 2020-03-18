@@ -48,6 +48,15 @@ ostream& operator<< (ostream& os, const Mesh& m)
 	{
 		os << i << " ";
 	}
+	os << "| ";
+	for(auto v : m.convex_colliders)
+	{
+		for(auto i : v)
+		{
+			os << i << " ";
+		}
+		os << ", ";
+	}
 	return os;
 }
 
@@ -55,24 +64,37 @@ istream& operator>> (istream& is, Mesh& m)
 {
 	float x, y ,z;
 	string s;
-	if(is >> s)
+	while(is >> s)
 	{
-		cout << ">>>>" << s << '\n';
-		while(s != "|")
-		{
-			x = std::stof(s);
-			is >> y >> z;
-			vec3 newv (x, y , z);
-			m.vertices.push_back(newv);
-			cout << "vec  " << glm::to_string(newv) << '\n';
-			if(is.eof()) break;
-			is >> s;
-		}
-		unsigned int i;	
-		while(is >> i)
-		{
-			m.indices.push_back(i);
-		}
+		if(s == "|") break;
+		x = std::stof(s);
+		is >> y >> z;
+		vec3 newv (x, y , z);
+		m.vertices.push_back(newv);
+		cout << "vec  " << glm::to_string(newv) << '\n';
 	}
+	unsigned int i;	
+	while(is >> s)
+	{
+		if(s== "|") break;
+		i = std::stoi(s);
+		m.indices.push_back(i);
+	}
+	vector<unsigned int> convex_indices;
+	while(is >> s)
+	{
+		if(s == ",")
+		{
+			m.convex_colliders.emplace_back(std::move(convex_indices));
+			convex_indices.clear();
+			continue;
+		}
+		convex_indices.push_back(std::stoi(s));
+	}
+	if(!m.convex_colliders.empty())
+	{
+		m.convex_colliders.emplace_back(std::move(convex_indices));
+	}
+	
 	return is;
 }
