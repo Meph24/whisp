@@ -120,17 +120,17 @@ Mesh torusMesh(	float torus_radius, unsigned int torus_samples,
 		indices.push_back(vi_10);
 	}
 
-	vector<vector<unsigned int>> convex_partitions;
+	vector<set<unsigned int>> convex_partitions;
 	for ( unsigned int torus_index = 0; torus_index < torus_samples; ++torus_index )
 	{
-		vector<unsigned int> v;
+		set<unsigned int> s;
 		//the current ring on the torus and the next will make a small tube section which is convex on the torus
 		for ( unsigned int tube_index = 0; tube_index < tube_samples; ++tube_index )
 		{
-			v.push_back((torus_index * tube_samples + tube_index));
-			v.push_back(((torus_index+1) * tube_samples + tube_index) % num_vertices);
+			s.insert((torus_index * tube_samples + tube_index));
+			s.insert(((torus_index+1) * tube_samples + tube_index) % num_vertices);
 		}
-		convex_partitions.emplace_back(std::move(v));
+		convex_partitions.emplace_back(std::move(s));
 	}
 
 	Mesh m(vertices.begin(), vertices.end(),

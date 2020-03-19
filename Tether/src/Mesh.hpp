@@ -4,10 +4,12 @@
 #include "glmutils.hpp"
 #include <iostream>
 #include <vector>
+#include <set>
 #include <array>
 
 using std::array;
 using std::vector;
+using std::set;
 using std::istream;
 using std::ostream;
 using glm::vec3;
@@ -21,7 +23,7 @@ struct Mesh
 	//indices come in groups of 3, which describe a triangle
 	vector<unsigned int> indices;
 
-	vector<vector<unsigned int>> convex_partitions;
+	vector<set<unsigned int>> convex_partitions;
 	
 	Mesh() = default;
 
@@ -40,7 +42,7 @@ struct Mesh
 	Mesh(const Mesh&) = default;
 	Mesh& operator=(const Mesh&) = default;
 
-	void setConvexPartitions(const vector<vector<unsigned int>>& convex_partitions);
+	void setConvexPartitions(const vector<set<unsigned int>>& convex_partitions);
 
 	array<unsigned int,3> faceIndicesByIndex(size_t i) const;
 	array<vec3, 3> faceByIndex(size_t i) const;

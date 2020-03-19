@@ -6,8 +6,11 @@
 #include "Mesh.hpp"
 #include <GL/glew.h>
 
+#include <set>
+
 #include "GeoFeatures.hpp"
 
+using std::set;
 using std::pair;
 
 class Model
@@ -19,6 +22,21 @@ private:
 	vector<unsigned int> m_indices;
 
 	pair<vec3, vec3> m_extent;
+
+	struct ConvexPart
+	{
+		const Model& source;
+		set<unsigned int> indices;
+		ConvexPart(const Model& source);
+		ConvexPart(const Model& source, set<unsigned int> indices);
+
+		template<typename IndexIterator>
+		ConvexPart(const Model& source, IndexIterator begin_iter, IndexIterator end_iter)
+		: source(source)
+		, indices(begin_iter, end_iter) {}
+	};
+
+	std::vector<ConvexPart> convex_parts;
 public:
 	Model(const Mesh& mesh);
 

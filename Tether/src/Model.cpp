@@ -41,6 +41,14 @@ array<vec3, 24 > Model::color_list =
 	vec3(0.25f,0.25f,0.25f), //white
 };
 
+Model::ConvexPart::ConvexPart(const Model& source)
+	: source(source) {}
+
+Model::ConvexPart::ConvexPart(const Model& source, set<unsigned int> indices)
+	: source(source)
+	, indices(indices) {}
+
+
 Model::Model(const Mesh& mesh)
 {
 	m_vertices.clear();
@@ -57,6 +65,11 @@ Model::Model(const Mesh& mesh)
 	m_indices.shrink_to_fit();
 
 	updateExtent();
+
+	for(set<unsigned int> v: mesh.convex_partitions)
+	{
+		convex_parts.push_back(ConvexPart(*this, v));
+	}
 }
 
 const vector<Vertex>& Model::vertices() const
@@ -134,32 +147,27 @@ void Model::drawNative() const
 
 	for(const FaceRef& fr : faces())	
 	{
-		/*
-		//switch color for every triangle
-		//so edges can be seen
-		float thisblue;
-		switch(i%4)
+
+		vec3 color = color_list[0];
+		//find the convex_part the object is in
+		unsigned int j = 0;
+		for(auto p : convex_parts)
 		{
-			default:
-			   	thisblue = 0.0f;
-			break;
-			case 0:
-				thisblue = 0.0f;
-			break;
-			case 1:
-				thisblue = 0.25f;
-			break;
-			case 2:
-				thisblue = 0.5f;
-			break;
-			case 3:
-				thisblue = 0.75f;
-			break;
+			FaceRef tempfr = fr;
+			std::sort(tempfr.begin(), tempfr.end());
+			vector<unsigned int> result(3);
+			vector<unsigned int>::iterator result_end;
+			result_end = std::set_intersection(p.indices.begin(), p.indices.end(), tempfr.begin(), tempfr.end(), result.begin());
+			unsigned int size = result_end - result.begin();
+			result.resize(size);
+			if(result.size() == 3)
+			{
+				unsigned int color_index = (j%(color_list.size()-1))+1;
+				color = color_list[color_index];
+				break;
+			}
+			++j;
 		}
-		thisblue = thisblue+(0.01f*(i%25));
-		glColor3f(1.0f, 0.0f, thisblue);
-		*/
-		const vec3& color = color_list[i%color_list.size()];
 		glColor3f(color.x, color.y, color.z);
 
 		for(VertexRef vr: fr)

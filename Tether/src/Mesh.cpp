@@ -10,7 +10,7 @@ using std::cout;
 using std::string;
 
 
-void Mesh::setConvexPartition(const vector<vector<unsigned int>>& convex_partition)
+void Mesh::setConvexPartitions(const vector<set<unsigned int>>& convex_partitions)
 {
 	this->convex_partitions = convex_partitions;
 }
@@ -85,7 +85,7 @@ istream& operator>> (istream& is, Mesh& m)
 		i = std::stoi(s);
 		m.indices.push_back(i);
 	}
-	vector<unsigned int> convex_indices;
+	set<unsigned int> convex_indices;
 	while(is >> s)
 	{
 		if(s == ",")
@@ -94,7 +94,7 @@ istream& operator>> (istream& is, Mesh& m)
 			convex_indices.clear();
 			continue;
 		}
-		convex_indices.push_back(std::stoi(s));
+		convex_indices.insert(std::stoi(s));
 	}
 	if(!m.convex_partitions.empty())
 	{
