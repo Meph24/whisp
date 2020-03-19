@@ -10,6 +10,11 @@ using std::cout;
 using std::string;
 
 
+void Mesh::setConvexPartition(const vector<vector<unsigned int>>& convex_partition)
+{
+	this->convex_partitions = convex_partitions;
+}
+
 array<unsigned int, 3> Mesh::faceIndicesByIndex(size_t i) const
 {
 	if(i >= faceCount())
@@ -49,7 +54,7 @@ ostream& operator<< (ostream& os, const Mesh& m)
 		os << i << " ";
 	}
 	os << "| ";
-	for(auto v : m.convex_colliders)
+	for(auto v : m.convex_partitions)
 	{
 		for(auto i : v)
 		{
@@ -85,15 +90,15 @@ istream& operator>> (istream& is, Mesh& m)
 	{
 		if(s == ",")
 		{
-			m.convex_colliders.emplace_back(std::move(convex_indices));
+			m.convex_partitions.emplace_back(std::move(convex_indices));
 			convex_indices.clear();
 			continue;
 		}
 		convex_indices.push_back(std::stoi(s));
 	}
-	if(!m.convex_colliders.empty())
+	if(!m.convex_partitions.empty())
 	{
-		m.convex_colliders.emplace_back(std::move(convex_indices));
+		m.convex_partitions.emplace_back(std::move(convex_indices));
 	}
 	
 	return is;

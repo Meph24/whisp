@@ -21,7 +21,7 @@ struct Mesh
 	//indices come in groups of 3, which describe a triangle
 	vector<unsigned int> indices;
 
-	vector<vector<unsigned int>> convex_colliders;
+	vector<vector<unsigned int>> convex_partitions;
 	
 	Mesh() = default;
 
@@ -39,6 +39,8 @@ struct Mesh
 
 	Mesh(const Mesh&) = default;
 	Mesh& operator=(const Mesh&) = default;
+
+	void setConvexPartitions(const vector<vector<unsigned int>>& convex_partitions);
 
 	array<unsigned int,3> faceIndicesByIndex(size_t i) const;
 	array<vec3, 3> faceByIndex(size_t i) const;
