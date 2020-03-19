@@ -27,7 +27,8 @@ Mesh torusMesh(	float torus_radius, unsigned int torus_samples,
 				float tube_radius, unsigned int tube_samples)
 {
 	vector<vec3> vertices;
-	vertices.reserve(torus_samples * tube_samples);
+	unsigned int num_vertices = torus_samples * tube_samples;
+	vertices.reserve(num_vertices);
 	vector<unsigned int> indices;
 	indices.reserve(3 * 2 * torus_samples * tube_samples);
 	
@@ -119,6 +120,23 @@ Mesh torusMesh(	float torus_radius, unsigned int torus_samples,
 		indices.push_back(vi_10);
 	}
 
-	return Mesh(vertices.begin(), vertices.end(),
+	vector<vector<unsigned int>> convex_partitions;
+	for ( unsigned int torus_index = 0; torus_index < torus_samples; ++torus_index )
+	{
+		vector<unsigned int> v;
+		//the current ring on the torus and the next will make a small tube section which is convex on the torus
+		for ( unsigned int tube_index = 0; tube_index < tube_samples; ++tube_index )
+		{
+			v.push_back((torus_index * tube_samples + tube_index));
+			v.push_back(((torus_index+1) * tube_samples + tube_index) % num_vertices);
+		}
+		convex_partitions.emplace_back(std::move(v));
+	}
+
+	Mesh m(vertices.begin(), vertices.end(),
 				indices.begin(), indices.end());
+
+	m.setConvexPartitions(convex_partitions);
+
+	return m;
 }

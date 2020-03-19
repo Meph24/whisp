@@ -1,6 +1,7 @@
 #include "diamondMesh.hpp"
 
 #include <vector>
+#include <numeric>
 
 #include "MathStuff.h"
 
@@ -42,8 +43,19 @@ Mesh diamondMesh(int facets, float radius, float height)
 
 	}
 
-	return Mesh(	vertices.begin(), vertices.end(),
-					indices.begin(), indices.end()
-			   );
+	//the diamond is convex, all vertices are part of the hull
+	vector<vector<unsigned int>> convex_partitions;
+	{
+		vector<unsigned int> v (vertices.size());
+		std::iota(v.begin(), v.end(), 0);
+		convex_partitions.emplace_back(std::move(v));
+	}
 
+
+	Mesh m(	vertices.begin(), vertices.end(),
+			indices.begin(), indices.end()
+		   );
+	m.setConvexPartitions(convex_partitions);
+
+	return m;
 }
