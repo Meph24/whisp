@@ -60,10 +60,10 @@ inline glm::vec3 operator*(const glm::vec3& b, const glm::mat4& a)
 */
 
 inline glm::vec4 operator+(const glm::vec4& v4, const glm::vec3& v3)
-{	return v4 + vec4(v3, 1.0f);	}
+{	return vec4(vec3(v4) + v3, v4.w);	}
 
 inline glm::vec4 operator+(const glm::vec3& v3, const glm::vec4& v4)
-{	return vec4(v3, 1.0f) + v4;	}
+{	return vec4(v3 + vec3(v4), v4.w);	}
 
 template<template<typename, precision> class matType, typename T, precision P>
 inline std::ostream& operator<<(std::ostream& os, matType<T,P> const & m)

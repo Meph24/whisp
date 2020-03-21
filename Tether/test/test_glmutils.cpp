@@ -61,11 +61,10 @@ TEST(test_glmutils, v3m4_mult)
 TEST(test_glmutils, v4v3_v3v4_add)
 {
 	vec3 v3 (1, 2, 3);
-	vec4 v4 (v3, 1);
 	vec4 other (2,3,4,5);
-	EXPECT_EQ(other + v4, other + v3);
-	EXPECT_EQ(v4 + other, v3 + other);
 	EXPECT_EQ(v3 + other, other + v3);
+
+	EXPECT_EQ(5, (other + v3).w);
 }
 
 TEST(test_glmutils, ostream)
