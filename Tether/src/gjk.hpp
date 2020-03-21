@@ -3,6 +3,7 @@
 
 #include "GeoFeatures.hpp"
 
+#include <algorithm>
 #include <utility>
 
 using std::pair;
@@ -15,15 +16,19 @@ class MinkowskiGenerator
 	VertexIterator0 v0_begin; VertexIterator0 v0_end; VertexIterator1 v1_begin; VertexIterator1 v1_end;
 	IndexIterator0 i0_begin; IndexIterator0 i0_end; IndexIterator1 i1_begin; IndexIterator1 i1_end;
 
+	vec3 relpos;
+
 public:
 	MinkowskiGenerator(
 			VertexIterator0 v0_begin, VertexIterator0 v0_end, VertexIterator1 v1_begin, VertexIterator1 v1_end,
-			IndexIterator0 i0_begin, IndexIterator0 i0_end, IndexIterator1 i1_begin, IndexIterator1 i1_end
+			IndexIterator0 i0_begin, IndexIterator0 i0_end, IndexIterator1 i1_begin, IndexIterator1 i1_end,
+			vec3 relative_position = vec3(0.0f)
 			)
 		: v0_begin(v0_begin) , v0_end(v0_end)
 		, v1_begin(v1_begin) , v1_end(v1_end)
 		, i0_begin(i0_begin) , i0_end(i0_end)
 		, i1_begin(i1_begin) , i1_end(i1_end)
+		, relpos(relative_position)
 	{}
 
 	//Input-Iterator
@@ -31,11 +36,12 @@ public:
 	{
 		const MinkowskiGenerator& source;
 		IndexIterator0 iter0; IndexIterator1 iter1;
-		Vertex minkowski_vertex;
+		vec3 minkowski_vertex;
+
 
 		void updateVertex()
 		{
-			minkowski_vertex = *(source.v0_begin + (*iter0)) - *(source.v1_begin + (*iter1));
+			minkowski_vertex = vec3((*(source.v0_begin + (*iter0))) - (source.relpos + *(source.v1_begin + (*iter1))));
 		}
 	public:
 		Iterator(const MinkowskiGenerator& source)
@@ -73,12 +79,12 @@ public:
 			return newiter;
 		}
 
-		Vertex& operator*()
+		vec3& operator*()
 		{
 			return minkowski_vertex;
 		}
 
-		Vertex& operator->()
+		vec3& operator->()
 		{
 			return minkowski_vertex;
 		}
@@ -103,7 +109,12 @@ public:
 		{
 			return std::make_pair(*iter0, *iter1);
 		}
-		Vertex get() const
+
+		vec3 relativePosition() const
+		{
+			return source.relpos;
+		}
+		vec3 get() const
 		{
 			return minkowski_vertex;
 		}
@@ -122,6 +133,29 @@ public:
 	}
 
 };
+
+
+struct MinkowskiPoint
+{
+	vec3 point;
+	unsigned int i0, i1;
+
+	MinkowskiPoint() = default;
+	MinkowskiPoint(vec3 point, unsigned int i0, unsigned int i1);
+};
+
+template<typename MinkowskiGeneratorType>
+MinkowskiPoint maxSupport(const MinkowskiGeneratorType& mg, const vec3& direction)
+{
+	auto max = std::max_element(mg.begin(), mg.end(),
+				[direction](const vec3& first, const vec3& second)
+				{
+					return glm::dot(first, direction) < glm::dot(second, direction);
+				});
+	
+	auto max_indices = max.indices();
+	return MinkowskiPoint(*max, max_indices.first, max_indices.second);
+}
 
 } /* namespace gjk */
 

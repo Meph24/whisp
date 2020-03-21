@@ -20,14 +20,17 @@ TEST(test_gjk, MinkowskiGenerator)
 	vector<unsigned int> indices0 = {0};
 	vector<unsigned int> indices1 = {0, 1};
 
+	vec3 relative_position (0.5f, 0.5f, 0.5f);
+
 	MinkowskiGenerator mg (
 			vertices0.begin(), vertices0.end(), vertices1.begin(), vertices1.end(),
-			indices0.begin(), indices0.end(), indices1.begin(), indices1.end()
+			indices0.begin(), indices0.end(), indices1.begin(), indices1.end(),
+			relative_position
 			);
 
 
-	vector<Vertex> expect_vertex = {	Vertex (0.5f, 0.5f, 0.5f, 0.0f),
-										Vertex(1.25f, 1.25f, 1.25f, 0.0f)	};
+	vector<vec3> expect_vertex = {	vec3(0.0f, 0.0f, 0.0f),
+									vec3(0.75f, 0.75f, 0.75f)	};
 	vector<pair<Vertex, Vertex>> expect_vertices = 
 	{
 		pair<Vertex, Vertex> (Vertex(1.0f, 1.0f, 1.0f, 1.0f), Vertex(0.5f, 0.5f, 0.5f, 1.0f)),
