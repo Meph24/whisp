@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 #include "../src/GeoFeatures.hpp"
+#include "../src/glmutils.hpp"
 
 #include <gtest/gtest.h>
 
@@ -60,6 +61,47 @@ TEST(test_gjk, MinkowskiGenerator)
 		++i;
 	}
 }
+
+TEST(test_gjk, support)
+{
+	//for simplicitly we use only 2d
+	vector<Vertex> vertices0 = {	Vertex(1.0f, 0.0f, 0.0f, 1.0f),
+									Vertex(0.0f, 0.0f, 0.0f, 1.0f),
+									Vertex(0.5f, 1.0f, 0.0f, 1.0f)
+								};
+
+	vector<Vertex> vertices1 = {	Vertex(1.0f, 0.0f, 0.0f, 1.0f),
+									Vertex(0.0f, 0.0f, 0.0f, 1.0f),
+									Vertex(0.5f, 1.0f, 0.0f, 1.0f)
+								};
+
+	vector<unsigned int> indices0 = {0,1,2};
+	vector<unsigned int> indices1 = {0,1,2};
+
+	vec3 relative_position (0.5f, 0.5f, 0.0f);
+
+	MinkowskiGenerator mg (
+			vertices0.begin(), vertices0.end(), vertices1.begin(), vertices1.end(),
+			indices0.begin(), indices0.end(), indices1.begin(), indices1.end(),
+			relative_position
+			);
+
+	gjk::MinkowskiPoint expect_point, result;
+
+	expect_point =  gjk::MinkowskiPoint(vec3(0.0f, 0.5f, 0.0f), 2, 1);
+	result = gjk::maxSupport(mg, vec3(1.0f, 1.0f, 0.0f));
+
+	ASSERT_EQ(expect_point, result) << glm::to_string(result.point) << ", " << result.i0 << ", " << result.i1 << " ;expected : " << glm::to_string(expect_point.point) << expect_point.i0 << ", " << expect_point.i1 ;
+
+	
+	expect_point =  gjk::MinkowskiPoint(vec3(-1.5f, -0.5f, 0.0f), 1, 0);
+	result = gjk::maxSupport(mg, vec3(-1.0f, 0.0f, 0.0f));
+
+	ASSERT_EQ(expect_point, result) << glm::to_string(result.point) << ", " << result.i0 << ", " << result.i1 << " ;expected : " << glm::to_string(expect_point.point) << expect_point.i0 << ", " << expect_point.i1 ;
+
+}
+
+
 
 int main (int argc , char** argv)
 {

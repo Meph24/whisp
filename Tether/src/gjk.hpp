@@ -34,36 +34,36 @@ public:
 	//Input-Iterator
 	struct Iterator
 	{
-		const MinkowskiGenerator& source;
+		const MinkowskiGenerator* source;
 		IndexIterator0 iter0; IndexIterator1 iter1;
 		vec3 minkowski_vertex;
 
 
 		void updateVertex()
 		{
-			minkowski_vertex = vec3((*(source.v0_begin + (*iter0))) - (source.relpos + *(source.v1_begin + (*iter1))));
+			minkowski_vertex = vec3((*(source->v0_begin + (*iter0))) - (source->relpos + *(source->v1_begin + (*iter1))));
 		}
 	public:
-		Iterator(const MinkowskiGenerator& source)
+		Iterator(const MinkowskiGenerator* source)
 			: source(source)
-			, iter0(source.i0_begin), iter1(source.i1_begin)
+			, iter0(source->i0_begin), iter1(source->i1_begin)
 		{
 			updateVertex();
 		}
-		Iterator(const Iterator&) = default;
+		Iterator(const Iterator& other) = default;
 		Iterator& operator= (const Iterator&) = default;
 		~Iterator() = default;
 
 		//prae
 		Iterator& operator++()
 		{
-			if(iter0 == source.i0_end) return *this;
+			if(iter0 == source->i0_end) return *this;
 
 			iter1++;
 
-			if(iter1 == source.i1_end)
+			if(iter1 == source->i1_end)
 			{
-				iter1 = source.i1_begin;
+				iter1 = source->i1_begin;
 				iter0++;
 			}
 
@@ -91,7 +91,7 @@ public:
 
 		bool operator== (const Iterator& other) const
 		{
-			if(other.iter0 == source.i0_end && iter0 == source.i0_end) return true;
+			if(other.iter0 == source->i0_end && iter0 == source->i0_end) return true;
 			if(iter0 == other.iter0 && iter1 == other.iter1) return true;
 			return false;
 		}
@@ -103,7 +103,7 @@ public:
 
 		pair<Vertex, Vertex> vertices() const
 		{
-			return std::make_pair(*(source.v0_begin + (*iter0)), *(source.v1_begin + (*iter1)));
+			return std::make_pair(*(source->v0_begin + (*iter0)), *(source->v1_begin + (*iter1)));
 		}
 		pair<unsigned int, unsigned int> indices() const
 		{
@@ -112,7 +112,7 @@ public:
 
 		vec3 relativePosition() const
 		{
-			return source.relpos;
+			return source->relpos;
 		}
 		vec3 get() const
 		{
@@ -123,11 +123,11 @@ public:
 
 	Iterator begin() const
 	{
-		return Iterator(*this);
+		return Iterator(this);
 	}
 	Iterator end() const
 	{
-		Iterator iter(*this);
+		Iterator iter(this);
 		iter.iter0 = this->i0_end;
 		return iter;
 	}
@@ -143,6 +143,9 @@ struct MinkowskiPoint
 	MinkowskiPoint() = default;
 	MinkowskiPoint(vec3 point, unsigned int i0, unsigned int i1);
 };
+
+bool operator==(const MinkowskiPoint& first, const MinkowskiPoint& second);
+bool operator!=(const MinkowskiPoint& first, const MinkowskiPoint& second);
 
 template<typename MinkowskiGeneratorType>
 MinkowskiPoint maxSupport(const MinkowskiGeneratorType& mg, const vec3& direction)
