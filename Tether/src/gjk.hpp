@@ -5,6 +5,12 @@
 
 #include <algorithm>
 #include <utility>
+#include <vector>
+#include <iostream>
+using std::cout;
+using std::ostream;
+
+using std::vector;
 
 using std::pair;
 
@@ -147,17 +153,310 @@ struct MinkowskiPoint
 bool operator==(const MinkowskiPoint& first, const MinkowskiPoint& second);
 bool operator!=(const MinkowskiPoint& first, const MinkowskiPoint& second);
 
-template<typename MinkowskiGeneratorType>
-MinkowskiPoint maxSupport(const MinkowskiGeneratorType& mg, const vec3& direction)
+ostream& operator<< (ostream& os, const MinkowskiPoint& p);
+
+template<typename MinkowskiPointIterator>
+MinkowskiPoint makeMinkowskiPoint(const MinkowskiPointIterator& iter)
 {
-	auto max = std::max_element(mg.begin(), mg.end(),
+	auto indices = iter.indices();
+	return std::move(MinkowskiPoint(iter.get(), indices.first, indices.second));
+}
+
+template<typename MinkowskiPointIterator>
+MinkowskiPoint maxSupport(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIterator& mp_end, const vec3& direction)
+{
+	MinkowskiPointIterator max = std::max_element(mp_begin, mp_end,
 				[direction](const vec3& first, const vec3& second)
 				{
 					return glm::dot(first, direction) < glm::dot(second, direction);
 				});
 	
-	auto max_indices = max.indices();
-	return MinkowskiPoint(*max, max_indices.first, max_indices.second);
+	return makeMinkowskiPoint(max);
+}
+
+enum SimplexType
+{
+	NONE = 0,
+	POINT = 1,
+	LINE = 2,
+	TRIANGLE = 3,
+	TETRAHEDRON = 4,
+
+	NUM_SIMPLEXTYPE
+};
+
+inline bool parallel(const vec3& d0, const vec3& d1)
+{
+	return (d0 / glm::length(d0)) == (d1 / glm::length(d1));
+}
+
+inline bool sameDirection(const vec3& d0, const vec3& d1)
+{
+	cout << "sameDirection inp : " << glm::to_string(d0) << "|" << glm::to_string(d1) << '\n';
+	float d = glm::dot(d0, d1);
+	cout << "sameDirection dot : " << d << '\n';
+	return d > 0;
+}
+
+inline bool doPoint(vector<MinkowskiPoint>& supports, vec3& direction)
+{
+	cout << "doPoint\n";
+	const vec3& a = supports.back().point;
+	direction = -a;
+	return false;
+}
+
+inline bool doLine(vector<MinkowskiPoint>& supports, vec3& direction)
+{
+	cout << "doLine\n";
+	const vec3& b = supports.front().point;
+	const vec3& a = supports.back().point;
+	vec3 ab = b-a;
+	//AB same direction as A0
+	if(sameDirection(ab, -a)) //origin near the line
+	{
+		//supports can remain same
+		direction = glm::cross(glm::cross(ab, -a), ab);
+		return false;
+	}
+	else //origin nearer to the newest point
+	{
+		supports = { supports.back() };
+		return doPoint(supports, direction);
+	}
+}
+
+inline bool doTriangle(vector<MinkowskiPoint>& supports, vec3& direction)
+{
+	cout << "doTriangle\n";
+	const vec3& c = supports[0].point;
+	const vec3& b = supports[1].point;
+	const vec3& a = supports[2].point;
+	const vec3 ab = b-a;
+	const vec3 ac = c-a;
+	const vec3 abc = glm::cross(ab, ac);
+
+	if(sameDirection(glm::cross(abc, ac), -a))
+	{
+		supports = {supports[0], supports[2]};
+		return doLine(supports, direction);
+	}
+	//need to check with -ab for winding purposes (direction of the cross)
+	else if(sameDirection(glm::cross(abc, -ab), -a))
+	{
+		supports = {supports[1], supports[2]};
+		return doLine(supports, direction);
+	}
+	else
+	{
+		if(sameDirection(abc, -a))
+		{
+			//supports stay the same
+			direction = abc;
+			return false;
+		}
+		else
+		{
+			std::swap(supports[0], supports[1]);
+			direction = -abc;
+			return false;
+		}
+	}
+}
+
+inline bool doTetrahedron(vector<MinkowskiPoint>& supports, vec3& direction)
+{
+	cout << "doTetrahedron\n";
+	const vec3& d = supports[0].point;
+	const vec3&	c = supports[1].point;
+	const vec3&	b = supports[2].point;
+	const vec3&	a = supports[3].point;
+
+	const vec3 ab = b-a;
+	const vec3 ac = c-a;
+	const vec3 ad = d-a;
+
+	const vec3 abc = glm::cross(ab, ac);
+	const vec3 acd = glm::cross(ac, ad);
+	const vec3 adb = glm::cross(ad, ab);
+
+	cout << "ASSERT :  samedirection abc" <<
+		((sameDirection(abc, a-d)? "TRUE" : "FALSE")) <<
+		((sameDirection(abc, b-d)? "TRUE" : "FALSE")) <<
+		((sameDirection(abc, c-d)? "TRUE" : "FALSE")) << '\n';
+
+	cout << "ASSERT :  samedirection acd" <<
+		((sameDirection(acd, a-b)? "TRUE" : "FALSE")) <<
+		((sameDirection(acd, c-b)? "TRUE" : "FALSE")) <<
+		((sameDirection(acd, d-b)? "TRUE" : "FALSE")) << '\n';
+
+	cout << "ASSERT :  samedirection adb" <<
+		((sameDirection(adb, a-c)? "TRUE" : "FALSE")) <<
+		((sameDirection(adb, d-c)? "TRUE" : "FALSE")) <<
+		((sameDirection(adb, b-c)? "TRUE" : "FALSE")) << '\n';
+
+
+
+	if(sameDirection(abc, -a))
+	{
+		supports = {supports[1], supports[2], supports[3]};
+		return doTriangle(supports, direction);
+	}
+	else if(sameDirection(acd, -a))
+	{
+		supports = {supports[0], supports[1], supports[3]};
+		return doTriangle(supports, direction);
+	}
+	else if(sameDirection(adb, -a))
+	{
+		supports = {supports[2], supports[0], supports[3]};
+		return doTriangle(supports, direction);
+	}
+	else
+	{
+		return true;
+	}
+
+}
+
+inline bool doSimplex(vector<MinkowskiPoint>& supports, vec3& direction)
+{
+	switch(supports.size())
+	{
+		default:
+			return false;
+		break;
+		case SimplexType::POINT:
+			return doPoint(supports, direction);
+		break;
+		case SimplexType::LINE:
+			return doLine(supports, direction);
+		break;
+		case SimplexType::TRIANGLE:
+			return doTriangle(supports, direction);
+		break;
+		case SimplexType::TETRAHEDRON:
+			return doTetrahedron(supports, direction);
+		break;
+	}
+}
+
+inline float doDistance(const vector<MinkowskiPoint>& supports)
+{
+	cout << "~~~~~\n";
+	cout << "do Distance : \n";
+	cout << "Supports:\n";
+	for(auto e : supports)
+	{
+		cout << e << '\n';
+	}
+	cout << ".....\n";
+
+	switch(supports.size())
+	{
+		default:
+			return 0.0;
+		case SimplexType::POINT:
+			return glm::length(supports.back().point);
+		break;
+		case SimplexType::LINE:
+		{
+			//get the normal in direction to the origin
+			const vec3& a = supports[0].point;
+			const vec3& b = supports[1].point;
+			vec3 ab = b - a;
+			vec3 n = glm::cross(glm::cross(ab, -a), ab);
+			//normalize that normal
+			n /= glm::length(n);
+			//the dot product should give us the length of projection of the normal to the origin
+			return glm::dot(n, -a);
+		}
+		break;
+		case SimplexType::TRIANGLE:
+		{
+			cout << "doDistance Triangle\n";
+			//since we know the point is definitiely over the triangle, double projection with the triangles normal will suffice
+			const vec3& a = supports[2].point;
+			const vec3& b = supports[1].point;
+			const vec3& c = supports[0].point;
+			vec3 n = glm::cross(b-a, c-a);
+			//normalize normal
+			n /= glm::length(n);
+			return glm::dot(n, -a);
+		}
+		break;
+	}
+}
+
+template<typename MinkowskiPointIterator>
+bool intersection(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIterator& mp_end, std::vector<MinkowskiPoint>* supports = nullptr)
+{
+	if(!supports)
+	{
+		supports = new std::vector<MinkowskiPoint>();
+		supports->reserve(4);
+		supports->emplace_back(makeMinkowskiPoint(mp_begin));
+	}
+	else if(supports->size() > 4 || supports->size() < 1)
+	{
+		supports->clear();
+		supports->reserve(4);
+		supports->emplace_back(makeMinkowskiPoint(mp_begin));
+	}
+
+	vec3 direction;
+
+	while(!doSimplex(*supports, direction))
+	{
+		cout << "-----------------------\n";
+		cout << "Supports:\n";
+		for(auto p : *supports)
+		{
+			cout << p << '\n';
+		}
+
+		MinkowskiPoint newSupport = maxSupport(mp_begin, mp_end, direction);
+		cout << glm::to_string(direction) << " New support : " << newSupport << '\n';
+		float s = glm::dot(newSupport.point, direction);
+		cout << s << '\n';
+		if(s < 0) 
+		{
+			return false;
+		}
+		supports->emplace_back(newSupport);
+	}
+	return true;
+}
+
+template<typename MinkowskiPointIterator>
+float distance(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIterator& mp_end, std::vector<MinkowskiPoint>* supports = nullptr)
+{
+	if(!supports)
+	{
+		supports = new std::vector<MinkowskiPoint>();
+		supports->reserve(4);
+		supports->emplace_back(makeMinkowskiPoint(mp_begin));
+	}
+	else if(supports->size() > 4 || supports->size() < 1)
+	{
+		supports->clear();
+		supports->reserve(4);
+		supports->emplace_back(makeMinkowskiPoint(mp_begin));
+	}
+
+	vec3 direction;
+
+	while(!doSimplex(*supports, direction))
+	{
+		MinkowskiPoint new_support = maxSupport(mp_begin, mp_end, direction);
+		if(std::find(supports->begin(), supports->end(), new_support) != supports->end())
+		{
+			//we've already found the neares feature
+			return doDistance(*supports);
+		}
+		supports->emplace_back(new_support);
+	}
+	return 0.0;
 }
 
 } /* namespace gjk */
