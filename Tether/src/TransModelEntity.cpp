@@ -10,12 +10,22 @@
 
 #include "collisionl2.hpp"
 
+vector<Model::ConvexPart> TransModelEntity::convexParts() const
+{
+	return mo.model().convexParts();
+}
+
 TransModelEntity::TransModelEntity(const Model& model)
 	: mo(model),
 	rot(0.0f), scale(1.0f), drot(0.0f), dscale(0.0f)
 {
 	pos.set0();
 	v.set0();
+}
+
+const ModelObject& TransModelEntity::modelObject() const
+{
+	return mo;
 }
 
 AABB TransModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)

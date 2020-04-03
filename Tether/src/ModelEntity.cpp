@@ -22,6 +22,11 @@ using glm::vec4;
 using glm::vec3;
 using glm::mat4;
 
+vector<Model::ConvexPart> ModelEntity::convexParts(float tick_time) const
+{
+	return m_model.convexParts();
+}
+
 const Model& ModelEntity::model()
 {
 	return m_model;

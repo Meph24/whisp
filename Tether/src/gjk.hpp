@@ -1,12 +1,18 @@
 #ifndef GJK_HPP
 #     define GJK_HPP
 
-#include "GeoFeatures.hpp"
 
 #include <algorithm>
 #include <utility>
 #include <vector>
 #include <iostream>
+#include <limits>
+
+#include "GeoFeatures.hpp"
+#include "TickServiceProvider.h"
+#include "IWorld.h"
+#include "Model.hpp"
+
 using std::cout;
 using std::ostream;
 
@@ -457,6 +463,126 @@ float distance(const MinkowskiPointIterator& mp_begin, const MinkowskiPointItera
 		supports->emplace_back(new_support);
 	}
 	return 0.0;
+}
+
+//TODO remodel so this template is not needed any more
+template<typename TimedModelType0, typename TimedModelType1>
+struct RelModels
+{
+	TimedModelType0 m0;
+	TimedModelType1 m1;
+
+	vec3 pos0_t0;
+	vec3 pos1_t0;
+	vec3 v0;
+	vec3 v1;
+
+	RelModels(TimedModelType0 m0, TimedModelType1 m1, TickServiceProvider* tsp)
+		: m0(m0), m1(m1)
+		, pos0_t0(vec3(0.0f))
+		, pos1_t0(tsp->getIWorld()->toMeters(m1.pos - m0.pos))
+		, v0(vec3(0.0f))
+		, v1(tsp->getIWorld()->toMeters(m1.pos - m0.pos))
+	{}
+
+	vec3 getPos0(float tick_seconds) const
+	{
+		return vec3(0.0f);
+	}
+	vec3 getPos1(float tick_seconds) const
+	{
+		return pos1_t0 + v1*tick_seconds;
+	}
+};
+
+template<typename TimedModelType0, typename TimedModelType1>
+float rootFindingSample(const RelModels<TimedModelType0, TimedModelType1>& relmodels, float tick_seconds)
+{
+	vector<Model::ConvexPart> m0_convex_parts, m1_convex_parts;
+	m0_convex_parts = relmodels.m0.convexParts(tick_seconds);
+	m1_convex_parts = relmodels.m1.convexParts(tick_seconds);
+
+
+	float dist = std::numeric_limits<float>::max();
+
+	//TODO AABB pruning between convex parts
+	for(auto m0_cp : m0_convex_parts)
+	{
+		for(auto m1_cp : m1_convex_parts)
+		{
+			auto m0_vertices = relmodels.m0.vertices(tick_seconds);
+			auto m1_vertices = relmodels.m0.vertices(tick_seconds);
+			vec3 relpos = relmodels.getPos1(tick_seconds) - relmodels.getPos0(tick_seconds);
+			MinkowskiGenerator mg (	m0_vertices.begin(), m0_vertices.end(),
+									m1_vertices.end(), m1_vertices.end(),
+									m0_cp.indices.begin(), m0_cp.indices.end(),
+									m1_cp.indices.begin(), m1_cp.indices.end(),
+									relpos
+									);
+			float new_dist = distance(mg.begin(), mg.end());
+			if(new_dist < dist) dist = new_dist;
+		}
+	}
+	return dist;
+}
+
+	
+
+template<typename TimedModelType0, typename TimedModelType1>
+bool firstRoot(const RelModels<TimedModelType0, TimedModelType1>& relmodels, float t0, float t1, float& time_out, unsigned int initial_samples = 10, float epsilon = 0.001)
+{
+	if(initial_samples < 2) return false;
+	//time, distance
+
+	float time0, time1, dist0, dist1;
+	time0 = t0; time1 = t1;
+	dist0 = rootFindingSample(relmodels, t0);
+
+	if(dist0 <= 0.0f)
+	{
+		//we already entered at a state of collision
+		//this doesn't count, as the collision had to be detected in the step before
+		//therefore aborting with a false state, but returning time, still
+		time_out = t0;
+		return false;
+	}
+
+	float timespan = t1 - t0;
+	float timestep = timespan / (initial_samples - 1);
+	for( int sample = 1 ; sample <= initial_samples; sample++ )
+	{
+		float time1 = t0+timestep*sample;
+		float dist1 = rootFindingSample(relmodels, time1);
+		if (dist1 <= 0.0f)
+			break;
+
+		if(sample == initial_samples)
+		{
+			return false;
+		}
+
+		dist0 = dist1;
+		time0 = time1;
+	}
+
+	while(time1-time0 > epsilon)
+	{
+		float time05 = time0 + (time1-time0) * 0.5;
+		float dist05 = rootFindingSample(relmodels, time05);
+		if(dist05 <= 0.0f)
+		{
+			time1 = time05;
+			dist1 = dist05;
+		}
+		else
+		{
+			time0 = time05;
+			dist0 = dist05;
+		}
+	}
+
+	time_out = time0;
+	return true;
 }
 
 } /* namespace gjk */

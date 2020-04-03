@@ -137,6 +137,11 @@ const pair<vec3, vec3>& Model::extent() const
 	return m_extent;
 }
 
+const std::vector<Model::ConvexPart>& Model::convexParts() const
+{
+	return convex_parts;
+}
+
 void Model::drawNative() const
 {
 	glEnable(GL_CULL_FACE);

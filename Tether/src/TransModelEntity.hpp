@@ -24,6 +24,8 @@ class TransModelEntity : public Entity, public Collider
 public:
 	TransModelEntity(const Model& model);
 
+	const ModelObject& modelObject() const;
+
 	vec3 rot, scale, drot, dscale;
 
 	AABB aabb(float tick_seconds, TickServiceProvider* tsp);
@@ -41,7 +43,9 @@ public:
 	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
 
 	Collider::TYPE type() const; 
-	
+
+	vector<Model::ConvexPart> convexParts() const;
+
 	vector<Vertex> vertices (float tick_time) const;
 
 	vector<EdgeRef> edges(float tick_time) const;
@@ -51,10 +55,6 @@ public:
 	spacevec position(float tick_time) const;
 
 	void react(float tick_time);
-
-
-
-
 };
 
 
