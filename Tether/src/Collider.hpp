@@ -8,6 +8,7 @@ class TickServiceProvider;
 #include "Spacevec.h"
 #include "DualPointer.h"
 #include "GeoFeatures.hpp"
+#include "Model.hpp"
 
 using std::vector;
 
@@ -60,7 +61,7 @@ public:
 	 */
 	virtual vector<FaceRef> faces (float tick_time) const = 0;
 
-	virtual spacevec position(float tick_time) const = 0;
+	virtual std::vector<Model::ConvexPart> convexParts() const = 0;
 
 	//TODO add metadata support or metadata support interface to the collision Reaction Call
 	//metadata would include collision force, materials invoved, etc. in a more advanced version of this project also position

@@ -31,4 +31,10 @@ template<typename PhysicsIF>
 inline DualPointer<PhysicsIF>::~DualPointer()
 {}
 
+template<typename PhysicsIF>
+DualPointer<PhysicsIF> makeDualPointer(Entity* e, PhysicsIF* pIF)
+{
+	return DualPointer<PhysicsIF>(e, pIF);
+}
+
 #endif /* SRC_DUALPOINTER_H_ */

@@ -13,6 +13,8 @@
 #include "IWorld.h"
 #include "Model.hpp"
 
+#include "Entity.h"
+
 using std::cout;
 using std::ostream;
 
@@ -198,15 +200,12 @@ inline bool parallel(const vec3& d0, const vec3& d1)
 
 inline bool sameDirection(const vec3& d0, const vec3& d1)
 {
-	cout << "sameDirection inp : " << glm::to_string(d0) << "|" << glm::to_string(d1) << '\n';
 	float d = glm::dot(d0, d1);
-	cout << "sameDirection dot : " << d << '\n';
 	return d > 0;
 }
 
 inline bool doPoint(vector<MinkowskiPoint>& supports, vec3& direction)
 {
-	cout << "doPoint\n";
 	const vec3& a = supports.back().point;
 	direction = -a;
 	return false;
@@ -214,7 +213,6 @@ inline bool doPoint(vector<MinkowskiPoint>& supports, vec3& direction)
 
 inline bool doLine(vector<MinkowskiPoint>& supports, vec3& direction)
 {
-	cout << "doLine\n";
 	const vec3& b = supports.front().point;
 	const vec3& a = supports.back().point;
 	vec3 ab = b-a;
@@ -234,7 +232,6 @@ inline bool doLine(vector<MinkowskiPoint>& supports, vec3& direction)
 
 inline bool doTriangle(vector<MinkowskiPoint>& supports, vec3& direction)
 {
-	cout << "doTriangle\n";
 	const vec3& c = supports[0].point;
 	const vec3& b = supports[1].point;
 	const vec3& a = supports[2].point;
@@ -272,7 +269,6 @@ inline bool doTriangle(vector<MinkowskiPoint>& supports, vec3& direction)
 
 inline bool doTetrahedron(vector<MinkowskiPoint>& supports, vec3& direction)
 {
-	cout << "doTetrahedron\n";
 	const vec3& d = supports[0].point;
 	const vec3&	c = supports[1].point;
 	const vec3&	b = supports[2].point;
@@ -285,23 +281,6 @@ inline bool doTetrahedron(vector<MinkowskiPoint>& supports, vec3& direction)
 	const vec3 abc = glm::cross(ab, ac);
 	const vec3 acd = glm::cross(ac, ad);
 	const vec3 adb = glm::cross(ad, ab);
-
-	cout << "ASSERT :  samedirection abc" <<
-		((sameDirection(abc, a-d)? "TRUE" : "FALSE")) <<
-		((sameDirection(abc, b-d)? "TRUE" : "FALSE")) <<
-		((sameDirection(abc, c-d)? "TRUE" : "FALSE")) << '\n';
-
-	cout << "ASSERT :  samedirection acd" <<
-		((sameDirection(acd, a-b)? "TRUE" : "FALSE")) <<
-		((sameDirection(acd, c-b)? "TRUE" : "FALSE")) <<
-		((sameDirection(acd, d-b)? "TRUE" : "FALSE")) << '\n';
-
-	cout << "ASSERT :  samedirection adb" <<
-		((sameDirection(adb, a-c)? "TRUE" : "FALSE")) <<
-		((sameDirection(adb, d-c)? "TRUE" : "FALSE")) <<
-		((sameDirection(adb, b-c)? "TRUE" : "FALSE")) << '\n';
-
-
 
 	if(sameDirection(abc, -a))
 	{
@@ -349,15 +328,6 @@ inline bool doSimplex(vector<MinkowskiPoint>& supports, vec3& direction)
 
 inline float doDistance(const vector<MinkowskiPoint>& supports)
 {
-	cout << "~~~~~\n";
-	cout << "do Distance : \n";
-	cout << "Supports:\n";
-	for(auto e : supports)
-	{
-		cout << e << '\n';
-	}
-	cout << ".....\n";
-
 	switch(supports.size())
 	{
 		default:
@@ -380,7 +350,6 @@ inline float doDistance(const vector<MinkowskiPoint>& supports)
 		break;
 		case SimplexType::TRIANGLE:
 		{
-			cout << "doDistance Triangle\n";
 			//since we know the point is definitiely over the triangle, double projection with the triangles normal will suffice
 			const vec3& a = supports[2].point;
 			const vec3& b = supports[1].point;
@@ -414,17 +383,8 @@ bool intersection(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIt
 
 	while(!doSimplex(*supports, direction))
 	{
-		cout << "-----------------------\n";
-		cout << "Supports:\n";
-		for(auto p : *supports)
-		{
-			cout << p << '\n';
-		}
-
 		MinkowskiPoint newSupport = maxSupport(mp_begin, mp_end, direction);
-		cout << glm::to_string(direction) << " New support : " << newSupport << '\n';
 		float s = glm::dot(newSupport.point, direction);
-		cout << s << '\n';
 		if(s < 0) 
 		{
 			return false;
@@ -454,6 +414,7 @@ float distance(const MinkowskiPointIterator& mp_begin, const MinkowskiPointItera
 
 	while(!doSimplex(*supports, direction))
 	{
+		cout << '+' << std::flush;
 		MinkowskiPoint new_support = maxSupport(mp_begin, mp_end, direction);
 		if(std::find(supports->begin(), supports->end(), new_support) != supports->end())
 		{
@@ -465,125 +426,24 @@ float distance(const MinkowskiPointIterator& mp_begin, const MinkowskiPointItera
 	return 0.0;
 }
 
-//TODO remodel so this template is not needed any more
-template<typename TimedModelType0, typename TimedModelType1>
-struct RelModels
+struct RelColliders
 {
-	TimedModelType0 m0;
-	TimedModelType1 m1;
+	DualPointer<Collider> c0;
+	DualPointer<Collider> c1;
 
-	vec3 pos0_t0;
-	vec3 pos1_t0;
-	vec3 v0;
-	vec3 v1;
+private:
+	vec3 m_pos1;
+	vec3 m_v1;
+public:
+	RelColliders(DualPointer<Collider> c0, DualPointer<Collider> c1, TickServiceProvider& tsp);
 
-	RelModels(TimedModelType0 m0, TimedModelType1 m1, TickServiceProvider* tsp)
-		: m0(m0), m1(m1)
-		, pos0_t0(vec3(0.0f))
-		, pos1_t0(tsp->getIWorld()->toMeters(m1.pos - m0.pos))
-		, v0(vec3(0.0f))
-		, v1(tsp->getIWorld()->toMeters(m1.pos - m0.pos))
-	{}
-
-	vec3 getPos0(float tick_seconds) const
-	{
-		return vec3(0.0f);
-	}
-	vec3 getPos1(float tick_seconds) const
-	{
-		return pos1_t0 + v1*tick_seconds;
-	}
+	vec3 pos0(float tick_seconds) const;
+	vec3 pos1(float tick_seconds) const;
 };
 
-template<typename TimedModelType0, typename TimedModelType1>
-float rootFindingSample(const RelModels<TimedModelType0, TimedModelType1>& relmodels, float tick_seconds)
-{
-	vector<Model::ConvexPart> m0_convex_parts, m1_convex_parts;
-	m0_convex_parts = relmodels.m0.convexParts(tick_seconds);
-	m1_convex_parts = relmodels.m1.convexParts(tick_seconds);
+float rootFindingSample(const RelColliders& relcolliders, float tick_seconds);
+bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time_out, int initial_samples = 10, float epsilon = 0.001);
 
-
-	float dist = std::numeric_limits<float>::max();
-
-	//TODO AABB pruning between convex parts
-	for(auto m0_cp : m0_convex_parts)
-	{
-		for(auto m1_cp : m1_convex_parts)
-		{
-			auto m0_vertices = relmodels.m0.vertices(tick_seconds);
-			auto m1_vertices = relmodels.m0.vertices(tick_seconds);
-			vec3 relpos = relmodels.getPos1(tick_seconds) - relmodels.getPos0(tick_seconds);
-			MinkowskiGenerator mg (	m0_vertices.begin(), m0_vertices.end(),
-									m1_vertices.end(), m1_vertices.end(),
-									m0_cp.indices.begin(), m0_cp.indices.end(),
-									m1_cp.indices.begin(), m1_cp.indices.end(),
-									relpos
-									);
-			float new_dist = distance(mg.begin(), mg.end());
-			if(new_dist < dist) dist = new_dist;
-		}
-	}
-	return dist;
-}
-
-	
-
-template<typename TimedModelType0, typename TimedModelType1>
-bool firstRoot(const RelModels<TimedModelType0, TimedModelType1>& relmodels, float t0, float t1, float& time_out, unsigned int initial_samples = 10, float epsilon = 0.001)
-{
-	if(initial_samples < 2) return false;
-	//time, distance
-
-	float time0, time1, dist0, dist1;
-	time0 = t0; time1 = t1;
-	dist0 = rootFindingSample(relmodels, t0);
-
-	if(dist0 <= 0.0f)
-	{
-		//we already entered at a state of collision
-		//this doesn't count, as the collision had to be detected in the step before
-		//therefore aborting with a false state, but returning time, still
-		time_out = t0;
-		return false;
-	}
-
-	float timespan = t1 - t0;
-	float timestep = timespan / (initial_samples - 1);
-	for( int sample = 1 ; sample <= initial_samples; sample++ )
-	{
-		float time1 = t0+timestep*sample;
-		float dist1 = rootFindingSample(relmodels, time1);
-		if (dist1 <= 0.0f)
-			break;
-
-		if(sample == initial_samples)
-		{
-			return false;
-		}
-
-		dist0 = dist1;
-		time0 = time1;
-	}
-
-	while(time1-time0 > epsilon)
-	{
-		float time05 = time0 + (time1-time0) * 0.5;
-		float dist05 = rootFindingSample(relmodels, time05);
-		if(dist05 <= 0.0f)
-		{
-			time1 = time05;
-			dist1 = dist05;
-		}
-		else
-		{
-			time0 = time05;
-			dist0 = dist05;
-		}
-	}
-
-	time_out = time0;
-	return true;
-}
 
 } /* namespace gjk */
 

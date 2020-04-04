@@ -52,8 +52,6 @@ public:
 
 	vector<FaceRef> faces(float tick_time) const;
 
-	spacevec position(float tick_time) const;
-
 	void react(float tick_time);
 };
 
