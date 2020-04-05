@@ -8,8 +8,8 @@ using std::cout;
 
 namespace gjk {
 
-MinkowskiPoint::MinkowskiPoint(vec3 point, unsigned int i0, unsigned int i1)
-	: point(point), i0(i0), i1(i1) {}
+MinkowskiPoint::MinkowskiPoint(const vec3& point, unsigned int i0, unsigned int i1)
+	: vec3(point), i0(i0), i1(i1) {}
 
 
 bool operator==(const MinkowskiPoint& first, const MinkowskiPoint& second)
@@ -24,7 +24,7 @@ bool operator!=(const MinkowskiPoint& first, const MinkowskiPoint& second)
 
 ostream& operator<< (ostream& os, const MinkowskiPoint& p)
 {
-	os << glm::to_string(p.point) << '(' << p.i0 << ',' << p.i1 << ')';
+	os << glm::to_string(p) << '(' << p.i0 << ',' << p.i1 << ')';
 	return os;
 }
 
@@ -63,6 +63,7 @@ float rootFindingSample(const RelColliders& relcolliders, float tick_seconds)
 			auto m0_vertices = relcolliders.c0.pIF->vertices(tick_seconds);
 			auto m1_vertices = relcolliders.c1.pIF->vertices(tick_seconds);
 			vec3 relpos = relcolliders.pos1(tick_seconds) - relcolliders.pos0(tick_seconds);
+			cout << "relpos : " << relpos << '\n';
 			MinkowskiGenerator mg (	m0_vertices.begin(), m0_vertices.end(),
 									m1_vertices.end(), m1_vertices.end(),
 									m0_cp.indices.begin(), m0_cp.indices.end(),
