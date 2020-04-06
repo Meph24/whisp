@@ -65,14 +65,54 @@ float rootFindingSample(const RelColliders& relcolliders, float tick_seconds)
 			vec3 relpos = relcolliders.pos1(tick_seconds) - relcolliders.pos0(tick_seconds);
 			cout << "relpos : " << relpos << '\n';
 			MinkowskiGenerator mg (	m0_vertices.begin(), m0_vertices.end(),
-									m1_vertices.end(), m1_vertices.end(),
+									m1_vertices.begin(), m1_vertices.end(),
 									m0_cp.indices.begin(), m0_cp.indices.end(),
 									m1_cp.indices.begin(), m1_cp.indices.end(),
 									relpos
 									);
 
+			cout << "Minkowski Generatrion ( relative position of " << glm::to_string(relpos) << " )\n";
+			cout << "vertices0: \n";
+			{
+			unsigned int i = 0;
+			for(auto v : m0_vertices)
+			{
+				cout << i << " : " << glm::to_string(v) << '\n';
+				i++;
+			}
+			}
+			cout << "vertices1: \n";
+			{
+			unsigned int i = 0;
+			for(auto v : m1_vertices)
+			{
+				cout << i << " : " << glm::to_string(v) << '\n';
+				i++;
+			}
+			}
+			cout << "indices0: \n";
+			for(auto i : m0_cp.indices)
+			{
+				cout << i << ',';
+			}
+			cout << '\n';
+			cout << "indices1: \n";
+			for(auto i : m1_cp.indices)
+			{
+				cout << i << ',';
+			}
+			cout << '\n';
+			
+
+
+			for(auto mp : mg)
+			{
+				cout << mp << '\n';
+			}
+			cout << "--------------------------\n";
+
 			cout << '>' << std::flush;
-			float new_dist = distance(mg.begin(), mg.end());
+			float new_dist = gjk::distance(mg.begin(), mg.end());
 			cout << '<' << std::flush;
 			if(new_dist < dist) dist = new_dist;
 		}

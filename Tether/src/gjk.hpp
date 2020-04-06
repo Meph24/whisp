@@ -8,6 +8,7 @@
 #include <vector>
 #include <iostream>
 #include <limits>
+#include <iterator>
 
 #include "GeoFeatures.hpp"
 #include "TickServiceProvider.h"
@@ -61,7 +62,7 @@ public:
 	{}
 
 	//Input-Iterator
-	struct Iterator
+	struct Iterator : public std::iterator<std::input_iterator_tag, MinkowskiPoint>
 	{
 		const MinkowskiGenerator* source;
 		IndexIterator0 iter0; IndexIterator1 iter1;
@@ -70,7 +71,7 @@ public:
 
 		void updatePoint()
 		{
-			point = MinkowskiPoint(
+			point = MinkowskiPoint (
 					vec3((*(source->v0_begin + (*iter0))) - (source->relpos + *(source->v1_begin + (*iter1)))),
 					*iter0, *iter1);
 		}
@@ -158,7 +159,7 @@ MinkowskiPoint maxSupport(const MinkowskiPointIterator& mp_begin, const Minkowsk
 					return f<s;
 				});
 
-	cout << "MAXSUPPORT RETURNS : " << ret << '\n';
+	//cout << "MAXSUPPORT RETURNS : " << ret << '\n';
 	return ret;
 }
 
@@ -186,13 +187,6 @@ inline bool sameDirection(const vec3& d0, const vec3& d1)
 
 inline bool doPoint(vector<MinkowskiPoint>& supports, vec3& direction)
 {
-
-	cout << "1:\n";
-	for(auto& s : supports)
-	{
-		cout << s << '\n';
-	}
-
 	const vec3& a = supports.back();
 	direction = -a;
 #ifdef GJK_RUNTIME_ASSERTS
@@ -203,11 +197,6 @@ inline bool doPoint(vector<MinkowskiPoint>& supports, vec3& direction)
 
 inline bool doLine(vector<MinkowskiPoint>& supports, vec3& direction)
 {
-	cout << "2:\n";
-	for(auto& s : supports)
-	{
-		cout << s << '\n';
-	}
 	const vec3& b = supports.front();
 	const vec3& a = supports.back();
 	vec3 ab = b-a;
@@ -232,11 +221,6 @@ inline bool doLine(vector<MinkowskiPoint>& supports, vec3& direction)
 
 inline bool doTriangle(vector<MinkowskiPoint>& supports, vec3& direction)
 {
-	cout << "3:\n";
-	for(auto& s : supports)
-	{
-		cout << s << '\n';
-	}
 	const vec3& c = supports[0];
 	const vec3& b = supports[1];
 	const vec3& a = supports[2];
@@ -281,11 +265,6 @@ inline bool doTriangle(vector<MinkowskiPoint>& supports, vec3& direction)
 inline bool doTetrahedron(vector<MinkowskiPoint>& supports, vec3& direction)
 {
 
-	cout << "4:\n";
-	for(auto& s : supports)
-	{
-		cout << s << '\n';
-	}
 	const vec3& d = supports[0];
 	const vec3&	c = supports[1];
 	const vec3&	b = supports[2];
@@ -323,11 +302,6 @@ inline bool doTetrahedron(vector<MinkowskiPoint>& supports, vec3& direction)
 
 inline bool doSimplex(vector<MinkowskiPoint>& supports, vec3& direction)
 {
-	cout << "doSimplex:\n";
-	for(auto& s : supports)
-	{
-		cout << s << '\n';
-	}
 	switch(supports.size())
 	{
 		default:
@@ -350,11 +324,6 @@ inline bool doSimplex(vector<MinkowskiPoint>& supports, vec3& direction)
 
 inline float doDistance(const vector<MinkowskiPoint>& supports)
 {
-	cout << "doDistane\n";
-	for(auto& s : supports)
-	{
-		cout << s << '\n';
-	}
 
 	switch(supports.size())
 	{
@@ -398,13 +367,15 @@ bool intersection(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIt
 	{
 		supports = new std::vector<MinkowskiPoint>();
 		supports->reserve(4);
-		supports->emplace_back(makeMinkowskiPoint(mp_begin));
+		MinkowskiPointIterator nonconstbegin = mp_begin;
+		supports->emplace_back(*nonconstbegin);
 	}
 	else if(supports->size() > 4 || supports->size() < 1)
 	{
 		supports->clear();
 		supports->reserve(4);
-		supports->emplace_back(makeMinkowskiPoint(mp_begin));
+		MinkowskiPointIterator nonconstbegin = mp_begin;
+		supports->emplace_back(*nonconstbegin);
 	}
 
 	vec3 direction;
@@ -428,13 +399,23 @@ float distance(const MinkowskiPointIterator& mp_begin, const MinkowskiPointItera
 	std::vector<MinkowskiPoint> supports; 
 	float dist = 0.0f;
 	supports.reserve(4);
-	MinkowskiPoint minkowskipoint = *mp_begin;
+	MinkowskiPoint minkowskipoint;
+	{
+		MinkowskiPointIterator begincopy = mp_begin;
+		minkowskipoint = *begincopy;
+	}
 	supports.emplace_back(minkowskipoint);
 
 	vec3 direction;
 
 	while(!doSimplex(supports, direction))
 	{
+		cout << supports.size() << "\n";
+		for(auto& s : supports)
+		{
+			cout << s << '\n';
+		}
+		cout << "......................................\n";
 		MinkowskiPoint new_support = maxSupport(mp_begin, mp_end, direction);
 		cout << "NEWS : " << new_support << '\n';
 		if(std::find(supports.begin(), supports.end(), new_support) != supports.end())

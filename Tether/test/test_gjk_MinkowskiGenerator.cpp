@@ -27,6 +27,15 @@ TEST(MinkowskiPoint, equals)
 	ASSERT_NE(mp0, mp2);
 }
 
+TEST(MinkowskiPoint, implicit_operators)
+{
+	MinkowskiPoint mp0 (vec3(1.0f, 1.0f, 1.0f), 0, 1);
+	MinkowskiPoint mp1 (vec3(0.5f, 0.5f, 0.5f), 0, 1);
+
+	EXPECT_EQ(vec3(1.5f, 1.5f, 1.5f), mp0+mp1);
+	EXPECT_EQ(vec3(0.5f, 0.5f, 0.5f), mp0-mp1);
+}
+
 TEST(test_gjk, MinkowskiGenerator)
 {
 	vector<Vertex> vertices0 = { Vertex(1.0f, 1.0f, 1.0f, 1.0f),
@@ -45,36 +54,20 @@ TEST(test_gjk, MinkowskiGenerator)
 			);
 
 
-	vector<vec3> expect_vertex = {	vec3(0.0f, 0.0f, 0.0f),
-									vec3(0.75f, 0.75f, 0.75f)	};
-	vector<pair<Vertex, Vertex>> expect_vertices = 
-	{
-		pair<Vertex, Vertex> (Vertex(1.0f, 1.0f, 1.0f, 1.0f), Vertex(0.5f, 0.5f, 0.5f, 1.0f)),
-		pair<Vertex, Vertex> (Vertex(1.0f, 1.0f, 1.0f, 1.0f), Vertex(-0.25f, -0.25f, -0.25f,1.0f))
-	};
-	vector<pair<unsigned int, unsigned int>> expect_indices = 
-	{
-		pair<unsigned int, unsigned int> (0, 0), pair<unsigned int, unsigned int> (0, 1)
-	};
+	vector<MinkowskiPoint> expect ({	MinkowskiPoint(vec3(0.0f, 0.0f, 0.0f), 0, 0),
+										MinkowskiPoint(vec3(0.75f, 0.75f, 0.75f), 0, 1),
+									});
 
-	unsigned int i = 0;
-	for(auto iter = mg.begin(); iter!=mg.end(); iter++)
-	{
-		auto indices = iter.indices();
-		auto vertices = iter.vertices();
-		auto vertex = iter.get();
+	vector<MinkowskiPoint> result(mg.begin(), mg.end());
 
-		ASSERT_EQ(vertex, *iter);
-		ASSERT_EQ(expect_vertex[i], vertex);
+	EXPECT_EQ(expect, result);
 
-		ASSERT_EQ(expect_indices[i].first, indices.first);
-		ASSERT_EQ(expect_indices[i].second, indices.second);
+	EXPECT_EQ(Vertex(1.0f, 1.0f, 1.0f, 1.0f), (*(vertices0.begin() + result[0].i0)));
+	EXPECT_EQ(Vertex(0.5f, 0.5f, 0.5f, 1.0f), (*(vertices1.begin() + result[0].i1)));
 
-		ASSERT_EQ(expect_vertices[i].first, vertices.first);
-		ASSERT_EQ(expect_vertices[i].second, vertices.second);
 
-		++i;
-	}
+	EXPECT_EQ(Vertex(1.0f, 1.0f, 1.0f, 1.0f), (*(vertices0.begin() + result[1].i0)));
+	EXPECT_EQ(Vertex(-0.25f, -0.25f, -0.25f, 1.0f), (*(vertices1.begin() + result[1].i1)));
 }
 
 TEST(test_gjk, support)
@@ -106,13 +99,13 @@ TEST(test_gjk, support)
 	expect_point =  MinkowskiPoint(vec3(0.0f, 0.5f, 0.0f), 2, 1);
 	result = maxSupport(mg.begin(), mg.end(), vec3(1.0f, 1.0f, 0.0f));
 
-	ASSERT_EQ(expect_point, result) << glm::to_string(result.point) << ", " << result.i0 << ", " << result.i1 << " ;expected : " << glm::to_string(expect_point.point) << expect_point.i0 << ", " << expect_point.i1 ;
+	ASSERT_EQ(expect_point, result) << glm::to_string(result) << ", " << result.i0 << ", " << result.i1 << " ;expected : " << glm::to_string(expect_point) << expect_point.i0 << ", " << expect_point.i1 ;
 
 	
 	expect_point =  gjk::MinkowskiPoint(vec3(-1.5f, -0.5f, 0.0f), 1, 0);
 	result = gjk::maxSupport(mg.begin(), mg.end(), vec3(-1.0f, 0.0f, 0.0f));
 
-	ASSERT_EQ(expect_point, result) << glm::to_string(result.point) << ", " << result.i0 << ", " << result.i1 << " ;expected : " << glm::to_string(expect_point.point) << expect_point.i0 << ", " << expect_point.i1 ;
+	ASSERT_EQ(expect_point, result) << glm::to_string(result) << ", " << result.i0 << ", " << result.i1 << " ;expected : " << glm::to_string(expect_point) << expect_point.i0 << ", " << expect_point.i1 ;
 
 }
 
@@ -153,7 +146,7 @@ TEST(gjk, doPoint)
 	vec3 direction;
 
 	EXPECT_FALSE(doPoint(supports, direction));
-	EXPECT_EQ(direction, -supports[0].point);
+	EXPECT_EQ(direction, -(vec3)supports[0]);
 	EXPECT_EQ(1, supports.size());
 	EXPECT_EQ(supports[0], mp);
 }
@@ -220,7 +213,7 @@ TEST(gjk, doTriangle_line_case_0)
 	//the direction vector should point left, outside of the triangle
 	EXPECT_TRUE(sameDirection(direction, vec3(-1.0f, 0.0f, 0.0f)));
 	//better: should point in the same direction as one of the edges coming from the remaining point
-	EXPECT_TRUE(sameDirection(mp2.point - mp1.point,direction ));
+	EXPECT_TRUE(sameDirection(mp2 - mp1,direction ));
 }
 
 TEST(gjk, doTriangle_line_case_1)
@@ -241,7 +234,7 @@ TEST(gjk, doTriangle_line_case_1)
 	EXPECT_TRUE(sameDirection(direction, vec3(1.0f, 0.0f, 0.0f)));
 
 	//better: should point in the same direction as one of the edges coming from the remaining point
-	EXPECT_TRUE(sameDirection(mp2.point - mp0.point,direction ));
+	EXPECT_TRUE(sameDirection(mp2- mp0, direction ));
 }
 
 TEST(gjk, doTetrahedron_enclosing)
@@ -279,7 +272,7 @@ TEST(gjk, doTetrahedron_left_triangle)
 	EXPECT_TRUE(sameDirection(direction, vec3(-1.0f, 0.0f, 0.0f)));
 
 	//vector shall point outside of the tetrahedron
-	EXPECT_TRUE(sameDirection(direction, mp3.point - mp1.point));
+	EXPECT_TRUE(sameDirection(direction, mp3 - mp1));
 }
 
 TEST(gjk, doTetrahedron_right_triangle)
@@ -302,7 +295,7 @@ TEST(gjk, doTetrahedron_right_triangle)
 	EXPECT_TRUE(sameDirection(direction, vec3(1.0f, 0.0f, 0.0f)));
 
 	//vector shall point outside of the tetrahedron
-	EXPECT_TRUE(sameDirection(direction, mp3.point - mp0.point));
+	EXPECT_TRUE(sameDirection(direction, mp3 - mp0));
 }
 
 
@@ -328,7 +321,7 @@ TEST(gjk, doTetrahedron_front_triangle)
 	EXPECT_TRUE(sameDirection(direction, vec3(0.0f, 0.0f, 1.0f)));
 
 	//vector shall point outside of the tetrahedron
-	EXPECT_TRUE(sameDirection(direction, mp3.point - mp2.point));
+	EXPECT_TRUE(sameDirection(direction, mp3 - mp2));
 }
 
 TEST(gjk, doTetrahedron_left_point)
@@ -505,7 +498,7 @@ TEST_F(test_GJK_distance, intersection)
 			relative_position
 			);
 	
-	EXPECT_EQ(0.0f, distance(mg.begin(), mg.end()));
+	EXPECT_EQ(0.0f, gjk::distance(mg.begin(), mg.end()));
 }
 
 TEST_F(test_GJK_distance, left_to_vertex)
@@ -520,7 +513,7 @@ TEST_F(test_GJK_distance, left_to_vertex)
 
 	vector<MinkowskiPoint> supports;
 
-	EXPECT_EQ(1.0f, distance(mg.begin(), mg.end(), &supports));
+	EXPECT_EQ(1.0f, gjk::distance(mg.begin(), mg.end(), &supports));
 
 	ASSERT_EQ(1, supports.size());
 	EXPECT_EQ(0, supports[0].i0);
@@ -540,7 +533,7 @@ TEST_F(test_GJK_distance, top_to_vertex)
 	vector<MinkowskiPoint> supports;
 
 	EXPECT_FALSE(intersection(mg.begin(), mg.end()));
-	EXPECT_EQ(1.0f, distance(mg.begin(), mg.end(), &supports));
+	EXPECT_EQ(1.0f, gjk::distance(mg.begin(), mg.end(), &supports));
 
 	ASSERT_EQ(1, supports.size());
 	EXPECT_EQ(2, supports[0].i0);
@@ -559,7 +552,7 @@ TEST_F(test_GJK_distance, left_to_edge)
 
 	vector<MinkowskiPoint> supports;
 
-	float d = distance(mg.begin(), mg.end(), &supports);
+	float d = gjk::distance(mg.begin(), mg.end(), &supports);
 	EXPECT_LT(1.0f, d);
 	EXPECT_GT(3.0f, d);
 
@@ -585,7 +578,7 @@ TEST_F(test_GJK_distance, under_face)
 
 	vector<MinkowskiPoint> supports;
 
-	float d = distance(mg.begin(), mg.end(), &supports);
+	float d = gjk::distance(mg.begin(), mg.end(), &supports);
 	EXPECT_FLOAT_EQ(1.0f, d);
 
 	ASSERT_EQ(3, supports.size());
