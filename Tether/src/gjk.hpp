@@ -1,7 +1,7 @@
 #ifndef GJK_HPP
 #     define GJK_HPP
 
-#define GJK_RUNTIME_ASSERTS
+//#define GJK_RUNTIME_ASSERTS
 
 #include <algorithm>
 #include <utility>
@@ -155,11 +155,8 @@ MinkowskiPoint maxSupport(const MinkowskiPointIterator& mp_begin, const Minkowsk
 				{
 					float f = glm::dot(first, direction);
 					float s = glm::dot(second, direction);
-		//			return (f < s)? s : f; 				
 					return f<s;
 				});
-
-	//cout << "MAXSUPPORT RETURNS : " << ret << '\n';
 	return ret;
 }
 
@@ -410,15 +407,9 @@ float distance(const MinkowskiPointIterator& mp_begin, const MinkowskiPointItera
 
 	while(!doSimplex(supports, direction))
 	{
-		cout << supports.size() << "\n";
-		for(auto& s : supports)
-		{
-			cout << s << '\n';
-		}
-		cout << "......................................\n";
 		MinkowskiPoint new_support = maxSupport(mp_begin, mp_end, direction);
-		cout << "NEWS : " << new_support << '\n';
-		if(std::find(supports.begin(), supports.end(), new_support) != supports.end())
+		if(std::find(supports.begin(), supports.end(), new_support) != supports.end()
+				|| glm::dot(direction, new_support) > glm::dot(direction, supports.back()))
 		{
 			//we've already found the neares feature
 			dist = doDistance(supports);

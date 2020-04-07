@@ -46,12 +46,10 @@ vec3 RelColliders::pos1(float tick_seconds) const
 float rootFindingSample(const RelColliders& relcolliders, float tick_seconds)
 {
 
-	cout << "~~~ rootFinding Sample ~~~:\n";
 	vector<Model::ConvexPart> m0_convex_parts, m1_convex_parts;
 	m0_convex_parts = relcolliders.c0.pIF->convexParts();
 	m1_convex_parts = relcolliders.c1.pIF->convexParts();
 
-	cout << "ConvexParts : " << m0_convex_parts.size() << " and " << m1_convex_parts.size() << '\n';
 
 	float dist = std::numeric_limits<float>::max();
 
@@ -63,57 +61,13 @@ float rootFindingSample(const RelColliders& relcolliders, float tick_seconds)
 			auto m0_vertices = relcolliders.c0.pIF->vertices(tick_seconds);
 			auto m1_vertices = relcolliders.c1.pIF->vertices(tick_seconds);
 			vec3 relpos = relcolliders.pos1(tick_seconds) - relcolliders.pos0(tick_seconds);
-			cout << "relpos : " << relpos << '\n';
 			MinkowskiGenerator mg (	m0_vertices.begin(), m0_vertices.end(),
 									m1_vertices.begin(), m1_vertices.end(),
 									m0_cp.indices.begin(), m0_cp.indices.end(),
 									m1_cp.indices.begin(), m1_cp.indices.end(),
 									relpos
 									);
-
-			cout << "Minkowski Generatrion ( relative position of " << glm::to_string(relpos) << " )\n";
-			cout << "vertices0: \n";
-			{
-			unsigned int i = 0;
-			for(auto v : m0_vertices)
-			{
-				cout << i << " : " << glm::to_string(v) << '\n';
-				i++;
-			}
-			}
-			cout << "vertices1: \n";
-			{
-			unsigned int i = 0;
-			for(auto v : m1_vertices)
-			{
-				cout << i << " : " << glm::to_string(v) << '\n';
-				i++;
-			}
-			}
-			cout << "indices0: \n";
-			for(auto i : m0_cp.indices)
-			{
-				cout << i << ',';
-			}
-			cout << '\n';
-			cout << "indices1: \n";
-			for(auto i : m1_cp.indices)
-			{
-				cout << i << ',';
-			}
-			cout << '\n';
-			
-
-
-			for(auto mp : mg)
-			{
-				cout << mp << '\n';
-			}
-			cout << "--------------------------\n";
-
-			cout << '>' << std::flush;
 			float new_dist = gjk::distance(mg.begin(), mg.end());
-			cout << '<' << std::flush;
 			if(new_dist < dist) dist = new_dist;
 		}
 	}
@@ -122,7 +76,6 @@ float rootFindingSample(const RelColliders& relcolliders, float tick_seconds)
 
 bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time_out, int initial_samples, float epsilon)
 {
-	cout << " ------- first Root -------\n";
 	if(initial_samples < 2) return false;
 	//time, distance
 
@@ -149,13 +102,11 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 		dist1 = rootFindingSample(relcolliders, time1);
 		if (dist1 <= 0.0f)
 		{
-			cout << "\nFound Intersection : \n";
 			break;
 		}
 
 		if(sample == initial_samples)
 		{
-			cout << '.';
 			return false;
 		}
 
