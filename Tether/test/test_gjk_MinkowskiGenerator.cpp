@@ -254,10 +254,11 @@ TEST(gjk, doTetrahedron_enclosing)
 
 TEST(gjk, doTetrahedron_left_triangle)
 {
-	MinkowskiPoint mp0 (vec3(1.0f, -1.0f, -1.0f), 0, 0);
-	MinkowskiPoint mp1 (vec3(3.0f, -1.0f, -1.0f), 0, 1);
-	MinkowskiPoint mp2 (vec3(2.0f, -1.0f, 1.0f), 0, 2);
-	MinkowskiPoint mp3 (vec3(2.0f, 1.0f, 0.0f), 0, 3);
+	MinkowskiPoint mp0 (vec3(1.0f, -1.0f, -1.5f), 0, 0);
+
+	MinkowskiPoint mp1 (vec3(3.0f, -1.0f, -1.5f), 0, 1);
+	MinkowskiPoint mp2 (vec3(2.0f, -1.0f, 0.5f), 0, 2);
+	MinkowskiPoint mp3 (vec3(2.0f, 1.0f, -0.5f), 0, 3);
 
 	std::vector<MinkowskiPoint> supports = {mp0, mp1, mp2, mp3};
 
@@ -277,10 +278,10 @@ TEST(gjk, doTetrahedron_left_triangle)
 
 TEST(gjk, doTetrahedron_right_triangle)
 {
-	MinkowskiPoint mp0 (vec3(-3.0f, -1.0f, -1.0f), 0, 0);
-	MinkowskiPoint mp1 (vec3(-1.0f, -1.0f, -1.0f), 0, 1);
-	MinkowskiPoint mp2 (vec3(-2.0f, -1.0f, 1.0f), 0, 2);
-	MinkowskiPoint mp3 (vec3(-2.0f, 1.0f, 0.0f), 0, 3);
+	MinkowskiPoint mp0 (vec3(-3.0f, -1.0f, -1.5f), 0, 0);
+	MinkowskiPoint mp1 (vec3(-1.0f, -1.0f, -1.5f), 0, 1);
+	MinkowskiPoint mp2 (vec3(-2.0f, -1.0f, 0.5f), 0, 2);
+	MinkowskiPoint mp3 (vec3(-2.0f, 1.0f, -0.5f), 0, 3);
 
 	std::vector<MinkowskiPoint> supports = {mp0, mp1, mp2, mp3};
 
@@ -446,6 +447,7 @@ TEST_F(test_GJK_intersection, on_vertex)
 
 TEST_F(test_GJK_intersection, vertex_vertex)
 {
+	//This test also tests the capability of edge-cases to determine exits properly
 	relative_position = vec3(-1.0f, 0.0f, 0.0f);	
 
 	MinkowskiGenerator mg (

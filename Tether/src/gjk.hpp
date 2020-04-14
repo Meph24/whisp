@@ -14,6 +14,7 @@
 #include "TickServiceProvider.h"
 #include "IWorld.h"
 #include "Model.hpp"
+#include "static_intersection.hpp"
 
 #include "Entity.h"
 
@@ -178,16 +179,17 @@ inline bool parallel(const vec3& d0, const vec3& d1)
 
 inline bool sameDirection(const vec3& d0, const vec3& d1)
 {
-	float d = glm::dot(d0, d1);
-	return d > 0;
+	return glm::dot(d0,d1) > 0;
 }
 
 inline bool doPoint(vector<MinkowskiPoint>& supports, vec3& direction)
 {
 	const vec3& a = supports.back();
 	direction = -a;
+	if(vecEquals(direction, vec3(0.0f)))
+		return true;
 #ifdef GJK_RUNTIME_ASSERTS
-		if(!sameDirection(-a, direction)) cout << "[DIRECTION ASSERT FAILED!]";
+		if(!sameDirection(-a, direction)) cout << "[POINT DIRECTION ASSERT FAILED!]" << -a << ']';
 #endif /* GJK_RUNTIME_ASSERTS */
 	return false;
 }
@@ -200,11 +202,16 @@ inline bool doLine(vector<MinkowskiPoint>& supports, vec3& direction)
 	//AB same direction as A0
 	if(sameDirection(ab, -a)) //origin near the line
 	{
-		//supports can remain same
 		direction = glm::cross(glm::cross(ab, -a), ab);
+		if(vecEquals(direction,vec3(0.0f))) return true;
 
 #ifdef GJK_RUNTIME_ASSERTS
-		if(!sameDirection(-a, direction)) cout << "[DIRECTION ASSERT FAILED! \n-a:" << glm::to_string(-a) << "\ndir:" << glm::to_string(direction) << "\nab x -a :" << glm::to_string(glm::cross(ab, -a)) << '\n';
+		if(!sameDirection(-a, direction)) cout << "[LINE DIRECTION ASSERT FAILED! \n-a:" << glm::to_string(-a) << "\ndir:" << glm::to_string(direction) << "\nab x -a :" << glm::to_string(glm::cross(ab, -a)) << '\n';
+		if(glm::dot(fcross, ab) != 0.0) cout << "[LINE DIRECTION ASSERT FAILED! fcross not orthogonal to line!]" << "\nfcross:" << glm::to_string(fcross) << "\nfcross dot ab :" << glm::dot(fcross, ab) << '\n';
+
+
+	if(glm::dot(direction, ab) != 0.0) cout << "[LINE DIRECTION ASSERT FAILED! direction not orthogonal to line!]" << "\ndir:" << glm::to_string(direction) << "\ndirection dot ab :" << glm::dot(direction, ab) << '\n';
+
 #endif /* GJK_RUNTIME_ASSERTS */
 
 		return false;
@@ -225,36 +232,64 @@ inline bool doTriangle(vector<MinkowskiPoint>& supports, vec3& direction)
 	const vec3 ac = c-a;
 	const vec3 abc = glm::cross(ab, ac);
 
-	if(sameDirection(glm::cross(abc, ac), -a))
+
+	const vec3 ac_orth = glm::cross(abc, ac);
+#ifdef GJK_RUNTIME_ASSERTS
+		if(!sameDirection(ac_orth, a-b)) cout << "[TRIANGLE LINE AC (sd: BA) DIRECTION ASSERT FAILED!]";
+		if(!sameDirection(ac_orth, c-b)) cout << "[TRIANGLE LINE AC (sd: CB) DIRECTION ASSERT FAILED!]";
+#endif /* GJK_RUNTIME_ASSERTS */
+	
+	// we might need to change the direction here, as we defined the smaller feature (simplex with less points) to be including
+	// the border points, where the dot is 0
+	// therefore we check whether the origin is not in the same direction as towards inside
+	// instead of asking if it is in the direction of outside
+	if(!sameDirection(-ac_orth, -a))
 	{
+
 		supports = {supports[0], supports[2]};
 		return doLine(supports, direction);
 	}
 	//need to check with -ab for winding purposes (direction of the cross)
-	else if(sameDirection(glm::cross(abc, -ab), -a))
-	{
-		supports = {supports[1], supports[2]};
-		return doLine(supports, direction);
-	}
-	else
-	{
-		if(sameDirection(abc, -a))
-		{
-			//supports stay the same
-			direction = abc;
+	else 
+	{	
+		vec3 ab_orth = glm::cross(abc, -ab);
 #ifdef GJK_RUNTIME_ASSERTS
-		if(!sameDirection(-a, direction)) cout << "[DIRECTION ASSERT FAILED!]";
+		if(!sameDirection(ab_orth, a-c)) cout << "[TRIANGLE LINE AB (sd: CA) DIRECTION ASSERT FAILED!]";
+		if(!sameDirection(ab_orth, b-c)) cout << "[TRIANGLE LINE AB (sd: CB) DIRECTION ASSERT FAILED!]";
 #endif /* GJK_RUNTIME_ASSERTS */
-			return false;
+		if(!sameDirection(-ab_orth, -a))
+		{
+			supports = {supports[1], supports[2]};
+			auto ret = doLine(supports, direction);
+			return ret;
 		}
+	
 		else
 		{
-			std::swap(supports[0], supports[1]);
-			direction = -abc;
+			if(!sameDirection(-abc, -a))
+			{
+
+
+				//supports stay the same
+				direction = abc;
+
+				if(std::abs(glm::dot(abc, -a)) < 0.0001)
+					return true;
 #ifdef GJK_RUNTIME_ASSERTS
-		if(!sameDirection(-a, direction)) cout << "[DIRECTION ASSERT FAILED!]";
+			if(!sameDirection(-a, direction)) cout << "[TRIANGLE DIRECTION ASSERT FAILED!]";
 #endif /* GJK_RUNTIME_ASSERTS */
-			return false;
+				return false;
+			}
+			else
+			{
+				//supports stay the same
+				std::swap(supports[0], supports[1]);
+				direction = -abc;
+#ifdef GJK_RUNTIME_ASSERTS
+			if(!sameDirection(-a, direction)) cout << "[TRIANGLE DIRECTION ASSERT FAILED!]";
+#endif /* GJK_RUNTIME_ASSERTS */
+				return false;
+			}
 		}
 	}
 }
@@ -275,17 +310,17 @@ inline bool doTetrahedron(vector<MinkowskiPoint>& supports, vec3& direction)
 	const vec3 acd = glm::cross(ac, ad);
 	const vec3 adb = glm::cross(ad, ab);
 
-	if(sameDirection(abc, -a))
+	if(!sameDirection(-abc, -a))
 	{
 		supports = {supports[1], supports[2], supports[3]};
 		return doTriangle(supports, direction);
 	}
-	else if(sameDirection(acd, -a))
+	else if(!sameDirection(-acd, -a))
 	{
 		supports = {supports[0], supports[1], supports[3]};
 		return doTriangle(supports, direction);
 	}
-	else if(sameDirection(adb, -a))
+	else if(!sameDirection(-adb, -a))
 	{
 		supports = {supports[2], supports[0], supports[3]};
 		return doTriangle(supports, direction);
@@ -297,7 +332,7 @@ inline bool doTetrahedron(vector<MinkowskiPoint>& supports, vec3& direction)
 
 }
 
-inline bool doSimplex(vector<MinkowskiPoint>& supports, vec3& direction)
+inline bool closestSimplex(vector<MinkowskiPoint>& supports, vec3& direction)
 {
 	switch(supports.size())
 	{
@@ -358,35 +393,66 @@ inline float doDistance(const vector<MinkowskiPoint>& supports)
 }
 
 template<typename MinkowskiPointIterator>
-bool intersection(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIterator& mp_end, std::vector<MinkowskiPoint>* supports = nullptr)
+bool intersection(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIterator& mp_end, std::vector<MinkowskiPoint>* supports_out = nullptr)
 {
-	if(!supports)
+	vector<MinkowskiPoint> supports;
+	supports.reserve(4);
+
 	{
-		supports = new std::vector<MinkowskiPoint>();
-		supports->reserve(4);
-		MinkowskiPointIterator nonconstbegin = mp_begin;
-		supports->emplace_back(*nonconstbegin);
+		MinkowskiPoint minkowskipoint;
+		MinkowskiPointIterator begincopy = mp_begin;
+		minkowskipoint = *begincopy;
+		supports.emplace_back(minkowskipoint);
 	}
-	else if(supports->size() > 4 || supports->size() < 1)
-	{
-		supports->clear();
-		supports->reserve(4);
-		MinkowskiPointIterator nonconstbegin = mp_begin;
-		supports->emplace_back(*nonconstbegin);
-	}
+
+
 
 	vec3 direction;
 
-	while(!doSimplex(*supports, direction))
+	unsigned int iter_depth = 0;
+	while(!closestSimplex(supports, direction))
 	{
-		MinkowskiPoint newSupport = maxSupport(mp_begin, mp_end, direction);
-		float s = glm::dot(newSupport, direction);
-		if(s < 0) 
+		cout << "Number of supports : " << supports.size() << '\n' <<
+			"Current search direction : " << direction << '\n';
+		MinkowskiPoint new_support = maxSupport(mp_begin, mp_end, direction);
+		cout << "NEW SUPPORT : " << new_support << '\n';
+
+		//all the lines the new support impies have to be directed in the search direction
+		
+		
+
+		if(glm::dot(new_support, direction) < 0) 
 		{
 			return false;
 		}
-		supports->emplace_back(newSupport);
+
+#ifdef GJK_RUNTIME_ASSERTS
+			if(std::any_of(supports.begin(), supports.end(), [&new_support, direction](const MinkowskiPoint& p){ return !sameDirection(new_support-p, direction);}))
+			{
+				cout << "[EXPANSION DIRECTION ASSERTION FAILED!]\n{\n";
+				cout << "Direction : " << direction << '\n'
+					<< "New Support : " << new_support << '\n';
+				for(auto p : supports)
+				{
+					if(!sameDirection(new_support-p, direction))
+					{
+						cout << ">>>";
+					}
+					cout << p << " with a dot of " << glm::dot(new_support-p, direction) << '\n';
+				}
+				cout << "\n}\n";
+			}
+				
+#endif /* GJK_RUNTIME_ASSERTS */
+
+
+
+		supports.emplace_back(new_support);
+
+		iter_depth++;
 	}
+
+	if(supports_out) *supports_out = supports;
 	return true;
 }
 
@@ -394,28 +460,82 @@ template<typename MinkowskiPointIterator>
 float distance(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIterator& mp_end, std::vector<MinkowskiPoint>* supports_out = nullptr)
 {
 	std::vector<MinkowskiPoint> supports; 
-	float dist = 0.0f;
 	supports.reserve(4);
-	MinkowskiPoint minkowskipoint;
+	float dist = 0.0f;
+
+	if(intersection(mp_begin, mp_end, &supports)) 
 	{
+		return dist;
+	}
+
+	{
+		MinkowskiPoint minkowskipoint;
 		MinkowskiPointIterator begincopy = mp_begin;
 		minkowskipoint = *begincopy;
+		supports.emplace_back(minkowskipoint);
 	}
-	supports.emplace_back(minkowskipoint);
 
 	vec3 direction;
 
-	while(!doSimplex(supports, direction))
+
+	unsigned int iter_depth = 0;
+	vec3 old_direction(-direction);
+	float min_dist = std::numeric_limits<float>::max();
+
+
+	while(!closestSimplex(supports, direction))
 	{
-		MinkowskiPoint new_support = maxSupport(mp_begin, mp_end, direction);
-		if(std::find(supports.begin(), supports.end(), new_support) != supports.end()
-				|| glm::dot(direction, new_support) > glm::dot(direction, supports.back()))
+		float temp_dist = doDistance(supports);
+		if(temp_dist < min_dist)
 		{
-			//we've already found the neares feature
+			min_dist = temp_dist;
+		}
+		else
+		{
+			dist = min_dist;
+			break;
+		}
+
+#ifdef GJK_RUNTIME_ASSERTS
+		if(supports.size() > 3)
+			cout << "WARNING: In gjk::distance a Tetrahedron was given as closest Simplex. This should not be, as the origin is confirmed not inside the shape!\n";
+#endif /*GJK_RUNTIME_ASSERTS*/
+
+		MinkowskiPoint new_support = maxSupport(mp_begin, mp_end, direction);
+		//the new point from here must be really farther, not coplanar to the ones we have already
+		//this also holds true if the lines we draw is actually just a point, the dot gets 0
+		//to test this quicky we can draw a line to the new point and test its dot with the search direction
+
+		if (std::any_of(supports.begin(), supports.end(), [&new_support,&direction](const MinkowskiPoint&p){return !sameDirection(new_support-p, direction);}))
+		{
+			//we've already found the nearest feature
 			dist = doDistance(supports);
 			break;
 		}
+
+#ifdef GJK_RUNTIME_ASSERTS
+			if(std::any_of(supports.begin(), supports.end(), [&new_support, direction](const MinkowskiPoint& p){ return !sameDirection(new_support-p, direction);}))
+			{
+				cout << "[EXPANSION DIRECTION ASSERTION FAILED!]\n{\n";
+				cout << "Direction : " << direction << '\n'
+					<< "New Support : " << new_support << '\n';
+				for(auto p : supports)
+				{
+					if(!sameDirection(new_support-p, direction))
+					{
+						cout << ">>>";
+					}
+					cout << p << " with a dot of " << glm::dot(new_support-p, direction) << '\n';
+				}
+				cout << "\n}\n";
+			}
+				
+#endif /* GJK_RUNTIME_ASSERTS */
+
+
 		supports.emplace_back(new_support);
+		old_direction = direction;
+		iter_depth++;
 	}
 	
 	if(supports_out) *supports_out = std::move(supports);

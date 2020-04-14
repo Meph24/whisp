@@ -43,7 +43,7 @@ vec3 RelColliders::pos1(float tick_seconds) const
 	return m_pos1 + m_v1*tick_seconds;
 }
 
-float rootFindingSample(const RelColliders& relcolliders, float tick_seconds)
+float nonConvexDistance(const RelColliders& relcolliders, float tick_seconds)
 {
 
 	vector<Model::ConvexPart> m0_convex_parts, m1_convex_parts;
@@ -67,11 +67,20 @@ float rootFindingSample(const RelColliders& relcolliders, float tick_seconds)
 									m1_cp.indices.begin(), m1_cp.indices.end(),
 									relpos
 									);
+
 			float new_dist = gjk::distance(mg.begin(), mg.end());
 			if(new_dist < dist) dist = new_dist;
 		}
 	}
 	return dist;
+}
+
+bool staticIntersectionAtTickBegin(const RelColliders& relcolliders, float t0, float& time_out)
+{
+	float distance = nonConvexDistance(relcolliders, t0);
+	if(distance > 0.0f)
+	{	return false;	}
+	return true;
 }
 
 bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time_out, int initial_samples, float epsilon)
@@ -82,7 +91,7 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 	float time0, time1, dist0, dist1;
 	time0 = t0; time1 = t1;
 
-	dist0 = rootFindingSample(relcolliders, t0);
+	dist0 = nonConvexDistance(relcolliders, t0);
 
 
 	if(dist0 <= 0.0f)
@@ -99,7 +108,7 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 	for( int sample = 1 ; sample <= initial_samples; sample++ )
 	{
 		time1 = t0+timestep*sample;
-		dist1 = rootFindingSample(relcolliders, time1);
+		dist1 = nonConvexDistance(relcolliders, time1);
 		if (dist1 <= 0.0f)
 		{
 			break;
@@ -117,7 +126,7 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 	while(time1-time0 > epsilon)
 	{
 		float time05 = time0 + (time1-time0) * 0.5;
-		float dist05 = rootFindingSample(relcolliders, time05);
+		float dist05 = nonConvexDistance(relcolliders, time05);
 		if(dist05 <= 0.0f)
 		{
 			time1 = time05;
