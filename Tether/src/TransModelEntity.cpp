@@ -90,14 +90,16 @@ void TransModelEntity::tick(	Timestamp t,
 	pos += v*tick_seconds;
 	rot += drot* tick_seconds;
 	scale += dscale * tick_seconds;
-	mo.setTransform(		glm::rotate(rot.x, vec3(1,0,0))
-							*	glm::rotate(rot.y, vec3(0,1,0))
-							*	glm::rotate(rot.z, vec3(0,0,1))
+	mo.setTransform(		glm::rotate(glm::radians(rot.x), vec3(1,0,0))
+							*	glm::rotate(glm::radians(rot.y), vec3(0,1,0))
+							*	glm::rotate(glm::radians(rot.z), vec3(0,0,1))
 							*	glm::scale(scale));
 
 	iw->collideAlgo->doChecks(
 		(Collider*) this, (Entity*) this,
 		tick_seconds, *tsp);
+
+	lastTick = t;
 }
 
 void TransModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)

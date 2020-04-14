@@ -183,6 +183,7 @@ void Model::drawNative() const
 		i++;
 	}	
 	glEnd();	
+	glDisable(GL_CULL_FACE);
 }
 
 void Model::drawHere() const
