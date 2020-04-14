@@ -9,6 +9,7 @@
 #include "WorldDefault.h"
 
 #include "Entity.h"
+#include "DrawServiceProvider.h"
 
 WorldDefault::WorldDefault():
 IWorld(16)
@@ -86,5 +87,6 @@ void WorldDefault::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServic
 	for(Entity * e: managedEntities)
 	{
 		e->draw(t,viewFrustum,iw,dsp);
+		if(dsp->drawAABBs) e->bb.draw(t,viewFrustum,iw,dsp);
 	}
 }
