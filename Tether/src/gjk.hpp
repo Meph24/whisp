@@ -412,10 +412,7 @@ bool intersection(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIt
 	unsigned int iter_depth = 0;
 	while(!closestSimplex(supports, direction))
 	{
-		cout << "Number of supports : " << supports.size() << '\n' <<
-			"Current search direction : " << direction << '\n';
 		MinkowskiPoint new_support = maxSupport(mp_begin, mp_end, direction);
-		cout << "NEW SUPPORT : " << new_support << '\n';
 
 		//all the lines the new support impies have to be directed in the search direction
 		
@@ -557,6 +554,8 @@ public:
 	vec3 pos1(float tick_seconds) const;
 };
 
+
+bool staticIntersectionAtTickBegin(const RelColliders& relcolliders, float t0, float& time_out);
 float rootFindingSample(const RelColliders& relcolliders, float tick_seconds);
 bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time_out, int initial_samples = 10, float epsilon = 0.001);
 

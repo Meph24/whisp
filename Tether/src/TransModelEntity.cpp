@@ -104,33 +104,14 @@ void TransModelEntity::tick(	Timestamp t,
 
 void TransModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
-
-	/*
-	//TODO the content of this function is not the intended behavior
-	//it is the behavior of ModelEntities
-	//change to appropriate behavior
-	//also TODO ist : factor in the Collider::TYPE in choosing a collision algorithm
-	vector<collisionl2::SubmodelCollision> collisions = 
-		collisionl2::linearInterpolation_R0(0.0f, delta_time, tsp.getIWorld(), *this, *(other.pIF));
-
-	if(collisions.empty()) return;
-
-	auto min_e = std::min_element(collisions.begin(), collisions.end());
-
-	react(min_e->time);
-	other.pIF->react(min_e->time);
-
-	*/
-
 	gjk::RelColliders relcolliders(makeDualPointer((Entity*) this,(Collider*) this), other, tsp);
 	float collision_time;
-	if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
+	//if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
+	if(! gjk::staticIntersectionAtTickBegin(relcolliders, 0.0f, collision_time))
 		return;	
 
 	react(collision_time);
 	other.pIF->react(collision_time);
-
-	
 }
 
 Collider::TYPE TransModelEntity::type() const

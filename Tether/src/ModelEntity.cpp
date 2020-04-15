@@ -116,21 +116,10 @@ void ModelEntity::tick	(
 
 void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
-	/*
-	vector<collisionl2::SubmodelCollision> collisions = 
-		collisionl2::linearInterpolation_R0(0.0f, delta_time, tsp.getIWorld(), *this, *(other.pIF));
-
-	if(collisions.empty()) return;
-
-	auto min_e = std::min_element(collisions.begin(), collisions.end());
-	
-	if (min_e->time > delta_time)
-		cerr << "ERROR : Collision to later time than tick!\n";
-	*/
-
 	gjk::RelColliders relcolliders(makeDualPointer((Entity*) this,(Collider*) this), other, tsp);
 	float collision_time;
-	if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
+	//if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
+	if(! gjk::staticIntersectionAtTickBegin(relcolliders, 0.0f, collision_time))
 		return;	
 
 	react(collision_time);
