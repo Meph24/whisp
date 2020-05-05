@@ -85,7 +85,7 @@ bool staticIntersectionAtTickBegin(const RelColliders& relcolliders, float t0, f
 
 bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time_out, int initial_samples, float epsilon)
 {
-	if(initial_samples < 2) return false;
+	if(initial_samples < 1) return false;
 	//time, distance
 
 	float time0, time1, dist0, dist1;
@@ -93,19 +93,17 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 
 	dist0 = nonConvexDistance(relcolliders, t0);
 
-
 	if(dist0 <= 0.0f)
 	{
-		//we already entered at a state of collision
-		//this doesn't count, as the collision had to be detected in the step before
-		//therefore aborting with a false state, but returning time, still
 		time_out = t0;
-		return false;
+		return true;
 	}
+
+	if(initial_samples == 1) return false;
 
 	float timespan = t1 - t0;
 	float timestep = timespan / (initial_samples - 1);
-	for( int sample = 1 ; sample <= initial_samples; sample++ )
+	for( int sample = 1 ; sample < initial_samples; sample++ )
 	{
 		time1 = t0+timestep*sample;
 		dist1 = nonConvexDistance(relcolliders, time1);
@@ -114,7 +112,7 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 			break;
 		}
 
-		if(sample == initial_samples)
+		if(sample == initial_samples - 1)
 		{
 			return false;
 		}

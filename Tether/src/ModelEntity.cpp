@@ -119,7 +119,7 @@ void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickSer
 	gjk::RelColliders relcolliders(makeDualPointer((Entity*) this,(Collider*) this), other, tsp);
 	float collision_time;
 	//if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
-	if(! gjk::staticIntersectionAtTickBegin(relcolliders, 0.0f, collision_time))
+	if(! gjk::firstRoot(relcolliders, 0.0f, delta_time, collision_time, 4))
 		return;	
 
 	react(collision_time);
