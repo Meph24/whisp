@@ -1,3 +1,5 @@
+#ifdef COLLISION_LINEAR_INTERPOLATION
+
 #ifndef COLLISIONL2_HPP
 #     define COLLISIONL2_HPP
 
@@ -15,7 +17,6 @@ using std::vector;
 
 namespace collisionl2
 {
-	/* cursor */
 
 struct CollisionFeature
 {
@@ -79,3 +80,5 @@ vector<SubmodelCollision> linearInterpolation_R0(
 
 }/* namespace collisionl2 */
 #endif /* COLLISIONL2_HPP */
+
+#endif

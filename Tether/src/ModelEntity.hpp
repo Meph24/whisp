@@ -15,6 +15,8 @@
 #include "glmutils.hpp"
 #include <glm/glm.hpp>
 
+#include "gjk.hpp"
+
 using glm::vec3;
 using glm::vec4;
 
@@ -60,14 +62,14 @@ public:
 	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
 
 	Collider::TYPE type() const; 
+
+	vector<Model::ConvexPart> convexParts() const;
 	
 	vector<Vertex> vertices (float tick_time) const;
 
 	vector<EdgeRef> edges(float tick_time) const;
 
 	vector<FaceRef> faces(float tick_time) const;
-
-	spacevec position(float tick_time) const;
 
 	void react(float tick_time);
 };

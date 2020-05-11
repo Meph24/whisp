@@ -10,12 +10,24 @@
 
 #include "collisionl2.hpp"
 
+#include "gjk.hpp"
+
+vector<Model::ConvexPart> TransModelEntity::convexParts() const
+{
+	return mo.model().convexParts();
+}
+
 TransModelEntity::TransModelEntity(const Model& model)
 	: mo(model),
 	rot(0.0f), scale(1.0f), drot(0.0f), dscale(0.0f)
 {
 	pos.set0();
 	v.set0();
+}
+
+const ModelObject& TransModelEntity::modelObject() const
+{
+	return mo;
 }
 
 AABB TransModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)
@@ -78,32 +90,28 @@ void TransModelEntity::tick(	Timestamp t,
 	pos += v*tick_seconds;
 	rot += drot* tick_seconds;
 	scale += dscale * tick_seconds;
-	mo.setTransform(		glm::rotate(rot.x, vec3(1,0,0))
-							*	glm::rotate(rot.y, vec3(0,1,0))
-							*	glm::rotate(rot.z, vec3(0,0,1))
+	mo.setTransform(		glm::rotate(glm::radians(rot.x), vec3(1,0,0))
+							*	glm::rotate(glm::radians(rot.y), vec3(0,1,0))
+							*	glm::rotate(glm::radians(rot.z), vec3(0,0,1))
 							*	glm::scale(scale));
 
 	iw->collideAlgo->doChecks(
 		(Collider*) this, (Entity*) this,
 		tick_seconds, *tsp);
+
+	lastTick = t;
 }
 
 void TransModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
+	gjk::RelColliders relcolliders(makeDualPointer((Entity*) this,(Collider*) this), other, tsp);
+	float collision_time;
+	//if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
+	if(! gjk::firstRoot(relcolliders, 0.0f, delta_time, collision_time, 5))
+		return;	
 
-	//TODO the content of this function is not the intended behavior
-	//it is the behavior of ModelEntities
-	//change to appropriate behavior
-	//also TODO ist : factor in the Collider::TYPE in choosing a collision algorithm
-	vector<collisionl2::SubmodelCollision> collisions = 
-		collisionl2::linearInterpolation_R0(0.0f, delta_time, tsp.getIWorld(), *this, *(other.pIF));
-
-	if(collisions.empty()) return;
-
-	auto min_e = std::min_element(collisions.begin(), collisions.end());
-	
-	react(min_e->time);
-	other.pIF->react(min_e->time);
+	react(collision_time);
+	other.pIF->react(collision_time);
 }
 
 Collider::TYPE TransModelEntity::type() const
@@ -126,14 +134,9 @@ vector<FaceRef> TransModelEntity::faces(float tick_time) const
 	return mo.model().faces();
 }
 
-spacevec TransModelEntity::position(float tick_time) const
-{
-	return tick_begin_pos + tick_begin_v * tick_time;
-}
-
 void TransModelEntity::react(float tick_time)
 {
-	pos = position(tick_time*0.9999);
+	pos = pos + (v*(tick_time));
 	v.set0();
 	drot = vec3(0.0f);
 	dscale = vec3(0.0f);

@@ -22,6 +22,11 @@ using glm::vec4;
 using glm::vec3;
 using glm::mat4;
 
+vector<Model::ConvexPart> ModelEntity::convexParts() const
+{
+	return m_model.convexParts();
+}
+
 const Model& ModelEntity::model()
 {
 	return m_model;
@@ -111,18 +116,14 @@ void ModelEntity::tick	(
 
 void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
-	vector<collisionl2::SubmodelCollision> collisions = 
-		collisionl2::linearInterpolation_R0(0.0f, delta_time, tsp.getIWorld(), *this, *(other.pIF));
+	gjk::RelColliders relcolliders(makeDualPointer((Entity*) this,(Collider*) this), other, tsp);
+	float collision_time;
+	//if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
+	if(! gjk::firstRoot(relcolliders, 0.0f, delta_time, collision_time, 4))
+		return;	
 
-	if(collisions.empty()) return;
-
-	auto min_e = std::min_element(collisions.begin(), collisions.end());
-	
-	if (min_e->time > delta_time)
-		cerr << "ERROR : Collision to later time than tick!\n";
-
-	react(min_e->time);
-	other.pIF->react(min_e->time);
+	react(collision_time);
+	other.pIF->react(collision_time);
 }
 
 
@@ -143,15 +144,8 @@ vector<FaceRef> ModelEntity::faces(float tick_time) const
 	return m_model.faces();
 }
 
-
-spacevec ModelEntity::position(float tick_time) const
-{
-	return tick_begin_pos + tick_begin_v * tick_time;
-}
-
-
 void ModelEntity::react(float tick_time)
 {
-	pos = position(tick_time*0.9999);
+	pos = pos + v * (tick_time);
 	v.set0();
 }

@@ -1,3 +1,5 @@
+#ifdef COLLISION_LINEAR_INTERPOLATION
+
 #include "collisionl2.hpp"
 
 #include "glmutils.hpp"
@@ -190,7 +192,7 @@ vector<SubmodelCollision> linearInterpolation_R0(
 	spacevec c0_pos, c1_pos;
 	vec3 c0_dpos, c1_dpos;
 
-	c0_pos = c0.position(t0);
+	c0_pos = c0.posT0();
 	c1_pos = c1.position(t0);
 
 	c0_dpos = iworld->toMeters(c0.position(t1) - c0_pos);
@@ -237,3 +239,5 @@ vector<SubmodelCollision> linearInterpolation_R0(
 }
 
 } /* namespace collisionl2 */
+
+#endif

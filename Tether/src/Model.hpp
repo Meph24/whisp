@@ -23,6 +23,7 @@ private:
 
 	pair<vec3, vec3> m_extent;
 
+public:
 	struct ConvexPart
 	{
 		const Model& source;
@@ -35,7 +36,7 @@ private:
 		: source(source)
 		, indices(begin_iter, end_iter) {}
 	};
-
+private:
 	std::vector<ConvexPart> convex_parts;
 public:
 	Model(const Mesh& mesh);
@@ -46,6 +47,8 @@ public:
 	~Model();
 
 	const Mesh& mesh() const;
+
+	const std::vector<ConvexPart>& convexParts() const;
 
 	const vector<Vertex>& vertices() const;
 	vector<EdgeRef> edges() const;
