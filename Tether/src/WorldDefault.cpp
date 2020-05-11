@@ -11,8 +11,8 @@
 #include "Entity.h"
 #include "DrawServiceProvider.h"
 
-WorldDefault::WorldDefault():
-IWorld(16)
+WorldDefault::WorldDefault(float GridSize):
+IWorld(GridSize)
 {
 }
 
@@ -59,7 +59,7 @@ void WorldDefault::tick(Timestamp t, TickServiceProvider* tsp)
 	}
 }
 
-void WorldDefault::postTick(TickServiceProvider* tsp)
+void WorldDefault::postTick(TickServiceProvider& tsp)
 {
 	auto size=managedEntities.size();
 	for(auto i=size*0;i<size;i++)
@@ -90,3 +90,4 @@ void WorldDefault::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServic
 		if(dsp->drawAABBs) e->bb.draw(t,viewFrustum,iw,dsp);
 	}
 }
+

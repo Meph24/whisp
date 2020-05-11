@@ -52,12 +52,12 @@ Simulation_World::Simulation_World(sf::Window * w)
 	test=0;
 	CfgIO cfgio( "./res/config.txt" );
 	Cfg cfg = cfgio.get();
-	int physDist=*cfg.getInt("graphics", "physicsDistance");
-	int renderDist=*cfg.getInt("graphics", "renderDistance");
+//	int physDist=*cfg.getInt("graphics", "physicsDistance");
+//	int renderDist=*cfg.getInt("graphics", "renderDistance");
 	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
 	objects_count=*cfg.getInt("simulation", "objects_count");
 
-	wd=new WorldDefault();
+	wd=new WorldDefault(16);
 	//cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
 	td=new TerrainDummy(getIWorld(),getIWorld()->fromMeters(0));
 
@@ -446,15 +446,17 @@ void Simulation_World::doPhysics(Timestamp t)
 
 	initNextTick();
 
-	iw->preTick(this);
+	iw->preTick(*this);
 
 	player->tick(t,this);//TODO insert into IWorld
 
 	iw->tick(t,this);
 
+	iw->finishTick(*this);
+
 	doReticks();
 
-	iw->postTick(this);
+	iw->postTick(*this);
 }
 
 void Simulation_World::loop()

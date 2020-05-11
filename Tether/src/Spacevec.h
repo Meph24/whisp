@@ -252,6 +252,9 @@ struct vec3if
 	vec3if<I,F> operator/(float scalar) const;
 	void operator/=(float scalar);
 
+	//low precision
+	vec3 operator/(vec3if<I,F> other) const;
+
 	//returns bit vector of comparison lsb=x
 	unsigned int operator<(vec3if<I,F> other) const;
 	unsigned int operator<=(vec3if<I,F> other) const;
@@ -442,9 +445,6 @@ inline std::ostream& operator <<(std::ostream& out, const struct vec3if<I, F> v)
 	return out;
 }
 
-typedef int gridInt;
-typedef intfloat<gridInt,float> spacelen;
-typedef vec3if<gridInt, float> spacevec;
 
 template<typename I, typename F>
 inline vec3if<I, F> vec3if<I, F>::operator -() const
@@ -482,6 +482,15 @@ inline float vec3if<I, F>::dot(vec3 v) const
 	return ret;
 }
 
+template<typename I, typename F>
+inline vec3 vec3if<I, F>::operator /(vec3if<I, F> other) const
+{
+	vec3 ret;
+	ret.x=(x.intpart+x.floatpart)/(other.x.intpart+other.x.floatpart);
+	ret.y=(y.intpart+y.floatpart)/(other.y.intpart+other.y.floatpart);
+	ret.z=(z.intpart+z.floatpart)/(other.z.intpart+other.z.floatpart);
+	return ret;
+}
 
 template<typename I, typename F>
 inline vec3if<I, F> vec3if<I, F>::selectWhere(int boolvec)
@@ -493,5 +502,53 @@ inline vec3if<I, F> vec3if<I, F>::selectWhere(int boolvec)
 	if(boolvec&4) ret.z=z;
 	return ret;
 }
+
+template<typename I, typename F>
+struct chunkCoordinate
+{
+	I x;
+	I y;
+	I z;
+	chunkCoordinate(const struct vec3if<I, F>& from);
+	chunkCoordinate(I X,I Y,I Z);
+
+	bool operator==(chunkCoordinate<I, F> other) const;
+	bool operator!=(chunkCoordinate<I, F> other) const;
+};
+
+
+template<typename I, typename F>
+inline chunkCoordinate<I, F>::chunkCoordinate(const struct vec3if<I, F>& from)
+{
+	x=from.x.intpart;
+	y=from.y.intpart;
+	z=from.z.intpart;
+}
+
+template<typename I, typename F>
+inline bool chunkCoordinate<I, F>::operator ==(chunkCoordinate<I, F> other) const
+{
+	return (x==other.x)&&(y==other.y)&&(z==other.z);
+}
+
+template<typename I, typename F>
+inline chunkCoordinate<I, F>::chunkCoordinate(I X, I Y, I Z):
+x(X),y(Y),z(Z)
+{
+}
+
+template<typename I, typename F>
+inline bool chunkCoordinate<I, F>::operator !=(chunkCoordinate<I, F> other) const
+{
+	return !((*this)==other);
+}
+
+
+// 32 bit integer leads to ~7 light-seconds world radius (@gridSize=1m)
+// 64 bit integer leads to ~970 light-years world radius (@gridSize=1m)
+typedef int gridInt;
+typedef intfloat<gridInt,float> spacelen;
+typedef vec3if<gridInt, float> spacevec;
+typedef chunkCoordinate<gridInt, float> chunkCoo;
 
 #endif /* SRC_SPACEVEC_H_ */

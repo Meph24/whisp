@@ -47,8 +47,8 @@ void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMe
 	//important because of the ability to activate the context in another thread
 	window.setActive(false);
 
-//	world = new Zombie_World(&window);
-	world = new Simulation_World(&window);
+	world = new Zombie_World(&window);
+//	world = new Simulation_World(&window);
 }
 
 void SFMLHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)

@@ -17,6 +17,7 @@ class Entity;
 
 #include <vector>
 
+//TODO maybe rework with lessons learned while implementing FilterHash
 template<typename PhysicsIF>
 class InteractionGroup1
 {

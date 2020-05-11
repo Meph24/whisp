@@ -28,28 +28,28 @@ void Entity::requestDestroy(IWorld * w)
 }
 
 
-void Entity::prepareForPartitionAlgo(void * filterAlgo,bool multichunkInitValue)
-{
-	if(alreadyChecked.size()) alreadyChecked.clear();
-	multichunk=multichunkInitValue;
-}
-
-bool Entity::hasCheckedAlready(Entity* other, void* filterAlgo)
-{
-}
-
-void Entity::registerAlreadyChecked(Entity* other, void* filterAlgo)
-{
-}
-
-unsigned int Entity::getUselessChecksNumber(void* filterAlgo)
-{
-}
-
-void Entity::ignoreAlreadyChecked(IgnoreCondition* condition, void* filterAlgo)
-{
-	//if(condition->evaluateCondition(e))
-}
+//void Entity::prepareForPartitionAlgo(void * filterAlgo,bool multichunkInitValue)
+//{
+//	if(alreadyChecked.size()) alreadyChecked.clear();
+//	multichunk=multichunkInitValue;
+//}
+//
+//bool Entity::hasCheckedAlready(Entity* other, void* filterAlgo)
+//{
+//}
+//
+//void Entity::registerAlreadyChecked(Entity* other, void* filterAlgo)
+//{
+//}
+//
+//unsigned int Entity::getUselessChecksNumber(void* filterAlgo)
+//{
+//}
+//
+//void Entity::ignoreAlreadyChecked(IgnoreCondition* condition, void* filterAlgo)
+//{
+//	//if(condition->evaluateCondition(e))
+//}
 
 #include "WarnErrReporter.h"
 

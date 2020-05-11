@@ -27,8 +27,8 @@ class WorldDefault;
 #define PM_LOGIC_PRECALC 1
 #define PM_LOGIC_GUNTICK 2
 #define PM_LOGIC_SPAWN 3
-#define PM_LOGIC_PHYSICS 4
-#define PM_LOGIC_CHUNKGEN 5
+#define PM_LOGIC_TICK 4
+#define PM_LOGIC_EVAL 5
 #define PM_LOGIC_CHUNKMOVE 6
 
 

@@ -143,7 +143,7 @@ bool EntityProjectileBulletLike::collide(HittableBulletLike* hittable,Projectile
 	float deltaE=0.5*typeB.mass*(vSqBefore*vSqBefore-vSqAfter*vSqAfter);
 	float dmg=deltaE*(typeB.dmgPerJd0*(1-deformation)+typeB.dmgPerJd1*deformation);
 
-	std::cout<<"hello projectile; dmg: "<<dmg<<std::endl;
+//	std::cout<<"hello projectile; dmg: "<<dmg<<std::endl;
 	if(!source) std::cout<<"source 0"<<std::endl;
 	else if(!hittable) std::cout<<"hittable 0"<<std::endl;
 	else if(dmg>0) source->hitCallback(dmg,false,true,hittable);

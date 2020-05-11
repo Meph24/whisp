@@ -39,7 +39,7 @@ protected:
 	std::vector<Entity *> deleteVec;//the entities that should be removed from world
 	//TODO addVec
 
-	void resetAlgos();
+	void resetAlgos(TickServiceProvider& tsp);
 public:
 	InteractFilterAlgoSym<Pushable>* pushAlgo=0;
 	InteractFilterAlgoAsym<Projectile,Hittable>* projectileAlgo=0;
@@ -59,9 +59,11 @@ public:
 	spacevec toUnitLength(spacevec v);//returns a vector of length 1m in the direction of the passed vector
 
 
-	virtual void preTick(TickServiceProvider * tsp);
-	virtual void postTick(TickServiceProvider * tsp)=0;
+	virtual void preTick(TickServiceProvider& tsp);
+	virtual void finishTick(TickServiceProvider& tsp);//finish main tick phase BEFORE reticks
+	virtual void postTick(TickServiceProvider& tsp)=0;//after all ticks and reticks
 
+	//Currently inactive
 	virtual void leaveWorld(Entity * e,TickServiceProvider * tsp);//is called if Entity is outside loaded area
 	virtual void hibernate(Entity * e);//Entity outside loaded area, but not deleted, does not get ticked
 	virtual void wakeHibernating(AABB bb);//awakes hibernating Entities inside bb and tries to insert them into active area

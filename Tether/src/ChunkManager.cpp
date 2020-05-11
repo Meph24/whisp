@@ -379,7 +379,7 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 
 
 #include "WarnErrReporter.h"
-void ChunkManager::applyEntityChunkChanges(TickServiceProvider * tsp)
+void ChunkManager::applyEntityChunkChanges(TickServiceProvider& tsp)
 {
 	int size=addVec.size();
 	for(int i=0;i<size;i++)
@@ -390,7 +390,7 @@ void ChunkManager::applyEntityChunkChanges(TickServiceProvider * tsp)
 		{
 			if(c.e->refCounter==0)//freshly spawned outside
 			{
-				leaveWorld(c.e,tsp);
+				leaveWorld(c.e,&tsp);
 			}
 			continue;
 		}
@@ -436,7 +436,7 @@ void ChunkManager::applyEntityChunkChanges(TickServiceProvider * tsp)
 			c.e->refCounter--;
 			if(c.e->refCounter==0)//moved outside
 			{
-				leaveWorld(c.e,tsp);
+				leaveWorld(c.e,&tsp);
 			}
 		}
 	}
@@ -638,7 +638,7 @@ bool ChunkManager::isValid(gridInt cx, gridInt cz)
 	return true;
 }
 
-void ChunkManager::postTick(TickServiceProvider* tsp)
+void ChunkManager::postTick(TickServiceProvider& tsp)
 {
 	//TODO find out how to exactly do this stuff, previously: "//TODO retick, applyEntityChunkChanges"
 	applyEntityChunkChanges(tsp);

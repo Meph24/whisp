@@ -51,8 +51,9 @@ Zombie_World::Zombie_World(sf::Window * w)
 	int renderDist=*cfg.getInt("graphics", "renderDistance");
 	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
 	std::cout<<"testStart"<<std::endl;
-	cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
-	wd=new WorldDefault();
+	float chunkSize=4;
+	cm=new ChunkManager(chunkSize,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
+	wd=new WorldDefault(chunkSize);
 	spawnZombies=true;
 	zCount = *cfg.getInt("test", "zombies");
 	zombieDist = *cfg.getInt("test", "zombieDist");
@@ -122,8 +123,8 @@ Zombie_World::Zombie_World(sf::Window * w)
 	pmLogic->setName("  precalculations",PM_LOGIC_PRECALC);
 	pmLogic->setName("        guns tick",PM_LOGIC_GUNTICK);
 	pmLogic->setName("            spawn",PM_LOGIC_SPAWN);
-	pmLogic->setName("          physics",PM_LOGIC_PHYSICS);
-	pmLogic->setName(" chunk generation",PM_LOGIC_CHUNKGEN);
+	pmLogic->setName("      entity tick",PM_LOGIC_TICK);
+	pmLogic->setName("   intersect eval",PM_LOGIC_EVAL);
 	pmLogic->setName("   chunk movement",PM_LOGIC_CHUNKMOVE);
 	pmLogic->setName("            other",PM_LOGIC_OUTSIDE);
 
@@ -235,15 +236,19 @@ void Zombie_World::doPhysics(Timestamp t)
 
 	initNextTick();
 
-	iw->preTick(this);
+	iw->preTick(*this);
 
 	player->tick(t,this);//TODO insert into IWorld
 
 	iw->tick(t,this);
 
+	pmLogic->registerTime(PM_LOGIC_TICK);
+
+	iw->finishTick(*this);
+
 	doReticks();
 
-	iw->postTick(this);
+	iw->postTick(*this);
 }
 
 void Zombie_World::loop()
@@ -350,9 +355,8 @@ void Zombie_World::doLogic(Timestamp t)
 		if (0.03f> (rand() % 32768) / 32768.0f) spawnZombie(t);//TODO replace by better spawn mechanic
 	pmLogic->registerTime(PM_LOGIC_SPAWN);
 	doPhysics(t);
-	pmLogic->registerTime(PM_LOGIC_PHYSICS);
+	pmLogic->registerTime(PM_LOGIC_EVAL);
 	getITerrain()->postTickTerrainCalcs(this,player->pos);
-	pmLogic->registerTime(PM_LOGIC_CHUNKGEN);
 	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);//TODO fix perf measurements
 }
 

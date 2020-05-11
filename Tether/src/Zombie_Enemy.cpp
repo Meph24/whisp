@@ -404,7 +404,7 @@ void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
 void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickServiceProvider& tsp)
 {
 	IWorld * iw=tsp.getIWorld();
-	std::cout<<"inside checkProjectile"<<std::endl;
+//	std::cout<<"inside checkProjectile"<<std::endl;
 	float before=this->remainingHP;
 	DualPointer<Projectile> projConv=DualPointer<Projectile>((Entity *)projectile,(Projectile *)projectile);
 
@@ -546,7 +546,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 	{
 		WarnErrReporter::noEffectErr("expected hp change when hit, but no hp change detected");
 	}
-	std::cout<<"Entity ptr="<<(Entity *)this<<"; remainingHP="<<remainingHP<<std::endl;
+//	std::cout<<"Entity ptr="<<(Entity *)this<<"; remainingHP="<<remainingHP<<std::endl;
 
 }
 
@@ -636,7 +636,7 @@ bool Zombie_Enemy::gotHit(float time, int part, EntityProjectileBulletLike * pro
 		legDmgMult = 0.55f;
 		break;
 	}
-	std::cout<<"hit on body part "<<part<<std::endl;
+//	std::cout<<"hit on body part "<<part<<std::endl;
 	legDmg+=legDmgMult*projectile->typeB.dmgPerJd0;//TODO replace with better logic once guns 2.0 work
 	remainingHP -= projectile->typeB.dmgPerJd0*dmgMult;
 

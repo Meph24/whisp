@@ -22,7 +22,7 @@ class InteractFilterDefaultSym: public InteractFilterAlgoSym<PhysicsIF>
 public:
 	InteractFilterDefaultSym();
 	virtual ~InteractFilterDefaultSym();
-	virtual void reset();//called after all individual interact requests of the current tick
+	virtual void reset();//called between tick rounds for data cleanup
 	virtual void doChecks(PhysicsIF * me,Entity * meAsEntity,float time,TickServiceProvider& tsp);
 };
 

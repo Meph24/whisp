@@ -20,7 +20,7 @@ class InteractFilterDefaultAsym: public InteractFilterAlgoAsym<MasterIF,SlaveIF>
 public:
 	InteractFilterDefaultAsym();
 	virtual ~InteractFilterDefaultAsym();
-	virtual void reset();//called after all individual interact requests of the current tick
+	virtual void reset();//called between tick rounds for data cleanup
 	virtual void doChecks(MasterIF * me,Entity * meAsEntity,float time,TickServiceProvider& tsp);
 	virtual void doChecks(SlaveIF * me,Entity * meAsEntity,float time,TickServiceProvider& tsp);
 };

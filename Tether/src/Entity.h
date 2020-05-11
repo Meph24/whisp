@@ -54,7 +54,8 @@ public:
 
 	bool exists=true;//if exists is false, memory will be freed soon
 
-	bool multichunk=false;//can be used by spatial partitioning algorithms (in conjunction with "alreadyChecked")
+	//TODO evaluate if it makes more sense to save value or recalculate each time:
+//	bool multichunk=false;//can be used by spatial partitioning algorithms (in conjunction with "alreadyChecked")
 
 
 	/*
@@ -75,11 +76,11 @@ public:
 
 
 	//methods used by spatial partitioning algorithms
-	void prepareForPartitionAlgo(void * filterAlgo,bool multichunkInitValue=false);//must be called upon entry in spatial partitioning algorithm (the algorithms is responsible for doing it as the first step)-
-	bool hasCheckedAlready(Entity * other,void * filterAlgo);//the spatial partitioning algorithm calls this to ensure every check is done exactly once
-	void registerAlreadyChecked(Entity * other,void * filterAlgo);//the spatial partitioning algorithm calls this when checking other has finished
-	unsigned int getUselessChecksNumber(void * filterAlgo);//gets the number of times that a useless check had to be performed due to the Entity being in multiple chunks
-	void ignoreAlreadyChecked(IgnoreCondition * condition,void * filterAlgo);
+//	void prepareForPartitionAlgo(void * filterAlgo,bool multichunkInitValue=false);//must be called upon entry in spatial partitioning algorithm (the algorithms is responsible for doing it as the first step)-
+//	bool hasCheckedAlready(Entity * other,void * filterAlgo);//the spatial partitioning algorithm calls this to ensure every check is done exactly once
+//	void registerAlreadyChecked(Entity * other,void * filterAlgo);//the spatial partitioning algorithm calls this when checking other has finished
+//	unsigned int getUselessChecksNumber(void * filterAlgo);//gets the number of times that a useless check had to be performed due to the Entity being in multiple chunks
+//	void ignoreAlreadyChecked(IgnoreCondition * condition,void * filterAlgo);
 
 
 	void follow(Entity * e);

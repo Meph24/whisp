@@ -79,7 +79,7 @@ low(posT1-sizeFromMid),high(posT1+sizeFromMid)
 
 bool AABB::isMultichunk()
 {
-	return (low.x.intpart!=high.x.intpart)||(low.z.intpart!=high.z.intpart);
+	return (low.x.intpart!=high.x.intpart)||(low.y.intpart!=high.y.intpart)||(low.z.intpart!=high.z.intpart);
 }
 
 void AABB::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
@@ -162,6 +162,21 @@ vec3 AABB::convert(int bitvec)
 	float y=(bitvec&2)/2;
 	float z=(bitvec&4)/4;
 	return vec3(x,y,z);
+}
+
+void AABB::extend(AABB other)
+{
+	spacevec otherLow=other.low;
+	spacevec otherHigh=other.high;
+	auto lower=otherLow<low;
+	auto higher=otherHigh>high;
+	low=otherLow.selectWhere(lower)+low.selectWhere(~lower);
+	high=otherHigh.selectWhere(higher)+high.selectWhere(~higher);
+}
+
+void AABB::extend(AABB* other)
+{
+	extend(*other);
 }
 
 AABB::~AABB()

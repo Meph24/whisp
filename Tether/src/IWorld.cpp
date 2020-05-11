@@ -10,6 +10,10 @@
 #include "Entity.h"
 #include "InteractFilterDefaultSym.h"
 #include "InteractFilterDefaultAsym.h"
+#include "FilterBoxSortAsym.h"
+#include "FilterBoxSortSym.h"
+#include "FilterHashSym.h"
+#include "FilterHashAsym.h"
 
 IWorld::IWorld()
 {
@@ -25,9 +29,9 @@ IWorld::~IWorld()
 
 void IWorld::initAlgos()
 {
-	pushAlgo=new InteractFilterDefaultSym<Pushable>();//TODO placeholder
-	projectileAlgo=new InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
-	collideAlgo=new InteractFilterDefaultSym<Collider>();//TODO placeholder
+	pushAlgo=new FilterHashSym<Pushable>();//new FilterBoxSortSym<Pushable>();//InteractFilterDefaultSym<Pushable>();//TODO placeholder
+	projectileAlgo=new FilterHashAsym<Projectile,Hittable>();//new FilterBoxSortAsym<Projectile,Hittable>(SLAVE_ONLY);//InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
+	collideAlgo=new FilterBoxSortSym<Collider>();//InteractFilterDefaultSym<Collider>();//TODO placeholder
 }
 
 float IWorld::toMeters(spacelen l)
@@ -123,13 +127,13 @@ void IWorld::requestEntityDelete(Entity* e)
 	deleteVec.push_back(e);
 }
 
-void IWorld::preTick(TickServiceProvider * tsp)
+void IWorld::preTick(TickServiceProvider& tsp)
 {
-	resetAlgos();
+	resetAlgos(tsp);
 }
 
 #include "myAssert.h"
-void IWorld::resetAlgos()
+void IWorld::resetAlgos(TickServiceProvider& tsp)
 {
 	assert(pushAlgo!=0);
 	assert(projectileAlgo!=0);
@@ -138,9 +142,9 @@ void IWorld::resetAlgos()
 	pushAlgo->reset();
 	projectileAlgo->reset();
 	collideAlgo->reset();
-	pushAlgo->doPrecalcs();
-	projectileAlgo->doPrecalcs();
-	collideAlgo->doPrecalcs();
+	pushAlgo->doPrecalcs(tsp);
+	projectileAlgo->doPrecalcs(tsp);
+	collideAlgo->doPrecalcs(tsp);
 }
 
 spacevec IWorld::toUnitLength(spacevec v)
@@ -154,4 +158,12 @@ gridSize(GridSize)
 {
 	initAlgos();
 }
-
+void IWorld::finishTick(TickServiceProvider& tsp)
+{
+	assert(pushAlgo!=0);
+	assert(projectileAlgo!=0);
+	assert(collideAlgo!=0);
+	pushAlgo->evaluationPhase(tsp);
+	projectileAlgo->evaluationPhase(tsp);
+	collideAlgo->evaluationPhase(tsp);
+}
