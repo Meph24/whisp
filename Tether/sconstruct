@@ -109,6 +109,7 @@ releaseobjects = []
 for src in sourceFiles:
  releaseobjectname = src.replace(source_root, release_build_dir,1)
  releaseobjectname = releaseobjectname.replace('.cpp', '.o')
+ releaseobjectname = releaseobjectname.replace('.c', '.o')
  releaseobjects = releaseobjects + [releaseobjectname]
  Alias("release", release_env.Object(releaseobjectname, src))
 
@@ -116,6 +117,7 @@ debugobjects = []
 for src in sourceFiles:
  debugobjectname = src.replace(source_root, debug_build_dir,1)
  debugobjectname = debugobjectname.replace('.cpp', '.o')
+ debugobjectname = debugobjectname.replace('.c', '.o')
  debugobjects = debugobjects + [debugobjectname]
  Alias("debug", debug_env.Object(debugobjectname, src))
 
@@ -159,6 +161,14 @@ for test in testSources:
  Alias("test", debug_test_env.Object(objname, test))
  Alias("test", debug_test_env.Program(execname, debugtestmainobjects+[objname]))
  
+
+for e in sorted(releaseobjects):
+ print(e)
+
+print('-'*42)
+
+for e in sorted(debugobjects):
+ print(e)
 
 ## MAIN PROGRAM '''
 Default([ release_env.Program('bin/whisp', releaseobjects),
