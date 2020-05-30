@@ -163,14 +163,6 @@ for test in testSources:
  Alias("test", debug_test_env.Program(execname, debugtestmainobjects+[objname]))
  
 
-for e in sorted(releaseobjects):
- print(e)
-
-print('-'*42)
-
-for e in sorted(debugobjects):
- print(e)
-
 ## MAIN PROGRAM '''
 Default([ release_env.Program('bin/whisp', releaseobjects),
 		  debug_env.Program('bin/whisp_debug', debugobjects)
