@@ -23,7 +23,7 @@ public:
 	};
 
 
-private:
+public:
 
 	/*
 	//	An interface for the MediaHandle to access window contexts for initialisation of the graphic thread
@@ -95,21 +95,5 @@ public:
 	//	Initializes threads and render data
 	*/
 	Graphics(IMediaHandle& mediaHandle, settings settings);
-	~Graphics();
-
-	/*
-	//	starts the graphic thread
-	//	can also be used to restart the thread completely by calling while the thread is still running
-	*/
-	void start();
-
-	/*
-	//	stops the graphic thread
-	*/
-	void stop();
-
-	
-
-	
 };
 

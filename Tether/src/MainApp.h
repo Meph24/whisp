@@ -4,6 +4,7 @@
 #include "Graphics.h"
 
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include <GL/glew.h>
@@ -14,8 +15,12 @@
 #include "EventHandler.h"
 #include "IMediaHandle.h"
 
+#include "IGameMode.h"
+#include "Simulation_World.h"
+
 #define PHYSICS_MAX_TICKLENGTH 20000
 
+using std::unique_ptr;
 
 class MainApp
 {
@@ -29,10 +34,13 @@ class MainApp
 	*/
 	Graphics graphics;
 
+	unique_ptr<IGameMode> gamemode;
+
 public:
 	MainApp()
 		:graphics(sfmlHandle)
 	{
+
 		IMediaHandle::ContextSettings settings;
 		settings.depth = 24;
 		settings.stencil = 8;
@@ -53,26 +61,26 @@ public:
 		int y=*cfg.getInt("graphics", "resolutionY");
 
 		sfmlHandle.createWindow("Test", x,y, settings);
-	}
+		graphics.init();
 
-	~MainApp() = default;
+		gamemode = std::unique_ptr<IGameMode>(new Simulation_World(&sfmlHandle.window));
+
+
+		gamemode->loadStandardTex();
+		srand(time(0));
+	}
 
 	void run()
 	{
 		sf::Clock clock;
 
-		graphics.start();
+
+
 		while (sfmlHandle.window.isOpen())
 		{
-			
-			//tick
-			sf::Time elapsed = clock.restart();
-			int us = elapsed.asMicroseconds();
-			if (us > PHYSICS_MAX_TICKLENGTH) us = PHYSICS_MAX_TICKLENGTH;
-
-			sf::Time t = sf::microseconds(1000);
-			sf::sleep(t);
-			
+			graphics.clear();
+			gamemode->loop();
+			sfmlHandle.display();	
 
 			//handle events
 			sfmlHandle.pollEvents();	

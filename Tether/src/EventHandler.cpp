@@ -54,7 +54,6 @@ void EventHandler::Filter::updateFilter(event e)
 #include "Zombie_MouseInput.h"
 extern Zombie_KeyInput * keyInput;
 extern Zombie_MouseInput * mouseInput;
-extern int enabledProgram;
 
 //#include "Zombie_World.h"
 //extern Zombie_World * world;
@@ -67,16 +66,7 @@ extern IGameMode * world;
 
 void EventHandler::sendOn(EventHandler::event e)
 {
-	//TODO dont hardcode stuff
-	if ((e.ID == 1039)&&e.value)//p
-	{
-		enabledProgram++;
-		std::cout << e.ID << "/" << e.value << std::endl;
-		return;
-	}
 //	std::cout << e.ID << "/" << e.value << std::endl;
-	if (enabledProgram==1)//zombie
-	{
 		world->eMap->event(e);
 		if (e.ID == 2048)
 		{
@@ -143,7 +133,6 @@ void EventHandler::sendOn(EventHandler::event e)
 				world->tm.targetRate = 0.1f;
 			else world->tm.targetRate = 1.0f;
 		}
-	}
 }
 
 void EventHandler::handle(EventHandler::event e)

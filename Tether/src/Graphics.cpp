@@ -17,11 +17,6 @@ Graphics(mediaHandle)
 
 }
 
-Graphics::~Graphics()
-{
-	stop();
-}
-
 void Graphics::init()
 {	
 	GLenum err = glewInit();
@@ -40,46 +35,7 @@ void Graphics::init()
 	glDepthMask(GL_TRUE);
 	glAlphaFunc(GL_GREATER, 0.02f);
 	glEnable(GL_ALPHA_TEST);
-
-
-
 }
-
-void Graphics::start()
-{
-	if (thread_isOn)
-	{
-		stop();
-	}
-	thread_isOn = true;
-	graphicThread = std::thread(&Graphics::graphicMain, this);
-}
-
-void Graphics::stop()
-{
-	if (thread_isOn)
-	{
-		thread_isOn = false;
-		if (graphicThread.joinable()) graphicThread.join();
-	}
-}
-
-void Graphics::graphicMain()
-{
-	mediaHandle.setContextToMyThread();
-	init();
-
-	while (thread_isOn)
-	{
-		render();
-	}
-}
-
-
-
-
-
-
 
 void Graphics::clear()
 {
@@ -97,11 +53,4 @@ void Graphics::clear(float r, float g, float b, float a, float depth)
 {
 	setClearParameters(r, g, b, a, depth);
 	clear();
-}
-#include "clickibunti.h"
-void Graphics::render()
-{
-	clear();
-	clickibunti();
-	mediaHandle.display();
 }
