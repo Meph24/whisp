@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 
 ### directory variables ###
 root = "."
@@ -191,3 +192,9 @@ Default([ release_env.Program('bin/whisp', releaseobjects),
 #Alias("install", Install(dir=install_dir, source="bin/libmoar.a"))
 
 Alias("clean", Clean('dirs', ['bin', 'build', 'install']))
+
+if os.path.isfile('bin/whisp'):
+	shutil.copy('bin/whisp', './whisp')
+if os.path.isfile('bin/whisp_debug'):
+	shutil.copy('bin/whisp_debug', './whisp_debug')
+
