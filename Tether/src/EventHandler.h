@@ -6,6 +6,8 @@
 */
 #define EVENTHANDLER_LOWID_BITS 10
 
+#include "IGameMode.h"
+
 
 class EventHandler
 {
@@ -66,7 +68,9 @@ private:
 
 	void sendOn(event e);
 public:
+	IGameMode* world;
 
+	void setGameMode(IGameMode* gamemode);
 	/*
 	//	The method to get events handled in further processes
 	//	Includes filtering of events, which do not bring new values

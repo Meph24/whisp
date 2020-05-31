@@ -17,6 +17,7 @@
 
 #include "IGameMode.h"
 #include "Simulation_World.h"
+#include "Zombie_World.h"
 
 #define PHYSICS_MAX_TICKLENGTH 20000
 
@@ -62,9 +63,9 @@ public:
 
 		sfmlHandle.createWindow("Test", x,y, settings);
 		graphics.init();
+		gamemode = std::unique_ptr<IGameMode>(new Zombie_World(&sfmlHandle.window));
 
-		gamemode = std::unique_ptr<IGameMode>(new Simulation_World(&sfmlHandle.window));
-
+		sfmlHandle.EH.setGameMode(gamemode.get());
 
 		gamemode->loadStandardTex();
 		srand(time(0));

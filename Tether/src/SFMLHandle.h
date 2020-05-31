@@ -10,8 +10,9 @@
 class SFMLHandle : public IMediaHandle
 {
 	// handler of the events
+public:
 	EventHandler EH;
-
+private:
 
 	void mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer);
 	void postHandleEvent(sf::Event& e);

@@ -50,16 +50,15 @@ void EventHandler::Filter::updateFilter(event e)
 	prevValue[e.ID] = e.value;
 }
 
+void EventHandler::setGameMode(IGameMode* gamemode)
+{
+	world = gamemode;
+}
+
 #include "Zombie_KeyInput.h"
 #include "Zombie_MouseInput.h"
 extern Zombie_KeyInput * keyInput;
 extern Zombie_MouseInput * mouseInput;
-
-//#include "Zombie_World.h"
-//extern Zombie_World * world;
-
-#include "Simulation_World.h"
-extern IGameMode * world;
 
 #include "CameraTP.h"
 
