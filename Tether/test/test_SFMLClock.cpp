@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <thread>
+#include <ratio>
 
 using namespace std::chrono;
 
@@ -27,6 +28,15 @@ TEST_F(test_SFMLClock, classic_usage)
 	//inaccuracies with sleeping and sampling the clock are ok
 	//but unreasonable values are to be detected by this test
 	ASSERT_LE(diff, 200);
+}
+
+TEST_F(test_SFMLClock, properties)
+{
+	//microsecond precision minimum
+	
+	ASSERT_TRUE( (std::ratio_less_equal< SFMLClock::period, std::micro >::value));
+	//steadyness
+	ASSERT_TRUE( SFMLClock::is_steady );
 }
 
 int main (int argc , char** argv)
