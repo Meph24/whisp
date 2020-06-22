@@ -2,28 +2,37 @@
 
 #include <gtest/gtest.h>
 
-#include <chrono>
+#include <ratio>
 
-#include <iostream>
-
-using namespace std::chrono;
-
-TEST(test_FloatSeconds, Float_Accuracy)
+TEST(test_time, WallClock_properties)
 {
-	nanoseconds ns(1543212345);
-	double d = (double)ns.count();
-	d /= 1000000000;
-	float manually_converted_float_seconds = (float) d;
-	FloatSeconds fs = ns;
-	ASSERT_EQ(ns, fs);
-	//LE = not greater than
-	//conversion should not produce an error
-	float diff = fs.count() - manually_converted_float_seconds;
-	ASSERT_EQ(diff, 0.0f);
+	//precision
+	EXPECT_TRUE( (std::ratio_less_equal<WallClock::period, std::micro>::value) );
+
+	//minimum real time elapsable (before initialization or otherwise)
+	//TODO specify exactly
+	//right now I think a year is generous, Meph
+	typedef duration<int, std::ratio<31556952>> years; //will be added in c++20
+	SFMLClock sfmlclock;
+	WallClock wc(sfmlclock);
+	;
+	WallClock::duration d = WallClock::time_point::max() - wc.now();
+	EXPECT_GT(d, years(1));
+	
+	//steadyness
+	EXPECT_TRUE(WallClock::is_steady);
 }
 
-int main (int argc , char** argv)
+TEST(test_time, SimClock_properties)
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	//precision
+	EXPECT_TRUE((std::ratio_less_equal<SimClock::period, std::micro>::value));
+	
+	//minimum simulation time elapsable
+	//TODO specify
+	
+	//steadyness
+	EXPECT_TRUE(SimClock::is_steady);
 }
+
+//TODO insert test main
