@@ -51,14 +51,14 @@ struct InputEvent
 {
 	EventId id;
 	float value;
-	WallClock::time_point t;
+	WallClock::time_point time;
 
-	InputEvent(EventId id, float value, WallClock::time_point t)
-		: id(id), value(value), t(t) {}
+	InputEvent(EventId id, float value, WallClock::time_point time)
+		: id(id), value(value), time(time) {}
 
 	friend std::ostream& operator<<(std::ostream& os, const InputEvent& e)
 	{
-		os << "(ID:" << e.id << "|Time:" << e.t.time_since_epoch().count() << "|Value:" << e.value << ')';
+		os << "(ID:" << e.id << "|Time:" << e.time.time_since_epoch().count() << "|Value:" << e.value << ')';
 		return os;
 	}
 };
@@ -152,7 +152,7 @@ public:
 	SFMLInputEventSource(sf::Window& w, const WallClock& wallclock)
 	: w(w), wallclock(wallclock), event_poll_counter(0) 	{}
 
-	vector<InputEvent> mapSFEventToInputEvents( const sf::Event& sfe, const WallClock::time_point& poll_time)
+	static vector<InputEvent> mapSFEventToInputEvents( const sf::Event& sfe, const WallClock::time_point& poll_time)
 	{
 		using namespace InputEventSpec;
 	
