@@ -266,6 +266,153 @@ public:
 	unsigned long long polled() const{ return event_poll_counter; }
 };
 
+class InputEventModifier
+{
+	string ID;
+public:
+	string name() const { return name; }
+	InputEventModifier(string ID) : ID(ID) {}
+	InputEvent& modify(InputEvent& ie) = 0;
+	InputEvent& operator()(InputEvent& ie) { return modify(ie); }
+}
+
+struct FunctionalInputEventModifier : public EventModifier
+{
+	std::function<InputEvent& (InputEvent&)> function;
+	FunctionalInputEventModifier(string ID, std::function<InputEvent& (InputEvent&)> function)
+		: ID(ID), function(function) {}
+	InputEvent& modify(InputEvent& ie) {return function(ie); }
+}
+
+struct InputEventModifier_None : public InputEventModifier
+{
+	public:
+		InputEventModifer_None() : InputEventModifer("None") {}
+		InputEvent& modify(InputEvent& ie) { return ie; } // we do absolutely nothing
+}
+
+struct InputEventModifier_OnPress : public InputEventModifier
+{
+	public:
+		InputEventModifer_OnPress() : InputEventModifer("OnPress") {}
+		InputEvent& modify(InputEvent& ie) { ie.value = (ie.value == 0.0f)? 0.0f : 1.0f; return ie; }
+}
+
+
+struct InputEventModifier_OnRelease : public InputEventModifier
+{
+	public:
+		InputEventModifer_OnRelease() : InputEventModifer("OnRelease") {}
+		InputEvent& modify(InputEvent& ie) { ie.value = (ie.value == 0.0f)? 1.0f : 0.0f; return ie; }
+}
+
+
+
+struct InputEventModifier_Scale : public InputEventModifier
+{
+	float factor;
+	public:
+		InputEventModifer_Scale(float factor) : InputEventModifer(string("ScaleBy") + std::to_string(factor)), factor(factor) {}
+		InputEventModifer_Scale(string name, float factor) : InputEventModifer(name) : factor(factor) {}
+		InputEvent& modify(InputEvent& ie) { ie.value = ie.value*factor; return ie; }
+}
+
+struct InputEventModifier_Invert : public InputEventModifier_Scale
+{
+		InputEventModifer_Invert() : InputEventModifer_Scale("Invert", -1.0f) {}
+}
+
+class ControlValue
+{
+	string id;
+public:
+	ControlValue(string id) : id(id) {}
+	void update(float value, const SimClock::time_point& time) = 0;
+};
+
+struct FunctionalControlValue : public ControlValue
+{
+	std::function<void(float, const SimClock::time_point&)> update_function;
+	FunctionalControlValue(string id, std::function<void(float, const SimClock::time_point& time)> update_function) : ControlValue(id), update_function(update_function) {}
+	void update( float value, const SimClock::time_point& time ){ update_function(value, time); }
+};
+
+struct ControlConfigEntry
+{
+	EventID id;
+	vector<string> modifierids;
+	string controlvalueid;
+};
+
+
+class Controlable
+{
+	map<InputEventInterpreter*, InputEventInterpreter::Registration>
+	//TODO
+	//in the future it might be necessary to provide the register of a subset of controlvalues
+	// for example to provide multiple control-schemes
+	map<string, ControlValue*> controlvalues;
+public:
+	~Controlable()
+};
+
+
+/**
+ * @brief Maps an InputEvent to a ControlValue at one point in time, according to ControlValue registration.
+ *
+ * Abstracts the DataStructure used to identify the currently mapped Controlvalue to an Input and different behaviors in doing so.
+ */
+class InputEventMapping
+{
+public:
+	ControlValue* map(EventId eid) = 0;
+	ControlValue* operator[](EventId eid) { return map(eid); }
+
+	Registration registerControlable ( const Controlable& controlable )
+	{
+			
+	}
+};
+
+class FlatInputEventMapping : InputEventMapping
+{
+	std::array<ControlValue*, InputEventSpec::EventType::NUM_EVENTTYPES*InputEventSpec::event_ids_per_type> mapping;
+};
+
+class InputEventInterpreter
+{
+	static map<string, InputEventModifier> modifier_list;
+
+
+	InputEventMapping inputevent_to_controlvalue;
+	map<EventID, vector<InputEventModifier*>> modifiers;
+
+	const SimClock& simclock;
+public:
+	InputEventInterpreter(const Simulation& sim) : simclock(simclock) {}
+	void interpret(InputEvent& inputevent)
+	{
+		if(!controlvalues[inputevent.id]) return;
+		
+		auto modsiterator = modifiers.find(inputevent.id);
+		if(modsiterator != modifiers.end())
+		{
+			for(auto m : *modsiterator) { (*m)(inputevent); }
+		}
+
+		inputevent_to_controlvalue[inputevent.id]->update(inputevent.value, sim.clock.map(inputevent.time));
+	}	
+
+	struct Registration
+	{
+		integer id;
+	};
+
+	Registration registerControlable(Controlable& controlable);
+};
+
+
+
 class Window{};
 struct SFMLWindow : public Window
 {
