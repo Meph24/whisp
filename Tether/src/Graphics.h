@@ -11,44 +11,12 @@ class IMediaHandle;
 */
 class Graphics
 {
-public: 
-
-
-	/*
-	//	All settings concerning Graphics can be passed through this struct
-	*/
-	struct settings
-	{
-		int someplaceholdersetting; // delete when add some real settings to it
-	};
-
-
 public:
 
 	/*
 	//	An interface for the MediaHandle to access window contexts for initialisation of the graphic thread
 	*/
 	IMediaHandle& mediaHandle;
-
-
-	/*
-	//	The thread the graphics will work in
-	//	All the rendering is done in this separate thread
-	*/
-	std::thread graphicThread;
-
-	/*
-	//	a bool which controls the thread
-	//	the bool is the condition for the rendering loop
-	//	by setting to false the render loop can be stopped
-	*/
-	bool thread_isOn;
-
-
-	/*
-	//	Main-function of the graphic thread
-	*/
-	void graphicMain();
 
 	/*
 	//	rendering of RenderData
@@ -90,10 +58,5 @@ public:
 	//	Render data is not initialized in this constructor
 	*/
 	Graphics(IMediaHandle& mediaHandle);
-
-	/*
-	//	Initializes threads and render data
-	*/
-	Graphics(IMediaHandle& mediaHandle, settings settings);
 };
 

@@ -5,12 +5,8 @@
 #include <GL/glew.h>
 #include <iostream>
 
-Graphics::Graphics(IMediaHandle& mediaHandle) :
-mediaHandle(mediaHandle)
-{}
-
-Graphics::Graphics(IMediaHandle& mediaHandle, Graphics::settings settings) :
-Graphics(mediaHandle)
+Graphics::Graphics(IMediaHandle& mediaHandle)
+: mediaHandle(mediaHandle)
 {
 
 	init();
