@@ -130,7 +130,7 @@ TEST(test_RelativeClock, max_base_time)
 	auto c1_4 = c1.now();
 	diff = c1_4 - c1_3;
 	EXPECT_LT(diff , third_wait_duration);
-};
+}
 
 TEST(test_RelativeClock, max_rel_time_default)
 {
@@ -182,20 +182,18 @@ TEST(test_RelativeClock, constraint_rate_changes)
 	TestBaseClock tbc;
 	RC c(tbc, 1.0f, 50ms, 100ms);
 
-	EXPECT_EQ(c.lastRate() , 1.0f);
+	EXPECT_EQ(1.0f, c.lastRate());
 	
 	tbc.advance(10ms);
 
 	c.tick();
 	//if no constraint is hit, no change
-	EXPECT_EQ(c.lastRate(), 1.0f);
+	EXPECT_EQ(1.0f, c.lastRate());
 
 	tbc.advance(60ms);
 	//if a constraint hits, it changes
 	c.tick();
-	EXPECT_EQ(c.lastRate(), 50/60);
-
-
+	EXPECT_EQ(50/60, c.lastRate());
 }
 
 TEST(test_RelativeClock, new_rate)
@@ -212,9 +210,9 @@ TEST(test_RelativeClock, new_rate)
 	EXPECT_LT(abs(c1_diff - c1_expected_0), microseconds(1));
 	
 	// now on rate 2.0
-	tbc.advance(milliseconds(1));
+	tbc.advance(c1_expected_0);
 	auto c1_2 = c1.tick();
-	microseconds c1_expected_1 = milliseconds(2);
+	microseconds c1_expected_1 = c1_expected_0 * 2;
 	c1_diff = c1_2 - c1_1;
 	EXPECT_LT(abs(c1_diff - c1_expected_1), microseconds(1));
 }
@@ -259,6 +257,70 @@ TEST(test_RelativeClock, new_max_rel_time)
 	microseconds c1_expected_1 = milliseconds(5);
 	c1_diff = c1_2 - c1_1;
 	EXPECT_LT(abs(c1_diff - c1_expected_1), microseconds(1));
+}
+
+TEST(test_RelativeClock, stopped)
+{
+	TestBaseClock tbc;
+
+	//initialized in stopped condition
+	RC c1(tbc, 0.0f, milliseconds(200), milliseconds(200));
+	auto c1_0 = c1.now();
+	tbc.advance(milliseconds(20));
+	auto c1_1 = c1.tick();
+	auto c1_2 = c1.now();
+
+	EXPECT_LT(abs(c1_0 - c1_1), microseconds(1));
+	EXPECT_LT(abs(c1_0 - c1_2), microseconds(1));
+}
+
+TEST(test_RelativeClock, starting)
+{
+	TestBaseClock tbc;
+
+	//initialized in stopped condition
+	RC c1(tbc, 0.0f, milliseconds(200), milliseconds(200));
+
+	auto c1_0 = c1.now();
+	tbc.advance(milliseconds(20));
+	c1.setNextTargetRate(1.0f);
+	auto c1_1 = c1.tick(); //this tick should still be on rate 0.0, but the clock should start to run again with rate 1.0 from here
+	EXPECT_EQ(0.0f, c1.lastRate());
+	EXPECT_EQ(1.0f, c1.targetRate());
+	EXPECT_LT(abs(c1_1 - c1_0), microseconds(1));
+	
+	tbc.advance(milliseconds(20));
+	auto c1_2 = c1.tick();
+	auto c1_3 = c1.now();
+
+	EXPECT_LT(abs(c1_3 - c1_2), 1us);
+	EXPECT_EQ(1.0f, c1.lastRate());
+	EXPECT_EQ(1.0f, c1.targetRate());
+	RC::duration c1_diff = c1_2 - c1_1;
+	EXPECT_LT(abs(c1_diff - milliseconds(20)), microseconds(1)) << "Diff actually: " << microseconds(c1_diff).count() << "us";
+}
+
+TEST(test_RelativeClock, stopping)
+{
+	TestBaseClock tbc;
+
+	//initialized in running condition
+	RC c1(tbc, 1.0f, 200ms, 200ms);
+	auto c1_0 = c1.now();
+	tbc.advance(20ms);
+	c1.setNextTargetRate(0.0f);
+	auto c1_1 = c1.tick(); // this tick still on rate 1.0, but clock should stop from here with a rate of 0.0
+	EXPECT_EQ(1.0f, c1.lastRate());
+	EXPECT_EQ(0.0f, c1.targetRate());
+	RC::duration c1_diff = c1_1 - c1_0;
+	EXPECT_LT(abs(c1_diff - 20ms), 1us);
+
+	tbc.advance(20ms);
+	auto c1_2 = c1.tick();
+	EXPECT_EQ(0.0f, c1.lastRate());
+	EXPECT_EQ(0.0f, c1.targetRate());
+	c1_diff = c1_2 - c1_1;
+	EXPECT_LT(abs(c1_diff), 1us);
 }
 
 int main (int argc , char** argv)
