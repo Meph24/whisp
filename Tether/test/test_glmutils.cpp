@@ -86,6 +86,26 @@ TEST(test_glmutils, rotateDeg)
 	EXPECT_TRUE(glm::vecEquals(vec3(0,1,0), rDeg * v));
 }
 
+
+
+TEST(test_glmutils, direction_to_rotation_angle)
+{
+	{
+		vec3 v(0.0f, 0.0f, 1.0f);
+		EXPECT_TRUE(glm::vecEquals(directionToAngleRotation(v), vec3(0.0f, 0.0f, 0.0f)));	
+	}
+	{
+		//exactly 180° results in x being turned
+			vec3 v(0.0f, 0.0f, -1.0f);
+		EXPECT_TRUE(glm::vecEquals(directionToAngleRotation(v), vec3(TAU/2, 0.0f, 0.0f)));	
+	}
+	{
+		//dumb input
+		vec3 v(0.0f, 0.0f, 0.0f);
+		EXPECT_TRUE(glm::vecEquals(directionToAngleRotation(v), vec3(0.0f, 0.0f, 0.0f)));	
+	}
+}
+
 int main (int argc , char** argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

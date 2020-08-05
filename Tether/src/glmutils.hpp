@@ -110,7 +110,7 @@ inline bool vecEqualsE(vec_type a, vec_type b, epsilon_prec epsilon)
 	auto ap = glm::value_ptr(a);
 	auto bp = glm::value_ptr(b);
 
-	for ( int i = 0; i < (vec_type::components); ++i )
+	for ( int i = 0; i < a.length(); ++i )
 	{
 		if(!flteqE(ap[i], bp[i], epsilon))
 		return false;
@@ -122,6 +122,38 @@ template<typename vec_type>
 inline bool vecEquals(const vec_type& a, const vec_type& b)
 {
 	return vecEqualsE(a, b, GLMUTILS_EQUALS_DEFAULT_EPSIOLON);
+}
+
+#include <iostream>
+using std::cout;
+
+#include "MathStuff.h"
+
+inline vec3 directionToAngleRotation(const vec3& direction)
+{
+	if(direction == vec3(0.0f)) return vec3(0.0f);
+	vec3 zero_rotation (0.0f, 0.0f, 1.0f);
+	vec3 dir = glm::normalize(direction);
+
+	const vec3 xaxis ( 1.0f, 0.0f, 0.0f );
+	const vec3 yaxis ( 0.0f, 1.0f, 0.0f );
+	const vec3 zaxis ( 0.0f, 0.0f, 1.0f );
+	if(vecEquals(zero_rotation, dir)) return vec3(0.0f);
+	float x = glm::orientedAngle(zero_rotation, dir, xaxis);
+	x = (x < 0)? TAU - x : x;
+	zero_rotation = zero_rotation * glm::rotate(x, xaxis);
+	if(vecEquals(zero_rotation, dir)) return vec3(x, 0.0f, 0.0f);
+	float y = glm::orientedAngle(zero_rotation, dir, yaxis);
+	y = (y < 0)? TAU - y : y;
+	zero_rotation = zero_rotation * glm::rotate(y, yaxis);
+	if(vecEquals(zero_rotation, dir)) return vec3(x, y, 0.0f);
+	float z = glm::orientedAngle(zero_rotation, dir, zaxis);
+	z = (z < 0)? TAU - z : z;
+
+	zero_rotation = zero_rotation * glm::rotate(z, zaxis); 
+	assert(vecEquals(zero_rotation, dir));
+
+	return vec3(x, y, z);
 }
 
 } /* namespace glm */	
