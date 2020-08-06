@@ -40,6 +40,8 @@ TEST(test_InputEvent_Spec, eventID_calculation_helper)
 	EXPECT_EQ(event_ids_per_type + 10, eventId(EventType::Keyboard, 10));
 }
 
+/*
+
 TEST(Test_SFMLInputEventSource_mapSFEventToInputEvent, TimePointEquality)
 {
 	vector<InputEvent> ret;
@@ -157,6 +159,7 @@ TEST(Test_SFMLInputEventSource_mapSFEventToInputEvent, Mouse)
 }
 
 //these mapping tests are getting stupid
+*/
 
 int main (int argc , char** argv)
 {
