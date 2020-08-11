@@ -29,6 +29,8 @@ class TickServiceProvider
 	std::vector<Retickable *> retickRequests;
 	SoundManager * sm;
 public:
+	unsigned long long interactionCounter=0;//for benchmark purposes
+	unsigned long long arbitraryNumber=0;//for benchmark purposes
 
 	EventMapper * eMap;
 

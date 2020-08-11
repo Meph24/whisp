@@ -36,7 +36,7 @@ ModelEntity::ModelEntity(const Model& model)
 :
 	m_model(model)
 {
-	surviveClearing = true;
+	surviveClearing = false;
 	v.set0();
 }
 

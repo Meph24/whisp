@@ -15,8 +15,11 @@
 class BenchEntityS: public Entity, public BenchSym
 {
 public:
-	BenchEntityS();
+	BenchEntityS(spacevec Size, spacevec Pos);
 	virtual ~BenchEntityS();
+
+	void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void tick(Timestamp t,TickServiceProvider * tsp);
 };
 
 #endif /* SRC_BENCHENTITYS_H_ */

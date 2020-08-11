@@ -17,6 +17,9 @@
 #include "Hittable.h"
 #include "Projectile.h"
 #include "Collider.hpp"
+#include "BenchAsymMaster.h"
+#include "BenchAsymSlave.h"
+#include "BenchSym.h"
 
 template<typename PhysicsIF>
 class InteractFilterAlgoSym;
@@ -44,6 +47,15 @@ public:
 	InteractFilterAlgoSym<Pushable>* pushAlgo=0;
 	InteractFilterAlgoAsym<Projectile,Hittable>* projectileAlgo=0;
 	InteractFilterAlgoSym<Collider>* collideAlgo=0;
+
+	InteractFilterAlgoSym<BenchSym>* benchAlgoSym=0;
+	InteractFilterAlgoAsym<BenchAsymMaster,BenchAsymSlave>* benchAlgoAsym=0;
+	//checklist for adding new interactions:
+	//1. add it here
+	//2. make sure the value is initialized somewhere
+	//3. make sure the value is deleted somewhere
+	//4. make sure these are called somewhere: reset(); doPrecalcs(tsp); evaluationPhase(tsp);
+	//yes this should be simplified in the future
 
 	IWorld();
 	IWorld(float GridSize);

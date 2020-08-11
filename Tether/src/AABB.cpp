@@ -40,13 +40,13 @@ low(pos),high(pos)
 AABB::AABB(spacevec pos, spacevec sizeFromMid):
 low(pos-sizeFromMid),high(pos+sizeFromMid)
 {
-	if(sizeFromMid.x.intpart>=10||sizeFromMid.z.intpart>=10)//TODO find the bug that causes this and remove afterwards
+	if(sizeFromMid.x.intpart>=100||sizeFromMid.z.intpart>=100)//TODO find the bug that causes this and remove afterwards
 	{
 		std::cout<<"REPORT THIS BUG, IT WAS BELIEVED TO BE FIXED AND APPARENTLY IS NOT:"<<std::endl;
 		std::cout<<sizeFromMid<<std::endl;
 		std::cout<<pos<<std::endl;
-		assert(sizeFromMid.x.intpart<10);
-		assert(sizeFromMid.z.intpart<10);
+		assert(sizeFromMid.x.intpart<100);
+		assert(sizeFromMid.z.intpart<100);
 	}
 	assert(!(low>high));
 }
@@ -54,17 +54,17 @@ low(pos-sizeFromMid),high(pos+sizeFromMid)
 AABB::AABB(spacevec posT1, spacevec sizeFromMid, spacevec movement):
 low(posT1-sizeFromMid),high(posT1+sizeFromMid)
 {
-	if(sizeFromMid.x.intpart>=10||sizeFromMid.z.intpart>=10||movement.z.intpart>=10||movement.x.intpart>=10)//TODO find the bug that causes this and remove afterwards
+	if(sizeFromMid.x.intpart>=100||sizeFromMid.z.intpart>=100||movement.z.intpart>=100||movement.x.intpart>=100)//TODO find the bug that causes this and remove afterwards
 	{
 		std::cout<<"REPORT THIS BUG, IT WAS BELIEVED TO BE FIXED AND APPARENTLY IS NOT:"<<std::endl;
 		std::cout<< "pos_t1:\n" << posT1<<std::endl;
 		std::cout<< "fromMid:\n" << sizeFromMid<<std::endl;
 		std::cout<< "movement:\n" << movement<<std::endl;
 
-		assert(sizeFromMid.x.intpart<10);
-		assert(sizeFromMid.z.intpart<10);
-		assert(movement.z.intpart<10);//Assertion failed! Expression: movement.z.intpart<10
-		assert(movement.x.intpart<10);
+		assert(sizeFromMid.x.intpart<100);
+		assert(sizeFromMid.z.intpart<100);
+		assert(movement.z.intpart<100);//Assertion failed! Expression: movement.z.intpart<10
+		assert(movement.x.intpart<100);
 	}
 	spacevec zero;
 	zero.set0();
@@ -110,7 +110,7 @@ void AABB::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvide
 	glPushMatrix();
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
 
-	glColor3f(1,1,1);
+//	glColor3f(1,1,1);
 //	std::cout<<std::endl;
 	for(int i=0;i<3;i++)
 	{

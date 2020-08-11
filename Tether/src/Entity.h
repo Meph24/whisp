@@ -39,17 +39,18 @@ public:
 
 
 	AABB bb;
+	vec3 bbColor;
 
 //	EntityIdent ID;
 
 	spacevec pos;
-	spacevec residentPos;//position that dictates in what chunk this entity belongs, do not touch, managed by chunk/chunkMagager
+	spacevec residentPos;//position that dictates in what chunk this entity belongs, do not touch, managed by chunk/chunkMagager//TODO remove/replace
 	spacevec v;
 
 	Timestamp lastTick;//used for timing
 	int lastTickID=0;//used for resets
 
-	std::vector<void *> alreadyChecked;//TODO
+	std::vector<void *> alreadyChecked;//TODO remove/replace
 
 
 	bool exists=true;//if exists is false, memory will be freed soon

@@ -8,19 +8,21 @@
 
 #include "BenchSym.h"
 
+#include "TickServiceProvider.h"
+
 BenchSym::BenchSym()
 {
-	// TODO Auto-generated constructor stub
-
 }
 
-void BenchSym::interact(Entity* self, DualPointer<BenchSym> other, float time,
-		TickServiceProvider& tsp)
+void BenchSym::interact(Entity* self, DualPointer<BenchSym> other, float time,TickServiceProvider& tsp)
 {
+	tsp.interactionCounter++;
+	tsp.arbitraryNumber+=(unsigned long long) self;
+	tsp.arbitraryNumber+=(unsigned long long) other.e;
+	//by doing all this the algorithm cannot be optimized away by the compiler
 }
 
 BenchSym::~BenchSym()
 {
-	// TODO Auto-generated destructor stub
 }
 

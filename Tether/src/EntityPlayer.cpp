@@ -31,6 +31,7 @@ using glm::vec3;
 EntityPlayer::EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
 speed(characterSpeed),heldItem(0),inventory(0)
 {
+	surviveClearing=true;
 	lastTick=spawnTime;
 	pos=startPos;
 	v.set0();

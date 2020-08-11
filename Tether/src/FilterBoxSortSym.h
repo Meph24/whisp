@@ -55,7 +55,7 @@ inline void FilterBoxSortSym<PhysicsIF>::evaluationPhase(TickServiceProvider& ts
 {
 	if(registered.empty()) return;
 	srand(42);
-	b.buildTree(registered.size());
+	b.buildTree(registered.size(),this->verbose);
 	for(InteractFilterEntry<PhysicsIF> fe: registered)
 	{
 		b.query(fe,tsp);

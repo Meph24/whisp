@@ -13,6 +13,7 @@ using std::unique_ptr;
 #include "TimestampManager.h"
 #include "Spacevec.h"
 
+
 class AdaptiveQuality;
 class PerformanceMeter;
 class DebugScreen;
@@ -22,6 +23,7 @@ class TexParamSet;
 class IWorld;
 class TerrainDummy;
 class WorldDefault;
+class BenchmarkManager;
 
 #include <SFML/Window.hpp>
 
@@ -44,7 +46,7 @@ class Simulation_World: public DrawServiceProvider, public IGameMode
 {
 	int objects_count;
 
-
+	BenchmarkManager * bm;
 
 	PerformanceMeter * pmLogic;
 	PerformanceMeter * pmGraphics;

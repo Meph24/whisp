@@ -80,28 +80,28 @@ inline void InteractionGroup2<MasterIF, SlaveIF>::check(DualPointer<MasterIF> f,
 {
 	//double code starts here, see InteractionGroup1
 	//TODO simplify for InteractionGroup2
-	if(tsp.tickID!=f.e->lastTickID)
-	{
-		f.e->prepareForPartitionAlgo(filterAlgo,multichunkInitValue);//->reset();
-		f.e->lastTickID=tsp.tickID;
-	}
-	if(tsp.tickID!=s.e->lastTickID)
-	{
-		s.e->prepareForPartitionAlgo(filterAlgo,multichunkInitValue);
-		s.e->lastTickID=tsp.tickID;
-	}
+//	if(tsp.tickID!=f.e->lastTickID)
+//	{
+//		f.e->prepareForPartitionAlgo(filterAlgo,multichunkInitValue);//->reset();
+//		f.e->lastTickID=tsp.tickID;
+//	}
+//	if(tsp.tickID!=s.e->lastTickID)
+//	{
+//		s.e->prepareForPartitionAlgo(filterAlgo,multichunkInitValue);
+//		s.e->lastTickID=tsp.tickID;
+//	}
 	if(!f.e->bb.doesIntersect(s.e->bb)) return;
 	AABB::intersectionCounter++;
-	if(f.e->multichunk&&s.e->multichunk)
-	{
-		int size=f.e->alreadyChecked.size();
-		for(int i=0;i<size;i++)
-		{
-			if((void *)s.pIF==f.e->alreadyChecked[i]) return;
-		}
-		f.e->alreadyChecked.push_back((void *)s.pIF);
-		s.e->alreadyChecked.push_back((void *)f.pIF);
-	}
+//	if(f.e->multichunk&&s.e->multichunk)
+//	{
+//		int size=f.e->alreadyChecked.size();
+//		for(int i=0;i<size;i++)
+//		{
+//			if((void *)s.pIF==f.e->alreadyChecked[i]) return;
+//		}
+//		f.e->alreadyChecked.push_back((void *)s.pIF);
+//		s.e->alreadyChecked.push_back((void *)f.pIF);
+//	}
 	//double code ends here
 	f.pIF->interact(f.e,s,time,tsp);
 	//s.pIF->interact(s.e,f,time,tsp);

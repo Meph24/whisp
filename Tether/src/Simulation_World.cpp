@@ -42,6 +42,7 @@ extern Zombie_MouseInput* mouseInput;
 #include "WarnErrReporter.h"
 #include "TerrainDummy.h"
 #include "WorldDefault.h"
+#include "BenchmarkManager.h"
 
 #include "randomModel.hpp"
 #include <glm/gtc/random.hpp>
@@ -58,6 +59,9 @@ Simulation_World::Simulation_World(sf::Window * w)
 	objects_count=*cfg.getInt("simulation", "objects_count");
 
 	wd=new WorldDefault(16);
+
+	bm=new BenchmarkManager(getIWorld());
+
 	//cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
 	td=new TerrainDummy(getIWorld(),getIWorld()->fromMeters(0));
 
@@ -74,6 +78,12 @@ Simulation_World::Simulation_World(sf::Window * w)
 			MAPPER_MODE_ADD,
 			CONDITION_ALWAYS_TRUE,
 			STATUS_ID_RESTART,
+			0);
+	eMap->registerAction(
+			EVENT_ID_KEY_T,
+			MAPPER_MODE_ADD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_BENCHMARK,
 			0);
 	eMap->registerAction(
 			EVENT_ID_KEY_E,
@@ -164,6 +174,7 @@ Simulation_World::~Simulation_World()
 {
 	//missing deletes (one-time tier 1 ode, so who cares)
 //	delete cm;
+	delete bm;
 	delete wd;
 
 	delete dsLogic;
@@ -444,6 +455,8 @@ void Simulation_World::doPhysics(Timestamp t)
 {
 	IWorld * iw=getIWorld();
 
+	bm->tick(t,this);
+
 	initNextTick();
 
 	iw->preTick(*this);
@@ -457,6 +470,8 @@ void Simulation_World::doPhysics(Timestamp t)
 	doReticks();
 
 	iw->postTick(*this);
+
+	bm->notifyTickEnded();
 }
 
 void Simulation_World::loop()

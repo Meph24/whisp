@@ -173,7 +173,7 @@ void Model::drawNative() const
 			}
 			++j;
 		}
-		glColor3f(color.x, color.y, color.z);
+		glColor3f(color.r, color.g, color.b);
 
 		for(VertexRef vr: fr)
 		{

@@ -15,8 +15,12 @@
 class BenchEntitySlave: public Entity, public BenchAsymSlave
 {
 public:
-	BenchEntitySlave();
+	BenchEntitySlave(spacevec Size, spacevec Pos);
+	BenchEntitySlave(AABB boundingBox);
 	virtual ~BenchEntitySlave();
+
+	void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void tick(Timestamp t,TickServiceProvider * tsp);
 };
 
 #endif /* SRC_BENCHENTITYSLAVE_H_ */

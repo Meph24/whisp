@@ -25,6 +25,8 @@ IWorld::~IWorld()
 	delete collideAlgo;
 	delete projectileAlgo;
 	delete pushAlgo;
+	delete benchAlgoAsym;
+	delete benchAlgoSym;
 }
 
 void IWorld::initAlgos()
@@ -32,6 +34,8 @@ void IWorld::initAlgos()
 	pushAlgo=new FilterHashSym<Pushable>();//new FilterBoxSortSym<Pushable>();//InteractFilterDefaultSym<Pushable>();//TODO placeholder
 	projectileAlgo=new FilterHashAsym<Projectile,Hittable>();//new FilterBoxSortAsym<Projectile,Hittable>(SLAVE_ONLY);//InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
 	collideAlgo=new FilterBoxSortSym<Collider>();//InteractFilterDefaultSym<Collider>();//TODO placeholder
+	benchAlgoSym=new InteractFilterDefaultSym<BenchSym>();
+	benchAlgoAsym=new InteractFilterDefaultAsym<BenchAsymMaster,BenchAsymSlave>();
 }
 
 float IWorld::toMeters(spacelen l)
@@ -138,13 +142,19 @@ void IWorld::resetAlgos(TickServiceProvider& tsp)
 	assert(pushAlgo!=0);
 	assert(projectileAlgo!=0);
 	assert(collideAlgo!=0);
-
+	assert(benchAlgoAsym!=0);
+	assert(benchAlgoSym!=0);
+	//TODO make common interface and use a loop instead
 	pushAlgo->reset();
 	projectileAlgo->reset();
 	collideAlgo->reset();
+	benchAlgoAsym->reset();
+	benchAlgoSym->reset();
 	pushAlgo->doPrecalcs(tsp);
 	projectileAlgo->doPrecalcs(tsp);
 	collideAlgo->doPrecalcs(tsp);
+	benchAlgoAsym->doPrecalcs(tsp);
+	benchAlgoSym->doPrecalcs(tsp);
 }
 
 spacevec IWorld::toUnitLength(spacevec v)
@@ -163,7 +173,11 @@ void IWorld::finishTick(TickServiceProvider& tsp)
 	assert(pushAlgo!=0);
 	assert(projectileAlgo!=0);
 	assert(collideAlgo!=0);
+	assert(benchAlgoAsym!=0);
+	assert(benchAlgoSym!=0);
 	pushAlgo->evaluationPhase(tsp);
 	projectileAlgo->evaluationPhase(tsp);
 	collideAlgo->evaluationPhase(tsp);
+	benchAlgoAsym->evaluationPhase(tsp);
+	benchAlgoSym->evaluationPhase(tsp);
 }

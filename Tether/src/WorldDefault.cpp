@@ -18,7 +18,7 @@ IWorld(GridSize)
 
 WorldDefault::~WorldDefault()
 {
-	// TODO Auto-generated destructor stub
+	for(auto ptr: managedEntities) delete ptr;
 }
 
 void WorldDefault::requestEntitySpawn(Entity* e)
@@ -87,7 +87,11 @@ void WorldDefault::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServic
 	for(Entity * e: managedEntities)
 	{
 		e->draw(t,viewFrustum,iw,dsp);
-		if(dsp->drawAABBs) e->bb.draw(t,viewFrustum,iw,dsp);
+		if(dsp->drawAABBs)
+		{
+			glColor3f(e->bbColor.r,e->bbColor.g,e->bbColor.b);
+			e->bb.draw(t,viewFrustum,iw,dsp);
+		}
 	}
 }
 

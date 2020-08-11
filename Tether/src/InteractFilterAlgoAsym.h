@@ -16,6 +16,8 @@ template<typename MasterIF,typename SlaveIF>
 class InteractFilterAlgoAsym
 {
 public:
+	bool verbose=true;
+	InteractFilterAlgoAsym();
 	virtual ~InteractFilterAlgoAsym();
 	virtual void doPrecalcs(TickServiceProvider& tsp);//called before any individual interact requests of the current tick
 	virtual void reset();//called between tick rounds for data cleanup
@@ -39,6 +41,11 @@ template<typename MasterIF, typename SlaveIF>
 inline void InteractFilterAlgoAsym<MasterIF, SlaveIF>::reset()
 {
 	//default: unused
+}
+
+template<typename MasterIF, typename SlaveIF>
+inline InteractFilterAlgoAsym<MasterIF, SlaveIF>::InteractFilterAlgoAsym()
+{
 }
 
 template<typename MasterIF, typename SlaveIF>

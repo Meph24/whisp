@@ -52,16 +52,16 @@ inline FilterHashAsym<MasterIF, SlaveIF>::~FilterHashAsym()
 template<typename MasterIF, typename SlaveIF>
 inline void FilterHashAsym<MasterIF, SlaveIF>::reset()
 {
-	std::cout<<std::endl<<"hash:"<<std::endl;
-	std::cout<<"occupied chunks by MasterIF (last time):"<<tableM.size()<<std::endl;
-	std::cout<<"occupied chunks by SlaveIF (last time):"<<tableS.size()<<std::endl;
+	if(this->verbose) std::cout<<std::endl<<"hash:"<<std::endl;
+	if(this->verbose) std::cout<<"occupied chunks by MasterIF (last time):"<<tableM.size()<<std::endl;
+	if(this->verbose) std::cout<<"occupied chunks by SlaveIF (last time):"<<tableS.size()<<std::endl;
 	tableM.clear();
 	tableS.clear();
-	std::cout<<"registered entities (MasterIF):"<<registeredNumM<<std::endl;
-	std::cout<<"registered entities (SlaveIF):"<<registeredNumS<<std::endl;
-	std::cout<<"potential checks:"<<potentialChecks<<std::endl;
-	std::cout<<"checks:"<<checks<<std::endl;
-	std::cout<<"intersections:"<<intersections<<std::endl;
+	if(this->verbose) std::cout<<"registered entities (MasterIF):"<<registeredNumM<<std::endl;
+	if(this->verbose) std::cout<<"registered entities (SlaveIF):"<<registeredNumS<<std::endl;
+	if(this->verbose) std::cout<<"potential checks:"<<potentialChecks<<std::endl;
+	if(this->verbose) std::cout<<"checks:"<<checks<<std::endl;
+	if(this->verbose) std::cout<<"intersections:"<<intersections<<std::endl;
 	checks=0;
 	intersections=0;
 	potentialChecks=0;

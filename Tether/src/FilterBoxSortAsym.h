@@ -80,7 +80,7 @@ inline void FilterBoxSortAsym<MasterIF, SlaveIF>::evaluationPhase(TickServicePro
 	if(masterValue>slaveValue)
 	{
 		if(registeredSlave.empty()) return;
-		bm.buildTree(registeredSlave.size());
+		bm.buildTree(registeredSlave.size(),this->verbose);//the guy that thought it was a good idea to write in the C++ standard that just "verbose" would lead to a "was not declared in this scope" should face a life sentence for crimes against humanity
 		for(InteractFilterEntry<SlaveIF> fe: registeredSlave)
 		{
 			bm.template query<SlaveIF,false>(fe,tsp);
@@ -89,7 +89,7 @@ inline void FilterBoxSortAsym<MasterIF, SlaveIF>::evaluationPhase(TickServicePro
 	else
 	{
 		if(registeredMaster.empty()) return;
-		bs.buildTree(registeredMaster.size());
+		bs.buildTree(registeredMaster.size(),this->verbose);
 		for(InteractFilterEntry<MasterIF> fe: registeredMaster)
 		{
 			bs.template query<MasterIF,true>(fe,tsp);

@@ -15,8 +15,12 @@
 class BenchEntityMaster: public Entity, public BenchAsymMaster
 {
 public:
-	BenchEntityMaster();
+	BenchEntityMaster(spacevec Size, spacevec Pos);
+	BenchEntityMaster(AABB boundingBox);
 	virtual ~BenchEntityMaster();
+
+	void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void tick(Timestamp t,TickServiceProvider * tsp);
 };
 
 #endif /* SRC_BENCHENTITYMASTER_H_ */

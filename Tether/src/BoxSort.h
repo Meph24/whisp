@@ -22,14 +22,14 @@ public:
 	unsigned long long potentialChecks=0;
 	unsigned long long checks=0;
 	unsigned long long intersections=0;
-	std::vector<InteractFilterEntry<PhysicsIF>>& registered;
+	std::vector<InteractFilterEntry<PhysicsIF>>& registered;//ownership belongs to the specific filter (asym/sym, not this class)
 
 	BoxSortTreeNode<PhysicsIF> * root;
 
 	BoxSort(std::vector<InteractFilterEntry<PhysicsIF>>& Registered);
 	virtual ~BoxSort();
 
-	void buildTree(unsigned int partnerEntities);
+	void buildTree(unsigned int partnerEntities,bool verbose);
 
 	template<typename QueryIF=PhysicsIF,bool queryIsMaster=false>
 	void query(InteractFilterEntry<QueryIF> qe,TickServiceProvider& tsp);//automatically excludes "me" from results
@@ -53,11 +53,11 @@ inline BoxSort<PhysicsIF>::~BoxSort()
 }
 #include <iostream>
 template<typename PhysicsIF>
-inline void BoxSort<PhysicsIF>::buildTree(unsigned int partnerEntities)
+inline void BoxSort<PhysicsIF>::buildTree(unsigned int partnerEntities,bool verbose)
 {
-	std::cout<<std::endl<<"potential checks:"<<potentialChecks<<std::endl;
-	std::cout<<"checks:"<<checks<<std::endl;
-	std::cout<<"intersections:"<<intersections<<std::endl;
+	if(verbose) std::cout<<std::endl<<"potential checks:"<<potentialChecks<<std::endl;
+	if(verbose) std::cout<<"checks:"<<checks<<std::endl;
+	if(verbose) std::cout<<"intersections:"<<intersections<<std::endl;
 	checks=0;
 	intersections=0;
 	potentialChecks=0;
@@ -80,10 +80,6 @@ inline void BoxSort<PhysicsIF>::query(InteractFilterEntry<QueryIF> qe,TickServic
 {
 	if(root==0) return;
 	query<QueryIF,queryIsMaster>(qe,root,tsp);
-//	for(InteractFilterEntry<PhysicsIF> entry: registered)
-//	{
-//		check<QueryIF,queryIsMaster>(qe,entry);
-//	}
 }
 
 template<typename PhysicsIF>

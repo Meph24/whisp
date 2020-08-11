@@ -7,15 +7,40 @@
  */
 
 #include "BenchEntityMaster.h"
+#include "IWorld.h"
+#include "TickServiceProvider.h"
+#include "InteractFilterAlgoAsym.h"
 
-BenchEntityMaster::BenchEntityMaster()
+BenchEntityMaster::BenchEntityMaster(spacevec Size, spacevec Pos)
 {
-	// TODO Auto-generated constructor stub
+	pos=Pos;
+	bb=AABB(Pos,Size*0.5f);
+	bbColor.g=0;
+	bbColor.b=0;
+	v.set0();
+}
 
+BenchEntityMaster::BenchEntityMaster(AABB boundingBox)
+{
+	bb=boundingBox;
+	bbColor.g=0;
+	bbColor.b=0;
+	pos=bb.low+(bb.high-bb.low)*0.5f;
+	v.set0();
 }
 
 BenchEntityMaster::~BenchEntityMaster()
 {
-	// TODO Auto-generated destructor stub
 }
 
+void BenchEntityMaster::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+{
+}
+
+void BenchEntityMaster::tick(Timestamp t, TickServiceProvider* tsp)
+{
+	IWorld * iw=tsp->getIWorld();
+	float seconds=t-lastTick;
+	lastTick=t;
+	iw->benchAlgoAsym->doChecks((BenchAsymMaster *) this,(Entity *) this,seconds,*tsp);
+}

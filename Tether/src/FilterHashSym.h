@@ -54,13 +54,13 @@ template<typename PhysicsIF>
 inline void FilterHashSym<PhysicsIF>::reset()
 {
 
-	std::cout<<std::endl<<"hash:"<<std::endl;
-	std::cout<<"occupied chunks (last time):"<<table.size()<<std::endl;
+	if(this->verbose) std::cout<<std::endl<<"hash: "<<std::endl;
+	if(this->verbose) std::cout<<"occupied chunks (last time):"<<table.size()<<std::endl;
 	table.clear();
-	std::cout<<"registered entities:"<<registeredNum<<std::endl;
-	std::cout<<"potential checks:"<<potentialChecks<<std::endl;
-	std::cout<<"checks:"<<checks<<std::endl;
-	std::cout<<"intersections:"<<intersections<<std::endl;
+	if(this->verbose) std::cout<<"registered entities:"<<registeredNum<<std::endl;
+	if(this->verbose) std::cout<<"potential checks:"<<potentialChecks<<std::endl;
+	if(this->verbose) std::cout<<"checks:"<<checks<<std::endl;
+	if(this->verbose) std::cout<<"intersections:"<<intersections<<std::endl;
 	checks=0;
 	intersections=0;
 	potentialChecks=0;

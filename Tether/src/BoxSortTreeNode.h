@@ -25,13 +25,13 @@ template<typename PhysicsIF>
 class BoxSortTreeNode
 {
 public:
-	InteractFilterEntry<PhysicsIF> * e;
+	InteractFilterEntry<PhysicsIF> * e=0;
 	spacelen spacevec::* dim;
 	spacelen key;
 	AABB1D lowerBounds;//maximum extent of left subtree
 	AABB1D higherBounds;//maximum extent of right subtree
-	BoxSortTreeNode<PhysicsIF> * lower;//left subtree
-	BoxSortTreeNode<PhysicsIF> * higher;//right subtree
+	BoxSortTreeNode<PhysicsIF> * lower=0;//left subtree
+	BoxSortTreeNode<PhysicsIF> * higher=0;//right subtree
 
 	BoxSortTreeNode(std::vector<InteractFilterEntry<PhysicsIF>>& toSort,spacelen spacevec::* d=&spacevec::x);
 	virtual ~BoxSortTreeNode();
@@ -50,8 +50,7 @@ dim(d)
 	if(toSortSize==1)
 	{
 		init(toSort[0]);
-		lower=0;
-		higher=0;
+		return;
 	}
 
 	//find median or estimate it
@@ -148,11 +147,8 @@ dim(d)
 		}
 	}
 	assert(toLower.size()+toHigher.size()+1==toSortSize);
-	if(toLower.empty()) lower=0;
-	else lower=new BoxSortTreeNode(toLower,getBestDim((lowerBounds3D.high-lowerBounds3D.low)/sizesL));
-	if(toHigher.empty()) higher=0;
-	else higher=new BoxSortTreeNode(toHigher,getBestDim((higherBounds3D.high-higherBounds3D.low)/sizesH));
-
+	if(!toLower.empty()) lower=new BoxSortTreeNode(toLower,getBestDim((lowerBounds3D.high-lowerBounds3D.low)/sizesL));
+	if(!toHigher.empty()) higher=new BoxSortTreeNode(toHigher,getBestDim((higherBounds3D.high-higherBounds3D.low)/sizesH));
 }
 
 template<typename PhysicsIF>
@@ -166,6 +162,7 @@ inline BoxSortTreeNode<PhysicsIF>::~BoxSortTreeNode()
 template<typename PhysicsIF>
 inline void BoxSortTreeNode<PhysicsIF>::init(InteractFilterEntry<PhysicsIF> setE)
 {
+	assert(e==0);
 	e=new InteractFilterEntry<PhysicsIF>(setE);
 	key=e->e.e->bb.low.*dim;
 }

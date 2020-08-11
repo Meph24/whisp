@@ -7,15 +7,31 @@
  */
 
 #include "BenchEntityS.h"
-
-BenchEntityS::BenchEntityS()
+#include "IWorld.h"
+#include "TickServiceProvider.h"
+#include "InteractFilterAlgoSym.h"
+BenchEntityS::BenchEntityS(spacevec Size, spacevec Pos)
 {
-	// TODO Auto-generated constructor stub
-
+	pos=Pos;
+	bb=AABB(Pos,Size*0.5f);
+	v.set0();
 }
 
 BenchEntityS::~BenchEntityS()
 {
-	// TODO Auto-generated destructor stub
 }
 
+void BenchEntityS::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+{
+}
+
+void BenchEntityS::tick(Timestamp t, TickServiceProvider* tsp)
+{
+	assert(tsp);
+	IWorld * iw=tsp->getIWorld();
+	assert(iw);
+	float seconds=t-lastTick;
+	lastTick=t;
+	assert(iw->benchAlgoSym);
+	iw->benchAlgoSym->doChecks((BenchSym *) this,(Entity *) this,seconds,*tsp);
+}

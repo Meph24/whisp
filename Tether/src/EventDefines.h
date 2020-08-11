@@ -14,6 +14,7 @@
 #define EVENT_ID_KEY_R (1024+('R'-'A'))
 #define EVENT_ID_KEY_E (1024+('E'-'A'))
 #define EVENT_ID_KEY_B (1024+('B'-'A'))
+#define EVENT_ID_KEY_T (1024+('T'-'A'))
 #define EVENT_ID_KEY_ARROW_UP 1097
 #define EVENT_ID_KEY_ARROW_DOWN 1098
 #define EVENT_ID_KEY_SHIFT 1062
@@ -30,6 +31,7 @@
 #define STATUS_ID_DRAW_AABBs 7
 #define STATUS_ID_GO_UP 8
 #define STATUS_ID_GO_DOWN 9
+#define STATUS_ID_BENCHMARK 10
 
 //event values
 #define EVENT_VALUE_KEY_PRESSED 1

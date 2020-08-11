@@ -17,6 +17,8 @@ template<typename PhysicsIF>
 class InteractFilterAlgoSym
 {
 public:
+	bool verbose=true;
+	InteractFilterAlgoSym();
 	virtual ~InteractFilterAlgoSym();
 	virtual void doPrecalcs(TickServiceProvider& tsp);//called before any individual interact requests of the current tick
 	virtual void reset();//called between tick rounds for data cleanup
@@ -38,6 +40,11 @@ template<typename PhysicsIF>
 inline void InteractFilterAlgoSym<PhysicsIF>::reset()
 {
 	//default: unused
+}
+
+template<typename PhysicsIF>
+inline InteractFilterAlgoSym<PhysicsIF>::InteractFilterAlgoSym()
+{
 }
 
 template<typename PhysicsIF>

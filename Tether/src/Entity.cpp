@@ -11,7 +11,9 @@
 #include "TickServiceProvider.h"
 
 Entity::Entity()
-{}
+{
+	bbColor={1,1,1};
+}
 
 void Entity::requestDestroy(IWorld * w)
 {
