@@ -33,6 +33,8 @@ env.Append(CPPDEFINES = cppdefines)
 env.Append(CPPFLAGS = cppflags)
 env.Append(CXXFLAGS = cxxflags)
 
+
+
 #release configuration
 release_env = env.Clone()
 release_build_dir = build_root+"/release"
@@ -112,7 +114,7 @@ for src in sourceFiles:
  releaseobjectname = releaseobjectname.replace('.cpp', '.o')
  releaseobjectname = releaseobjectname.replace('.c', '.o')
  releaseobjects = releaseobjects + [releaseobjectname]
- Alias("release", release_env.Object(releaseobjectname, src))
+ Alias("release_objects", release_env.Object(releaseobjectname, src))
 
 debugobjects = []
 for src in sourceFiles:
@@ -120,7 +122,7 @@ for src in sourceFiles:
  debugobjectname = debugobjectname.replace('.cpp', '.o')
  debugobjectname = debugobjectname.replace('.c', '.o')
  debugobjects = debugobjects + [debugobjectname]
- Alias("debug", debug_env.Object(debugobjectname, src))
+ Alias("debug_objects", debug_env.Object(debugobjectname, src))
 
 
 ### TESTING
@@ -162,19 +164,33 @@ for test in testSources:
  Alias("test", debug_test_env.Object(objname, test))
  Alias("test", debug_test_env.Program(execname, debugtestmainobjects+[objname]))
  
+def move_release_binary(target, src, env):
+	if os.path.isfile('bin/whisp'):
+		os.remove('./whisp')
+		print('Deleted old release binary!')
+		shutil.copy('bin/whisp', './whisp')
+		print('Copied new release binary!')
 
-for e in sorted(releaseobjects):
- print(e)
+def move_debug_binary(target, src, env):
+	if os.path.isfile('bin/whisp_debug'):
+		os.remove('./whisp_debug')
+		print('Deleted old debug binary!')
+		shutil.copy('bin/whisp_debug', './whisp_debug')
+		print('Copied new debug binary!')
 
-print('-'*42)
-
-for e in sorted(debugobjects):
- print(e)
 
 ## MAIN PROGRAM '''
-Default([ release_env.Program('bin/whisp', releaseobjects),
-		  debug_env.Program('bin/whisp_debug', debugobjects)
-		])
+release_target = release_env.Program('bin/whisp', releaseobjects)
+Alias("release", release_target)
+debug_target = debug_env.Program('bin/whisp_debug', debugobjects)
+Alias("debug", debug_target)
+
+release_env.AddPostAction(release_target, Delete('./whisp'))
+release_env.AddPostAction(release_target, Copy('./whisp', './bin/whisp'))
+debug_env.AddPostAction(debug_target, Delete('./whisp_debug'))
+debug_env.AddPostAction(debug_target, Copy('./whisp_debug', './bin/whisp_debug'))
+
+Default([ release_target, debug_target ])
 
 #install_dir = "install"
 
@@ -193,8 +209,4 @@ Default([ release_env.Program('bin/whisp', releaseobjects),
 
 Alias("clean", Clean('dirs', ['bin', 'build', 'install']))
 
-if os.path.isfile('bin/whisp'):
-	shutil.copy('bin/whisp', './whisp')
-if os.path.isfile('bin/whisp_debug'):
-	shutil.copy('bin/whisp_debug', './whisp_debug')
 
