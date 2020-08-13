@@ -40,7 +40,7 @@ BenchScenario::~BenchScenario()
 float BenchScenario::randomFloat()
 {
 	float lsBits=rand()/(float)RAND_MAX;
-	return (rand()+lsBits)/(float)(RAND_MAX+1);
+	return (rand()+lsBits)/((float)RAND_MAX+1);
 }
 
 #include "myAssert.h"
