@@ -24,7 +24,7 @@ public:
 	virtual ~IGameMode();
 
 	virtual void loop()=0;
-	virtual void loadStandardTex()=0;
+	virtual void init()=0;
 	virtual void trigger(bool pulled)=0;
 };
 

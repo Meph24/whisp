@@ -11,7 +11,6 @@ using std::cout;
 #include "Zombie_MouseInput.h"
 
 extern Zombie_KeyInput* keyInput;
-extern Zombie_MouseInput* mouseInput;
 
 #include "ZombieTree.h"
 #include "TextureStatic2D.h"
@@ -96,6 +95,18 @@ Zombie_World::Zombie_World(sf::Window * w)
 			CONDITION_ALWAYS_TRUE,
 			STATUS_ID_DRAW_AABBs,
 			EVENT_VALUE_KEY_PRESSED);
+	eMap->registerAction(
+			EVENT_ID_KEY_Z,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_SLOMO,
+			EVENT_VALUE_KEY_PRESSED);
+	eMap->registerAction(
+			EVENT_ID_KEY_P,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_PAUSE,
+			EVENT_VALUE_KEY_PRESSED);
 
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
 
@@ -111,10 +122,6 @@ Zombie_World::Zombie_World(sf::Window * w)
 	pmGraphics = new PerformanceMeter(PM_GRAPHICS_FLUSH+1,1000);
 	pmLogic->roundtripUpdateIndex = 0;
 	pmGraphics->roundtripUpdateIndex = 0;
-
-	//dirty
-	keyInput = player->keyInp;
-	mouseInput = player->mouseInp;
 
 	dsLogic=new DebugScreen(pmLogic,&g);
 	dsGraphics=new DebugScreen(pmGraphics,&g);
@@ -191,7 +198,7 @@ void Zombie_World::render(Timestamp t)
 	delete viewFrustum;
 }
 
-void Zombie_World::loadStandardTex()
+void Zombie_World::init()
 {
 	IWorld * iw=getIWorld();
 
@@ -253,6 +260,9 @@ void Zombie_World::doPhysics(Timestamp t)
 
 void Zombie_World::loop()
 {
+	tm.targetRate=1;
+	if(eMap->getStatus(STATUS_ID_PAUSE)) tm.targetRate=0;
+	if(eMap->getStatus(STATUS_ID_SLOMO)) tm.targetRate*=0.1;
 	if (eMap->getStatusAndReset(STATUS_ID_RESTART))
 	{
 		restart();

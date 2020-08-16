@@ -10,7 +10,6 @@
 #include "Zombie_MouseInput.h"
 
 extern Zombie_KeyInput* keyInput;
-extern Zombie_MouseInput* mouseInput;
 
 #include "ZombieTree.h"
 #include "TextureStatic2D.h"
@@ -121,6 +120,18 @@ Simulation_World::Simulation_World(sf::Window * w)
 			CONDITION_ALWAYS_TRUE,
 			STATUS_ID_GO_DOWN,
 			1);
+	eMap->registerAction(
+			EVENT_ID_KEY_Z,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_SLOMO,
+			EVENT_VALUE_KEY_PRESSED);
+	eMap->registerAction(
+			EVENT_ID_KEY_P,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_PAUSE,
+			EVENT_VALUE_KEY_PRESSED);
 
 	float characterSpeed=7.6f;
 
@@ -135,10 +146,6 @@ Simulation_World::Simulation_World(sf::Window * w)
 	pmGraphics = new PerformanceMeter(PM_GRAPHICS_FLUSH+1,1000);
 	pmLogic->roundtripUpdateIndex = 0;
 	pmGraphics->roundtripUpdateIndex = 0;
-
-	//dirty
-	keyInput = player->keyInp;
-	mouseInput = player->mouseInp;
 
 	dsLogic=new DebugScreen(pmLogic,&g);
 	dsGraphics=new DebugScreen(pmGraphics,&g);
@@ -214,7 +221,7 @@ void Simulation_World::render(Timestamp t)
 	delete viewFrustum;
 }
 
-void Simulation_World::loadStandardTex()
+void Simulation_World::init()
 {
 	IWorld * iw=getIWorld();
 
@@ -476,6 +483,9 @@ void Simulation_World::doPhysics(Timestamp t)
 
 void Simulation_World::loop()
 {
+	tm.targetRate=1;
+	if(eMap->getStatus(STATUS_ID_PAUSE)) tm.targetRate=0;
+	if(eMap->getStatus(STATUS_ID_SLOMO)) tm.targetRate*=0.1;
 	if (eMap->getStatusAndReset(STATUS_ID_RESTART))
 	{
 		restart();

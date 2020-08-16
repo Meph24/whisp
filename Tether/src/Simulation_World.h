@@ -96,7 +96,7 @@ public:
 
 	void spawn(Entity *, spacevec);
 
-	void loadStandardTex();
+	void init();
 
 	void trigger(bool pulled);
 

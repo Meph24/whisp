@@ -80,7 +80,7 @@ public:
 
 	virtual Entity * getTarget(Entity * me);
 
-	void loadStandardTex();
+	void init();
 
 	void trigger(bool pulled);
 

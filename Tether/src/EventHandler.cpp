@@ -52,13 +52,6 @@ void EventHandler::Filter::updateFilter(event e)
 
 #include "Zombie_KeyInput.h"
 #include "Zombie_MouseInput.h"
-extern Zombie_KeyInput * keyInput;
-extern Zombie_MouseInput * mouseInput;
-extern int enabledProgram;
-
-//#include "Zombie_World.h"
-//extern Zombie_World * world;
-
 #include "Simulation_World.h"
 extern IGameMode * world;
 
@@ -67,81 +60,74 @@ extern IGameMode * world;
 
 void EventHandler::sendOn(EventHandler::event e)
 {
-	//TODO dont hardcode stuff
-	if ((e.ID == 1039)&&e.value)//p
+	if(world) world->eMap->event(e);
+	Zombie_MouseInput * mouseInp=0;
+	if(world) if(world->player) mouseInp=world->player->mouseInp;
+	Zombie_KeyInput * keyInput=0;
+	if(world) if(world->player) keyInput=world->player->keyInp;
+	if (e.ID == 2048)
 	{
-		enabledProgram++;
-		std::cout << e.ID << "/" << e.value << std::endl;
-		return;
+		if (mouseInp)
+			mouseInp->mouseMovedX(e.value);
 	}
-//	std::cout << e.ID << "/" << e.value << std::endl;
-	if (enabledProgram==1)//zombie
+	else if (e.ID == 2049)
 	{
-		world->eMap->event(e);
-		if (e.ID == 2048)
+		if (mouseInp)
+			mouseInp->mouseMovedY(e.value);
+	}
+	else if (e.ID == 1024 + ('W' - 'A'))
+	{
+		if (keyInput)
+			keyInput->walkForward(e.value);
+	}
+	else if (e.ID == 1024 + ('S' - 'A'))
+	{
+		if (keyInput)
+			keyInput->walkBack(e.value);
+	}
+	else if (e.ID == 1024 + ('A' - 'A'))
+	{
+		if (keyInput)
+			keyInput->walkLeft(e.value);
+	}
+	else if (e.ID == 1024 + ('D' - 'A'))
+	{
+		if (keyInput)
+			keyInput->walkRight(e.value);
+	}
+	else if ((e.ID == 1060) && e.value)
+	{
+		if (keyInput)
+			keyInput->menuButton();
+	}
+	else if (e.ID == 2052)
+	{
+		if(world) world->trigger(e.value);
+	}
+	else if (e.ID == 2050)
+	{
+		if(world) world->player->switchWeapon(e.value);
+	}
+	else if (e.ID == 2053)
+	{
+		float zoomMult=8;
+		if(e.value)
 		{
-			if (mouseInput)
-				mouseInput->mouseMovedX(e.value);
-		}
-		else if (e.ID == 2049)
-		{
-			if (mouseInput)
-				mouseInput->mouseMovedY(e.value);
-		}
-		else if (e.ID == 1024 + ('W' - 'A'))
-		{
-			if (keyInput)
-				keyInput->walkForward(e.value);
-		}
-		else if (e.ID == 1024 + ('S' - 'A'))
-		{
-			if (keyInput)
-				keyInput->walkBack(e.value);
-		}
-		else if (e.ID == 1024 + ('A' - 'A'))
-		{
-			if (keyInput)
-				keyInput->walkLeft(e.value);
-		}
-		else if (e.ID == 1024 + ('D' - 'A'))
-		{
-			if (keyInput)
-				keyInput->walkRight(e.value);
-		}
-		else if ((e.ID == 1060) && e.value)
-		{
-			if (keyInput)
-				keyInput->menuButton();
-		}
-		else if (e.ID == 2052)
-		{
-			world->trigger(e.value);
-		}
-		else if (e.ID == 2050)
-		{
-			world->player->switchWeapon(e.value);
-		}
-		else if (e.ID == 2053)
-		{
-			float zoomMult=8;
-			if(e.value)
+			if(world) world->player->cam->zoom/=zoomMult;
+			if(mouseInp)
 			{
-				world->player->cam->zoom/=zoomMult;
 				world->player->mouseInp->sensitivityX/=zoomMult;//TODO find better way
 				world->player->mouseInp->sensitivityY/=zoomMult;
 			}
-			else
+		}
+		else
+		{
+			if(world) world->player->cam->zoom*=zoomMult;
+			if(mouseInp)
 			{
-				world->player->cam->zoom*=zoomMult;
 				world->player->mouseInp->sensitivityX*=zoomMult;
 				world->player->mouseInp->sensitivityY*=zoomMult;
 			}
-		}
-		else if ((e.ID == 1049) && e.value)
-		{
-			if (world->tm.targetRate == 1.0f)
-				world->tm.targetRate = 0.1f;
-			else world->tm.targetRate = 1.0f;
 		}
 	}
 }

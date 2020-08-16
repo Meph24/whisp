@@ -98,10 +98,18 @@ void Graphics::clear(float r, float g, float b, float a, float depth)
 	setClearParameters(r, g, b, a, depth);
 	clear();
 }
-#include "clickibunti.h"
+#include "IGameMode.h"
+IGameMode * world;
 void Graphics::render()
 {
+	static bool hasRunBefore=0;
 	clear();
-	clickibunti();
+	if (hasRunBefore == 0)
+	{
+		hasRunBefore = 1;
+		world->init();
+		srand(time(0));
+	}
+	world->loop();
 	mediaHandle.display();
 }
