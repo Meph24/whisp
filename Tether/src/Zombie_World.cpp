@@ -10,7 +10,6 @@ using std::cout;
 #include "Zombie_KeyInput.h"
 #include "Zombie_MouseInput.h"
 
-extern Zombie_KeyInput* keyInput;
 
 #include "ZombieTree.h"
 #include "TextureStatic2D.h"
