@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SFMLHandle.h"
-#include "Graphics.h"
 
 class MainApp
 {
@@ -9,11 +8,6 @@ class MainApp
 	//	Media Handle Instance, encapsulation of the Media Layer
 	*/
 	SFMLHandle sfmlHandle;
-
-	/*
-	//	Rendering component
-	*/
-	Graphics graphics;
 
 	// _test_begin
 	float counter;

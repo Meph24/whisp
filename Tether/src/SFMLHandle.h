@@ -7,7 +7,7 @@
 
 #include <SFML/Window.hpp>
 
-class SFMLHandle : public IMediaHandle
+struct SFMLHandle : public IMediaHandle
 {
 	// handler of the events
 	EventHandler EH;
