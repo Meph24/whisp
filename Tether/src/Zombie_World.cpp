@@ -280,12 +280,13 @@ void Zombie_World::loop()
 
 void Zombie_World::trigger(bool pulled)
 {
-	if (!pulled)
-	{
-		player->guns[player->currentGun]->stopShooting();
-		return;
-	}
-	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,*getIWorld());
+	player->trigger(pulled,tm.getSlaveTimestamp(),shot,*getIWorld());
+//	if (!pulled)
+//	{
+//		player->guns[player->currentGun]->stopShooting();
+//		return;
+//	}
+//	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,*getIWorld());
 }
 void Zombie_World::spawnZombie(Timestamp t)
 {

@@ -43,10 +43,8 @@ speed(characterSpeed),heldItem(0),inventory(0)
 	cam->width=w->getSize().x;
 	cam->maxView=1024*8;
 	setTP(false);
-	cam->zoom=1;//TODO zoom change should be in control of player class
-	mouseInp = new Zombie_MouseInput(this, w);
-	mouseInp->sensitivityX=sensX;
-	mouseInp->sensitivityY=sensY;
+	cam->zoom=defaultZoom;
+	mouseInp = new Zombie_MouseInput(this, w,sensX,sensY);
 	keyInp = new Zombie_KeyInput(mouseInp,cam);
 	mouseInp->enable();
 	HP=maxHP;
@@ -94,6 +92,7 @@ EntityPlayer::~EntityPlayer()
 
 void EntityPlayer::switchWeapon(int dir)
 {
+	if(dir==0) return;
 	guns[currentGun]->stopShooting();
 	currentGun=(currentGun+dir+wCount*1024)%wCount;//TODO
 	std::cout<<"gun switched to"<<currentGun<<std::endl;
@@ -188,9 +187,15 @@ spacevec EntityPlayer::getCamPos()
 {
 	return pos+characterEyeOffset;
 }
-
+#include "EventDefines.h"
 Frustum * EntityPlayer::newFrustumApplyPerspective(Timestamp t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction)
 {
+	EventMapper * eMap=tsp->eMap;
+	float zoomMult=8;
+	float zoomed=eMap->getStatus(STATUS_ID_ZOOM);
+	float zoomFactor=zoomed?zoomMult:1;
+	mouseInp->setSensitivityMultiplier(1.0f/zoomFactor);
+	cam->zoom=defaultZoom/zoomFactor;
 	IWorld * iw=tsp->getIWorld();
 	float time=t-lastTick;
 	spacevec curPos=pos+v*time;
@@ -235,6 +240,8 @@ void EntityPlayer::tick(Timestamp t, TickServiceProvider* tsp)
 	ITerrain * it=tsp->getITerrain();
 
 	EventMapper * eMap=tsp->eMap;
+	switchWeapon(eMap->getStatusAndReset(STATUS_ID_WEAPON_SWITCH));
+
 	if(eMap->getStatusAndReset(STATUS_ID_INVENTORY))
 	{
 		Item * temp=heldItem;//put inventory in hand or put it back
@@ -298,4 +305,14 @@ void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,Hittable
 	{
 		hitmark=1;
 	}
+}
+
+void EntityPlayer::trigger(bool pulled,Timestamp now,ITexture * tex,IWorld& iw)
+{
+	if (!pulled)
+	{
+		guns[currentGun]->stopShooting();
+		return;
+	}
+	guns[currentGun]->tryShoot(now,cam,this,tex,iw);
 }

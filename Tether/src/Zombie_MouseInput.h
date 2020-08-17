@@ -14,14 +14,17 @@ public:
 
 	float sensitivityX;
 	float sensitivityY;
+	float defaultSensitivityX;
+	float defaultSensitivityY;
 
-	Zombie_MouseInput(EntityPlayer * playerToSteer, sf::Window * window);
+	Zombie_MouseInput(EntityPlayer * playerToSteer, sf::Window * window,float sensX,float sensY);
 	~Zombie_MouseInput();
 	void enable();
 	void disable();
 	void toggleEnable();
 	void mouseMovedX(int pos);
 	void mouseMovedY(int pos);
+	void setSensitivityMultiplier(float multiplier=1);
 
 	ICamera3D * getCam();
 };

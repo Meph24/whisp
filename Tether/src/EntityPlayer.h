@@ -21,6 +21,7 @@ class CameraTP;
 class Frustum;
 class Item;
 class ItemContainer;
+class ITexture;
 
 
 #include <SFML/Window.hpp>
@@ -33,6 +34,8 @@ class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 
 	bool isPerspective=false;
 public:
+
+	float defaultZoom=1;
 
 	int score=0;
 
@@ -79,6 +82,7 @@ public:
 
 
 	void switchWeapon(int dir);
+	void trigger(bool pulled,Timestamp now,ITexture * tex,IWorld& iw);
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */

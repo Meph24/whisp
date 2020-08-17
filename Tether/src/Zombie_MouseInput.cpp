@@ -3,11 +3,13 @@
 #include "EntityPlayer.h"
 #include "CameraTP.h"
 
-Zombie_MouseInput::Zombie_MouseInput(EntityPlayer * playerToSteer, sf::Window * window) :
+Zombie_MouseInput::Zombie_MouseInput(EntityPlayer * playerToSteer, sf::Window * window,float sensX,float sensY) :
 player(playerToSteer),
 w(window),
-sensitivityX(0.1f),
-sensitivityY(0.1f)
+sensitivityX(sensX),
+sensitivityY(sensY),
+defaultSensitivityX(sensX),
+defaultSensitivityY(sensY)
 {
 
 }
@@ -62,4 +64,10 @@ void Zombie_MouseInput::mouseMovedY(int pos)
 ICamera3D * Zombie_MouseInput::getCam()
 {
 	return player->cam;
+}
+
+void Zombie_MouseInput::setSensitivityMultiplier(float multiplier)
+{
+	sensitivityX=defaultSensitivityX*multiplier;
+	sensitivityY=defaultSensitivityY*multiplier;
 }

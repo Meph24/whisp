@@ -131,6 +131,24 @@ Simulation_World::Simulation_World(sf::Window * w)
 			CONDITION_ALWAYS_TRUE,
 			STATUS_ID_PAUSE,
 			EVENT_VALUE_KEY_PRESSED);
+	eMap->registerAction(
+			EVENT_ID_MOUSE_RMB,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_ZOOM,
+			EVENT_VALUE_KEY_PRESSED);
+	eMap->registerAction(
+			EVENT_ID_MOUSE_WHEEL,
+			MAPPER_MODE_ADD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_WEAPON_SWITCH,
+			0);
+	eMap->registerAction(
+			EVENT_ID_MOUSE_LMB,
+			MAPPER_MODE_HOLD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_TRIGGER,
+			EVENT_VALUE_KEY_PRESSED);
 
 	float characterSpeed=7.6f;
 
@@ -501,12 +519,7 @@ void Simulation_World::loop()
 
 void Simulation_World::trigger(bool pulled)
 {
-	if (!pulled)
-	{
-		player->guns[player->currentGun]->stopShooting();
-		return;
-	}
-	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,*getIWorld());
+	player->trigger(pulled,tm.getSlaveTimestamp(),shot,*getIWorld());
 }
 
 Entity* Simulation_World::getTarget(Entity* me)

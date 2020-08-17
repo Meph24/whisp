@@ -104,32 +104,6 @@ void EventHandler::sendOn(EventHandler::event e)
 	{
 		if(world) world->trigger(e.value);
 	}
-	else if (e.ID == 2050)
-	{
-		if(world) world->player->switchWeapon(e.value);
-	}
-	else if (e.ID == 2053)
-	{
-		float zoomMult=8;
-		if(e.value)
-		{
-			if(world) world->player->cam->zoom/=zoomMult;
-			if(mouseInp)
-			{
-				world->player->mouseInp->sensitivityX/=zoomMult;//TODO find better way
-				world->player->mouseInp->sensitivityY/=zoomMult;
-			}
-		}
-		else
-		{
-			if(world) world->player->cam->zoom*=zoomMult;
-			if(mouseInp)
-			{
-				world->player->mouseInp->sensitivityX*=zoomMult;
-				world->player->mouseInp->sensitivityY*=zoomMult;
-			}
-		}
-	}
 }
 
 void EventHandler::handle(EventHandler::event e)
