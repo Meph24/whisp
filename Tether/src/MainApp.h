@@ -1,9 +1,13 @@
 #pragma once
 
 #include "SFMLHandle.h"
-
+#include "WallClock.hpp"
+#include "SFMLClock.hpp"
 class MainApp
 {
+	SFMLClock base_clock;
+	WallClock clock;
+
 	/*
 	//	Media Handle Instance, encapsulation of the Media Layer
 	*/

@@ -14,6 +14,7 @@
 #define PHYSICS_MAX_TICKLENGTH 20000
 
 MainApp::MainApp()
+	: clock(base_clock)
 {
 	IMediaHandle::ContextSettings settings;
 	settings.depth = 24;
