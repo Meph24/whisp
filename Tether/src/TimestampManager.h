@@ -34,7 +34,6 @@ public:
 
 
 	TimestampManager(float TargetRate,float MaxMasterWallTime,float MaxMasterGameTime);//time in ms
-	~TimestampManager();
 };
 
 #endif /* SRC_TIMESTAMPMANAGER_H_ */

@@ -11,6 +11,7 @@
 
 #include "TickServiceProvider.h"
 #include "TimestampManager.h"
+#include "SimClock.hpp"
 
 class EntityPlayer;
 
@@ -18,10 +19,12 @@ class IGameMode: public TickServiceProvider
 {
 public:
 	EntityPlayer * player;
+
+	SimClock clock;
 	TimestampManager tm;
 
-	IGameMode();
-	virtual ~IGameMode();
+	IGameMode(const WallClock& reference_clock);
+	virtual ~IGameMode() = default;
 
 	virtual void loop()=0;
 	virtual void init()=0;

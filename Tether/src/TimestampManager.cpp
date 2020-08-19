@@ -55,7 +55,3 @@ Timestamp TimestampManager::getSlaveTimestamp()
 	return ret;
 }
 
-TimestampManager::~TimestampManager()
-{
-}
-

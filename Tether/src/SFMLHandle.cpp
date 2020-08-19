@@ -13,6 +13,7 @@
 
 
 SFMLHandle::SFMLHandle()
+	: wallclock(nullptr)
 {}
 
 SFMLHandle::SFMLHandle(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings) :
@@ -47,8 +48,10 @@ void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMe
 	//important because of the ability to activate the context in another thread
 	window.setActive(false);
 
-//	world = new Zombie_World(&window);
-	world = new Simulation_World(&window);
+	
+	assert(wallclock);
+//	world = new Zombie_World(*wallclock, &window);
+	world = new Simulation_World(*wallclock, &window);
 }
 
 void SFMLHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)

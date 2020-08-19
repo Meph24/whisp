@@ -41,7 +41,8 @@ using std::cout;
 
 #include <iostream>
 
-Zombie_World::Zombie_World(sf::Window * w)
+Zombie_World::Zombie_World(const WallClock& reference_clock, sf::Window * w)
+	: IGameMode(reference_clock)
 {
 	CfgIO cfgio( "./res/config.txt" );
 	Cfg cfg = cfgio.get();

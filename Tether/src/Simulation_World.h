@@ -83,7 +83,7 @@ class Simulation_World: public DrawServiceProvider, public IGameMode
 	int test;//TODO remove
 
 public:
-	Simulation_World(sf::Window * w);
+	Simulation_World(const WallClock& reference_clock, sf::Window * w);
 	~Simulation_World();
 
 	//TickServiceProvider

@@ -46,7 +46,8 @@
 #include <glm/gtc/random.hpp>
 
 
-Simulation_World::Simulation_World(sf::Window * w)
+Simulation_World::Simulation_World(const WallClock& reference_clock, sf::Window * w)
+	: IGameMode(reference_clock)
 {
 	test=0;
 	CfgIO cfgio( "./res/config.txt" );

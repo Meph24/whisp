@@ -69,7 +69,7 @@ class Zombie_World: public DrawServiceProvider, public IGameMode
 public:
 
 
-	Zombie_World(sf::Window * w);
+	Zombie_World(const WallClock& reference_clock, sf::Window * w);
 	~Zombie_World();
 
 	//TickServiceProvider
