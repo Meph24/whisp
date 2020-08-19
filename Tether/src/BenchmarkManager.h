@@ -69,7 +69,7 @@ class BenchmarkManager: public Tickable
 public:
 	unsigned int repeats=16;//how often is the same experiment repeated
 
-	void tick(Timestamp t,TickServiceProvider * tsp);//call before ticks, when it is safe to modify required values
+	void tick(const SimClock::time_point& next_tick_begin,TickServiceProvider * tsp);//call before ticks, when it is safe to modify required values
 	void notifyTickEnded();
 
 	bool isInactivePhase();

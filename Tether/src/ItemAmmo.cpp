@@ -24,5 +24,5 @@ Item* ItemAmmo::newClone()
 	return new ItemAmmo(*this);
 }
 
-void ItemAmmo::tick(Timestamp t,TickServiceProvider * tsp)
+void ItemAmmo::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp)
 {}

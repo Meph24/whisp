@@ -16,9 +16,9 @@ class EntitySound: public Entity
 	sf::Sound sound;
 	bool playSoon;
 public:
-	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 
-	virtual void tick(Timestamp t,TickServiceProvider * tsp);
+	virtual void tick(const SimClock::time_point& t,TickServiceProvider * tsp);
 
 	virtual void notifyRemoval(Entity * e);
 	EntitySound(Entity * attachedTo,const sf::SoundBuffer& soundTemplate,float pitch=1.0f,bool enable3D=true);

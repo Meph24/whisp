@@ -50,8 +50,8 @@ void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMe
 
 	
 	assert(wallclock);
-//	world = new Zombie_World(*wallclock, &window);
-	world = new Simulation_World(*wallclock, &window);
+	world = new Zombie_World(*wallclock, &window);
+//	world = new Simulation_World(*wallclock, &window);
 }
 
 void SFMLHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)

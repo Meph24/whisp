@@ -94,7 +94,7 @@ public:
 
 	void requestEntityMove(Entity * e);//do not call yourself, managed by chunks
 	void render(float lodQ,Frustum * viewFrustum);//TODO drawable
-	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);//TODO
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum, IWorld& iw, DrawServiceProvider * dsp);//TODO
 	void generateMissing(int count);
 	void applyEntityChunkChanges(TickServiceProvider& tsp);//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
 	void setMid(spacevec abs,TickServiceProvider * tsp);//absolute x,z
@@ -118,7 +118,7 @@ public:
 
 	//from IWorld interface:
 	void clearEntities();
-	void tick(Timestamp t,TickServiceProvider * tsp);
+	void tick(const SimClock::time_point& next_tick_time ,TickServiceProvider * tsp);
 	void postTick(TickServiceProvider& tsp);
 	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks.
 };

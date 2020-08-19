@@ -51,11 +51,11 @@ void WorldDefault::clearEntities()
 	remain.clear();
 }
 
-void WorldDefault::tick(Timestamp t, TickServiceProvider* tsp)
+void WorldDefault::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	for(Entity * e: managedEntities)
 	{
-		e->tick(t,tsp);
+		e->tick(next_tick_begin, tsp);
 	}
 }
 
@@ -82,15 +82,15 @@ void WorldDefault::postTick(TickServiceProvider& tsp)
 	}
 }
 
-void WorldDefault::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+void WorldDefault::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
 {
 	for(Entity * e: managedEntities)
 	{
-		e->draw(t,viewFrustum,iw,dsp);
+		e->draw(draw_time, viewFrustum,iw,dsp);
 		if(dsp->drawAABBs)
 		{
 			glColor3f(e->bbColor.r,e->bbColor.g,e->bbColor.b);
-			e->bb.draw(t,viewFrustum,iw,dsp);
+			e->bb.draw(draw_time, viewFrustum,iw,dsp);
 		}
 	}
 }

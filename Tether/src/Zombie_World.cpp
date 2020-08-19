@@ -56,8 +56,6 @@ Zombie_World::Zombie_World(const WallClock& reference_clock, sf::Window * w)
 	spawnZombies=true;
 	zCount = *cfg.getInt("test", "zombies");
 	zombieDist = *cfg.getInt("test", "zombieDist");
-	Timestamp timS=tm.getSlaveTimestamp();
-
 
 	eMap->registerAction(
 			EVENT_ID_KEY_F3,
@@ -113,7 +111,7 @@ Zombie_World::Zombie_World(const WallClock& reference_clock, sf::Window * w)
 	float sensX = *cfg.getFlt("input", "sensitivityX");
 	float sensY = *cfg.getFlt("input", "sensitivityY");
 
-	player=new EntityPlayer(timS,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
+	player=new EntityPlayer(clock.now(),{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
 	player->cam->zoom = 1;//TODO better zoom
 	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getFlt("graphics","maxRenderTime")));//TODO not hard code
 
@@ -179,7 +177,7 @@ Zombie_World::~Zombie_World()
 	delete adQ;
 	delete player;
 }
-void Zombie_World::render(Timestamp t)
+void Zombie_World::render(const SimClock::time_point& t)
 {
 	IWorld& iw=*getIWorld();
 
@@ -237,7 +235,7 @@ void Zombie_World::init()
 }
 
 
-void Zombie_World::doPhysics(Timestamp t)
+void Zombie_World::doPhysics(const SimClock::time_point& next_tick_begin)
 {
 	IWorld * iw=getIWorld();
 
@@ -245,9 +243,9 @@ void Zombie_World::doPhysics(Timestamp t)
 
 	iw->preTick(*this);
 
-	player->tick(t,this);//TODO insert into IWorld
+	player->tick(next_tick_begin,this);//TODO insert into IWorld
 
-	iw->tick(t,this);
+	iw->tick(next_tick_begin,this);
 
 	pmLogic->registerTime(PM_LOGIC_TICK);
 
@@ -260,36 +258,43 @@ void Zombie_World::doPhysics(Timestamp t)
 
 void Zombie_World::loop()
 {
-	tm.targetRate=1;
-	if(eMap->getStatus(STATUS_ID_PAUSE)) tm.targetRate=0;
-	if(eMap->getStatus(STATUS_ID_SLOMO)) tm.targetRate*=0.1;
+	if(eMap->getStatus(STATUS_ID_PAUSE))
+	{	
+		clock.setNextTargetRate(0.0);
+	}
+	else if(eMap->getStatus(STATUS_ID_SLOMO)) 
+	{
+		clock.setNextTargetRate(0.1);
+	}
+	else
+	{
+		clock.setNextTargetRate(1.0);
+	}
 	if (eMap->getStatusAndReset(STATUS_ID_RESTART))
 	{
 		restart();
 	}
-	Timestamp t=tm.masterUpdate();
+	SimClock::time_point sim_tick_begin = clock.tick();
 	if (!(player->HP < 0))
 	{
-		//test=(test+1)%4;
-		//if(!test)
-			doLogic(t);
+			doLogic(sim_tick_begin);
 	}
-	doGraphics(t);
+	doGraphics(sim_tick_begin);
 }
 
 
 
 void Zombie_World::trigger(bool pulled)
 {
-	player->trigger(pulled,tm.getSlaveTimestamp(),shot,*getIWorld());
+	player->trigger(pulled, clock.now( ),shot,*getIWorld());
 //	if (!pulled)
 //	{
 //		player->guns[player->currentGun]->stopShooting();
 //		return;
 //	}
-//	player->guns[player->currentGun]->tryShoot(tm.getSlaveTimestamp(),player->cam,player,shot,*getIWorld());
+//	player->guns[player->currentGun]->tryShoot(tm.getSlaveconst SimClock::time_point&(),player->cam,player,shot,*getIWorld());
 }
-void Zombie_World::spawnZombie(Timestamp t)
+void Zombie_World::spawnZombie(const SimClock::time_point& t)
 {
 	IWorld * iw=getIWorld();
 
@@ -355,10 +360,10 @@ void Zombie_World::drawGameOver()//TODO find new home
 	revertView();
 }
 
-void Zombie_World::doLogic(Timestamp t)
+void Zombie_World::doLogic(const SimClock::time_point& t)
 {
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
-//	Timestamp t=tm.masterUpdate();
+//	const SimClock::time_point& t=tm.masterUpdate();
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
 	player->guns[player->currentGun]->tick(t,player->cam,player,shot,*getIWorld());
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
@@ -371,7 +376,7 @@ void Zombie_World::doLogic(Timestamp t)
 	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);//TODO fix perf measurements
 }
 
-void Zombie_World::doGraphics(Timestamp t)
+void Zombie_World::doGraphics(const SimClock::time_point& t)
 {
 	IWorld * iw=getIWorld();
 
@@ -383,7 +388,7 @@ void Zombie_World::doGraphics(Timestamp t)
 	}
 	else
 	{
-//		Timestamp t=tm.getSlaveTimestamp();
+//		const SimClock::time_point& t=tm.getSlaveconst SimClock::time_point&();
 		pmGraphics->registerTime(PM_GRAPHICS_OUTSIDE);
 		render(t);
 		pmGraphics->registerTime(PM_GRAPHICS_WORLD);

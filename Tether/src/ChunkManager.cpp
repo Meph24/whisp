@@ -210,11 +210,11 @@ void ChunkManager::generateMissing(int count)
 }
 
 
-void ChunkManager::tick(Timestamp t, TickServiceProvider* tsp)
+void ChunkManager::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
 	{
-		if(chunks[i]) chunks[i]->tick(t,tsp);
+		if(chunks[i]) chunks[i]->tick(next_tick_begin, tsp);
 	}
 }
 
@@ -534,7 +534,7 @@ chunkSearchResult ChunkManager::smartSearch(Entity* e, spacevec pos)
 	return chunkSearch(e,ret.chunkIndex);
 }
 
-void ChunkManager::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
+void ChunkManager::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
 {
 	int startX=chunksPerAxis/2-renderDistanceChunks;
 	int startZ=chunksPerAxis/2-renderDistanceChunks;
@@ -552,7 +552,7 @@ void ChunkManager::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawService
 			int indx=runz*chunksPerAxis+runx;
 			if(chunks[indx])
 			{
-				chunks[indx]->draw(t,viewFrustum,iw,dsp);
+				chunks[indx]->draw(draw_time,viewFrustum,iw,dsp);
 			}
 		}
 	}

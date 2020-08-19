@@ -9,9 +9,10 @@
 #ifndef SRC_DRAWSERVICEPROVIDER_H_
 #define SRC_DRAWSERVICEPROVIDER_H_
 
+#include "SimClock.hpp"
+
 #include"glmutils.hpp"
 using glm::vec3;
-#include "Timestamp.h"
 
 class Drawable;
 class Frustum;
@@ -68,7 +69,7 @@ public:
 	virtual ITexture * suggestFont();//returns 0 if no suggestion is made
 
 	void registerTransparentCallback(float priority,Drawable * callbackRequester);
-	void doTransparentCallbacks(Timestamp t,Frustum * viewFrustum,IWorld& it);
+	void doTransparentCallbacks(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& it);
 
 
 };
