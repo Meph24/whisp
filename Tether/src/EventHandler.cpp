@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+EventHandler::EventHandler(IGameMode* world) : world(world) {}
+
 EventHandler::Filter::Filter()
 {
 	prevValue = new float[NUM_EVENTTYPES << EVENTHANDLER_LOWID_BITS];
@@ -52,8 +54,6 @@ void EventHandler::Filter::updateFilter(event e)
 
 #include "Zombie_KeyInput.h"
 #include "Zombie_MouseInput.h"
-#include "Simulation_World.h"
-extern IGameMode * world;
 
 #include "CameraTP.h"
 

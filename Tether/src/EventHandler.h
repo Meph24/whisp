@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include "IGameMode.h"
+
 /*
 //	Space for the lowerID parts
 */
@@ -66,6 +68,9 @@ private:
 
 	void sendOn(event e);
 public:
+	IGameMode * world;
+	EventHandler(IGameMode* world);
+
 
 	/*
 	//	The method to get events handled in further processes

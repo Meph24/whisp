@@ -7,10 +7,15 @@
 
 #include <SFML/Window.hpp>
 
+#include "IGameMode.h"
+#include <memory>
+
+using std::unique_ptr;
+
 struct SFMLHandle : public IMediaHandle
 {
 	// handler of the events
-	EventHandler EH;
+	unique_ptr<EventHandler> event_handler;
 
 
 	void mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer);
@@ -21,10 +26,12 @@ public:
 
 	sf::ContextSettings contextSettings;
 	sf::Window window;
-	SFMLHandle();
+	SFMLHandle() = default;
 	SFMLHandle(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
-	~SFMLHandle();
 
+
+	void operateSimulation(IGameMode* simulation);
+	void disconnectSimulation();
 
 	void createWindow(std::string name,  int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
 	void pollEvents();

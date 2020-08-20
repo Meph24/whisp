@@ -1,13 +1,18 @@
 #pragma once
 
 #include "SFMLHandle.h"
+#include <memory>
+
+using std::unique_ptr;
 
 class MainApp
 {
 	/*
 	//	Media Handle Instance, encapsulation of the Media Layer
 	*/
-	SFMLHandle sfmlHandle;
+	unique_ptr<SFMLHandle> sfmlHandle;
+
+	unique_ptr<IGameMode> sim;
 
 	// _test_begin
 	float counter;
@@ -18,7 +23,6 @@ class MainApp
 	void tick(int us);
 public:
 	MainApp();
-	~MainApp();
 
 	/*
 	//	run() MUST be called explicitly

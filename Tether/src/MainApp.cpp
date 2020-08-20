@@ -11,6 +11,9 @@
 #include "EventHandler.h"
 #include "IMediaHandle.h"
 
+#include "Simulation_World.h"
+#include "Zombie_World.h"
+
 #define PHYSICS_MAX_TICKLENGTH 20000
 
 MainApp::MainApp()
@@ -34,7 +37,11 @@ MainApp::MainApp()
 	int x=*cfg.getInt("graphics", "resolutionX");
 	int y=*cfg.getInt("graphics", "resolutionY");
 
-	sfmlHandle.createWindow("Test", x,y, settings);
+
+	sfmlHandle.reset(new SFMLHandle("Dwengine", x, y, settings));
+	sim.reset(new Simulation_World(&sfmlHandle->window));
+	sfmlHandle->operateSimulation(sim.get());
+
 }
 
 void MainApp::tick(int us)
@@ -43,12 +50,9 @@ void MainApp::tick(int us)
 	//do stuff
 }
 
-#include "IGameMode.h"
-IGameMode* world;
-
 void MainApp::run()
 {
-	sfmlHandle.window.setActive();
+	sfmlHandle->window.setActive();
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
@@ -70,15 +74,15 @@ void MainApp::run()
 
 	sf::Clock clock;
 
-	world->init();
+	sim->init();
 	srand(time(0));
 
-	while (sfmlHandle.window.isOpen())
+	while (sfmlHandle->window.isOpen())
 	{
 		//render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		world->loop();
-		sfmlHandle.display();
+		sim->loop();
+		sfmlHandle->display();
 
 		//tick
 		sf::Time elapsed = clock.restart();
@@ -87,11 +91,7 @@ void MainApp::run()
 		tick(us);
 
 		//handle events
-		sfmlHandle.pollEvents();	
+		sfmlHandle->pollEvents();	
 	}
 
-}
-
-MainApp::~MainApp()
-{
 }
