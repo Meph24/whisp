@@ -22,8 +22,8 @@ std::ostream& operator<<(std::ostream& os, const InputEvent& e)
 	return os;
 }
 
-InputEventSource::Iterator::Iterator(InputEventSource* source, bool enditerator)
-	: source(source)
+InputEventSource::Iterator::Iterator(InputEventSource& source, bool enditerator)
+	: source(&source)
 	, e()
 	, c(source->polled())
 	, isenditerator(enditerator)

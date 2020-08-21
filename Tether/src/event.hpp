@@ -70,7 +70,7 @@ struct InputEventSource
 		bool isenditerator;
 
 	public:
-		Iterator(InputEventSource* source, bool enditerator = false);
+		Iterator(InputEventSource& source, bool enditerator = false);
 		Iterator(const Iterator& other) = default;
 		Iterator& operator= (const Iterator&) = default;
 		~Iterator() = default;
