@@ -1,20 +1,20 @@
-#include "Window.hpp"
+#include "SFMLWindow.hpp"
 
-bool Window::isOpen() const { return w.isOpen(); }
-void Window::close() { w.close(); }
-void Window::display() { w.display(); }
+bool SFMLWindow::isOpen() const { return w.isOpen(); }
+void SFMLWindow::close() { w.close(); }
+void SFMLWindow::display() { w.display(); }
 
-float Window::width() const { return w.getSize().x; }
-float Window::height() const { return w.getSize().y; }
-void Window::activate() { w.setActive(true); }
+float SFMLWindow::width() const { return w.getSize().x; }
+float SFMLWindow::height() const { return w.getSize().y; }
+void SFMLWindow::activate() { w.setActive(true); }
 
-Window::Window(unsigned int width, unsigned int height, string title, const WallClock& wallclock)
+SFMLWindow::SFMLWindow(unsigned int width, unsigned int height, string title, const WallClock& wallclock)
 	: w(sf::VideoMode(400, 300), title)
 	, wallclock(wallclock)
 	, event_poll_counter(0) {}
 
 
-vector<InputEvent> Window::mapSFEventToInputEvents( const sf::Event& sfe, const WallClock::time_point& poll_time)
+vector<InputEvent> SFMLWindow::mapSFEventToInputEvents( const sf::Event& sfe, const WallClock::time_point& poll_time)
 {
 	using namespace InputEventSpec;
 
@@ -101,7 +101,7 @@ return ret;
 }
 
 
-bool Window::pollNext(InputEvent& e_out)
+bool SFMLWindow::pollNext(InputEvent& e_out)
 {
 	if(!backlog.empty()) 
 	{
@@ -125,4 +125,4 @@ bool Window::pollNext(InputEvent& e_out)
 	return true;
 }
 
-unsigned long long Window::polled() const{ return event_poll_counter; }
+unsigned long long SFMLWindow::polled() const{ return event_poll_counter; }
