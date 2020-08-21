@@ -90,27 +90,6 @@ struct InputEventSource
 	Iterator end();
 };
 
-#include <SFML/Window.hpp>
-
-class SFMLInputEventSource : public InputEventSource
-{
-	sf::Window& w;
-	const WallClock& wallclock;
-
-	vector<InputEvent> backlog;
-
-	unsigned long long event_poll_counter;
-
-public:
-	SFMLInputEventSource(sf::Window& w, const WallClock& wallclock);
-
-	static vector<InputEvent> mapSFEventToInputEvents( const sf::Event& sfe, const WallClock::time_point& poll_time);
-
-	bool pollNext(InputEvent& e_out);
-
-	unsigned long long polled() const;
-};
-
 struct InputEventInterpreter
 {
 	virtual void interpret(InputEvent& inputevent) = 0;

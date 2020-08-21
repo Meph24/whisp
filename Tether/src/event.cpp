@@ -25,7 +25,7 @@ std::ostream& operator<<(std::ostream& os, const InputEvent& e)
 InputEventSource::Iterator::Iterator(InputEventSource& source, bool enditerator)
 	: source(&source)
 	, e()
-	, c(source->polled())
+	, c(source.polled())
 	, isenditerator(enditerator)
 {}
 
@@ -66,9 +66,9 @@ bool InputEventSource::Iterator::operator!= (const Iterator& other) const
 
 InputEventSource::Iterator InputEventSource::begin()
 {
-	return Iterator(this);
+	return Iterator(*this);
 }
 InputEventSource::Iterator InputEventSource::end()
 {
-	return Iterator(this, true);
+	return Iterator(*this, true);
 }
