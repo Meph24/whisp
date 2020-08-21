@@ -23,10 +23,8 @@ Item* Item::newClone()
 	return 0;
 }
 
-void Item::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
-{
-
-}
+void Item::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
+{}
 
 void Item::giveNewUniqueNotickID()
 {

@@ -45,8 +45,11 @@
 #include "randomModel.hpp"
 #include <glm/gtc/random.hpp>
 
+#include "FloatSeconds.hpp"
 
-Simulation_World::Simulation_World(sf::Window * w)
+
+Simulation_World::Simulation_World(const WallClock& reference_clock, sf::Window * w)
+	: IGameMode(reference_clock)
 {
 	test=0;
 	CfgIO cfgio( "./res/config.txt" );
@@ -63,7 +66,7 @@ Simulation_World::Simulation_World(sf::Window * w)
 	//cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
 	td=new TerrainDummy(getIWorld(),getIWorld()->fromMeters(0));
 
-	Timestamp timS=tm.masterUpdate();
+	SimClock::time_point timS = clock.tick();
 
 	eMap->registerAction(
 			EVENT_ID_KEY_F3,
@@ -156,7 +159,6 @@ Simulation_World::Simulation_World(sf::Window * w)
 	float sensY = *cfg.getFlt("input", "sensitivityY");
 
 	player=new EntityPlayer(timS,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
-	player->cam->zoom = 1;//TODO better zoom
 	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getFlt("graphics","maxRenderTime")));//TODO not hard code
 
 	pmLogic = new PerformanceMeter(PM_LOGIC_CHUNKMOVE+1,1000);
@@ -219,21 +221,21 @@ Simulation_World::~Simulation_World()
 	delete player;
 }
 
-void Simulation_World::render(Timestamp t)
+void Simulation_World::render(const SimClock::time_point& render_time)
 {
 	IWorld& iw=*getIWorld();
 
 	callbackList.clear();
 	float renderTime=(pmGraphics->getTime(PM_GRAPHICS_WORLD)+pmGraphics->getTime(PM_GRAPHICS_FLUSH))/1000000.0f;
 	float quality=adQ->getQuality(renderTime);
-	Frustum * viewFrustum=player->newFrustumApplyPerspective(t,true,this,quality);
+	Frustum * viewFrustum=player->newFrustumApplyPerspective(render_time,true,this,quality);
 
 	grass->bind();
 	//cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
 
-	iw.draw(t,viewFrustum,iw,this);
-	player->draw(t,viewFrustum,iw,this);//TODO  this is the job of an instance of IWorld
-	doTransparentCallbacks(t,viewFrustum,iw);//TODO bugs here
+	iw.draw(render_time,viewFrustum,iw,this);
+	player->draw(render_time,viewFrustum,iw,this);//TODO  this is the job of an instance of IWorld
+	doTransparentCallbacks(render_time,viewFrustum,iw);//TODO bugs here
 
 	delete viewFrustum;
 }
@@ -475,19 +477,19 @@ void Simulation_World::init()
 
 }
 
-void Simulation_World::doPhysics(Timestamp t)
+void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
 {
 	IWorld * iw=getIWorld();
 
-	bm->tick(t,this);
+	bm->tick(next_tick_begin,this);
 
 	initNextTick();
 
 	iw->preTick(*this);
 
-	player->tick(t,this);//TODO insert into IWorld
+	player->tick(next_tick_begin,this);//TODO insert into IWorld
 
-	iw->tick(t,this);
+	iw->tick(next_tick_begin,this);
 
 	iw->finishTick(*this);
 
@@ -500,26 +502,37 @@ void Simulation_World::doPhysics(Timestamp t)
 
 void Simulation_World::loop()
 {
-	tm.targetRate=1;
-	if(eMap->getStatus(STATUS_ID_PAUSE)) tm.targetRate=0;
-	if(eMap->getStatus(STATUS_ID_SLOMO)) tm.targetRate*=0.1;
+	if(eMap->getStatus(STATUS_ID_PAUSE))
+	{	
+		clock.setNextTargetRate(0.0);
+	}
+	else if(eMap->getStatus(STATUS_ID_SLOMO)) 
+	{
+		clock.setNextTargetRate(0.1);
+	}
+	else
+	{
+		clock.setNextTargetRate(1.0);
+	}
 	if (eMap->getStatusAndReset(STATUS_ID_RESTART))
 	{
 		restart();
 	}
-	Timestamp t=tm.masterUpdate();
+	
+	SimClock::time_point new_tick_begin = clock.tick();
+
 	if (!(player->HP < 0))
 	{
 		//test=(test+1)%4;
 		//if(!test)
-			doLogic(t);
+			doLogic(new_tick_begin);
 	}
-	doGraphics(t);
+	doGraphics(new_tick_begin);
 }
 
 void Simulation_World::trigger(bool pulled)
 {
-	player->trigger(pulled,tm.getSlaveTimestamp(),shot,*getIWorld());
+	player->trigger(pulled, clock.now() ,shot,*getIWorld());
 }
 
 Entity* Simulation_World::getTarget(Entity* me)
@@ -548,30 +561,31 @@ void Simulation_World::drawGameOver()//TODO find new home
 	revertView();
 }
 
-void Simulation_World::doLogic(Timestamp t)
+void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 {
 	IWorld * iw=getIWorld();
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
 	//Timestamp t=tm.masterUpdate();
 
-	static Timestamp last=t;
+	static SimClock::time_point last_call;
 
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
-	player->guns[player->currentGun]->tick(t,player->cam,player,shot,*getIWorld());
+	player->guns[player->currentGun]->tick(next_tick_begin, player->cam,player,shot,*getIWorld());
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
 	pmLogic->registerTime(PM_LOGIC_SPAWN);
-	doPhysics(t);
+	doPhysics(next_tick_begin);
 	pmLogic->registerTime(PM_LOGIC_PHYSICS);
 	getITerrain()->postTickTerrainCalcs(this,player->pos);
 	pmLogic->registerTime(PM_LOGIC_CHUNKGEN);
-	td->height+=iw->fromMeters(eMap->getStatus(STATUS_ID_GO_UP)*(t-last)*player->speed);
-	td->height-=iw->fromMeters(eMap->getStatus(STATUS_ID_GO_DOWN)*(t-last)*player->speed);
+	float time_since_last_call = (float) FloatSeconds ( next_tick_begin - last_call );
+	td->height+=iw->fromMeters(eMap->getStatus(STATUS_ID_GO_UP)*time_since_last_call*player->speed);
+	td->height-=iw->fromMeters(eMap->getStatus(STATUS_ID_GO_DOWN)*time_since_last_call*player->speed);
 	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);//TODO fix perf measurements
 
-	last=t;
+	last_call = next_tick_begin;
 }
 
-void Simulation_World::doGraphics(Timestamp t)
+void Simulation_World::doGraphics(const SimClock::time_point& t)
 {
 	IWorld * iw=getIWorld();
 
@@ -624,7 +638,7 @@ ITerrain* Simulation_World::getITerrain()
 void Simulation_World::spawn(Entity* e, spacevec pos)
 {
 	e->pos=pos;
-	e->lastTick = tm.getSlaveTimestamp();
+	e->last_ticked = clock.now();
 	getIWorld()->requestEntitySpawn(e);
 }
 

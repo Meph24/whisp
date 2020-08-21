@@ -32,8 +32,8 @@ public:
 	virtual Item * removeNextItem(u32 maxCount);//returns the last item with up to an amount of maxCount
 
 	virtual Item * newClone();
-	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);//when held by player: must draw GUI and/or the physical item
-	virtual void tick(Timestamp t,TickServiceProvider * tsp);
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);//when held by player: must draw GUI and/or the physical item
+	virtual void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
 
 	ItemContainer();
 	virtual ~ItemContainer();

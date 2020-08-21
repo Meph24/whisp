@@ -5,6 +5,7 @@
 
 #include "EventHandler.h"
 #include "Buffer.h"
+#include "WallClock.hpp"
 
 #include <SFML/Window.hpp>
 
@@ -15,6 +16,8 @@ using std::unique_ptr;
 
 struct Operator : public IMediaHandle
 {
+	WallClock* wallclock;
+
 	// handler of the events
 	unique_ptr<EventHandler> event_handler;
 
@@ -25,10 +28,11 @@ struct Operator : public IMediaHandle
 public:
 
 
+
 	sf::ContextSettings contextSettings;
 	sf::Window window;
 	Operator() = default;
-	Operator(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
+	Operator(WallClock& wallclock, std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
 
 
 	void operateSimulation(IGameMode* simulation);

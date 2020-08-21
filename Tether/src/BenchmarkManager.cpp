@@ -80,7 +80,7 @@ world(World),pm(2)
 	assert(!asymScenarios.empty());
 }
 
-void BenchmarkManager::tick(Timestamp t, TickServiceProvider* tsp)
+void BenchmarkManager::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	IWorld * w=tsp->getIWorld();
 	assert(w==world);

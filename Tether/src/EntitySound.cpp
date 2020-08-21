@@ -12,6 +12,7 @@
 #include "Frustum.h"
 #include "TickServiceProvider.h"
 #include "ChunkManager.h"
+#include "FloatSeconds.hpp"
 
 EntitySound::EntitySound(Entity* attachedTo,const sf::SoundBuffer& soundTemplate,float pitch,bool enable3D):
 attached(attachedTo)
@@ -47,9 +48,9 @@ void EntitySound::notifyRemoval(Entity* e)
 	v=e->v;
 }
 
-void EntitySound::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
+void EntitySound::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
 {
-	float tickOffset=t-lastTick;
+	float tickOffset=(float) FloatSeconds(draw_time-last_ticked);
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
 	vec3 interPosMeters=iw.toMeters(interPos);
 	sound.setPosition(interPosMeters.x,interPosMeters.y,interPosMeters.z);
@@ -61,14 +62,14 @@ void EntitySound::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceP
 	}
 }
 
-void EntitySound::tick(Timestamp t, TickServiceProvider* tsp)
+void EntitySound::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	if(attached)
 	{
 		pos=attached->pos;
 		v=attached->v;
 	}
-	lastTick=t;
+	last_ticked = next_tick_begin;
 	if((!playSoon)&&sound.getStatus()==sf::Sound::Status::Stopped)
 	{
 		std::cout<<"sound request destroy"<<std::endl;

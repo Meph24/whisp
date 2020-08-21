@@ -12,6 +12,8 @@
 
 #include "gjk.hpp"
 
+#include "FloatSeconds.hpp"
+
 vector<Model::ConvexPart> TransModelEntity::convexParts() const
 {
 	return mo.model().convexParts();
@@ -38,13 +40,13 @@ AABB TransModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)
 					tsp->getIWorld()->fromMeters(mo.extent().second));
 }
 
-void TransModelEntity::draw(	Timestamp ts, 
+void TransModelEntity::draw(	const SimClock::time_point& ts, 
 						Frustum* viewFrustum, 
 						IWorld& iw,
 						DrawServiceProvider* dsp
 					 )
 {
-	float tickOffset = ts-lastTick;
+	float tickOffset = (float)FloatSeconds(ts-last_ticked);
 	if(!viewFrustum->inside(bb,iw)) return;
 	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;
 	vec3 interPosMeters = iw.toMeters(interPos);
@@ -64,11 +66,11 @@ void TransModelEntity::draw(	Timestamp ts,
 	glPopMatrix();
 }
 
-void TransModelEntity::tick(	Timestamp t,
+void TransModelEntity::tick(	const SimClock::time_point& next_tick_begin,
 						TickServiceProvider* tsp
 					 )
 {
-	float tick_seconds = t - lastTick;
+	float tick_seconds = (float) FloatSeconds(next_tick_begin - last_ticked);
 
 	tick_begin_pos = pos;
 	tick_begin_v = v;
@@ -99,7 +101,7 @@ void TransModelEntity::tick(	Timestamp t,
 		(Collider*) this, (Entity*) this,
 		tick_seconds, *tsp);
 
-	lastTick = t;
+	last_ticked = next_tick_begin;
 }
 
 void TransModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)

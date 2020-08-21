@@ -11,6 +11,7 @@
 #include "TickServiceProvider.h"
 #include "ITexture.h"
 #include "Frustum.h"
+#include "FloatSeconds.hpp"
 
 #include <GL/glew.h>
 
@@ -84,9 +85,9 @@ void Zombie_Tree::drawLeaves()
 	glEnd();
 }
 
-void Zombie_Tree::draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
+void Zombie_Tree::draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
 {
-	float tickOffset=t-lastTick;
+	float tickOffset = (float) FloatSeconds ( draw_time - last_ticked );
 
 	if(!viewFrustum->inside(bb,iw))
 	{	
@@ -132,10 +133,10 @@ Zombie_Tree::~Zombie_Tree()
 	std::cout<<"destroy"<<std::endl;
 }
 
-void Zombie_Tree::tick(Timestamp t, TickServiceProvider* tsp)
+void Zombie_Tree::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 //	float seconds=t-lastTick;
-	lastTick=t;
+	last_ticked=next_tick_begin;
 
 	IWorld * iw=tsp->getIWorld();
 	ITerrain * it=tsp->getITerrain();

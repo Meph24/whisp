@@ -7,7 +7,7 @@ class EntityPlayer;
 class ITexture;
 class IWorld;
 
-#include "Timestamp.h"
+#include "SimClock.hpp"
 #include "RecoilReturning.h"
 
 #include "noise/noise.h"
@@ -22,7 +22,7 @@ using namespace noise;
 
 class Zombie_Gun
 {
-	Timestamp lastTimestamp;
+	SimClock::time_point last_time;
 	float rld;
 	float timer;
 	ItemAmmo * pType;
@@ -44,10 +44,10 @@ public:
 	vec3 recoil;
 	vec3 recoilSpread;
 
-	Zombie_Gun(Timestamp initTimestamp,std::string weaponName,float ReloadTime,const std::string& filename,float pitchModifier,ItemAmmo * pType,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread);
+	Zombie_Gun(const SimClock::time_point& init_time, std::string weaponName,float ReloadTime,const std::string& filename,float pitchModifier,ItemAmmo * pType,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread);
 	~Zombie_Gun();
-	void tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw);
-	void tick(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw);//TODO tsp
+	void tryShoot(const SimClock::time_point& call_time, ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw);
+	void tick(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw);//TODO tsp
 	void stopShooting();
 };
 

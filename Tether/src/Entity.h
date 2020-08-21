@@ -14,6 +14,7 @@
 
 #include "AABB.h"
 #include "Spacevec.h"
+#include "SimClock.hpp"
 
 class TickServiceProvider;
 class Frustum;
@@ -47,7 +48,7 @@ public:
 	spacevec residentPos;//position that dictates in what chunk this entity belongs, do not touch, managed by chunk/chunkMagager//TODO remove/replace
 	spacevec v;
 
-	Timestamp lastTick;//used for timing
+	SimClock::time_point last_ticked;
 	int lastTickID=0;//used for resets
 
 	std::vector<void *> alreadyChecked;//TODO remove/replace
@@ -67,10 +68,10 @@ public:
 	virtual void move(float time,ChunkManager * cm);
 */
 
-	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)=0;
+	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)=0;
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
-	virtual void tick(Timestamp t,TickServiceProvider * tsp)=0;
+	virtual void tick(const SimClock::time_point& next_tick_begin,TickServiceProvider * tsp)=0;
 	virtual void onLeaveWorld(TickServiceProvider * tsp);//called when outside of loaded chunk area
 
 	void requestDestroy(IWorld * w);//call this to request delete, do NOT delete any other way

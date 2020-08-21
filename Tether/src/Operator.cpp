@@ -23,11 +23,13 @@ void Operator::disconnectSimulation()
 	event_handler.reset(nullptr);
 }
 
-Operator::Operator(	string name, 
+Operator::Operator(	WallClock&		wallclock,
+						string		name, 
 						int			reswidth, 
 						int			resheight, 
 						IMediaHandle::ContextSettings& settings) 
-	: contextSettings(24, 8, 0, 3, 3)
+	: wallclock(&wallclock)
+	, contextSettings(24, 8, 0, 3, 3)
 	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
 {
 	//important because of the ability to activate the context in another thread

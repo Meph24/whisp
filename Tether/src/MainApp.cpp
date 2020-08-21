@@ -17,6 +17,7 @@
 #define PHYSICS_MAX_TICKLENGTH 20000
 
 MainApp::MainApp()
+	: clock(base_clock)
 {
 	IMediaHandle::ContextSettings settings;
 	settings.depth = 24;
@@ -38,10 +39,9 @@ MainApp::MainApp()
 	int y=*cfg.getInt("graphics", "resolutionY");
 
 
-	op.reset(new Operator("Dwengine", x, y, settings));
-	sim.reset(new Simulation_World(&op->window));
+	op.reset(new Operator(clock, "Dwengine", x, y, settings));
+	sim.reset(new Simulation_World(clock, &op->window));
 	op->operateSimulation(sim.get());
-
 }
 
 void MainApp::tick(int us)

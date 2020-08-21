@@ -15,20 +15,21 @@
 #include "Chunk.h"
 #include "InteractFilterAlgoSym.h"
 #include "InteractFilterAlgoAsym.h"
+#include "FloatSeconds.hpp"
 
 #include <cstdlib>
 #include <GL/glew.h>
 
 int Zombie_Enemy::zombieCount=0;
 
-Zombie_Enemy::Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,TickServiceProvider* tsp):
+Zombie_Enemy::Zombie_Enemy(const SimClock::time_point& spawn_time,ITexture * texture,spacevec startPos,TickServiceProvider* tsp):
 tex(texture),ml(),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitionAnim(0.5f,0,1)
 {
 	IWorld * iw=tsp->getIWorld();
 	ITerrain * it=tsp->getITerrain();
 	fac=FACTION_ZOMBIES;
 	acceptedConversions=FLAG_HIT_TYPE_BULLET_LIKE;
-	lastTick=spawnTime;
+	last_ticked = spawn_time;
 	pos=it->clip(startPos,true);
 	v=iw->fromMeters({0,0,0});
 	facing = std::rand() % 360;
@@ -242,9 +243,9 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 	glPopMatrix();
 }
 #include <iostream>
-void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
+void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
 {
-	float tickOffset=t-lastTick;
+	float tickOffset=(float) FloatSeconds(draw_time-last_ticked);
 	if(!viewFrustum->inside(bb,iw))
 	{
 //		std::cout<<"zombie outside view"<<std::endl;//use this to test Frustum Culling
@@ -300,14 +301,14 @@ void Zombie_Enemy::draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawService
 	glPopMatrix();
 }
 
-void Zombie_Enemy::tick(Timestamp t,TickServiceProvider * tsp)
+void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceProvider * tsp)
 {
 	IWorld * iw=tsp->getIWorld();
 	ITerrain * it=tsp->getITerrain();
 
 	headshot=true;
-	float seconds=t-lastTick;
-	lastTick=t;
+	float seconds=(float) FloatSeconds(next_tick_time-last_ticked);
+	last_ticked = next_tick_time;
 	bodyAnim.update(seconds);
 	if(legDmg>0.25f*totalHP)
 		transitionAnim.update(seconds);

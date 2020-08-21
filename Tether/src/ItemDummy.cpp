@@ -24,6 +24,6 @@ ItemDummy::~ItemDummy()
 	// TODO Auto-generated destructor stub
 }
 
-void ItemDummy::tick(Timestamp t, TickServiceProvider* tsp)
+void ItemDummy::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 }

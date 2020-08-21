@@ -2,11 +2,16 @@
 
 #include "Operator.hpp"
 #include <memory>
+#include "WallClock.hpp"
+#include "SFMLClock.hpp"
 
 using std::unique_ptr;
 
 class MainApp
 {
+	SFMLClock base_clock;
+	WallClock clock;
+
 	/*
 	//	Media Handle Instance, encapsulation of the Media Layer
 	*/
