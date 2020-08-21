@@ -105,6 +105,24 @@ Zombie_World::Zombie_World(const WallClock& reference_clock, sf::Window * w)
 			CONDITION_ALWAYS_TRUE,
 			STATUS_ID_PAUSE,
 			EVENT_VALUE_KEY_PRESSED);
+	eMap->registerAction(
+			EVENT_ID_MOUSE_RMB,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_ZOOM,
+			EVENT_VALUE_KEY_PRESSED);
+	eMap->registerAction(
+			EVENT_ID_MOUSE_WHEEL,
+			MAPPER_MODE_ADD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_WEAPON_SWITCH,
+			0);
+	eMap->registerAction(
+			EVENT_ID_MOUSE_LMB,
+			MAPPER_MODE_HOLD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_TRIGGER,
+			EVENT_VALUE_KEY_PRESSED);
 
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
 
@@ -112,7 +130,6 @@ Zombie_World::Zombie_World(const WallClock& reference_clock, sf::Window * w)
 	float sensY = *cfg.getFlt("input", "sensitivityY");
 
 	player=new EntityPlayer(clock.now(),{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
-	player->cam->zoom = 1;//TODO better zoom
 	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getFlt("graphics","maxRenderTime")));//TODO not hard code
 
 

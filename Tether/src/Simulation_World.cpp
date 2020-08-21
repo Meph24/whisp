@@ -159,7 +159,6 @@ Simulation_World::Simulation_World(const WallClock& reference_clock, sf::Window 
 	float sensY = *cfg.getFlt("input", "sensitivityY");
 
 	player=new EntityPlayer(timS,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
-	player->cam->zoom = 1;//TODO better zoom
 	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getFlt("graphics","maxRenderTime")));//TODO not hard code
 
 	pmLogic = new PerformanceMeter(PM_LOGIC_CHUNKMOVE+1,1000);
