@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OPERATOR_HPP
+#     define OPERATOR_HPP
 
 #include "IMediaHandle.h"
 
@@ -7,10 +8,15 @@
 
 #include <SFML/Window.hpp>
 
-struct SFMLHandle : public IMediaHandle
+#include "IGameMode.h"
+#include <memory>
+
+using std::unique_ptr;
+
+struct Operator : public IMediaHandle
 {
 	// handler of the events
-	EventHandler EH;
+	unique_ptr<EventHandler> event_handler;
 
 
 	void mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer);
@@ -21,14 +27,18 @@ public:
 
 	sf::ContextSettings contextSettings;
 	sf::Window window;
-	SFMLHandle();
-	SFMLHandle(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
-	~SFMLHandle();
+	Operator() = default;
+	Operator(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
 
+
+	void operateSimulation(IGameMode* simulation);
+	void disconnectSimulation();
 
 	void createWindow(std::string name,  int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
 	void pollEvents();
 	void setContextToMyThread();
 	void display();
 };
+
+#endif /* OPERATOR_HPP */
 
