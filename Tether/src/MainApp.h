@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SFMLHandle.h"
+#include "Operator.hpp"
 #include <memory>
 
 using std::unique_ptr;
@@ -10,7 +10,7 @@ class MainApp
 	/*
 	//	Media Handle Instance, encapsulation of the Media Layer
 	*/
-	unique_ptr<SFMLHandle> sfmlHandle;
+	unique_ptr<Operator> op;
 
 	unique_ptr<IGameMode> sim;
 

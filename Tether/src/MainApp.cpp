@@ -38,9 +38,9 @@ MainApp::MainApp()
 	int y=*cfg.getInt("graphics", "resolutionY");
 
 
-	sfmlHandle.reset(new SFMLHandle("Dwengine", x, y, settings));
-	sim.reset(new Simulation_World(&sfmlHandle->window));
-	sfmlHandle->operateSimulation(sim.get());
+	op.reset(new Operator("Dwengine", x, y, settings));
+	sim.reset(new Simulation_World(&op->window));
+	op->operateSimulation(sim.get());
 
 }
 
@@ -52,7 +52,7 @@ void MainApp::tick(int us)
 
 void MainApp::run()
 {
-	sfmlHandle->window.setActive();
+	op->window.setActive();
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
@@ -77,12 +77,12 @@ void MainApp::run()
 	sim->init();
 	srand(time(0));
 
-	while (sfmlHandle->window.isOpen())
+	while (op->window.isOpen())
 	{
 		//render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		sim->loop();
-		sfmlHandle->display();
+		op->display();
 
 		//tick
 		sf::Time elapsed = clock.restart();
@@ -91,7 +91,7 @@ void MainApp::run()
 		tick(us);
 
 		//handle events
-		sfmlHandle->pollEvents();	
+		op->pollEvents();	
 	}
 
 }

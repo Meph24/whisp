@@ -1,4 +1,4 @@
-#include "SFMLHandle.h"
+#include "Operator.hpp"
 
 #include <GL/glew.h>
 #include <iostream>
@@ -13,17 +13,17 @@ using std::string;
 #define JOYSTICK_BUTTON_OFFSET 8
 
 
-void SFMLHandle::operateSimulation(IGameMode* simulation)
+void Operator::operateSimulation(IGameMode* simulation)
 {
 	event_handler.reset(new EventHandler(simulation));
 }
 
-void SFMLHandle::disconnectSimulation()
+void Operator::disconnectSimulation()
 {
 	event_handler.reset(nullptr);
 }
 
-SFMLHandle::SFMLHandle(	string name, 
+Operator::Operator(	string name, 
 						int			reswidth, 
 						int			resheight, 
 						IMediaHandle::ContextSettings& settings) 
@@ -34,7 +34,7 @@ SFMLHandle::SFMLHandle(	string name,
 	window.setActive(false);
 }
 
-void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
+void Operator::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
 {
 	contextSettings.depthBits = settings.depth;
 	contextSettings.stencilBits = settings.stencil;
@@ -49,7 +49,7 @@ void SFMLHandle::createWindow(std::string name, int reswidth, int resheight, IMe
 	window.setActive(false);
 }
 
-void SFMLHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
+void Operator::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
 {
 	if(!event_handler) return;
 
@@ -135,7 +135,7 @@ void SFMLHandle::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler
 	}
 }
 
-void SFMLHandle::pollEvents()
+void Operator::pollEvents()
 {
 
 	if(!event_handler) return;
@@ -163,7 +163,7 @@ void SFMLHandle::pollEvents()
 	}
 }
 
-void SFMLHandle::preHandleEvent(sf::Event& e)
+void Operator::preHandleEvent(sf::Event& e)
 {
 
 	//switch (e.type)
@@ -175,7 +175,7 @@ void SFMLHandle::preHandleEvent(sf::Event& e)
     //
 	//	case sf::Event::EventType::Resized:
 	//	//hardcursorhandle.updateLockPosition();
-	//	std::cout << SFMLHandle.window.getSize().x << "/" << SFMLHandle.window.getSize().y;
+	//	std::cout << Operator.window.getSize().x << "/" << Operator.window.getSize().y;
 	//	break;
     //
 	//	case sf::Event::EventType::GainedFocus:
@@ -187,7 +187,7 @@ void SFMLHandle::preHandleEvent(sf::Event& e)
 	//	case sf::Event::EventType::KeyPressed:
 	//	if (e.key.code == sf::Keyboard::Key::L) hardcursorhandle.setLocked(true);
 	//	if (e.key.code == sf::Keyboard::Key::U) hardcursorhandle.setLocked(false);
-	//	if (e.key.code == sf::Keyboard::Key::R) SFMLHandle.window.setSize (sf::Vector2u(400, 400));
+	//	if (e.key.code == sf::Keyboard::Key::R) Operator.window.setSize (sf::Vector2u(400, 400));
 	//	break;
     //
 	//	*/
@@ -198,7 +198,7 @@ void SFMLHandle::preHandleEvent(sf::Event& e)
 
 }
 
-void SFMLHandle::postHandleEvent(sf::Event& e)
+void Operator::postHandleEvent(sf::Event& e)
 {
 	switch (e.type)
 	{
@@ -216,12 +216,12 @@ void SFMLHandle::postHandleEvent(sf::Event& e)
 	}
 }
 
-void SFMLHandle::setContextToMyThread()
+void Operator::setContextToMyThread()
 {
 	window.setActive(true);
 }
 
-void SFMLHandle::display()
+void Operator::display()
 {
 	window.display();
 }
