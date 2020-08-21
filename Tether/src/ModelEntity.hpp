@@ -6,7 +6,6 @@
 #include "Spacevec.h"
 
 #include "Model.hpp"
-#include "Timestamp.h"
 
 #include "Collider.hpp"
 
@@ -33,7 +32,7 @@ public:
 
 	const Model& model();
 	
-	virtual void draw(	Timestamp ts, 
+	virtual void draw(	const SimClock::time_point& draw_time,
 						Frustum* viewFrustum, 
 						IWorld& iw,
 						DrawServiceProvider* dsp
@@ -53,7 +52,7 @@ public:
 	 */
 	AABB aabb(float tick_seconds, TickServiceProvider* tsp);
 
-	virtual void tick(	Timestamp t,
+	virtual void tick(	const SimClock::time_point& next_tick_begin,
 						TickServiceProvider* tsp
 					 );
 

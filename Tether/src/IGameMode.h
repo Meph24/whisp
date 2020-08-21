@@ -10,7 +10,7 @@
 #define SRC_IGAMEMODE_H_
 
 #include "TickServiceProvider.h"
-#include "TimestampManager.h"
+#include "SimClock.hpp"
 
 class EntityPlayer;
 
@@ -18,10 +18,11 @@ class IGameMode: public TickServiceProvider
 {
 public:
 	EntityPlayer * player;
-	TimestampManager tm;
 
-	IGameMode();
-	virtual ~IGameMode();
+	SimClock clock;
+
+	IGameMode(const WallClock& reference_clock);
+	virtual ~IGameMode() = default;
 
 	virtual void loop()=0;
 	virtual void init()=0;

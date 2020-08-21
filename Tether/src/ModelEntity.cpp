@@ -16,6 +16,8 @@
 
 #include <iostream>
 
+#include "FloatSeconds.hpp"
+
 using std::cerr;
 
 using glm::vec4;
@@ -44,13 +46,13 @@ ModelEntity::~ModelEntity()
 {}
 
 void ModelEntity::draw(	
-					Timestamp ts, 
+					const SimClock::time_point& draw_time,
 					Frustum* viewFrustum,
 					IWorld& iw,
 					DrawServiceProvider* dsp
 				 )
 {
-	float tickOffset = ts-lastTick;
+	float tickOffset = (float) FloatSeconds(draw_time-last_ticked);
 	if(!viewFrustum->inside(bb,iw)) return;
 	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;
 	vec3 interPosMeters = iw.toMeters(interPos);
@@ -82,12 +84,12 @@ AABB ModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)
 }
 
 void ModelEntity::tick	(
-							Timestamp t,
+							const SimClock::time_point& next_tick_begin,
 							TickServiceProvider* tsp
 						)
 {
-	float tick_seconds = t - lastTick;
-	lastTick = t;
+	float tick_seconds = (float) FloatSeconds(next_tick_begin - last_ticked);
+	last_ticked = next_tick_begin;
 
 	tick_begin_pos = pos;
 	tick_begin_v = v;

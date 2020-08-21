@@ -9,7 +9,7 @@
 #ifndef SRC_TICKABLE_H_
 #define SRC_TICKABLE_H_
 
-#include "Timestamp.h"
+#include "SimClock.hpp"
 
 #define MAX_TICK_TIME 0.02f
 
@@ -20,7 +20,7 @@ class Tickable
 {
 public:
 	//difference to last timestamp is guaranteed to be between 0 and MAX_TICK_TIME
-	virtual void tick(Timestamp t,TickServiceProvider * tsp)=0;
+	virtual void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp)=0;
 
 	Tickable();
 	virtual ~Tickable();

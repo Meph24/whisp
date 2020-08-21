@@ -14,6 +14,7 @@
 #define PHYSICS_MAX_TICKLENGTH 20000
 
 MainApp::MainApp()
+	: clock(base_clock)
 {
 	IMediaHandle::ContextSettings settings;
 	settings.depth = 24;
@@ -33,6 +34,8 @@ MainApp::MainApp()
 
 	int x=*cfg.getInt("graphics", "resolutionX");
 	int y=*cfg.getInt("graphics", "resolutionY");
+
+	sfmlHandle.wallclock = &clock; //TODO after eradication of sfmlhandle this should not exist anymore
 
 	sfmlHandle.createWindow("Test", x,y, settings);
 }

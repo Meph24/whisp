@@ -4,6 +4,7 @@
 
 #include "EventHandler.h"
 #include "Buffer.h"
+#include "WallClock.hpp"
 
 #include <SFML/Window.hpp>
 
@@ -18,6 +19,8 @@ struct SFMLHandle : public IMediaHandle
 	void preHandleEvent(sf::Event& e);
 public:
 
+
+	WallClock* wallclock;
 
 	sf::ContextSettings contextSettings;
 	sf::Window window;

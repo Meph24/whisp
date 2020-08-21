@@ -137,7 +137,7 @@ int fuck (int argc , char** argv)
 #include "WarnErrReporter.h"
 #include <iostream>
 
-void ItemContainer::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
+void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
 {
 	std::cout<<"selected: "<<selected<<std::endl;
 	dsp->transformViewToGUI(0.75f);
@@ -201,7 +201,7 @@ void ItemContainer::draw(Timestamp t, Frustum* viewFrustum,IWorld& iw,DrawServic
 	dsp->revertView();
 }
 #include "EventDefines.h"
-void ItemContainer::tick(Timestamp t, TickServiceProvider* tsp)
+void ItemContainer::tick(const SimClock::time_point& t, TickServiceProvider* tsp)
 {
 	EventMapper * eMap=tsp->eMap;
 	i64 selectAdd=eMap->getStatusAndReset(STATUS_ID_SELECTION_DOWN);

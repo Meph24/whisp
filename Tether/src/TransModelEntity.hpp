@@ -30,13 +30,13 @@ public:
 
 	AABB aabb(float tick_seconds, TickServiceProvider* tsp);
 
-	void draw(	Timestamp ts, 
+	void draw(	const SimClock::time_point& ts, 
 						Frustum* viewFrustum, 
 						IWorld& iw,
 						DrawServiceProvider* dsp
 					 );
 
-	void tick(	Timestamp t,
+	void tick(	const SimClock::time_point& t,
 						TickServiceProvider* tsp
 					 );
 

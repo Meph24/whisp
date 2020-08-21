@@ -10,6 +10,7 @@
 #include "IWorld.h"
 #include "TickServiceProvider.h"
 #include "InteractFilterAlgoAsym.h"
+#include "FloatSeconds.hpp"
 
 BenchEntityMaster::BenchEntityMaster(spacevec Size, spacevec Pos)
 {
@@ -33,14 +34,14 @@ BenchEntityMaster::~BenchEntityMaster()
 {
 }
 
-void BenchEntityMaster::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+void BenchEntityMaster::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
 {
 }
 
-void BenchEntityMaster::tick(Timestamp t, TickServiceProvider* tsp)
+void BenchEntityMaster::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	IWorld * iw=tsp->getIWorld();
-	float seconds=t-lastTick;
-	lastTick=t;
+	float seconds= (float) FloatSeconds(next_tick_begin - last_ticked);
+	last_ticked = next_tick_begin;
 	iw->benchAlgoAsym->doChecks((BenchAsymMaster *) this,(Entity *) this,seconds,*tsp);
 }

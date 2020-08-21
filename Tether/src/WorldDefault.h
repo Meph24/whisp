@@ -22,8 +22,8 @@ public:
 
 	void requestEntitySpawn(Entity * e);
 	void clearEntities();
-	void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
-	void tick(Timestamp t,TickServiceProvider* tsp);
+	void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void tick(const SimClock::time_point& next_tick_begin,TickServiceProvider* tsp);
 	void postTick(TickServiceProvider& tsp);
 };
 

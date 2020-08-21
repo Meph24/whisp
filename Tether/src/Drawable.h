@@ -9,7 +9,7 @@
 #ifndef SRC_DRAWABLE_H_
 #define SRC_DRAWABLE_H_
 
-#include "Timestamp.h"
+#include "SimClock.hpp"
 
 class DrawServiceProvider;
 class IWorld;
@@ -20,7 +20,7 @@ class Drawable
 public:
 	Drawable() = default;
 	virtual ~Drawable() = default;
-	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)=0;//observerPos must already be interpolated with tickOffset
 };
 
 

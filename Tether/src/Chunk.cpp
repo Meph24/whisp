@@ -206,7 +206,7 @@ inline float Chunk::getH(int xh, int yh)
 	return height[yh*size+xh];
 }
 
-void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
+void Chunk::tick(const SimClock::time_point& next_tick_end, TickServiceProvider* tsp)
 {
 	int size=managedEntities.size();
 	for(int i=0;i<size;i++)
@@ -216,19 +216,19 @@ void Chunk::tick(Timestamp t, TickServiceProvider* tsp)
 		{
 			parent->requestEntityMove(managedEntities[i]);
 		}
-		managedEntities[i]->tick(t,tsp);
+		managedEntities[i]->tick(next_tick_end, tsp);
 	}
 }
 
-void Chunk::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+void Chunk::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
 {
 	int size=managedEntities.size();
 	for(int i=0;i<size;i++)
 	{
 		if(managedEntities[i]->exists)
 		{
-			managedEntities[i]->draw(t,viewFrustum,iw,dsp);
-			if(dsp->drawAABBs) managedEntities[i]->bb.draw(t,viewFrustum,iw,dsp);
+			managedEntities[i]->draw(draw_time, viewFrustum, iw, dsp);
+			if(dsp->drawAABBs) managedEntities[i]->bb.draw(draw_time, viewFrustum, iw, dsp);
 		}
 	}
 }

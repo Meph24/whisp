@@ -9,12 +9,13 @@
 #include "glmutils.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include "FloatSeconds.hpp"
 
 using glm::vec3;
 
 
 Zombie_Gun::Zombie_Gun(
-		Timestamp initTimestamp,
+		const SimClock::time_point& init_time,
 		std::string weaponName, 
 		float reloadTime,
 		const std::string& filename,
@@ -24,7 +25,7 @@ Zombie_Gun::Zombie_Gun(
 		vec3 Recoil,
 		vec3 RecoilSpread
 		)
-	: lastTimestamp(initTimestamp)
+	: last_time(init_time)
 	, rld(reloadTime)
 	, timer(0)
 	, pType(type)
@@ -55,7 +56,7 @@ Zombie_Gun::~Zombie_Gun()
 
 #include <iostream>
 #define recoilDampeningTime 0.5f
-void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw)
+void Zombie_Gun::tryShoot(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw)
 {
 	trigger=true;
 	if (timer <= 0)
@@ -111,7 +112,7 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 		vec3 velvec(velX, velY, velZ);
 		v = ml * velvec;	
 
-		EntityProjectileBulletLike * zp= new EntityProjectileBulletLike(player,pType->bulletData,callTimestamp,player->getCamPos(),iw.fromMeters(v)+player->v);
+		EntityProjectileBulletLike * zp= new EntityProjectileBulletLike(player,pType->bulletData,call_time,player->getCamPos(),iw.fromMeters(v)+player->v);
 		iw.requestEntitySpawn((Entity *)zp);
 
 		ml.pop();
@@ -123,9 +124,9 @@ void Zombie_Gun::tryShoot(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer *
 	recoilM.registerRecoil(recoil,recoilRand,{0,0,0});
 }
 
-void Zombie_Gun::tick(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw)
+void Zombie_Gun::tick(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw)
 {
-	float sec=callTimestamp-lastTimestamp;
+	float sec = (float)FloatSeconds(call_time-last_time);
 	vec3 recoilMod=recoilM.getRecoilDiff(sec);
 	cam->alpha-=recoilMod.x;
 	cam->beta+=recoilMod.y;
@@ -141,10 +142,10 @@ void Zombie_Gun::tick(Timestamp callTimestamp,ICamera3D * cam,EntityPlayer * pla
 	{
 		if(trigger)
 		{
-			tryShoot(callTimestamp,cam,player,tex, iw);
+			tryShoot(call_time,cam,player,tex, iw);
 		}
 	}
-	lastTimestamp=callTimestamp;
+	last_time=call_time;
 }
 
 void Zombie_Gun::stopShooting()

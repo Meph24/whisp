@@ -82,7 +82,7 @@ bool AABB::isMultichunk()
 	return (low.x.intpart!=high.x.intpart)||(low.y.intpart!=high.y.intpart)||(low.z.intpart!=high.z.intpart);
 }
 
-void AABB::draw(Timestamp t, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+void AABB::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
 {
 	if(!viewFrustum->inside(*(this),iw)) return;
 	float widthOnScreen=1.0f/1024;//apparent size on the screen

@@ -16,19 +16,20 @@
 #include "IWorld.h"
 #include "ChunkManager.h"
 #include "InteractFilterAlgoAsym.h"
+#include "FloatSeconds.hpp"
 
 #include "glmutils.hpp"
 
 ITexture * EntityProjectileBulletLike::tex=new TextureDummy();
 
 
-EntityProjectileBulletLike::EntityProjectileBulletLike(BulletLikeSource * origin,BulletLikeType t,Timestamp spawnTime,spacevec position,spacevec velocity):
+EntityProjectileBulletLike::EntityProjectileBulletLike(BulletLikeSource * origin,BulletLikeType t,const SimClock::time_point& spawn_time, spacevec position,spacevec velocity):
 typeB(t),source(origin)
 //,fromItem(item)
 {
 	typeH=FLAG_HIT_TYPE_BULLET_LIKE;
 	posOld=position;
-	lastTick=spawnTime;
+	last_ticked = spawn_time;
 	pos=position;
 	v=velocity;
 }
@@ -38,9 +39,9 @@ EntityProjectileBulletLike::~EntityProjectileBulletLike()
 //	delete fromItem;
 }
 
-void EntityProjectileBulletLike::draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
+void EntityProjectileBulletLike::draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
 {
-	float tickOffset=t-lastTick;
+	float tickOffset=(float)FloatSeconds(draw_time - last_ticked);
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;//TODO frustum culling?
 	vec3 interPosMeters=iw.toMeters(interPos);
 	tex->bind();
@@ -95,12 +96,12 @@ void EntityProjectileBulletLike::draw(Timestamp t,Frustum * viewFrustum,IWorld& 
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 }
-void EntityProjectileBulletLike::tick(Timestamp t, TickServiceProvider* tsp)
+void EntityProjectileBulletLike::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	IWorld * iw=tsp->getIWorld();
 
-	float time=t-lastTick;
-	lastTick=t;
+	float time = (float) FloatSeconds(next_tick_begin - last_ticked);
+	last_ticked = next_tick_begin;
 
 	ITerrain * it=tsp->getITerrain();
 

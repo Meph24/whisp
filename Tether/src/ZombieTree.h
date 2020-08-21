@@ -32,8 +32,8 @@ public:
 	Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves);
 	Zombie_Tree(spacevec position, float diameter, float height, float diameterLeaves, ITexture* textureLog, ITexture* textureLeaves);
 	~Zombie_Tree();
-	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
-	virtual void tick(Timestamp t,TickServiceProvider * tsp);
+	virtual void draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void tick(const SimClock::time_point& t,TickServiceProvider * tsp);
 };
 
 #endif /* SRC_ZOMBIETREE_H_ */

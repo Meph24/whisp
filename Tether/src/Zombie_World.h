@@ -4,7 +4,6 @@
 #include "DrawServiceProvider.h"
 #include "IGameMode.h"
 
-#include "TimestampManager.h"
 #include "Spacevec.h"
 
 class AdaptiveQuality;
@@ -58,18 +57,18 @@ class Zombie_World: public DrawServiceProvider, public IGameMode
 	int zombieDist;
 	AdaptiveQuality * adQ;
 
-	void render(Timestamp t);
-	void doPhysics(Timestamp t);
-	void spawnZombie(Timestamp t);
+	void render(const SimClock::time_point& t);
+	void doPhysics(const SimClock::time_point& t);
+	void spawnZombie(const SimClock::time_point& t);
 	void restart();
 	void drawGameOver();
-	void doLogic(Timestamp t);
-	void doGraphics(Timestamp t);
+	void doLogic(const SimClock::time_point& t);
+	void doGraphics(const SimClock::time_point& t);
 
 public:
 
 
-	Zombie_World(sf::Window * w);
+	Zombie_World(const WallClock& reference_clock, sf::Window * w);
 	~Zombie_World();
 
 	//TickServiceProvider

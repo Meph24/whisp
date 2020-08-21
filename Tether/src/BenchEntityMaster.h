@@ -19,8 +19,8 @@ public:
 	BenchEntityMaster(AABB boundingBox);
 	virtual ~BenchEntityMaster();
 
-	void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
-	void tick(Timestamp t,TickServiceProvider * tsp);
+	void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
 };
 
 #endif /* SRC_BENCHENTITYMASTER_H_ */

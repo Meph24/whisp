@@ -35,7 +35,6 @@ class Chunk: public Tickable, public Drawable
 	//GLuint bufID;
 	ChunkManager * parent;
 
-
 	inline float getH(int x,int y);//inside chunk grid
 public:
 	std::vector<Entity *> managedEntities;//must be ticked by this chunk, usually entities that are located in this chunk (with a few exceptions)
@@ -43,10 +42,10 @@ public:
 	int lastTickID=0;
 	InteractionManager * interMan;
 	AABB bb;
-	void tick(Timestamp t,TickServiceProvider * tsp);
+	void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
 	spacelen getHeight(float x,float z);//coordinates inside chunk
 	void render(int lod,spacevec camOffset);//TODO replace
-	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 	void clearEntities();
 
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1

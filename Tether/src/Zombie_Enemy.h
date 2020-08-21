@@ -61,11 +61,11 @@ public:
 
 
 	//spawns a random zombie at the given location
-	Zombie_Enemy(Timestamp spawnTime,ITexture * texture,spacevec startPos,TickServiceProvider * tsp);
+	Zombie_Enemy(const SimClock::time_point& spawnTime,ITexture * texture,spacevec startPos,TickServiceProvider * tsp);
 	~Zombie_Enemy();
 
-	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
-	virtual void tick(Timestamp t,TickServiceProvider * tsp);
+	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void tick(const SimClock::time_point& next_tick_time,TickServiceProvider * tsp);
 
 	void checkProjectile(EntityProjectileBulletLike * projectile,TickServiceProvider& tsp);
 	float checkBox(DualPointer<Projectile> projectile,CumulativeMat * ml,float xFrom, float xTo, float yFrom, float yTo, float zFrom, float zTo,TickServiceProvider& tsp);//valid hit from 0 to 1, otherwise -1

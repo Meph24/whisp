@@ -12,6 +12,7 @@
 #include "BulletLikeSource.h"
 #include "Pushable.h"
 #include "Entity.h"
+#include "SimClock.hpp"
 
 
 class Zombie_MouseInput;
@@ -62,19 +63,17 @@ public:
 	Item * heldItem;//to browse the inventory, "heldItem" is switched with "inventory"
 	Item * inventory;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
 
-	EntityPlayer(Timestamp spawnTime,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
+	EntityPlayer(SimClock::time_point spawn_time,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
 	~EntityPlayer();
 
 	void changeTPdist(float amount);
 
 	spacevec getCamPos();
-	Frustum * newFrustumApplyPerspective(Timestamp t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction=-1);
+	Frustum * newFrustumApplyPerspective(SimClock::time_point t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction=-1);
 
-	//void applyPerspective(Timestamp t,bool fresh,ChunkManager * cm);
+	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 
-	virtual void draw(Timestamp t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
-
-	virtual void tick(Timestamp t,TickServiceProvider * tsp);
+	virtual void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
 
 	virtual void push(spacevec amount, TickServiceProvider& tsp);
 
@@ -82,7 +81,7 @@ public:
 
 
 	void switchWeapon(int dir);
-	void trigger(bool pulled,Timestamp now,ITexture * tex,IWorld& iw);
+	void trigger(bool pulled, SimClock::time_point now,ITexture * tex,IWorld& iw);
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */
