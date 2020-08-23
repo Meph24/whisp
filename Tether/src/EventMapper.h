@@ -1,11 +1,3 @@
-/*
- * EventMapper.h
- *
- *  Created on:	Sep 6, 2017
- *      Author:	HL65536
- *     Version:	2.0
- */
-
 #ifndef SRC_EVENTMAPPER_H_
 #define SRC_EVENTMAPPER_H_
 
@@ -46,10 +38,16 @@
 
 #define CONDITION_ALWAYS_TRUE 0
 
+#include <array>
 #include <vector>
+#include <unordered_map>
 
 #include "EventHandler.h"
 #include "PerformanceMeter.h"
+
+using std::array;
+using std::vector;
+using std::unordered_map;
 
 typedef struct
 {
@@ -59,6 +57,7 @@ typedef struct
 	float mapParam;//different meaning depending on mode
 } mapping;
 
+typedef array<float, 256> ControlInputStatusSet;
 
 class EventMapper
 {
@@ -72,18 +71,14 @@ public:
 	//inputs -> replace with offset
 
 
-	float * status;//the output/condition input
-	int stSize;
+	ControlInputStatusSet control_input_stati;//the output/condition input
 
 	//input related:
-	std::vector<int> ID;//input event IDs
-	std::vector<mapping> m;
+	unordered_map<int, vector<mapping>> event_id_mappings;
 
 	PerformanceMeter pm;
 
-	EventMapper(int statusSize=256);
-	EventMapper(std::string url);
-	~EventMapper();
+	EventMapper();
 
 	float getStatus(int ID);
 
@@ -94,7 +89,6 @@ public:
 	void setConditionORedTrue(int ID);//this works with multiple users (not thread safe) as long as they do not call these functions in an alternating pattern (true, false, true, false)
 	void setConditionORedFalse(int ID);//condition will be true when at least one user wants it to be true (condition=#true calls>#false calls)
 
-	float getTimeRef();
 	void event(EventHandler::event e);
 
 	float getStatusAndReset(int indx,float resetTo=0);//not thread safe; reset value
