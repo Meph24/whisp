@@ -1,12 +1,12 @@
 
 #include "EventHandler.h"
 #include "EntityPlayer.h"
-#include "EventMapper.h"
+#include "EventMapper.hpp"
 
 
 #include <iostream>
 
-EventHandler::EventHandler(IGameMode* world) : world(world) {}
+EventHandler::EventHandler(IGameMode* sim, EventMapper* event_mapper) : sim(sim), event_mapper(event_mapper) {}
 
 EventHandler::Filter::Filter()
 {
@@ -60,11 +60,11 @@ void EventHandler::Filter::updateFilter(event e)
 
 void EventHandler::sendOn(EventHandler::event e)
 {
-	if(world) world->eMap->event(e);
+	if(event_mapper) event_mapper->event(e);
 	Zombie_MouseInput * mouseInp=0;
-	if(world) if(world->player) mouseInp=world->player->mouseInp;
+	if(sim) if(sim->player) mouseInp=sim->player->mouseInp;
 	Zombie_KeyInput * keyInput=0;
-	if(world) if(world->player) keyInput=world->player->keyInp;
+	if(sim) if(sim->player) keyInput=sim->player->keyInp;
 	if (e.ID == 2048)
 	{
 		if (mouseInp)
@@ -102,7 +102,7 @@ void EventHandler::sendOn(EventHandler::event e)
 	}
 	else if (e.ID == 2052)
 	{
-		if(world) world->trigger(e.value);
+		if(sim) sim->trigger(e.value);
 	}
 }
 

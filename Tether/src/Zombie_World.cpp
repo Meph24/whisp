@@ -25,13 +25,11 @@ using std::cout;
 #include "MeshIO.hpp"
 
 
-#include "EventDefines.h"
 #include "EntityPlayer.h"
 #include "Graphics2D.h"
 #include "ChunkManager.h"
 #include "Zombie_Gun.h"
 #include "DebugScreen.h"
-#include "EventMapper.h"
 #include "CameraTP.h"
 #include "AdaptiveQuality.h"
 #include "EntityProjectileBulletLike.h"
@@ -56,73 +54,6 @@ Zombie_World::Zombie_World(const WallClock& reference_clock, sf::Window * w)
 	spawnZombies=true;
 	zCount = *cfg.getInt("test", "zombies");
 	zombieDist = *cfg.getInt("test", "zombieDist");
-
-	eMap->registerAction(
-			EVENT_ID_KEY_F3,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_DEBUG_SCREEN_ACTIVE,
-			EVENT_VALUE_KEY_PRESSED);
-	eMap->registerAction(
-			EVENT_ID_KEY_R,
-			MAPPER_MODE_ADD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_RESTART,
-			0);
-	eMap->registerAction(
-			EVENT_ID_KEY_E,
-			MAPPER_MODE_ADD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_INVENTORY,
-			0);
-	eMap->registerAction(
-			EVENT_ID_KEY_ARROW_UP,
-			MAPPER_MODE_ADD,
-			-CONDITION_SELECTION_ACTIVE,
-			STATUS_ID_SELECTION_UP,
-			0);
-	eMap->registerAction(
-			EVENT_ID_KEY_ARROW_DOWN,
-			MAPPER_MODE_ADD,
-			-CONDITION_SELECTION_ACTIVE,
-			STATUS_ID_SELECTION_DOWN,
-			0);
-	eMap->registerAction(
-			EVENT_ID_KEY_B,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_DRAW_AABBs,
-			EVENT_VALUE_KEY_PRESSED);
-	eMap->registerAction(
-			EVENT_ID_KEY_Z,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_SLOMO,
-			EVENT_VALUE_KEY_PRESSED);
-	eMap->registerAction(
-			EVENT_ID_KEY_P,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_PAUSE,
-			EVENT_VALUE_KEY_PRESSED);
-	eMap->registerAction(
-			EVENT_ID_MOUSE_RMB,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_ZOOM,
-			EVENT_VALUE_KEY_PRESSED);
-	eMap->registerAction(
-			EVENT_ID_MOUSE_WHEEL,
-			MAPPER_MODE_ADD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_WEAPON_SWITCH,
-			0);
-	eMap->registerAction(
-			EVENT_ID_MOUSE_LMB,
-			MAPPER_MODE_HOLD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_TRIGGER,
-			EVENT_VALUE_KEY_PRESSED);
 
 	float characterSpeed=30.6f;//debug speed=30.6; release speed should be 3.6f
 
@@ -273,13 +204,15 @@ void Zombie_World::doPhysics(const SimClock::time_point& next_tick_begin)
 	iw->postTick(*this);
 }
 
+#include "EventDefines.h"
+
 void Zombie_World::loop()
 {
-	if(eMap->getStatus(STATUS_ID_PAUSE))
+	if(control_input_stati->status(STATUS_ID_PAUSE))
 	{	
 		clock.setNextTargetRate(0.0);
 	}
-	else if(eMap->getStatus(STATUS_ID_SLOMO)) 
+	else if(control_input_stati->status(STATUS_ID_SLOMO)) 
 	{
 		clock.setNextTargetRate(0.1);
 	}
@@ -287,7 +220,7 @@ void Zombie_World::loop()
 	{
 		clock.setNextTargetRate(1.0);
 	}
-	if (eMap->getStatusAndReset(STATUS_ID_RESTART))
+	if (control_input_stati->getStatusAndReset(STATUS_ID_RESTART))
 	{
 		restart();
 	}
@@ -397,7 +330,7 @@ void Zombie_World::doGraphics(const SimClock::time_point& t)
 {
 	IWorld * iw=getIWorld();
 
-	drawAABBs=eMap->getStatus(STATUS_ID_DRAW_AABBs)==1;
+	drawAABBs=control_input_stati->status(STATUS_ID_DRAW_AABBs)==1;
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
 	if (player->HP < 0)
 	{
@@ -409,7 +342,7 @@ void Zombie_World::doGraphics(const SimClock::time_point& t)
 		pmGraphics->registerTime(PM_GRAPHICS_OUTSIDE);
 		render(t);
 		pmGraphics->registerTime(PM_GRAPHICS_WORLD);
-		if(eMap->getStatus(STATUS_ID_DEBUG_SCREEN_ACTIVE))
+		if(control_input_stati->status(STATUS_ID_DEBUG_SCREEN_ACTIVE))
 		{
 			transformViewToGUI(1);
 			glColor3f(1, 0, 1);

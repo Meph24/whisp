@@ -13,13 +13,103 @@ using std::string;
 #define JOYSTICK_BUTTON_OFFSET 8
 
 
+#include "EventDefines.h"
+
 void Operator::operateSimulation(IGameMode* simulation)
 {
-	event_handler.reset(new EventHandler(simulation));
+	event_mapper.reset(new EventMapper(*simulation->control_input_stati));
+	event_handler.reset(new EventHandler(simulation, event_mapper.get()));
+
+	event_mapper->registerAction(
+			EVENT_ID_KEY_F3,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_DEBUG_SCREEN_ACTIVE,
+			EVENT_VALUE_KEY_PRESSED);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_R,
+			MAPPER_MODE_ADD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_RESTART,
+			0);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_T,
+			MAPPER_MODE_ADD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_BENCHMARK,
+			0);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_E,
+			MAPPER_MODE_ADD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_INVENTORY,
+			0);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_ARROW_UP,
+			MAPPER_MODE_ADD,
+			-CONDITION_SELECTION_ACTIVE,
+			STATUS_ID_SELECTION_UP,
+			0);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_ARROW_DOWN,
+			MAPPER_MODE_ADD,
+			-CONDITION_SELECTION_ACTIVE,
+			STATUS_ID_SELECTION_DOWN,
+			0);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_B,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_DRAW_AABBs,
+			EVENT_VALUE_KEY_PRESSED);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_SHIFT,
+			MAPPER_MODE_HOLD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_GO_UP,
+			1);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_CTRL,
+			MAPPER_MODE_HOLD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_GO_DOWN,
+			1);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_Z,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_SLOMO,
+			EVENT_VALUE_KEY_PRESSED);
+	event_mapper->registerAction(
+			EVENT_ID_KEY_P,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_PAUSE,
+			EVENT_VALUE_KEY_PRESSED);
+	event_mapper->registerAction(
+			EVENT_ID_MOUSE_RMB,
+			MAPPER_MODE_TOGGLE,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_ZOOM,
+			EVENT_VALUE_KEY_PRESSED);
+	event_mapper->registerAction(
+			EVENT_ID_MOUSE_WHEEL,
+			MAPPER_MODE_ADD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_WEAPON_SWITCH,
+			0);
+	event_mapper->registerAction(
+			EVENT_ID_MOUSE_LMB,
+			MAPPER_MODE_HOLD,
+			CONDITION_ALWAYS_TRUE,
+			STATUS_ID_TRIGGER,
+			EVENT_VALUE_KEY_PRESSED);
+
 }
 
 void Operator::disconnectSimulation()
 {
+	event_handler.reset(nullptr);
 	event_handler.reset(nullptr);
 }
 

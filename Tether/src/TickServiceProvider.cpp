@@ -10,13 +10,13 @@
 #include "Retickable.h"
 #include "ThreadDataManager.h"
 #include "SoundManager.h"
-#include "EventMapper.h"
+#include "EventMapper.hpp"
 
 TickServiceProvider::TickServiceProvider()
+	: control_input_stati(new ControlInputStatusSet())
 {
 	threadDataMan=new ThreadDataManager(1);
 	sm=new SoundManager();
-	eMap=new EventMapper();
 }
 
 TickServiceProvider::~TickServiceProvider()
