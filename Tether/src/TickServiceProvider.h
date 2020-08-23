@@ -1,11 +1,3 @@
-/*
- * ServiceProviderItem.h
- *
- *  Created on:	Jan 24, 2018
- *      Author:	HL65536
- *     Version:	1.0
- */
-
 #ifndef SRC_TICKSERVICEPROVIDER_H_
 #define SRC_TICKSERVICEPROVIDER_H_
 
@@ -21,6 +13,10 @@ class IWorld;
 class ITerrain;
 
 #include <vector>
+#include <memory>
+#include "ControlInputStatusSet.hpp"
+
+using std::unique_ptr;
 
 //provides services for tickable stuff
 class TickServiceProvider
@@ -32,7 +28,7 @@ public:
 	unsigned long long interactionCounter=0;//for benchmark purposes
 	unsigned long long arbitraryNumber=0;//for benchmark purposes
 
-	EventMapper * eMap;
+	unique_ptr<ControlInputStatusSet> control_input_stati;
 
 	int tickID=0;
 	virtual ICamera3D * getHolderCamera()=0;//can return 0 if currently not held

@@ -9,7 +9,7 @@
 #include "ItemContainer.h"
 #include "TickServiceProvider.h"
 #include "DrawServiceProvider.h"
-#include "EventMapper.h"
+#include "EventMapper.hpp"
 #include "Graphics2D.h"
 
 ItemContainer::ItemContainer():
@@ -203,9 +203,9 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 #include "EventDefines.h"
 void ItemContainer::tick(const SimClock::time_point& t, TickServiceProvider* tsp)
 {
-	EventMapper * eMap=tsp->eMap;
-	i64 selectAdd=eMap->getStatusAndReset(STATUS_ID_SELECTION_DOWN);
-	selectAdd-=eMap->getStatusAndReset(STATUS_ID_SELECTION_UP);
+	ControlInputStatusSet& stati = *tsp->control_input_stati;
+	i64 selectAdd=stati.getStatusAndReset(STATUS_ID_SELECTION_DOWN);
+	selectAdd-=stati.getStatusAndReset(STATUS_ID_SELECTION_UP);
 	if(items.size()<1) return;
 	while(selectAdd+selected<0) selectAdd+=items.size();
 	while(selectAdd+selected>=(i64)items.size()) selectAdd-=items.size();

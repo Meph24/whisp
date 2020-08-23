@@ -49,6 +49,8 @@ using std::array;
 using std::vector;
 using std::unordered_map;
 
+#include "ControlInputStatusSet.hpp"
+
 typedef struct
 {
 	int mode;//mapping mode, see defines
@@ -57,10 +59,11 @@ typedef struct
 	float mapParam;//different meaning depending on mode
 } mapping;
 
-typedef array<float, 256> ControlInputStatusSet;
+
 
 class EventMapper
 {
+	ControlInputStatusSet* managed_stati;//the output/condition input
 public:
 	//input: eventID
 	//output: queryable status
@@ -70,28 +73,16 @@ public:
 	//inputs -> add with offset
 	//inputs -> replace with offset
 
-
-	ControlInputStatusSet control_input_stati;//the output/condition input
-
 	//input related:
 	unordered_map<int, vector<mapping>> event_id_mappings;
 
 	PerformanceMeter pm;
 
-	EventMapper();
-
-	float getStatus(int ID);
-
-	void toggleCondition(int ID);
-	void setConditionTrue(int ID);
-	void setConditionFalse(int ID);
-
-	void setConditionORedTrue(int ID);//this works with multiple users (not thread safe) as long as they do not call these functions in an alternating pattern (true, false, true, false)
-	void setConditionORedFalse(int ID);//condition will be true when at least one user wants it to be true (condition=#true calls>#false calls)
+	EventMapper(ControlInputStatusSet& control_input_status_set);
+	void changeManaged(ControlInputStatusSet& control_input_status_set);
+	ControlInputStatusSet& stati();
 
 	void event(EventHandler::event e);
-
-	float getStatusAndReset(int indx,float resetTo=0);//not thread safe; reset value
 
 	void registerAction(int ID,int mode,int condition,int statusIndex,float mapParam);
 

@@ -4,6 +4,7 @@
 #include "IMediaHandle.h"
 
 #include "EventHandler.h"
+#include "EventMapper.hpp"
 #include "Buffer.h"
 #include "WallClock.hpp"
 
@@ -26,6 +27,8 @@ struct Operator : public IMediaHandle
 	void postHandleEvent(sf::Event& e);
 	void preHandleEvent(sf::Event& e);
 public:
+
+	unique_ptr<EventMapper> event_mapper;
 
 
 

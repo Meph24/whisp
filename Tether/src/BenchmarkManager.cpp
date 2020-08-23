@@ -78,7 +78,7 @@ void BenchmarkManager::tick(const SimClock::time_point& next_tick_begin, TickSer
 	assert(w==world);
 	assert(w);
 	assert(repeats>0);
-	if (tsp->eMap->getStatusAndReset(STATUS_ID_BENCHMARK))
+	if (tsp->control_input_stati->getStatusAndReset(STATUS_ID_BENCHMARK))
 	{
 		if(isInactivePhase())
 		{
