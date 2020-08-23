@@ -1,11 +1,3 @@
-/*
- * EntityPlayer.h
- *
- *  Created on:	Apr 16, 2018
- *      Author:	HL65536
- *     Version:	2.0
- */
-
 #ifndef SRC_ENTITYPLAYER_H_
 #define SRC_ENTITYPLAYER_H_
 

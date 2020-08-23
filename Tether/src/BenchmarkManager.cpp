@@ -1,16 +1,8 @@
-/*
- * BenchmarkManager.cpp
- *
- *  Created on:	04.05.2020
- *      Author:	HL65536
- *     Version:	1.0
- */
-
 #include "BenchmarkManager.h"
 
 #include "IWorld.h"
 #include "TickServiceProvider.h"
-#include "EventMapper.h"
+#include "EventMapper.hpp"
 #include "EventDefines.h"
 #include "InteractFilterDefaultSym.h"
 #include "InteractFilterDefaultAsym.h"
