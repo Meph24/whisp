@@ -1,3 +1,10 @@
+/*
+ * EventMapper.hpp
+ *
+ *  Created on:	Sep 6, 2017
+ *      Author:	HL65536, Meph24
+ *     Version:	2.1
+ */
 #ifndef SRC_EVENTMAPPER_H_
 #define SRC_EVENTMAPPER_H_
 
@@ -35,19 +42,16 @@
 
 
 
-
 #define CONDITION_ALWAYS_TRUE 0
 
-#include <array>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "EventHandler.h"
 #include "PerformanceMeter.h"
 
-using std::array;
-using std::vector;
 using std::unordered_map;
+using std::vector;
 
 #include "ControlInputStatusSet.hpp"
 

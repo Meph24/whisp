@@ -1,3 +1,10 @@
+/*
+ * ServiceProviderItem.h
+ *
+ *  Created on:	Jan 24, 2018
+ *      Author:	HL65536
+ *     Version:	1.0
+ */
 #ifndef SRC_TICKSERVICEPROVIDER_H_
 #define SRC_TICKSERVICEPROVIDER_H_
 
