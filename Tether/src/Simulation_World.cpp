@@ -290,6 +290,11 @@ void Simulation_World::init()
 		models.emplace_back(new Model( m ));
 		
 	}
+	{
+		MeshIO meshio("./res/prism.mesh");
+		Mesh m (meshio.get());
+		models.emplace_back(new Model( m ));
+	}
 
 /*	
  *	for ( int i = 0; i < 5; ++i )
@@ -425,6 +430,7 @@ void Simulation_World::init()
 		}
 	}
 
+
 	//cogged crosses
 	{
 		TransModelEntity* me0 = new TransModelEntity(*(models[1]));
@@ -473,8 +479,28 @@ void Simulation_World::init()
 		spawn(me1, iw->fromMeters(pos1));
 
 	}
+	//prisms
+	{
+		vec3 moving_offset(5.0f, 0.0f, 0.0f);
+		vec3 moving_down(0.0f, -0.75f, 0.0f);
+		vec3 rotation_increments(0.0f, 0.0f, 90.0f);
 
+		vec3 start(1.0f, 1.0f, 1.0f);
+		vec3 experiments_offset(0.0f, 0.0f, 3.0f);
 
+		for ( int i = 1; i <= 32; ++i )
+		{
+			TransModelEntity* prism_static = new TransModelEntity(*(models[3]));
+			TransModelEntity* prism_moving = new TransModelEntity(*(models[3]));
+
+			prism_moving->v = iw->fromMeters(vec3(-0.5f, 0.0f, 0.0f) * (float)i);
+			prism_static->rot = vec3(0.0f, 90.0f, 0.0f);
+			prism_moving->drot = rotation_increments * (float)i;
+
+			spawn(prism_static, iw->fromMeters(start + (float)i * experiments_offset));
+			spawn(prism_moving, iw->fromMeters(start + (float)i * experiments_offset + moving_offset*(float)i + moving_down));
+		}
+	}
 }
 
 void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
