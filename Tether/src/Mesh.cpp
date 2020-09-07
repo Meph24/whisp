@@ -96,10 +96,7 @@ istream& operator>> (istream& is, Mesh& m)
 		}
 		convex_indices.insert(std::stoi(s));
 	}
-	if(!m.convex_partitions.empty())
-	{
-		m.convex_partitions.emplace_back(std::move(convex_indices));
-	}
+	if(!convex_indices.empty()) m.convex_partitions.emplace_back(std::move(convex_indices));
 	
 	return is;
 }
