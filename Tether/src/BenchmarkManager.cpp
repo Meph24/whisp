@@ -5,12 +5,11 @@
  *      Author:	HL65536
  *     Version:	1.0
  */
-
 #include "BenchmarkManager.h"
 
 #include "IWorld.h"
 #include "TickServiceProvider.h"
-#include "EventMapper.h"
+#include "EventMapper.hpp"
 #include "EventDefines.h"
 #include "InteractFilterDefaultSym.h"
 #include "InteractFilterDefaultAsym.h"
@@ -86,7 +85,7 @@ void BenchmarkManager::tick(const SimClock::time_point& next_tick_begin, TickSer
 	assert(w==world);
 	assert(w);
 	assert(repeats>0);
-	if (tsp->eMap->getStatusAndReset(STATUS_ID_BENCHMARK))
+	if (tsp->control_input_stati->getStatusAndReset(STATUS_ID_BENCHMARK))
 	{
 		if(isInactivePhase())
 		{

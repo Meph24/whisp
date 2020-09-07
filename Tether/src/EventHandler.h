@@ -68,8 +68,12 @@ private:
 
 	void sendOn(event e);
 public:
-	IGameMode * world;
-	EventHandler(IGameMode* world);
+	IGameMode* sim;
+	EventMapper* event_mapper;
+
+	//This constructor only holds parameters because of legacy code
+	//namely Zombie_KeyInput, Zombie_MouseInput und IGameMode.trigger()
+	EventHandler(IGameMode* sim, EventMapper* event_mapper);
 
 
 	/*

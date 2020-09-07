@@ -19,7 +19,7 @@ using glm::vec3;
 #include "TickServiceProvider.h"
 #include "ChunkManager.h"
 #include "Zombie_KeyInput.h"
-#include "EventMapper.h"
+#include "EventMapper.hpp"
 #include "Frustum.h"
 #include "DrawServiceProvider.h"
 #include "Zombie_Gun.h"
@@ -191,9 +191,9 @@ spacevec EntityPlayer::getCamPos()
 #include "EventDefines.h"
 Frustum * EntityPlayer::newFrustumApplyPerspective(SimClock::time_point t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction)
 {
-	EventMapper * eMap=tsp->eMap;
+	ControlInputStatusSet& controlinputs = *tsp->control_input_stati;
 	float zoomMult=8;
-	float zoomed=eMap->getStatus(STATUS_ID_ZOOM);
+	float zoomed=controlinputs.status(STATUS_ID_ZOOM);
 	float zoomFactor=zoomed?zoomMult:1;
 	mouseInp->setSensitivityMultiplier(1.0f/zoomFactor);
 	cam->zoom=defaultZoom/zoomFactor;
@@ -240,15 +240,15 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	IWorld * iw=tsp->getIWorld();
 	ITerrain * it=tsp->getITerrain();
 
-	EventMapper * eMap=tsp->eMap;
-	switchWeapon(eMap->getStatusAndReset(STATUS_ID_WEAPON_SWITCH));
+	ControlInputStatusSet& controlinputs = *tsp->control_input_stati;
+	switchWeapon(controlinputs.getStatusAndReset(STATUS_ID_WEAPON_SWITCH));
 
-	if(eMap->getStatusAndReset(STATUS_ID_INVENTORY))
+	if(controlinputs.getStatusAndReset(STATUS_ID_INVENTORY))
 	{
 		Item * temp=heldItem;//put inventory in hand or put it back
 		heldItem=inventory;
 		inventory=temp;
-		eMap->toggleCondition(CONDITION_SELECTION_ACTIVE);//TODO find out which is inventory and set value ORed accordingly
+		controlinputs.toggleCondition(CONDITION_SELECTION_ACTIVE);//TODO find out which is inventory and set value ORed accordingly
 	}
 
 	if(heldItem) heldItem->tick(next_tick_begin, tsp);
