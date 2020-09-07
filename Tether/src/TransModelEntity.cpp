@@ -86,7 +86,7 @@ void TransModelEntity::tick(	const SimClock::time_point& next_tick_begin,
 	//simulation testing code
 	//TODO remove
 	
-	if(glm::length(iw->toMeters(pos)) > 100)
+	if(glm::length(iw->toMeters(pos)) > 300)
 		v = -v;
 
 	pos += v*tick_seconds;

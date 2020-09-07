@@ -103,7 +103,7 @@ void ModelEntity::tick	(
 	//entity attribute changes go here
 	//this is code for collision simulation
 	//entities turn around after flying away too far
-	if(glm::length(iw->toMeters(pos)) > 100)
+	if(glm::length(iw->toMeters(pos)) > 300)
 		v = v * -1.0f;
 
 	//apply pos by velocity
