@@ -402,7 +402,7 @@ void Simulation_World::init()
 		vec3 start(1.0f, 1.0f, 1.0f);
 		vec3 experiments_offset(0.0f, 0.0f, 3.0f);
 
-		for ( int i = 1; i <= 32; i+=2 )
+		for ( int i = 1; i <= 64; i+=2 )
 		{
 			TransModelEntity* prism_static = new TransModelEntity(*(models[3]));
 			TransModelEntity* prism_moving = new TransModelEntity(*(models[3]));
