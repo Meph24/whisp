@@ -6,16 +6,13 @@ Tether/res/config.txt
 *.swp
 
 #eclipse
-/Debug/
-/Release/
-/SFML-2.4.2/
-/src.zip
-/src (2).zip
-/rls/
-/dbg/
-*.settings/*
-.cproject
-.project
+Tether/Debug/
+Tether/Release/
+Tether/.settings/*
+Tether/.cproject
+Tether/.project
+Tether/SFML/
+
 
 
 #sconstruct
@@ -30,9 +27,6 @@ whisp.exe
 whisp_debug.exe
 
 
-/glm/
-/SFML/
-
 #stuff in the test area
 Tether/test/logging_test/*.log
 Tether/test/logging_test/*.exe
@@ -40,7 +34,7 @@ Tether/test/logging_test/*.o
 Tether/test/logging_test/log_*
 
 
-#vscode & Windwos dependencies
+#vscode & Windows dependencies
 deps
 *.dll
 dependency_install
