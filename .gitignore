@@ -44,3 +44,4 @@ Tether/test/logging_test/log_*
 deps
 *.dll
 dependency_install
+.vscode/
