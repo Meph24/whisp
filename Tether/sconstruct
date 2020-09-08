@@ -28,7 +28,7 @@ def platformSlash():
 def compiler():
     if get_platform() == "Windows":
       return "g++.exe"
-    return "g++"
+    return "g++-9"
 
 
 ### program info

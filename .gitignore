@@ -34,10 +34,10 @@ whisp_debug.exe
 /SFML/
 
 #stuff in the test area
-test/logging_test/*.log
-test/logging_test/*.exe
-test/logging_test/*.o
-test/logging_test/log_*
+Tether/test/logging_test/*.log
+Tether/test/logging_test/*.exe
+Tether/test/logging_test/*.o
+Tether/test/logging_test/log_*
 
 
 #vscode & Windwos dependencies
