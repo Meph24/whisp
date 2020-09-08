@@ -1,0 +1,46 @@
+
+#general
+Tether/res/config.txt
+
+#linux
+*.swp
+
+#eclipse
+/Debug/
+/Release/
+/SFML-2.4.2/
+/src.zip
+/src (2).zip
+/rls/
+/dbg/
+*.settings/*
+.cproject
+.project
+
+
+#sconstruct
+.sconsign.dblite
+bin/
+build/
+
+#default executable location
+whisp
+whisp_debug
+whisp.exe
+whisp_debug.exe
+
+
+/glm/
+/SFML/
+
+#stuff in the test area
+test/logging_test/*.log
+test/logging_test/*.exe
+test/logging_test/*.o
+test/logging_test/log_*
+
+
+#vscode & Windwos dependencies
+deps
+*.dll
+dependency_install
