@@ -74,11 +74,12 @@ inline std::ostream& operator<<(std::ostream& os, matType<T,P> const & m)
 	os << glm::to_string(m); return os;
 }
 
+/*
 inline std::ostream& operator<<(std::ostream& os, const glm::vec<3, float, (glm::qualifier)0> v)
 {
 	os << glm::to_string(v); return os;
 }
-
+*/
 
 inline mat4 	rotateDeg (float angle, vec3 const &v)
 {
