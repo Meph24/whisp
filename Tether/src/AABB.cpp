@@ -124,9 +124,9 @@ void AABB::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWo
 		{
 			int firCooMult=(j&1)*2-1;
 			int secTerCooMult=(j&2)-1;
-			vec3 fir=convert(firCoo)*firCooMult;
-			vec3 sec=convert(secCoo)*secTerCooMult;
-			vec3 ter=convert(terCoo)*secTerCooMult;
+			vec3 fir=convert(firCoo)*(float)firCooMult;
+			vec3 sec=convert(secCoo)*(float)secTerCooMult;
+			vec3 ter=convert(terCoo)*(float)secTerCooMult;
 //			std::cout<<"AABB draw: "<<fir<<" "<<sec<<" "<<ter<<std::endl;
 
 			vec3 baseOut=(fir+sec+ter)*distMax;

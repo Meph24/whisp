@@ -1,6 +1,41 @@
 import os
 import re
 import shutil
+import sys
+
+def get_platform():
+    platforms = {
+        'linux1' : 'Linux',
+        'linux2' : 'Linux',
+        'darwin' : 'OS X',
+        'win32' : 'Windows'
+    }
+    if sys.platform not in platforms:
+        return sys.platform
+    
+    return platforms[sys.platform]
+
+def platformExecutableExtention():
+    if get_platform() == "Windows":
+      return ".exe"
+    return ""
+
+def platformSlash():
+    if get_platform() == "Windows":
+      return "\\"
+    return "/"
+
+def compiler():
+    if get_platform() == "Windows":
+      return "g++.exe"
+    return "g++"
+
+
+### program info
+appname = "whisp"
+debug_appname = appname + "_debug" + platformExecutableExtention()
+release_appname = appname + platformExecutableExtention()
+
 
 ### directory variables ###
 root = "."
@@ -10,21 +45,34 @@ test_root = 'test'
 
 
 ### Compiler ###
-cxx = 'g++-9'
+cxx = compiler()
 cppdefines = {}
 cppflags = ['-Wall','-Wpedantic']
 cxxflags = ['-std=c++1z']
 
 
-### Dependencies ###A
-lib = ['GL', 'GLEW']
-lib += ['sfml-graphics', 'sfml-window', 'sfml-system', 'sfml-network', 'sfml-audio', 'pthread']
+### Dependencies ###
+lib = []
 libpaths = []
+gllib = ['GL', 'GLEW']
+otherlibs = []
+sfmllib = ['sfml-graphics', 'sfml-window', 'sfml-system', 'sfml-network', 'sfml-audio', 'pthread']
+if get_platform() == "Windows":
+    gllib  = ["opengl32", "glu32", "glew32"]
+    otherlibs = ["stdc++fs"]
+lib += gllib + sfmllib + otherlibs
 
 
 ### build environment specification ###
-
 env = Environment()
+
+#in Windows scons doesn't seem to be able to pick up PATH
+if get_platform() == "Windows":
+    env = Environment(ENV = {'PATH': os.environ['PATH'], 'TEMP':os.environ['TEMP']}, tools = ['gcc','g++','gnulink','ar'])
+    env.Append(CPPPATH=['./deps/include'])
+    libpaths += ['./deps/lib']
+
+
 
 env.Replace(CXX = cxx)
 env.Append(LIBS = lib)
@@ -73,7 +121,7 @@ elif len(sourceFiles) > 10:
 else:
  print('Sources found :')
  for src in sourceFiles:
-  print 's> '+src
+  print('s> '+src)
 
 if not headerFiles:
  print('No Header files found !')
@@ -82,7 +130,7 @@ elif len(headerFiles) > 10:
 else:
  print('Headers found : ')
  for hdr in headerFiles:
-  print 'h> ' + hdr
+  print ('h> ' + hdr)
 
 ### Test Collection ###
 testSources = []
@@ -146,8 +194,8 @@ releasetestmainobjects = [x for x in releasetestmainobjects if not x.endswith('m
 for test in testSources:
  objname = test.replace(test_root, test_release_dir,1)
  objname = objname.replace('.cpp', '.o')
- execname = test.replace(test_root+"/", test_release_bin_dir+"/")
- execname = execname.replace('.cpp','.test')
+ execname = test.replace(test_root+ platformSlash(), test_release_bin_dir+platformSlash())
+ execname = execname.replace('.cpp','.test' + platformExecutableExtention())
  releasetestobjects = releasetestobjects + [objname]
  Alias("test", release_test_env.Object(objname, test))
  Alias("test", release_test_env.Program(execname, releasetestmainobjects+[objname]))
@@ -158,37 +206,37 @@ debugtestmainobjects = [x for x in debugtestmainobjects if not x.endswith('/main
 for test in testSources:
  objname = test.replace(test_root, test_debug_dir,1)
  objname = objname.replace('.cpp', '.o')
- execname = test.replace(test_root+"/", test_debug_bin_dir+"/")
- execname = execname.replace('.cpp','.test')
+ execname = test.replace(test_root+platformSlash(), test_debug_bin_dir+platformSlash())
+ execname = execname.replace('.cpp','.test' + platformExecutableExtention())
  debugtestobjects = debugtestobjects + [objname]
  Alias("test", debug_test_env.Object(objname, test))
  Alias("test", debug_test_env.Program(execname, debugtestmainobjects+[objname]))
  
 def move_release_binary(target, src, env):
-	if os.path.isfile('bin/whisp'):
-		os.remove('./whisp')
+	if os.path.isfile('bin/' + release_appname):
+		os.remove('./' + release_appname)
 		print('Deleted old release binary!')
-		shutil.copy('bin/whisp', './whisp')
+		shutil.copy('bin/' + release_appname, './' + release_appname)
 		print('Copied new release binary!')
 
 def move_debug_binary(target, src, env):
-	if os.path.isfile('bin/whisp_debug'):
-		os.remove('./whisp_debug')
+	if os.path.isfile('bin/' + debug_appname):
+		os.remove('./' + debug_appname)
 		print('Deleted old debug binary!')
-		shutil.copy('bin/whisp_debug', './whisp_debug')
+		shutil.copy('bin/' + debug_appname, './' + debug_appname)
 		print('Copied new debug binary!')
 
 
 ## MAIN PROGRAM '''
-release_target = release_env.Program('bin/whisp', releaseobjects)
+release_target = release_env.Program('bin/' + release_appname, releaseobjects)
 Alias("release", release_target)
-debug_target = debug_env.Program('bin/whisp_debug', debugobjects)
+debug_target = debug_env.Program('bin/' + debug_appname, debugobjects)
 Alias("debug", debug_target)
 
-release_env.AddPostAction(release_target, Delete('./whisp'))
-release_env.AddPostAction(release_target, Copy('./whisp', './bin/whisp'))
-debug_env.AddPostAction(debug_target, Delete('./whisp_debug'))
-debug_env.AddPostAction(debug_target, Copy('./whisp_debug', './bin/whisp_debug'))
+release_env.AddPostAction(release_target, Delete('./' + release_appname))
+release_env.AddPostAction(release_target, Copy('./' + release_appname, './bin/' + release_appname ))
+debug_env.AddPostAction(debug_target, Delete('./'+ debug_appname ))
+debug_env.AddPostAction(debug_target, Copy('./' + debug_appname, './bin/' +debug_appname))
 
 Default([ release_target, debug_target ])
 

@@ -24,7 +24,7 @@ bool operator!=(const MinkowskiPoint& first, const MinkowskiPoint& second)
 
 ostream& operator<< (ostream& os, const MinkowskiPoint& p)
 {
-	os << glm::to_string(p) << '(' << p.i0 << ',' << p.i1 << ')';
+	os << glm::to_string((vec3)p) << '(' << p.i0 << ',' << p.i1 << ')';
 	return os;
 }
 

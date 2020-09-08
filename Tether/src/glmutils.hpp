@@ -14,6 +14,9 @@
 //TODO find out why it is throwing lots of warnings with -O3 (instead of just ignoring them)
 //This only happens with one specific setup (windows, eclipse, mingw)
 
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/transform.hpp>
+
 #include "fltcmp.hpp"
 
 #include <iostream>
@@ -31,7 +34,7 @@ inline float sqlen(const vec_type& vec)
 {
 	float sum = 0.0;
 	auto vptr = glm::value_ptr(vec);
-	for ( int i = 0; i < vec_type::components; ++i )
+	for ( int i = 0; i < vec.length(); ++i )
 	{
 		sum += *(vptr+i) * *(vptr+i);
 	}
@@ -68,9 +71,14 @@ inline glm::vec4 operator+(const glm::vec3& v3, const glm::vec4& v4)
 template<template<typename, precision> class matType, typename T, precision P>
 inline std::ostream& operator<<(std::ostream& os, matType<T,P> const & m)
 {
-	os << glm::to_string(m);
-	return os;
+	os << glm::to_string(m); return os;
 }
+
+inline std::ostream& operator<<(std::ostream& os, const glm::vec<3, float, (glm::qualifier)0> v)
+{
+	os << glm::to_string(v); return os;
+}
+
 
 inline mat4 	rotateDeg (float angle, vec3 const &v)
 {
@@ -110,7 +118,7 @@ inline bool vecEqualsE(vec_type a, vec_type b, epsilon_prec epsilon)
 	auto ap = glm::value_ptr(a);
 	auto bp = glm::value_ptr(b);
 
-	for ( int i = 0; i < (vec_type::components); ++i )
+	for ( int i = 0; i < a.length(); ++i )
 	{
 		if(!flteqE(ap[i], bp[i], epsilon))
 		return false;
