@@ -52,8 +52,6 @@ void MainApp::tick(int us)
 
 void MainApp::run()
 {
-	op->window.setActive();
-
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{

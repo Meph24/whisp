@@ -123,7 +123,6 @@ Operator::Operator(	WallClock&		wallclock,
 	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
 {
 	//important because of the ability to activate the context in another thread
-	window.setActive(false);
 }
 
 void Operator::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
