@@ -16,7 +16,6 @@
 
 
 class Zombie_MouseInput;
-class Zombie_KeyInput;
 class Zombie_Gun;
 class CameraTP;
 class Frustum;
@@ -41,7 +40,6 @@ public:
 	int score=0;
 
 	Zombie_MouseInput * mouseInp;
-	Zombie_KeyInput * keyInp;
 
 	CameraTP * cam;
 	float minTPdist=2;

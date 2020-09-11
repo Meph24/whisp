@@ -21,6 +21,34 @@ void Operator::operateSimulation(IGameMode* simulation)
 	event_handler.reset(new EventHandler(simulation, event_mapper.get()));
 
 	event_mapper->registerAction(
+		EVENT_ID_KEY_W,
+		MAPPER_MODE_HOLD,
+		CONDITION_ALWAYS_TRUE,
+		STATUS_ID_WALK_Z,
+		1
+	);
+	event_mapper->registerAction(
+		EVENT_ID_KEY_S,
+		MAPPER_MODE_HOLD,
+		CONDITION_ALWAYS_TRUE,
+		STATUS_ID_WALK_Z,
+		-1
+	);
+	event_mapper->registerAction(
+		EVENT_ID_KEY_A,
+		MAPPER_MODE_HOLD,
+		CONDITION_ALWAYS_TRUE,
+		STATUS_ID_WALK_X,
+		-1
+	);
+	event_mapper->registerAction(
+		EVENT_ID_KEY_D,
+		MAPPER_MODE_HOLD,
+		CONDITION_ALWAYS_TRUE,
+		STATUS_ID_WALK_X,
+		1
+	);
+	event_mapper->registerAction(
 			EVENT_ID_KEY_F3,
 			MAPPER_MODE_TOGGLE,
 			CONDITION_ALWAYS_TRUE,

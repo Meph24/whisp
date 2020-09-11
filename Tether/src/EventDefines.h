@@ -50,6 +50,8 @@
 #define STATUS_ID_TRIGGER 14
 #define STATUS_ID_WEAPON_SWITCH 15
 #define STATUS_ID_ZOOM 16
+#define STATUS_ID_WALK_Z 17
+#define STATUS_ID_WALK_X 18
 
 //event values
 #define EVENT_VALUE_KEY_PRESSED 1

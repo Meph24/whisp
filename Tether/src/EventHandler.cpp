@@ -52,7 +52,6 @@ void EventHandler::Filter::updateFilter(event e)
 	prevValue[e.ID] = e.value;
 }
 
-#include "Zombie_KeyInput.h"
 #include "Zombie_MouseInput.h"
 
 #include "CameraTP.h"
@@ -63,8 +62,6 @@ void EventHandler::sendOn(EventHandler::event e)
 	if(event_mapper) event_mapper->event(e);
 	Zombie_MouseInput * mouseInp=0;
 	if(sim) if(sim->player) mouseInp=sim->player->mouseInp;
-	Zombie_KeyInput * keyInput=0;
-	if(sim) if(sim->player) keyInput=sim->player->keyInp;
 	if (e.ID == 2048)
 	{
 		if (mouseInp)
@@ -74,31 +71,6 @@ void EventHandler::sendOn(EventHandler::event e)
 	{
 		if (mouseInp)
 			mouseInp->mouseMovedY(e.value);
-	}
-	else if (e.ID == 1024 + ('W' - 'A'))
-	{
-		if (keyInput)
-			keyInput->walkForward(e.value);
-	}
-	else if (e.ID == 1024 + ('S' - 'A'))
-	{
-		if (keyInput)
-			keyInput->walkBack(e.value);
-	}
-	else if (e.ID == 1024 + ('A' - 'A'))
-	{
-		if (keyInput)
-			keyInput->walkLeft(e.value);
-	}
-	else if (e.ID == 1024 + ('D' - 'A'))
-	{
-		if (keyInput)
-			keyInput->walkRight(e.value);
-	}
-	else if ((e.ID == 1060) && e.value)
-	{
-		if (keyInput)
-			keyInput->menuButton();
 	}
 	else if (e.ID == 2052)
 	{

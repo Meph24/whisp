@@ -46,7 +46,6 @@ speed(characterSpeed),heldItem(0),inventory(0)
 	setTP(false);
 	cam->zoom=defaultZoom;
 	mouseInp = new Zombie_MouseInput(this, w,sensX,sensY);
-	keyInp = new Zombie_KeyInput(mouseInp,cam);
 	mouseInp->enable();
 	HP=maxHP;
 
@@ -78,7 +77,6 @@ speed(characterSpeed),heldItem(0),inventory(0)
 EntityPlayer::~EntityPlayer()
 {
 	delete cam;
-	delete keyInp;
 	delete mouseInp;
 	for(int i=0;i<wCount;i++)
 	{
@@ -266,7 +264,19 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	if (HP > maxHP) HP = maxHP;
 
 	spacevec oldPos=pos;
-	vec3 wantedV=keyInp->getVelocity()*speed;
+
+	float m11 = cos((-cam->beta) / 360 * TAU);
+	float m12 = -sin((-cam->beta) / 360 * TAU);
+	float m21 = -m12;//sin
+	float m22 = m11;//cos
+
+	float frontVec = controlinputs.status(STATUS_ID_WALK_Z);
+	float rightVec = controlinputs.status(STATUS_ID_WALK_X);
+
+	float movZ = -m11*frontVec+m12*rightVec;
+	float movX = -m21*frontVec+m22*rightVec;
+	vec3 wantedV = vec3(movX, 0.0f, movZ) * speed;
+
 	pos+=iw->fromMeters(wantedV)*time;
 	pos=it->clip(pos,true);
 	spacevec newPos=pos;
