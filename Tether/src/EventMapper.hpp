@@ -8,6 +8,94 @@
 #ifndef SRC_EVENTMAPPER_H_
 #define SRC_EVENTMAPPER_H_
 
+#include <unordered_map>
+#include <vector>
+
+#include "EventHandler.h"
+#include "PerformanceMeter.h"
+
+#include <functional>
+
+using std::function;
+using std::unordered_map;
+using std::vector;
+
+
+#include "ControlInputStatusSet.hpp"
+
+#define EVENTMAPPING_FUNCTION_PARAMETERS EventHandler::event& e,ControlInputStatusSet& stati
+
+using EventMappingCondition = function <bool (EVENTMAPPING_FUNCTION_PARAMETERS)>;
+using EventMappingAction = function <void (EVENTMAPPING_FUNCTION_PARAMETERS)>;
+
+struct EventMapping
+{
+	EventMappingCondition condition;
+	EventMappingAction action;
+
+	void map(EVENTMAPPING_FUNCTION_PARAMETERS)
+	{
+		if(! condition(e, stati)) return;
+
+		action(e, stati);
+	}
+
+	struct conditions
+	{
+		static bool always_true(EVENTMAPPING_FUNCTION_PARAMETERS) { return true; }
+
+		static bool on_key_press(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
+		static bool on_key_release(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; };
+	};
+
+	struct actions
+	{
+		struct Toggle
+		{
+			int to_toggle_status_index;
+			Toggle(int to_toggle_status_index) : to_toggle_status_index(to_toggle_status_index) {}
+
+			void toggle(float& f) { f = (f > 0.0f)? 0.0f : 1.0f; }
+
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { toggle( stati[to_toggle_status_index]); }
+		};
+
+		struct Combination
+		{
+			int hold_group_status_index; //the status index that represents the status for the group of keys used together
+			float weight;
+
+			Combination(int hold_group_status_index, float weight) 
+				: hold_group_status_index(hold_group_status_index)
+				, weight(weight) {}
+
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { stati[hold_group_status_index] += (e.value>0)? weight : -weight; }
+		};
+
+		struct AccumulateValue
+		{
+			int status_index;
+			float offset;
+
+			AccumulateValue(int status_index) : status_index(status_index), offset(0.0) {}
+			AccumulateValue(int status_index, float offset) : status_index(status_index), offset(offset) {}
+
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { stati[status_index] += e.value + offset; }
+		};
+
+		struct GetValue
+		{
+			int status_index;
+			float offset;
+
+			GetValue(int status_index) : status_index(status_index), offset(0.0) {}
+			GetValue(int status_index, float offset) : status_index(status_index), offset(offset) {}
+
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { stati[status_index] = e.value + offset; }
+		};
+	};
+};
+
 #define MAPPER_MODE_EMPTY -1
 //no mapping
 
@@ -31,29 +119,8 @@
 //replaces status with event value+mapParam
 //use case example: get current mouse position
 
-
-//the modes below are not implemented yet
-#define MAPPER_MODE_TIMESTAMP_GREATER 5
-//TODO status = last time where event > mapParam, seconds
-
-
-#define MAPPER_MODE_TIMESTAMP_LESSOREQUAL 6
-//TODO status = last time where event <= mapParam
-
-
-
 #define CONDITION_ALWAYS_TRUE 0
 
-#include <unordered_map>
-#include <vector>
-
-#include "EventHandler.h"
-#include "PerformanceMeter.h"
-
-using std::unordered_map;
-using std::vector;
-
-#include "ControlInputStatusSet.hpp"
 
 typedef struct
 {
@@ -69,26 +136,21 @@ class EventMapper
 {
 	ControlInputStatusSet* managed_stati;//the output/condition input
 public:
-	//input: eventID
-	//output: queryable status
-	//supported tier2 options:
-	//ORed inputs -> hold (different weights and directions supported)
-	//inputs -> toggle on matching value
-	//inputs -> add with offset
-	//inputs -> replace with offset
-
-	//input related:
 	unordered_map<int, vector<mapping>> event_id_mappings;
+	unordered_map<int, vector<EventMapping>> event_id_event_mappings;
 
 	PerformanceMeter pm;
 
 	EventMapper(ControlInputStatusSet& control_input_status_set);
 	void changeManaged(ControlInputStatusSet& control_input_status_set);
+
 	ControlInputStatusSet& stati();
 
-	void event(EventHandler::event e);
+	void event(EventHandler::event& e);
 
 	void registerAction(int ID,int mode,int condition,int statusIndex,float mapParam);
+
+	void registerMapping(int eventid, EventMapping mapping);
 
 	void clearAllMappings();//does not delete saved status values
 };

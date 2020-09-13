@@ -11,9 +11,15 @@ EventMapper::EventMapper(ControlInputStatusSet& control_input_status_set)
 	std::cout << "managed_stati size=" << managed_stati->size() << std::endl;
 }
 
-void EventMapper::event(EventHandler::event e)
+void EventMapper::event(EventHandler::event& e)
 {
 	ControlInputStatusSet& stati = *managed_stati;
+
+	for(EventMapping& m : event_id_event_mappings[e.ID])
+	{
+		m.map(e, *managed_stati);
+	}
+
 	for(mapping& myM : event_id_mappings[e.ID])
 	{
 		bool evAsTrue=false;
@@ -74,11 +80,14 @@ void EventMapper::event(EventHandler::event e)
 	}
 }
 
-
 void EventMapper::registerAction(int id, int mode, int condition,int statusIndex, float mapParam)
 {
 		event_id_mappings[id].push_back({mode,condition,statusIndex,mapParam});
 }
 
+void EventMapper::registerMapping(int eventid, EventMapping mapping)
+{	
+	event_id_event_mappings[eventid].emplace_back(mapping);
+}
 
 void EventMapper::clearAllMappings(){ event_id_mappings.clear(); }
