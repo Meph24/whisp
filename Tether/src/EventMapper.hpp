@@ -119,48 +119,11 @@ struct EventMapping
 	};
 };
 
-#define MAPPER_MODE_EMPTY -1
-//no mapping
-
-#define MAPPER_MODE_HOLD 0
-//output is the sum of all mapParams where the events are currently >0
-//use case example: is button x currently pressed?; are buttons x+y or x+z currently pressed?
-
-#define MAPPER_MODE_TOGGLE 1
-//toggles the status value between 0 and 1 if event value is specified value
-//use case example: toggle GUI element on/off
-
-#define MAPPER_MODE_ADD 2
-//adds the event value and mapParam to status
-//use case example: how much has the user scrolled with the mouse wheel?; has the user pressed key x at any point since last check
-
-#define MAPPER_MODE_ADD_RESETM 3
-//adds the event value and mapParam to status and resets mouse position afterwards to -mapParam
-//use case example: first person camera movement by mouse
-
-#define MAPPER_MODE_REPLACE 4
-//replaces status with event value+mapParam
-//use case example: get current mouse position
-
-#define CONDITION_ALWAYS_TRUE 0
-
-
-typedef struct
-{
-	int mode;//mapping mode, see defines
-	int condition;//index of status array that needs to be 0 (if condition positive) or !=0 (if condition negative, 0 means no condition
-	int statusIndex;
-	float mapParam;//different meaning depending on mode
-} mapping;
-
-
-
 class EventMapper
 {
 	ControlInputStatusSet* managed_stati;//the output/condition input
 public:
-	unordered_map<int, vector<mapping>> event_id_mappings;
-	unordered_map<int, vector<EventMapping>> event_id_event_mappings;
+	unordered_map<int, vector<EventMapping>> event_id_mappings;
 
 	PerformanceMeter pm;
 
@@ -170,8 +133,6 @@ public:
 	ControlInputStatusSet& stati();
 
 	void event(EventHandler::event& e);
-
-	void registerAction(int ID,int mode,int condition,int statusIndex,float mapParam);
 
 	void registerMapping(int eventid, EventMapping mapping);
 

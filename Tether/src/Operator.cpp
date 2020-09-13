@@ -114,7 +114,6 @@ void Operator::operateSimulation(IGameMode* simulation)
 void Operator::disconnectSimulation()
 {
 	event_handler.reset(nullptr);
-	event_handler.reset(nullptr);
 }
 
 Operator::Operator(	WallClock&		wallclock,
