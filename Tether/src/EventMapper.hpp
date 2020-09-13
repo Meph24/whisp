@@ -49,8 +49,8 @@ struct EventMapping
 	{
 		static bool alwaysTrue(EVENTMAPPING_FUNCTION_PARAMETERS) { return true; }
 
-		static bool onKeyPress(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
-		static bool onKeyRelease(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; };
+		static bool keyPressed(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
+		static bool keyReleased(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; };
 	
 		struct StatusAsCondition
 		{
@@ -179,7 +179,6 @@ public:
 	// if some other condition would be considered a sensible default in your context (like for example toggle is usally paired with keyPressed) it is not advisable to use this function
 	// with the default condition and rather specify the condition, or even pass a complete EventMapping object as stated in another method.
 	void registerMapping(int eventid, EventMappingAction action, EventMappingCondition condition = EventMapping::conditions::alwaysTrue);
-
 
 	void clearAllMappings();
 };

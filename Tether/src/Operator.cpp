@@ -42,7 +42,7 @@ void Operator::operateSimulation(IGameMode* simulation)
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_F3,
 		Act::Toggle(STATUS_ID_DEBUG_SCREEN_ACTIVE),
-		Cond::onKeyPress
+		Cond::keyPressed
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_R,
@@ -72,7 +72,7 @@ void Operator::operateSimulation(IGameMode* simulation)
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_B,
 			Act::Toggle(STATUS_ID_DRAW_AABBs),
-			Cond::onKeyPress
+			Cond::keyPressed
 	);
 	//TODO oh boy the terrain hack again ... please fix 'n replace (issue #35)
 	// why 2 status ids here is unclear, might be needed to be changed
@@ -87,18 +87,18 @@ void Operator::operateSimulation(IGameMode* simulation)
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_Z,
 			Act::Toggle(STATUS_ID_SLOMO), 
-			Cond::onKeyPress
+			Cond::keyPressed
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_P,
 			Act::Toggle(STATUS_ID_PAUSE),
-			Cond::onKeyPress
+			Cond::keyPressed
 	);
 
 	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_RMB,
 			Act::Toggle(STATUS_ID_ZOOM),
-			Cond::onKeyPress
+			Cond::keyPressed
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_WHEEL,
