@@ -30,8 +30,13 @@ using EventMappingAction = function <void (EVENTMAPPING_FUNCTION_PARAMETERS)>;
 
 struct EventMapping
 {
-	EventMappingCondition condition;
 	EventMappingAction action;
+	EventMappingCondition condition;
+
+	EventMapping(EventMappingAction action)
+		: action(action), condition(conditions::alwaysTrue) {}
+	EventMapping(EventMappingAction action, EventMappingCondition condition)
+		: action(action), condition(condition) {}
 
 	void map(EVENTMAPPING_FUNCTION_PARAMETERS)
 	{
@@ -42,10 +47,25 @@ struct EventMapping
 
 	struct conditions
 	{
-		static bool always_true(EVENTMAPPING_FUNCTION_PARAMETERS) { return true; }
+		static bool alwaysTrue(EVENTMAPPING_FUNCTION_PARAMETERS) { return true; }
 
-		static bool on_key_press(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
-		static bool on_key_release(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; };
+		static bool onKeyPress(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
+		static bool onKeyRelease(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; };
+	
+		struct StatusAsCondition
+		{
+			int to_check_status;
+			bool expected;
+
+			StatusAsCondition(int to_check_status, bool expected)
+				: to_check_status(to_check_status), expected(expected) {}
+
+			bool operator()(EVENTMAPPING_FUNCTION_PARAMETERS) 
+			{ 
+				return (expected)? 
+					0 > 0.0 : 0 <= 0.0;
+			}
+		};
 	};
 
 	struct actions
@@ -60,12 +80,15 @@ struct EventMapping
 			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { toggle( stati[to_toggle_status_index]); }
 		};
 
-		struct Combination
+		struct Combinate
 		{
 			int hold_group_status_index; //the status index that represents the status for the group of keys used together
 			float weight;
 
-			Combination(int hold_group_status_index, float weight) 
+			Combinate(int hold_group_status_index)
+				: hold_group_status_index(hold_group_status_index)
+				, weight(1.0f) {}
+			Combinate(int hold_group_status_index, float weight) 
 				: hold_group_status_index(hold_group_status_index)
 				, weight(weight) {}
 
@@ -152,6 +175,12 @@ public:
 
 	void registerMapping(int eventid, EventMapping mapping);
 
-	void clearAllMappings();//does not delete saved status values
+	//be warned that this is a convenience function which, by default, the condition, with which the Mapping is constructed here is "EventMapping::conditions::alwaysTrue"
+	// if some other condition would be considered a sensible default in your context (like for example toggle is usally paired with keyPressed) it is not advisable to use this function
+	// with the default condition and rather specify the condition, or even pass a complete EventMapping object as stated in another method.
+	void registerMapping(int eventid, EventMappingAction action, EventMappingCondition condition = EventMapping::conditions::alwaysTrue);
+
+
+	void clearAllMappings();
 };
 #endif /* SRC_EVENTMAPPER_H_ */

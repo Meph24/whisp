@@ -20,118 +20,94 @@ void Operator::operateSimulation(IGameMode* simulation)
 	event_mapper.reset(new EventMapper(*simulation->control_input_stati));
 	event_handler.reset(new EventHandler(simulation, event_mapper.get()));
 
-	event_mapper->registerAction(
-		EVENT_ID_KEY_W,
-		MAPPER_MODE_HOLD,
-		CONDITION_ALWAYS_TRUE,
-		STATUS_ID_WALK_Z,
-		1
+	using Act = EventMapping::actions;
+	using Cond = EventMapping::conditions;
+
+	event_mapper->registerMapping(
+		EVENT_ID_KEY_W, 
+		Act::Combinate(STATUS_ID_WALK_Z, 1.0f)
 	);
-	event_mapper->registerAction(
-		EVENT_ID_KEY_S,
-		MAPPER_MODE_HOLD,
-		CONDITION_ALWAYS_TRUE,
-		STATUS_ID_WALK_Z,
-		-1
+	event_mapper->registerMapping(
+		EVENT_ID_KEY_S, 
+		Act::Combinate(STATUS_ID_WALK_Z, -1.0f)
 	);
-	event_mapper->registerAction(
-		EVENT_ID_KEY_A,
-		MAPPER_MODE_HOLD,
-		CONDITION_ALWAYS_TRUE,
-		STATUS_ID_WALK_X,
-		-1
+	event_mapper->registerMapping(
+		EVENT_ID_KEY_A, 
+		Act::Combinate(STATUS_ID_WALK_X, -1.0f)
 	);
-	event_mapper->registerAction(
-		EVENT_ID_KEY_D,
-		MAPPER_MODE_HOLD,
-		CONDITION_ALWAYS_TRUE,
-		STATUS_ID_WALK_X,
-		1
+	event_mapper->registerMapping(
+		EVENT_ID_KEY_D, 
+		Act::Combinate(STATUS_ID_WALK_X, 1.0f)
 	);
-	event_mapper->registerAction(
-			EVENT_ID_KEY_F3,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_DEBUG_SCREEN_ACTIVE,
-			EVENT_VALUE_KEY_PRESSED);
-	event_mapper->registerAction(
+	event_mapper->registerMapping(
+		EVENT_ID_KEY_F3,
+		Act::Toggle(STATUS_ID_DEBUG_SCREEN_ACTIVE),
+		Cond::onKeyPress
+	);
+	event_mapper->registerMapping(
 			EVENT_ID_KEY_R,
-			MAPPER_MODE_ADD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_RESTART,
-			0);
-	event_mapper->registerAction(
+			Act::AccumulateValue(STATUS_ID_RESTART)
+	);
+	event_mapper->registerMapping(
 			EVENT_ID_KEY_T,
-			MAPPER_MODE_ADD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_BENCHMARK,
-			0);
-	event_mapper->registerAction(
+			Act::AccumulateValue(STATUS_ID_BENCHMARK)
+	);
+	event_mapper->registerMapping(
 			EVENT_ID_KEY_E,
-			MAPPER_MODE_ADD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_INVENTORY,
-			0);
-	event_mapper->registerAction(
+			Act::AccumulateValue(STATUS_ID_INVENTORY)
+	);
+
+	event_mapper->registerMapping( 
 			EVENT_ID_KEY_ARROW_UP,
-			MAPPER_MODE_ADD,
-			-CONDITION_SELECTION_ACTIVE,
-			STATUS_ID_SELECTION_UP,
-			0);
-	event_mapper->registerAction(
+			Act::AccumulateValue(STATUS_ID_SELECTION_UP),
+			Cond::StatusAsCondition(CONDITION_SELECTION_ACTIVE, false)
+			);
+
+	event_mapper->registerMapping( 
 			EVENT_ID_KEY_ARROW_DOWN,
-			MAPPER_MODE_ADD,
-			-CONDITION_SELECTION_ACTIVE,
-			STATUS_ID_SELECTION_DOWN,
-			0);
-	event_mapper->registerAction(
+			Act::AccumulateValue(STATUS_ID_SELECTION_DOWN),
+			Cond::StatusAsCondition(CONDITION_SELECTION_ACTIVE, false)
+			);
+
+	event_mapper->registerMapping(
 			EVENT_ID_KEY_B,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_DRAW_AABBs,
-			EVENT_VALUE_KEY_PRESSED);
-	event_mapper->registerAction(
+			Act::Toggle(STATUS_ID_DRAW_AABBs),
+			Cond::onKeyPress
+	);
+	//TODO oh boy the terrain hack again ... please fix 'n replace (issue #35)
+	// why 2 status ids here is unclear, might be needed to be changed
+	event_mapper->registerMapping(
 			EVENT_ID_KEY_SHIFT,
-			MAPPER_MODE_HOLD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_GO_UP,
-			1);
-	event_mapper->registerAction(
+			Act::Combinate(STATUS_ID_GO_UP, 1.0)
+	);
+	event_mapper->registerMapping(
 			EVENT_ID_KEY_CTRL,
-			MAPPER_MODE_HOLD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_GO_DOWN,
-			1);
-	event_mapper->registerAction(
+			Act::Combinate(STATUS_ID_GO_DOWN, 1.0)
+	);
+	event_mapper->registerMapping(
 			EVENT_ID_KEY_Z,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_SLOMO,
-			EVENT_VALUE_KEY_PRESSED);
-	event_mapper->registerAction(
+			Act::Toggle(STATUS_ID_SLOMO), 
+			Cond::onKeyPress
+	);
+	event_mapper->registerMapping(
 			EVENT_ID_KEY_P,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_PAUSE,
-			EVENT_VALUE_KEY_PRESSED);
-	event_mapper->registerAction(
+			Act::Toggle(STATUS_ID_PAUSE),
+			Cond::onKeyPress
+	);
+
+	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_RMB,
-			MAPPER_MODE_TOGGLE,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_ZOOM,
-			EVENT_VALUE_KEY_PRESSED);
-	event_mapper->registerAction(
+			Act::Toggle(STATUS_ID_ZOOM),
+			Cond::onKeyPress
+	);
+	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_WHEEL,
-			MAPPER_MODE_ADD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_WEAPON_SWITCH,
-			0);
-	event_mapper->registerAction(
+			Act::AccumulateValue(STATUS_ID_WEAPON_SWITCH)
+	);
+	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_LMB,
-			MAPPER_MODE_HOLD,
-			CONDITION_ALWAYS_TRUE,
-			STATUS_ID_TRIGGER,
-			EVENT_VALUE_KEY_PRESSED);
+			Act::Combinate(STATUS_ID_TRIGGER)
+	);
 
 }
 
