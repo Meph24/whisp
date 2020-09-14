@@ -20,8 +20,8 @@ void Operator::operateSimulation(IGameMode* simulation)
 	event_mapper.reset(new EventMapper(*simulation->control_input_stati));
 	event_handler.reset(new EventHandler(simulation, event_mapper.get()));
 
-	using Act = EventMapping::actions;
-	using Cond = EventMapping::conditions;
+	namespace Act = eventmapping::actions;
+	namespace Cond = eventmapping::conditions;
 
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_W, 
@@ -60,13 +60,13 @@ void Operator::operateSimulation(IGameMode* simulation)
 	event_mapper->registerMapping( 
 			EVENT_ID_KEY_ARROW_UP,
 			Act::AccumulateValue(STATUS_ID_SELECTION_UP),
-			Cond::StatusAsCondition(CONDITION_SELECTION_ACTIVE, false)
+			Cond::statusAsCondition(CONDITION_SELECTION_ACTIVE, false)
 			);
 
 	event_mapper->registerMapping( 
 			EVENT_ID_KEY_ARROW_DOWN,
 			Act::AccumulateValue(STATUS_ID_SELECTION_DOWN),
-			Cond::StatusAsCondition(CONDITION_SELECTION_ACTIVE, false)
+			Cond::statusAsCondition(CONDITION_SELECTION_ACTIVE, false)
 			);
 
 	event_mapper->registerMapping(
@@ -74,6 +74,8 @@ void Operator::operateSimulation(IGameMode* simulation)
 			Act::Toggle(STATUS_ID_DRAW_AABBs),
 			Cond::keyPressed
 	);
+
+
 	//TODO oh boy the terrain hack again ... please fix 'n replace (issue #35)
 	// why 2 status ids here is unclear, might be needed to be changed
 	event_mapper->registerMapping(
@@ -84,6 +86,7 @@ void Operator::operateSimulation(IGameMode* simulation)
 			EVENT_ID_KEY_CTRL,
 			Act::Combinate(STATUS_ID_GO_DOWN, 1.0)
 	);
+
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_Z,
 			Act::Toggle(STATUS_ID_SLOMO), 
@@ -94,11 +97,9 @@ void Operator::operateSimulation(IGameMode* simulation)
 			Act::Toggle(STATUS_ID_PAUSE),
 			Cond::keyPressed
 	);
-
 	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_RMB,
-			Act::Toggle(STATUS_ID_ZOOM),
-			Cond::keyPressed
+			Act::Hold(STATUS_ID_ZOOM)
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_WHEEL,

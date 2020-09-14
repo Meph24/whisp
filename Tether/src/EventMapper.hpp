@@ -25,7 +25,6 @@ using std::vector;
 
 #define EVENTMAPPING_FUNCTION_PARAMETERS EventHandler::event& e,ControlInputStatusSet& stati
 
-
 struct EventMapping
 {
 	using Condition = function <bool (EVENTMAPPING_FUNCTION_PARAMETERS)>;
@@ -34,42 +33,26 @@ struct EventMapping
 	Action action;
 	Condition condition;
 
-	EventMapping(Action action)
-		: action(action), condition(conditions::alwaysTrue) {}
 	EventMapping(Action action, Condition condition)
 		: action(action), condition(condition) {}
 
-	void map(EVENTMAPPING_FUNCTION_PARAMETERS)
-	{
-		if(! condition(e, stati)) return;
+	void map(EVENTMAPPING_FUNCTION_PARAMETERS);
+};
 
-		action(e, stati);
-	}
+//Note, that while these logical operators are provided for conditions
+// they do not work with implicit constructors
+// meaning we seem to cannot pass a function pointer in there and expect
+// a std::function object imlicitly being constructed, sadly
+// this means the construction of EventMapping::Conditions must be explicit in these cases
+// for all predefined conditions below, there shall be a simple way to access these
+// note therefore the difference between callable and function-object
+EventMapping::Condition operator&& (const EventMapping::Condition& c0, const EventMapping::Condition& c1);
+EventMapping::Condition operator|| (const EventMapping::Condition& c0, const EventMapping::Condition& c1);
+EventMapping::Condition operator! (const EventMapping::Condition& c0);
 
-	struct conditions
-	{
-		static bool alwaysTrue(EVENTMAPPING_FUNCTION_PARAMETERS) { return true; }
-
-		static bool keyPressed(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
-		static bool keyReleased(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; };
-	
-		struct StatusAsCondition
-		{
-			int to_check_status;
-			bool expected;
-
-			StatusAsCondition(int to_check_status, bool expected)
-				: to_check_status(to_check_status), expected(expected) {}
-
-			bool operator()(EVENTMAPPING_FUNCTION_PARAMETERS) 
-			{ 
-				return (expected)? 
-					0 > 0.0 : 0 <= 0.0;
-			}
-		};
-	};
-
-	struct actions
+namespace eventmapping
+{
+	namespace actions
 	{
 		struct Toggle
 		{
@@ -117,8 +100,40 @@ struct EventMapping
 
 			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { stati[status_index] = e.value + offset; }
 		};
-	};
-};
+
+		typedef GetValue Hold;
+	} /* namespace actions */
+
+	namespace conditions
+	{
+		// callables here
+		bool CALL_alwaysTrue(EVENTMAPPING_FUNCTION_PARAMETERS);
+		bool CALL_keyPressedCall(EVENTMAPPING_FUNCTION_PARAMETERS);
+		bool CALL_keyReleasedCall(EVENTMAPPING_FUNCTION_PARAMETERS);
+		struct EventValueEquals
+		{
+			float expected;
+			EventValueEquals(float expected);
+			bool operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
+		};
+		struct StatusAsCondition
+		{
+			int to_check_status;
+			bool expected;
+			StatusAsCondition(int to_check_status, bool expected);
+			bool operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
+		};
+
+		//predefined condition-type conditions for easy combinations via operator
+		const EventMapping::Condition alwaysTrue = CALL_alwaysTrue ;
+		const EventMapping::Condition keyPressed = CALL_keyPressedCall;
+		const EventMapping::Condition keyReleased = CALL_keyReleasedCall;
+		
+		EventMapping::Condition eventValueEquals(float expected);
+		EventMapping::Condition statusAsCondition(int to_check_status, bool expected);
+	} /* namespace conditions */
+} /* namespace eventmapping */
+
 
 class EventMapper
 {
@@ -140,7 +155,7 @@ public:
 	//be warned that this is a convenience function which, by default, the condition, with which the Mapping is constructed here is "EventMapping::conditions::alwaysTrue"
 	// if some other condition would be considered a sensible default in your context (like for example toggle is usally paired with keyPressed) it is not advisable to use this function
 	// with the default condition and rather specify the condition, or even pass a complete EventMapping object as stated in another method.
-	void registerMapping(int eventid, EventMapping::Action action, EventMapping::Condition condition = EventMapping::conditions::alwaysTrue);
+	void registerMapping(int eventid, EventMapping::Action action, EventMapping::Condition condition = eventmapping::conditions::alwaysTrue);
 
 	void clearAllMappings();
 };
