@@ -20,7 +20,7 @@ void EventMapper::registerMapping(int eventid, EventMapping mapping)
 	event_id_mappings[eventid].emplace_back(mapping);
 }
 
-void EventMapper::registerMapping(int eventid, EventMappingAction action, EventMappingCondition condition)
+void EventMapper::registerMapping(int eventid, EventMapping::Action action, EventMapping::Condition condition)
 {
 	registerMapping(eventid, EventMapping(action, condition));	
 }

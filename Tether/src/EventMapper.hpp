@@ -25,17 +25,18 @@ using std::vector;
 
 #define EVENTMAPPING_FUNCTION_PARAMETERS EventHandler::event& e,ControlInputStatusSet& stati
 
-using EventMappingCondition = function <bool (EVENTMAPPING_FUNCTION_PARAMETERS)>;
-using EventMappingAction = function <void (EVENTMAPPING_FUNCTION_PARAMETERS)>;
 
 struct EventMapping
 {
-	EventMappingAction action;
-	EventMappingCondition condition;
+	using Condition = function <bool (EVENTMAPPING_FUNCTION_PARAMETERS)>;
+	using Action = function <void (EVENTMAPPING_FUNCTION_PARAMETERS)>;
+	
+	Action action;
+	Condition condition;
 
-	EventMapping(EventMappingAction action)
+	EventMapping(Action action)
 		: action(action), condition(conditions::alwaysTrue) {}
-	EventMapping(EventMappingAction action, EventMappingCondition condition)
+	EventMapping(Action action, Condition condition)
 		: action(action), condition(condition) {}
 
 	void map(EVENTMAPPING_FUNCTION_PARAMETERS)
@@ -139,7 +140,7 @@ public:
 	//be warned that this is a convenience function which, by default, the condition, with which the Mapping is constructed here is "EventMapping::conditions::alwaysTrue"
 	// if some other condition would be considered a sensible default in your context (like for example toggle is usally paired with keyPressed) it is not advisable to use this function
 	// with the default condition and rather specify the condition, or even pass a complete EventMapping object as stated in another method.
-	void registerMapping(int eventid, EventMappingAction action, EventMappingCondition condition = EventMapping::conditions::alwaysTrue);
+	void registerMapping(int eventid, EventMapping::Action action, EventMapping::Condition condition = EventMapping::conditions::alwaysTrue);
 
 	void clearAllMappings();
 };
