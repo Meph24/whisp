@@ -21,7 +21,7 @@ class ITerrain;
 
 #include <vector>
 #include <memory>
-#include "ControlInputStatusSet.hpp"
+#include "SimulationInputStatusSet.hpp"
 
 using std::unique_ptr;
 

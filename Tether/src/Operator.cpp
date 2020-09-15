@@ -21,8 +21,8 @@ void Operator::operateSimulation(IGameMode* simulation)
 	event_mapper.reset(new EventMapper(input_status));
 	event_handler.reset(new EventHandler(simulation, event_mapper.get()));
 
-	using Act = EventMapping::actions;
-	using Cond = EventMapping::conditions;
+	namespace Act = eventmapping::actions;
+	namespace Cond = eventmapping::conditions;
 
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_W, 
@@ -47,26 +47,26 @@ void Operator::operateSimulation(IGameMode* simulation)
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_R,
-			Act::SendSignal(&input_status.restart)
+			Act::AccumulateValue(&input_status.restart)
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_T,
-			Act::SendSignal(&input_status.benchmark)
+			Act::AccumulateValue(&input_status.benchmark)
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_E,
-			Act::SendSignal(&input_status.inventory)
+			Act::AccumulateValue(&input_status.inventory)
 	);
 	event_mapper->registerMapping( 
 			EVENT_ID_KEY_ARROW_UP,
 			Act::AccumulateValue(&input_status.selection_up),
-			Cond::StatusAsCondition(&input_status.selection_active, false)
+			Cond::StatusAsCondition(&input_status.selection_active, true)
 			);
 
 	event_mapper->registerMapping( 
 			EVENT_ID_KEY_ARROW_DOWN,
 			Act::AccumulateValue(&input_status.selection_down),
-			Cond::StatusAsCondition(&input_status.selection_active, false)
+			Cond::StatusAsCondition(&input_status.selection_active, true)
 			);
 
 	event_mapper->registerMapping(
@@ -74,6 +74,8 @@ void Operator::operateSimulation(IGameMode* simulation)
 			Act::Toggle(&input_status.draw_aabbs),
 			Cond::keyPressed
 	);
+
+
 	//TODO oh boy the terrain hack again ... please fix 'n replace (issue #35)
 	// why 2 status ids here is unclear, might be needed to be changed
 	event_mapper->registerMapping(
@@ -84,6 +86,7 @@ void Operator::operateSimulation(IGameMode* simulation)
 			EVENT_ID_KEY_CTRL,
 			Act::Combinate(&input_status.go_down, 1.0)
 	);
+
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_Z,
 			Act::Toggle(&input_status.slomo), 
@@ -94,7 +97,6 @@ void Operator::operateSimulation(IGameMode* simulation)
 			Act::Toggle(&input_status.pause),
 			Cond::keyPressed
 	);
-
 	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_RMB,
 			Act::Toggle(&input_status.zoom),
@@ -108,7 +110,6 @@ void Operator::operateSimulation(IGameMode* simulation)
 			EVENT_ID_MOUSE_LMB,
 			Act::Combinate(&input_status.trigger)
 	);
-
 }
 
 void Operator::disconnectSimulation()

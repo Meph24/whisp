@@ -65,8 +65,6 @@ class Zombie_World: public DrawServiceProvider, public IGameMode
 	void doLogic(const SimClock::time_point& t);
 	void doGraphics(const SimClock::time_point& t);
 
-	SimulationInputStatusSet::SignalChannel prev_reset_signal;
-
 public:
 
 

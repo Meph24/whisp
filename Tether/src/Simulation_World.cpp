@@ -47,7 +47,6 @@
 
 Simulation_World::Simulation_World(const WallClock& reference_clock, sf::Window * w)
 	: IGameMode(reference_clock)
-	, prev_reset_signal(SimulationInputStatusSet().restart)
 {
 	test=0;
 	CfgIO cfgio( "./res/config.txt" );
@@ -456,9 +455,8 @@ void Simulation_World::loop()
 	{
 		clock.setNextTargetRate(1.0);
 	}
-	if (input_status->restart != prev_reset_signal)
+	if (input_status->getStatusAndReset(input_status->restart))
 	{
-		prev_reset_signal = input_status->restart;
 		restart();
 	}
 	

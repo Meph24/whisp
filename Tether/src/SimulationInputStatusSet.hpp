@@ -4,43 +4,23 @@
 #include <array>
 using std::array;
 
-#define CONTROLINPUTSTATUSSET_MAXCONTROLS 256
-
-struct ControlInputStatusSet : public array<float, CONTROLINPUTSTATUSSET_MAXCONTROLS>
-{
-	ControlInputStatusSet();
-
-	using array::operator[];
-
-	float status(size_type ID);
-
-	void toggleCondition(size_type ID);
-	void setConditionTrue(size_type ID);
-	void setConditionFalse(size_type ID);
-
-	void setConditionORedTrue(size_type ID);//this works with multiple users (not thread safe) as long as they do not call these functions in an alternating pattern (true, false, true, false)
-	void setConditionORedFalse(size_type ID);//condition will be true when at least one user wants it to be true (condition=#true calls>#false calls)
-
-	float getStatusAndReset(int indx,float resetTo=0);//not thread safe; reset value
-};
-
 #include "glmutils.hpp"
 
-
+//this struct shall be kept sendable, that means no dynamic allocation and pointers allowed
 struct SimulationInputStatusSet
 {
 	using SignalChannel = unsigned short;
 
 	//stati
 	bool debug_screen_active;
-	SignalChannel restart;
-	SignalChannel inventory;
+	float restart;
+	float inventory;
 	float selection_up;
 	float selection_down;
 	bool draw_aabbs;
 	float go_up;
 	float go_down;
-	SignalChannel benchmark;
+	float benchmark;
 	bool slomo;
 	bool pause;
 	bool menu;
@@ -55,7 +35,7 @@ struct SimulationInputStatusSet
 	SimulationInputStatusSet()
 	: debug_screen_active(false)
 	, restart(0)
-	, inventory(0)
+	, inventory(0.0f)
 	, selection_up(0.0f)
 	, selection_down(0.0f)
 	, draw_aabbs(false)

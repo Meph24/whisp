@@ -23,8 +23,7 @@
 #include "BenchScenarioShotgun.h"
 
 BenchmarkManager::BenchmarkManager(IWorld* World)
-: prev_benchmark_signal(SimulationInputStatusSet().benchmark)
-, world(World)
+: world(World)
 , pm(2)
 {
 	{
@@ -81,6 +80,9 @@ BenchmarkManager::BenchmarkManager(IWorld* World)
 	assert(!asymScenarios.empty());
 }
 
+#include <iostream>
+using std::cout;
+
 void BenchmarkManager::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	IWorld * w=tsp->getIWorld();
@@ -88,10 +90,8 @@ void BenchmarkManager::tick(const SimClock::time_point& next_tick_begin, TickSer
 	assert(w);
 	assert(repeats>0);
 
-	if(prev_benchmark_signal != tsp->input_status->benchmark)
+	if(tsp->input_status->getStatusAndReset(tsp->input_status->benchmark) > 0)
 	{
-		prev_benchmark_signal = tsp->input_status->benchmark;
-
 		if(isInactivePhase())
 		{
 			init(w);//start benchmark
