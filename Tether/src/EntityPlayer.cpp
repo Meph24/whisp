@@ -277,32 +277,15 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 
 	spacevec oldPos=pos;
 
-	float m11 = cos((-cam->beta) / 360 * TAU);
-	float m12 = -sin((-cam->beta) / 360 * TAU);
-	float m21 = -m12;//sin
-	float m22 = m11;//cos
-
-	float frontVec = controlinputs.walk.z;
-	float rightVec = controlinputs.walk.x;
-
-	float movZ = -m11*frontVec+m12*rightVec;
-	float movX = -m21*frontVec+m22*rightVec;
-	vec3 wantedV = vec3(movX, 0.0f, movZ) * speed;
-
-	pos+=iw->fromMeters(wantedV)*time;
-	pos=it->clip(pos,true);
-	spacevec newPos=pos;
-	vec3 moved=iw->toMeters(newPos-oldPos);
-	if(glm::sqlen(moved) > 0.0000000001f)
+	vec3 wantedV = controlinputs.walk;
+	wantedV.z*=-1; //invert because someone thought it would be nice forward meaning negative
+	if(wantedV != vec3(0.0f))
 	{
-		vec3 norm=glm::normalize(moved);
-		float speedModA=(glm::length(vec3(norm.x,0,norm.z)));
-		vec3 flat=vec3(moved.x,0,moved.z);
-		float h=moved.y/glm::length(flat);
-		SpeedMod sm=SpeedMod();
-		float speedModB=sm.slowdownFromTerrain(h);
-		pos=it->clip(oldPos+iw->fromMeters(flat*speedModA*speedModB),true);
+		wantedV = cam->getNormal(wantedV);
 	}
+	pos+=iw->fromMeters(wantedV * speed )*time;
+
+	
 	if(time>0.0000000001f)
 		v=(pos-oldPos)/time;
 
