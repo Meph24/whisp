@@ -27,6 +27,8 @@ class ITexture;
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 
+#include "SimulationInputStatusSet.hpp"
+
 
 class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 {

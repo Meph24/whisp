@@ -207,11 +207,11 @@ void Zombie_World::doPhysics(const SimClock::time_point& next_tick_begin)
 
 void Zombie_World::loop()
 {
-	if(control_input_stati->status(STATUS_ID_PAUSE))
+	if(input_status->pause)
 	{	
 		clock.setNextTargetRate(0.0);
 	}
-	else if(control_input_stati->status(STATUS_ID_SLOMO)) 
+	else if(input_status->slomo)
 	{
 		clock.setNextTargetRate(0.1);
 	}
@@ -219,7 +219,7 @@ void Zombie_World::loop()
 	{
 		clock.setNextTargetRate(1.0);
 	}
-	if (control_input_stati->getStatusAndReset(STATUS_ID_RESTART))
+	if ( input_status->getStatusAndReset(input_status->restart))
 	{
 		restart();
 	}
@@ -329,7 +329,7 @@ void Zombie_World::doGraphics(const SimClock::time_point& t)
 {
 	IWorld * iw=getIWorld();
 
-	drawAABBs=control_input_stati->status(STATUS_ID_DRAW_AABBs)==1;
+	drawAABBs=input_status->draw_aabbs;
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
 	if (player->HP < 0)
 	{
@@ -341,7 +341,7 @@ void Zombie_World::doGraphics(const SimClock::time_point& t)
 		pmGraphics->registerTime(PM_GRAPHICS_OUTSIDE);
 		render(t);
 		pmGraphics->registerTime(PM_GRAPHICS_WORLD);
-		if(control_input_stati->status(STATUS_ID_DEBUG_SCREEN_ACTIVE))
+		if(input_status->debug_screen_active)
 		{
 			transformViewToGUI(1);
 			glColor3f(1, 0, 1);

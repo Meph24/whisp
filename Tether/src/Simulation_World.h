@@ -39,6 +39,7 @@ class BenchmarkManager;
 #define PM_LOGIC_CHUNKGEN 5
 #define PM_LOGIC_CHUNKMOVE 6
 
+#include "SimulationInputStatusSet.hpp"
 
 class Simulation_World: public DrawServiceProvider, public IGameMode
 {

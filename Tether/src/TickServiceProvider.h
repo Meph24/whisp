@@ -21,7 +21,7 @@ class ITerrain;
 
 #include <vector>
 #include <memory>
-#include "ControlInputStatusSet.hpp"
+#include "SimulationInputStatusSet.hpp"
 
 using std::unique_ptr;
 
@@ -35,7 +35,7 @@ public:
 	unsigned long long interactionCounter=0;//for benchmark purposes
 	unsigned long long arbitraryNumber=0;//for benchmark purposes
 
-	unique_ptr<ControlInputStatusSet> control_input_stati;
+	unique_ptr<SimulationInputStatusSet> input_status;
 
 	int tickID=0;
 	virtual ICamera3D * getHolderCamera()=0;//can return 0 if currently not held
