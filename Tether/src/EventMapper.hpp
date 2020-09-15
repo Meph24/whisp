@@ -57,12 +57,9 @@ namespace eventmapping
 		struct Toggle
 		{
 			bool* to_toggle;
-			Toggle(bool* to_toggle)
-				: to_toggle(to_toggle) {}
-
-			void toggle(bool& b) { b = (b)? false : true; }
-
-			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { toggle(*to_toggle); }
+			Toggle(bool* to_toggle);
+			void toggle(bool& b);
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
 
 		struct Combinate
@@ -70,14 +67,9 @@ namespace eventmapping
 			float* hold_group_accumulation_variable; //the status index that represents the status for the group of keys used together
 			float weight;
 
-			Combinate(float* hold_group_accumulation_variable)
-				: hold_group_accumulation_variable(hold_group_accumulation_variable)
-				, weight(1.0f) {}
-			Combinate(float* hold_group_accumulation_variable, float weight) 
-				: hold_group_accumulation_variable(hold_group_accumulation_variable)
-				, weight(weight) {}
-
-			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *hold_group_accumulation_variable += (e.value>0)? weight : -weight; }
+			Combinate(float* hold_group_accumulation_variable);
+			Combinate(float* hold_group_accumulation_variable, float weight);
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
 
 		struct AccumulateValue
@@ -85,21 +77,19 @@ namespace eventmapping
 			float* accumulation_variable;
 			float offset;
 
-			AccumulateValue(float* accumulation_variable) :  accumulation_variable(accumulation_variable), offset(0.0) {}
-			AccumulateValue(float* accumulation_variable, float offset) : accumulation_variable(accumulation_variable), offset(offset) {}
+			AccumulateValue(float* accumulation_variable);
+			AccumulateValue(float* accumulation_variable, float offset);
 
-			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *accumulation_variable += e.value + offset; }
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
 
 		struct Replace
 		{
 			float* replace_target;
 			float offset;
-
-			Replace(float* replace_target) :  replace_target(replace_target), offset(0.0) {}
-			Replace(float* replace_target, float offset) : replace_target(replace_target), offset(offset) {}
-
-			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *replace_target = (float)e.value + offset; }
+			Replace(float* replace_target);
+			Replace(float* replace_target, float offset);
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
 
 		typedef Replace Hold;

@@ -22,6 +22,28 @@ EventMapping::Condition operator! (const EventMapping::Condition& c0)
 	return [c0](EVENTMAPPING_FUNCTION_PARAMETERS)->bool{ return !c0(e, stati); };
 }
 
+
+eventmapping::actions::Toggle::Toggle(bool* to_toggle) : to_toggle(to_toggle) {}
+void eventmapping::actions::Toggle::toggle(bool& b) { b = (b)? false : true; }
+void eventmapping::actions::Toggle::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { toggle(*to_toggle); }
+
+
+eventmapping::actions::Combinate::Combinate(float* hold_group_accumulation_variable)
+	: hold_group_accumulation_variable(hold_group_accumulation_variable)
+	, weight(1.0f) {}
+eventmapping::actions::Combinate::Combinate(float* hold_group_accumulation_variable, float weight) 
+	: hold_group_accumulation_variable(hold_group_accumulation_variable)
+	, weight(weight) {}
+void eventmapping::actions::Combinate::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *hold_group_accumulation_variable += (e.value>0)? weight : -weight; }
+
+eventmapping::actions::Replace::Replace(float* replace_target) :  replace_target(replace_target), offset(0.0) {}
+eventmapping::actions::Replace::Replace(float* replace_target, float offset) : replace_target(replace_target), offset(offset) {}
+void eventmapping::actions::Replace::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *replace_target = (float)e.value + offset; }
+
+eventmapping::actions::AccumulateValue::AccumulateValue(float* accumulation_variable) :  accumulation_variable(accumulation_variable), offset(0.0) {}
+eventmapping::actions::AccumulateValue::AccumulateValue(float* accumulation_variable, float offset) : accumulation_variable(accumulation_variable), offset(offset) {}
+void eventmapping::actions::AccumulateValue::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *accumulation_variable += e.value + offset; }
+
 bool eventmapping::conditions::CALL_alwaysTrue(EVENTMAPPING_FUNCTION_PARAMETERS) { return true; }
 bool eventmapping::conditions::CALL_keyPressedCall(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
 bool eventmapping::conditions::CALL_keyReleasedCall(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; }
