@@ -17,7 +17,8 @@ using std::string;
 
 void Operator::operateSimulation(IGameMode* simulation)
 {
-	event_mapper.reset(new EventMapper(*simulation->control_input_stati));
+	SimulationInputStatusSet& input_status = *simulation->input_status;
+	event_mapper.reset(new EventMapper(input_status));
 	event_handler.reset(new EventHandler(simulation, event_mapper.get()));
 
 	using Act = EventMapping::actions;
@@ -25,88 +26,87 @@ void Operator::operateSimulation(IGameMode* simulation)
 
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_W, 
-		Act::Combinate(STATUS_ID_WALK_Z, 1.0f)
+		Act::Combinate(&input_status.walk.z, 1.0f)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_S, 
-		Act::Combinate(STATUS_ID_WALK_Z, -1.0f)
+		Act::Combinate(&input_status.walk.z, -1.0f)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_A, 
-		Act::Combinate(STATUS_ID_WALK_X, -1.0f)
+		Act::Combinate(&input_status.walk.x, -1.0f)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_D, 
-		Act::Combinate(STATUS_ID_WALK_X, 1.0f)
+		Act::Combinate(&input_status.walk.x, 1.0f)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_F3,
-		Act::Toggle(STATUS_ID_DEBUG_SCREEN_ACTIVE),
+		Act::Toggle(&input_status.debug_screen_active),
 		Cond::keyPressed
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_R,
-			Act::AccumulateValue(STATUS_ID_RESTART)
+			Act::SendSignal(&input_status.restart)
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_T,
-			Act::AccumulateValue(STATUS_ID_BENCHMARK)
+			Act::SendSignal(&input_status.benchmark)
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_E,
-			Act::AccumulateValue(STATUS_ID_INVENTORY)
+			Act::SendSignal(&input_status.inventory)
 	);
-
 	event_mapper->registerMapping( 
 			EVENT_ID_KEY_ARROW_UP,
-			Act::AccumulateValue(STATUS_ID_SELECTION_UP),
-			Cond::StatusAsCondition(CONDITION_SELECTION_ACTIVE, false)
+			Act::AccumulateValue(&input_status.selection_up),
+			Cond::StatusAsCondition(&input_status.selection_active, false)
 			);
 
 	event_mapper->registerMapping( 
 			EVENT_ID_KEY_ARROW_DOWN,
-			Act::AccumulateValue(STATUS_ID_SELECTION_DOWN),
-			Cond::StatusAsCondition(CONDITION_SELECTION_ACTIVE, false)
+			Act::AccumulateValue(&input_status.selection_down),
+			Cond::StatusAsCondition(&input_status.selection_active, false)
 			);
 
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_B,
-			Act::Toggle(STATUS_ID_DRAW_AABBs),
+			Act::Toggle(&input_status.draw_aabbs),
 			Cond::keyPressed
 	);
 	//TODO oh boy the terrain hack again ... please fix 'n replace (issue #35)
 	// why 2 status ids here is unclear, might be needed to be changed
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_SHIFT,
-			Act::Combinate(STATUS_ID_GO_UP, 1.0)
+			Act::Combinate(&input_status.go_up, 1.0)
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_CTRL,
-			Act::Combinate(STATUS_ID_GO_DOWN, 1.0)
+			Act::Combinate(&input_status.go_down, 1.0)
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_Z,
-			Act::Toggle(STATUS_ID_SLOMO), 
+			Act::Toggle(&input_status.slomo), 
 			Cond::keyPressed
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_KEY_P,
-			Act::Toggle(STATUS_ID_PAUSE),
+			Act::Toggle(&input_status.pause),
 			Cond::keyPressed
 	);
 
 	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_RMB,
-			Act::Toggle(STATUS_ID_ZOOM),
+			Act::Toggle(&input_status.zoom),
 			Cond::keyPressed
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_WHEEL,
-			Act::AccumulateValue(STATUS_ID_WEAPON_SWITCH)
+			Act::AccumulateValue(&input_status.weapon_switch)
 	);
 	event_mapper->registerMapping(
 			EVENT_ID_MOUSE_LMB,
-			Act::Combinate(STATUS_ID_TRIGGER)
+			Act::Combinate(&input_status.trigger)
 	);
 
 }

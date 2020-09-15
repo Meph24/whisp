@@ -6,6 +6,7 @@
  *     Version:	2.0
  */
 
+#include <GL/glew.h>
 #include "EntityPlayer.h"
 
 #include "glmutils.hpp"
@@ -28,8 +29,16 @@ using glm::vec3;
 #include "InteractFilterAlgoSym.h"
 #include "FloatSeconds.hpp"
 
-EntityPlayer::EntityPlayer(SimClock::time_point spawn_time,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed):
-speed(characterSpeed),heldItem(0),inventory(0)
+EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
+							spacevec startPos,
+							sf::Window * w,
+							float sensX,
+							float sensY,
+							float characterSpeed)
+	: speed(characterSpeed)
+	, heldItem(0)
+	, inventory(0)
+	, prev_inventory_signal(SimulationInputStatusSet().inventory)
 {
 	surviveClearing=true;
 	last_ticked=spawn_time;
@@ -188,9 +197,9 @@ spacevec EntityPlayer::getCamPos()
 #include "EventDefines.h"
 Frustum * EntityPlayer::newFrustumApplyPerspective(SimClock::time_point t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction)
 {
-	ControlInputStatusSet& controlinputs = *tsp->control_input_stati;
+	SimulationInputStatusSet& controlinputs = *(tsp->input_status);
 	float zoomMult=8;
-	float zoomed=controlinputs.status(STATUS_ID_ZOOM);
+	bool zoomed=controlinputs.zoom;
 	float zoomFactor=zoomed?zoomMult:1;
 	mouseInp->setSensitivityMultiplier(1.0f/zoomFactor);
 	cam->zoom=defaultZoom/zoomFactor;
@@ -237,15 +246,20 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	IWorld * iw=tsp->getIWorld();
 	ITerrain * it=tsp->getITerrain();
 
-	ControlInputStatusSet& controlinputs = *tsp->control_input_stati;
-	switchWeapon(controlinputs.getStatusAndReset(STATUS_ID_WEAPON_SWITCH));
+	SimulationInputStatusSet& controlinputs = *tsp->input_status;
+	switchWeapon(controlinputs.getStatusAndReset(controlinputs.weapon_switch));
 
-	if(controlinputs.getStatusAndReset(STATUS_ID_INVENTORY))
+	if(prev_inventory_signal != controlinputs.inventory)
 	{
+		prev_inventory_signal = controlinputs.inventory;
+
 		Item * temp=heldItem;//put inventory in hand or put it back
 		heldItem=inventory;
 		inventory=temp;
-		controlinputs.toggleCondition(CONDITION_SELECTION_ACTIVE);//TODO find out which is inventory and set value ORed accordingly
+
+		//this writes to controlinputs, which shall not be permitted in the future ( issue #36 )
+		//this line will need to go
+		controlinputs.toggleCondition(controlinputs.selection_active);//TODO find out which is inventory and set value ORed accordingly
 	}
 
 	if(heldItem) heldItem->tick(next_tick_begin, tsp);
@@ -269,8 +283,8 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	float m21 = -m12;//sin
 	float m22 = m11;//cos
 
-	float frontVec = controlinputs.status(STATUS_ID_WALK_Z);
-	float rightVec = controlinputs.status(STATUS_ID_WALK_X);
+	float frontVec = controlinputs.walk.z;
+	float rightVec = controlinputs.walk.x;
 
 	float movZ = -m11*frontVec+m12*rightVec;
 	float movX = -m21*frontVec+m22*rightVec;

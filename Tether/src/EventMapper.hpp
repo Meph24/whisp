@@ -23,7 +23,7 @@ using std::vector;
 
 #include "ControlInputStatusSet.hpp"
 
-#define EVENTMAPPING_FUNCTION_PARAMETERS EventHandler::event& e,ControlInputStatusSet& stati
+#define EVENTMAPPING_FUNCTION_PARAMETERS EventHandler::event& e, SimulationInputStatusSet& stati
 
 using EventMappingCondition = function <bool (EVENTMAPPING_FUNCTION_PARAMETERS)>;
 using EventMappingAction = function <void (EVENTMAPPING_FUNCTION_PARAMETERS)>;
@@ -54,16 +54,15 @@ struct EventMapping
 	
 		struct StatusAsCondition
 		{
-			int to_check_status;
+			bool* to_check;
 			bool expected;
 
-			StatusAsCondition(int to_check_status, bool expected)
-				: to_check_status(to_check_status), expected(expected) {}
+			StatusAsCondition(bool *to_check, bool expected)
+				: to_check(to_check), expected(expected) {}
 
 			bool operator()(EVENTMAPPING_FUNCTION_PARAMETERS) 
 			{ 
-				return (expected)? 
-					0 > 0.0 : 0 <= 0.0;
+				return (*to_check == expected);
 			}
 		};
 	};
@@ -72,65 +71,73 @@ struct EventMapping
 	{
 		struct Toggle
 		{
-			int to_toggle_status_index;
-			Toggle(int to_toggle_status_index) : to_toggle_status_index(to_toggle_status_index) {}
+			bool* to_toggle;
+			Toggle(bool* to_toggle)
+				: to_toggle(to_toggle) {}
 
-			void toggle(float& f) { f = (f > 0.0f)? 0.0f : 1.0f; }
+			void toggle(bool& b) { b = (b)? false : true; }
 
-			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { toggle( stati[to_toggle_status_index]); }
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { toggle(*to_toggle); }
 		};
 
 		struct Combinate
 		{
-			int hold_group_status_index; //the status index that represents the status for the group of keys used together
+			float* hold_group_accumulation_variable; //the status index that represents the status for the group of keys used together
 			float weight;
 
-			Combinate(int hold_group_status_index)
-				: hold_group_status_index(hold_group_status_index)
+			Combinate(float* hold_group_accumulation_variable)
+				: hold_group_accumulation_variable(hold_group_accumulation_variable)
 				, weight(1.0f) {}
-			Combinate(int hold_group_status_index, float weight) 
-				: hold_group_status_index(hold_group_status_index)
+			Combinate(float* hold_group_accumulation_variable, float weight) 
+				: hold_group_accumulation_variable(hold_group_accumulation_variable)
 				, weight(weight) {}
 
-			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { stati[hold_group_status_index] += (e.value>0)? weight : -weight; }
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *hold_group_accumulation_variable += (e.value>0)? weight : -weight; }
 		};
 
 		struct AccumulateValue
 		{
-			int status_index;
+			float* accumulation_variable;
 			float offset;
 
-			AccumulateValue(int status_index) : status_index(status_index), offset(0.0) {}
-			AccumulateValue(int status_index, float offset) : status_index(status_index), offset(offset) {}
+			AccumulateValue(float* accumulation_variable) :  accumulation_variable(accumulation_variable), offset(0.0) {}
+			AccumulateValue(float* accumulation_variable, float offset) : accumulation_variable(accumulation_variable), offset(offset) {}
 
-			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { stati[status_index] += e.value + offset; }
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *accumulation_variable += e.value + offset; }
 		};
 
-		struct GetValue
+		struct SendSignal
 		{
-			int status_index;
+			SimulationInputStatusSet::SignalChannel* signal_channel;
+			SendSignal(SimulationInputStatusSet::SignalChannel* signal_channel) : signal_channel(signal_channel) {}
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { ++(*signal_channel); };
+		};
+
+		struct Replace
+		{
+			float* replace_target;
 			float offset;
 
-			GetValue(int status_index) : status_index(status_index), offset(0.0) {}
-			GetValue(int status_index, float offset) : status_index(status_index), offset(offset) {}
+			Replace(float* replace_target) :  replace_target(replace_target), offset(0.0) {}
+			Replace(float* replace_target, float offset) : replace_target(replace_target), offset(offset) {}
 
-			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { stati[status_index] = e.value + offset; }
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *replace_target = (float)e.value + offset; }
 		};
 	};
 };
 
 class EventMapper
 {
-	ControlInputStatusSet* managed_stati;//the output/condition input
+	SimulationInputStatusSet* managed_stati;//the output/condition input
 public:
 	unordered_map<int, vector<EventMapping>> event_id_mappings;
 
 	PerformanceMeter pm;
 
-	EventMapper(ControlInputStatusSet& control_input_status_set);
-	void changeManaged(ControlInputStatusSet& control_input_status_set);
+	EventMapper(SimulationInputStatusSet& input_status_);
+	void changeManaged(SimulationInputStatusSet& input_status);
 
-	ControlInputStatusSet& stati();
+	SimulationInputStatusSet& stati();
 
 	void event(EventHandler::event& e);
 

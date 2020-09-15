@@ -27,6 +27,8 @@ class ITexture;
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 
+#include "ControlInputStatusSet.hpp"
+
 
 class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 {
@@ -60,6 +62,8 @@ public:
 
 	Item * heldItem;//to browse the inventory, "heldItem" is switched with "inventory"
 	Item * inventory;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
+
+	SimulationInputStatusSet::SignalChannel prev_inventory_signal;
 
 	EntityPlayer(SimClock::time_point spawn_time,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
 	~EntityPlayer();

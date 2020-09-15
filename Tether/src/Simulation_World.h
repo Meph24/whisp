@@ -39,6 +39,7 @@ class BenchmarkManager;
 #define PM_LOGIC_CHUNKGEN 5
 #define PM_LOGIC_CHUNKMOVE 6
 
+#include "ControlInputStatusSet.hpp"
 
 class Simulation_World: public DrawServiceProvider, public IGameMode
 {
@@ -80,6 +81,8 @@ class Simulation_World: public DrawServiceProvider, public IGameMode
 
 	int test;//TODO remove
 
+
+	SimulationInputStatusSet::SignalChannel prev_reset_signal;
 public:
 	Simulation_World(const WallClock& reference_clock, sf::Window * w);
 	~Simulation_World();

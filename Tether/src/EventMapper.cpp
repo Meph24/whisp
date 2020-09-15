@@ -2,8 +2,8 @@
 #include <iostream>
 #include "SFML/Window.hpp"
 
-EventMapper::EventMapper(ControlInputStatusSet& control_input_status_set)
-	: managed_stati(&control_input_status_set)
+EventMapper::EventMapper(SimulationInputStatusSet& input_status)
+	: managed_stati(&input_status)
 	, pm(1)
 {}
 

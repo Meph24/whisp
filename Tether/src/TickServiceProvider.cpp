@@ -13,7 +13,7 @@
 #include "EventMapper.hpp"
 
 TickServiceProvider::TickServiceProvider()
-	: control_input_stati(new ControlInputStatusSet())
+	: input_status(new SimulationInputStatusSet())
 {
 	threadDataMan=new ThreadDataManager(1);
 	sm=new SoundManager();

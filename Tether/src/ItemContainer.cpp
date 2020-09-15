@@ -203,16 +203,15 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 #include "EventDefines.h"
 void ItemContainer::tick(const SimClock::time_point& t, TickServiceProvider* tsp)
 {
-	ControlInputStatusSet& stati = *tsp->control_input_stati;
-	i64 selectAdd=stati.getStatusAndReset(STATUS_ID_SELECTION_DOWN);
-	selectAdd-=stati.getStatusAndReset(STATUS_ID_SELECTION_UP);
+	SimulationInputStatusSet& stati = *tsp->input_status;
+	i64 selectAdd=stati.getStatusAndReset(stati.selection_up);
+	selectAdd-=stati.getStatusAndReset(stati.selection_down);
 	if(items.size()<1) return;
 	while(selectAdd+selected<0) selectAdd+=items.size();
 	while(selectAdd+selected>=(i64)items.size()) selectAdd-=items.size();
 	selected=(u32)(selectAdd+selected);
 	if(selected<firstInList) firstInList=selected;
 	if(selected>=firstInList+maxListLen) firstInList=selected-maxListLen+1;
-
 }
 
 ItemContainer::~ItemContainer()

@@ -22,8 +22,10 @@
 #include "BenchScenarioUniformAsym.h"
 #include "BenchScenarioShotgun.h"
 
-BenchmarkManager::BenchmarkManager(IWorld* World):
-world(World),pm(2)
+BenchmarkManager::BenchmarkManager(IWorld* World)
+: prev_benchmark_signal(SimulationInputStatusSet().benchmark)
+, world(World)
+, pm(2)
 {
 	{
 		auto algo=new InteractFilterDefaultSym<BenchSym>();
@@ -85,8 +87,11 @@ void BenchmarkManager::tick(const SimClock::time_point& next_tick_begin, TickSer
 	assert(w==world);
 	assert(w);
 	assert(repeats>0);
-	if (tsp->control_input_stati->getStatusAndReset(STATUS_ID_BENCHMARK))
+
+	if(prev_benchmark_signal != tsp->input_status->benchmark)
 	{
+		prev_benchmark_signal = tsp->input_status->benchmark;
+
 		if(isInactivePhase())
 		{
 			init(w);//start benchmark
