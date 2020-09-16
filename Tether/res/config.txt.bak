@@ -1,18 +1,20 @@
 [graphics]
 resolutionX=1920
 resolutionY=1080
-renderDistance=12
-physicsDistance=12
+renderDistance=16
+physicsDistance=16
 chunkLoadRate=40
-terrainQuality=2.0
+terrainQuality=0.5
 maxRenderTime=120.0
 
 
 [test]
-zombies=5
+zombies=0
 zombieDist=50
-
 
 [input]
 sensitivityX=0.0431654676
 sensitivityY=0.0431654676
+
+[simulation]
+objects_count=64

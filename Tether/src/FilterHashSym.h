@@ -90,6 +90,7 @@ inline void FilterHashSym<PhysicsIF>::doChecks(PhysicsIF* me, Entity* meAsEntity
 		assert((high.z-low.z)<1000);
 		assert((high.y-low.y)<1000);
 		assert((high.x-low.x)<1000);
+		bool foundChunk=false;
 		for(gridInt z=low.z;z!=high.z+1;z++)
 		{
 			for(gridInt y=low.y;y!=high.y+1;y++)
@@ -114,10 +115,11 @@ inline void FilterHashSym<PhysicsIF>::doChecks(PhysicsIF* me, Entity* meAsEntity
 						}
 					}
 					vec.push_back(entry);
-					registeredNum++;
+					foundChunk=true;
 				}
 			}
 		}
+		if(foundChunk) registeredNum++;
 		duplicates.clear();
 	}
 }

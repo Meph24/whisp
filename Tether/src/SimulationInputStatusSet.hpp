@@ -26,6 +26,7 @@ struct SimulationInputStatusSet
 	float weapon_switch;
 	bool zoom;
 	bool clip;
+	bool verbose;
 	vec3 walk;
 
 	//this needs to go as it is assigned from the wrong direction as of now (issue #36)
@@ -45,6 +46,7 @@ struct SimulationInputStatusSet
 	, trigger(0.0f)
 	, weapon_switch(0.0f)
 	, zoom(false)
+	, verbose(false)
 	, walk(vec3(0.0f))
 	{}
 

@@ -146,6 +146,7 @@ void Zombie_World::render(const SimClock::time_point& t)
 void Zombie_World::init()
 {
 	IWorld * iw=getIWorld();
+	input_status->clip=true;
 
 	tps = new TexParamSet();
 	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -254,7 +255,7 @@ void Zombie_World::spawnZombie(const SimClock::time_point& t)
 	float maxDistMultiplier=1.2f;
 	float r2 = (((rand()%32768)/32768.0f)*(maxDistMultiplier-1)+ 1)*zombieDist;
 	iw->requestEntitySpawn(new Zombie_Enemy(t,zombieTex, player->pos+iw->fromMeters(vec3(sin(r1)*r2,0, cos(r1)*r2)),this));
-	std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
+	if(input_status->verbose) std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
 	for(int i=1;i<32;i++)
 	{
 		if (Zombie_Enemy::zombieCount>=zCount) return;
@@ -279,7 +280,7 @@ void Zombie_World::spawnZombie(const SimClock::time_point& t)
 		//float r4 = ((rand()%32768)/32768.0f)*4 + 5;
 
 //		cm->requestEntitySpawn(new Zombie_Tree(player->pos+cm->fromMeters(vec3(sin(r1)*r2+sin(i)*5,0,5*cos(i)+cos(r1)*r2)),1.2, r3, r4, tree, leaves));
-		std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
+		if(input_status->verbose) std::cout<<"zombie spawned, new zombie count:"<<Zombie_Enemy::zombieCount<<std::endl;
 	}
 }
 
@@ -308,9 +309,16 @@ void Zombie_World::drawGameOver()//TODO find new home
 	g->drawString(scoreString, -0.8f, 0.62f, 0.1f, 8);
 	revertView();
 }
-
+#include "InteractFilterAlgoAsym.h"
+#include "InteractFilterAlgoSym.h"
 void Zombie_World::doLogic(const SimClock::time_point& t)
 {
+	IWorld * iw=getIWorld();
+	iw->verbose=input_status->verbose;
+	iw->projectileAlgo->verbose=iw->verbose;
+	iw->collideAlgo->verbose=iw->verbose;
+	iw->pushAlgo->verbose=iw->verbose;
+
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
 	player->guns[player->currentGun]->tick(t,player->cam,player,shot,*getIWorld());

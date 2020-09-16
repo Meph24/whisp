@@ -41,7 +41,7 @@ void Projectile::interact(Entity* self, DualPointer<Hittable> other, float time,
 void Projectile::retick(TickServiceProvider* tsp)
 {
 	int size=collisions.size();
-	std::cout<<"before:"<<std::endl;
+//	std::cout<<"before:"<<std::endl;
 	//for(int i=0;i<size;i++)
 	//{
 	//	std::cout<<collisions[i].location<<"  "<<collisions[i].originChunk.x.intpart<<";"<<collisions[i].originChunk.z.intpart<<"    "<<collisions[i].hitVictim.e<<std::endl;

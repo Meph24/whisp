@@ -92,6 +92,7 @@ inline void FilterHashAsym<MasterIF, SlaveIF>::doChecks(MasterIF* me,Entity* meA
 		assert((high.z-low.z)<1000);
 		assert((high.y-low.y)<1000);
 		assert((high.x-low.x)<1000);
+		bool foundChunk=false;
 		for(gridInt z=low.z;z!=high.z+1;z++)
 		{
 			for(gridInt y=low.y;y!=high.y+1;y++)
@@ -116,10 +117,11 @@ inline void FilterHashAsym<MasterIF, SlaveIF>::doChecks(MasterIF* me,Entity* meA
 						}
 					}
 					tableM[chunkCoo(x,y,z)].push_back(entry);
-					registeredNumM++;
+					foundChunk=true;
 				}
 			}
 		}
+		if(foundChunk) registeredNumM++;
 		duplicates.clear();
 	}
 }
@@ -131,6 +133,7 @@ inline void FilterHashAsym<MasterIF, SlaveIF>::doChecks(SlaveIF* me,Entity* meAs
 	bool isMultichunk=entry.e.e->bb.isMultichunk();
 	chunkCoo low(entry.e.e->bb.low);
 	potentialChecks+=registeredNumS;
+	bool foundChunk=false;
 	if(!isMultichunk)
 	{
 		std::vector<InteractFilterEntry<MasterIF>>& vec=tableM[low];
@@ -139,7 +142,7 @@ inline void FilterHashAsym<MasterIF, SlaveIF>::doChecks(SlaveIF* me,Entity* meAs
 			check(elem,entry,tsp);
 		}
 		tableS[low].push_back(entry);
-		registeredNumM++;
+		registeredNumS++;
 	}
 	else
 	{
@@ -171,10 +174,11 @@ inline void FilterHashAsym<MasterIF, SlaveIF>::doChecks(SlaveIF* me,Entity* meAs
 						}
 					}
 					tableS[chunkCoo(x,y,z)].push_back(entry);
-					registeredNumS++;
+					foundChunk=true;
 				}
 			}
 		}
+		if(foundChunk) registeredNumS++;
 		duplicates.clear();
 	}
 }
