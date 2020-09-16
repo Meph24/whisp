@@ -18,8 +18,6 @@ struct SimulationInputStatusSet
 	float selection_up;
 	float selection_down;
 	bool draw_aabbs;
-	float go_up;
-	float go_down;
 	float benchmark;
 	bool slomo;
 	bool pause;
@@ -27,6 +25,7 @@ struct SimulationInputStatusSet
 	float trigger;
 	float weapon_switch;
 	bool zoom;
+	bool clip;
 	vec3 walk;
 
 	//this needs to go as it is assigned from the wrong direction as of now (issue #36)
@@ -39,8 +38,6 @@ struct SimulationInputStatusSet
 	, selection_up(0.0f)
 	, selection_down(0.0f)
 	, draw_aabbs(false)
-	, go_up(0.0f)
-	, go_down(0.0f)
 	, benchmark(0)
 	, slomo(false)
 	, pause(false)
