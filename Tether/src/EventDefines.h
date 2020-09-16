@@ -21,6 +21,7 @@
 #define EVENT_ID_KEY_T (1024+('T'-'A'))
 #define EVENT_ID_KEY_P (1024+('P'-'A'))
 #define EVENT_ID_KEY_Z (1024+('Z'-'A'))
+#define EVENT_ID_KEY_C (1024+('C'-'A'))
 #define EVENT_ID_KEY_ARROW_UP 1097
 #define EVENT_ID_KEY_ARROW_DOWN 1098
 #define EVENT_ID_KEY_SHIFT 1062

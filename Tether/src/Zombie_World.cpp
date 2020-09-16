@@ -312,7 +312,6 @@ void Zombie_World::drawGameOver()//TODO find new home
 void Zombie_World::doLogic(const SimClock::time_point& t)
 {
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
-//	const SimClock::time_point& t=tm.masterUpdate();
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
 	player->guns[player->currentGun]->tick(t,player->cam,player,shot,*getIWorld());
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);

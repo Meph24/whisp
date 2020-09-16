@@ -106,6 +106,11 @@ void Operator::operateSimulation(IGameMode* simulation)
 		EVENT_ID_MOUSE_LMB,
 		Act::Combinate(&input_status.trigger)
 	);
+	event_mapper->registerMapping(
+		EVENT_ID_KEY_C,
+		Act::Toggle(&input_status.clip),
+		Cond::keyPressed
+	);
 }
 
 void Operator::disconnectSimulation()

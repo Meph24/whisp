@@ -504,12 +504,7 @@ void Simulation_World::drawGameOver()//TODO find new home
 
 void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 {
-	IWorld * iw=getIWorld();
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
-	//Timestamp t=tm.masterUpdate();
-
-	static SimClock::time_point last_call;
-
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
 	player->guns[player->currentGun]->tick(next_tick_begin, player->cam,player,shot,*getIWorld());
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
@@ -518,12 +513,7 @@ void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 	pmLogic->registerTime(PM_LOGIC_PHYSICS);
 	getITerrain()->postTickTerrainCalcs(this,player->pos);
 	pmLogic->registerTime(PM_LOGIC_CHUNKGEN);
-	float time_since_last_call = (float) FloatSeconds ( next_tick_begin - last_call );
-	td->height+=iw->fromMeters(input_status->go_up * time_since_last_call * player->speed);
-	td->height-=iw->fromMeters(input_status->go_down * time_since_last_call * player->speed);
 	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);//TODO fix perf measurements
-
-	last_call = next_tick_begin;
 }
 
 void Simulation_World::doGraphics(const SimClock::time_point& t)
