@@ -13,44 +13,25 @@ using SignalCounter = std::uint16_t;
 //this struct shall be kept sendable, that means no dynamic allocation and pointers allowed
 struct SimulationInputStatusSet
 {
-
 	//stati
-	bool debug_screen_active;
-	float restart;
-	SignalCounter inventory;
-	SignalCounter selection_up;
-	SignalCounter selection_down;
-	bool draw_aabbs;
-	float benchmark;
-	bool slomo;
-	bool pause;
-	bool menu;
-	float trigger;
-	float weapon_switch;
-	bool zoom;
-	bool clip;
-	vec3 walk;
+	bool debug_screen_active = false;
+	float restart = 0.0;
+	SignalCounter inventory = 0;
+	SignalCounter selection_up = 0;
+	SignalCounter selection_down = 0;
+	bool draw_aabbs = false;
+	float benchmark = 0.0;
+	bool slomo = false;
+	bool pause = false;
+	bool menu = false;
+	float trigger = 0.0f;
+	float weapon_switch = 0.0f;
+	bool zoom = false;
+	bool clip = 1;
+	vec3 walk = vec3(0.0f);
 
 	//this needs to go as it is assigned from the wrong direction as of now (issue #36)
-	bool selection_active;
-
-	SimulationInputStatusSet()
-	: debug_screen_active(false)
-	, restart(0)
-	, inventory(0.0f)
-	, selection_up(0.0f)
-	, selection_down(0.0f)
-	, draw_aabbs(false)
-	, benchmark(0)
-	, slomo(false)
-	, pause(false)
-	, menu(false)
-	, trigger(0.0f)
-	, weapon_switch(0.0f)
-	, zoom(false)
-	, walk(vec3(0.0f))
-	{}
-
+	bool selection_active = 0;
 
 	//these methods probably need to go, as they participate in writing to this status-set
 	// from the wrong side ( issue #36 )
