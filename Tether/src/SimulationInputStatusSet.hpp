@@ -6,7 +6,9 @@ using std::array;
 
 #include "glmutils.hpp"
 
-using SignalCounter = unsigned int;
+#include <cstdint>
+
+using SignalCounter = std::uint16_t;
 
 //this struct shall be kept sendable, that means no dynamic allocation and pointers allowed
 struct SimulationInputStatusSet
