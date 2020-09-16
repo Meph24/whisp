@@ -89,50 +89,6 @@ void ItemContainer::insertR(Item* it)
 	}
 }
 
-/*
-#include <iostream>
-#include <string>
-
-
-
-#include <filesystem>
-namespace fs = std::filesystem;
-#define FS_SUPPORT "native"
-
-    //#include <experimental/filesystem>
-    //namespace fs = std::experimental::filesystem;
-    //#define FS_SUPPORT "experimental"
-
-    //#define FS_SUPPORT "not supported"
-
-using std::cout;
-using std::string;
-
-int fuck (int argc , char** argv)
-{
-    cout << "Filesystem library support status : " << FS_SUPPORT << '\n';
-
-    if(FS_SUPPORT == "not_supported") return 1;
-
-    fs::path p0;
-    p0 = "/home/meph/Documents";
-
-    cout << p0    << " "
-                << ((fs::exists(p0))?"exists": "does not exists")
-                << " and is " << (fs::is_directory(p0)? "a directory":"not a")
-                << " directory!" << "\n\nIt has following content:\nFlat:\n";
-    for(auto& e : fs::directory_iterator(p0))
-    {
-        cout << e << '\n';
-    }
-//    cout << "Recursive:\n";
-//    for(auto& e : fs::recursive_directory_iterator(p0))
-//    {
-//        cout << e << '\n';
-//    }
-    return 0;
-}
-*/
 #include "ShortNames.h"
 #include "WarnErrReporter.h"
 #include <iostream>
