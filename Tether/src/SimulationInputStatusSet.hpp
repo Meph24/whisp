@@ -15,7 +15,7 @@ struct SimulationInputStatusSet
 {
 	//stati
 	bool debug_screen_active = false;
-	float restart = 0.0;
+	SignalCounter restart = 0;
 	SignalCounter inventory = 0;
 	SignalCounter selection_up = 0;
 	SignalCounter selection_down = 0;

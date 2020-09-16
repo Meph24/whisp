@@ -30,6 +30,7 @@ class WorldDefault;
 #define PM_LOGIC_EVAL 5
 #define PM_LOGIC_CHUNKMOVE 6
 
+#include "SimulationInputStatusSet.hpp"
 
 class Zombie_World: public DrawServiceProvider, public IGameMode
 {
@@ -60,7 +61,10 @@ class Zombie_World: public DrawServiceProvider, public IGameMode
 	void render(const SimClock::time_point& t);
 	void doPhysics(const SimClock::time_point& t);
 	void spawnZombie(const SimClock::time_point& t);
+
+	SignalCounter prev_restart_signal = 0;
 	void restart();
+
 	void drawGameOver();
 	void doLogic(const SimClock::time_point& t);
 	void doGraphics(const SimClock::time_point& t);

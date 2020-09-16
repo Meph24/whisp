@@ -54,7 +54,7 @@ void Operator::operateSimulation(IGameMode* simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_R,
-		Act::AccumulateValue(&input_status.restart)
+		Act::SendSignal(&input_status.restart)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_T,

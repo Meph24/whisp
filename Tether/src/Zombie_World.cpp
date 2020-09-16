@@ -220,8 +220,9 @@ void Zombie_World::loop()
 	{
 		clock.setNextTargetRate(1.0);
 	}
-	if ( input_status->getStatusAndReset(input_status->restart))
+	if( prev_restart_signal != input_status->restart )
 	{
+		prev_restart_signal = input_status->restart;
 		restart();
 	}
 	SimClock::time_point sim_tick_begin = clock.tick();

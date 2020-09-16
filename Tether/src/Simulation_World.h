@@ -74,7 +74,10 @@ class Simulation_World: public DrawServiceProvider, public IGameMode
 
 	void render(const SimClock::time_point& t);
 	void doPhysics(const SimClock::time_point& t);
+
+	SignalCounter prev_restart_signal = 0;
 	void restart();
+
 	void drawGameOver();
 	void doLogic(const SimClock::time_point& t);
 	void doGraphics(const SimClock::time_point& t);

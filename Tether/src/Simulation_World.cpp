@@ -455,8 +455,9 @@ void Simulation_World::loop()
 	{
 		clock.setNextTargetRate(1.0);
 	}
-	if (input_status->getStatusAndReset(input_status->restart))
+	if( prev_restart_signal != input_status->restart )
 	{
+		prev_restart_signal = input_status->restart;
 		restart();
 	}
 	
