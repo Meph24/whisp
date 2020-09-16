@@ -27,10 +27,14 @@ class InteractFilterAlgoAsym;
 
 #include <vector>
 
+#include "SimulationInputStatusSet.hpp"
+
 class BenchmarkManager: public Tickable
 {
 	IWorld * world;
 	PerformanceMeter pm;
+
+	SignalCounter prev_benchmark_signal = 0;
 
 	void nextPhase();
 	 void nextAlgo();

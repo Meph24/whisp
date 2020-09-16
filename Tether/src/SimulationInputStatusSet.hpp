@@ -20,7 +20,7 @@ struct SimulationInputStatusSet
 	SignalCounter selection_up = 0;
 	SignalCounter selection_down = 0;
 	bool draw_aabbs = false;
-	float benchmark = 0.0;
+	SignalCounter benchmark = 0.0;
 	bool slomo = false;
 	bool pause = false;
 	bool menu = false;

@@ -90,8 +90,9 @@ void BenchmarkManager::tick(const SimClock::time_point& next_tick_begin, TickSer
 	assert(w);
 	assert(repeats>0);
 
-	if(tsp->input_status->getStatusAndReset(tsp->input_status->benchmark) > 0)
+	if(prev_benchmark_signal != tsp->input_status->benchmark)
 	{
+		prev_benchmark_signal = tsp->input_status->benchmark;
 		if(isInactivePhase())
 		{
 			init(w);//start benchmark
