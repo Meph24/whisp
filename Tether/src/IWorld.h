@@ -44,6 +44,9 @@ protected:
 
 	void resetAlgos(TickServiceProvider& tsp);
 public:
+
+	bool verbose;
+
 	InteractFilterAlgoSym<Pushable>* pushAlgo=0;
 	InteractFilterAlgoAsym<Projectile,Hittable>* projectileAlgo=0;
 	InteractFilterAlgoSym<Collider>* collideAlgo=0;

@@ -9,5 +9,5 @@
 #include "IGameMode.h"
 
 IGameMode::IGameMode(const WallClock& reference_clock)
-	: clock(reference_clock, /* rate */ 0.0f, 1s, 40ms)
+	: clock(reference_clock, /* rate */ 0.0f, 200ms, 20ms)
 {}

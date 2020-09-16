@@ -54,7 +54,6 @@ template<typename PhysicsIF>
 inline void FilterBoxSortSym<PhysicsIF>::evaluationPhase(TickServiceProvider& tsp)
 {
 	if(registered.empty()) return;
-	srand(42);
 	b.buildTree(registered.size(),this->verbose);
 	for(InteractFilterEntry<PhysicsIF> fe: registered)
 	{

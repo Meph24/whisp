@@ -106,6 +106,11 @@ void Operator::operateSimulation(IGameMode* simulation)
 		EVENT_ID_KEY_C,
 		Act::Toggle(&input_status.clip)
 	);
+	event_mapper->registerMapping(
+		EVENT_ID_KEY_V,
+		Act::Toggle(&input_status.verbose),
+		Cond::keyPressed
+	);
 }
 
 void Operator::disconnectSimulation()

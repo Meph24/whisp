@@ -27,7 +27,8 @@ struct SimulationInputStatusSet
 	float trigger = 0.0f;
 	float weapon_switch = 0.0f;
 	bool zoom = false;
-	bool clip = 1;
+	bool clip = false;
+	bool verbose = false;
 	vec3 walk = vec3(0.0f);
 
 	//this needs to go as it is assigned from the wrong direction as of now (issue #36)

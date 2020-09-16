@@ -34,7 +34,7 @@ attached(attachedTo)
 	sound.setPitch(pitch);
 	sound.setAttenuation(0.5f);
 	playSoon=true;
-	std::cout<<"sound created"<<std::endl;
+//	std::cout<<"sound created"<<std::endl;
 }
 
 void EntitySound::notifyRemoval(Entity* e)
@@ -57,7 +57,7 @@ void EntitySound::draw(const SimClock::time_point& draw_time, Frustum* viewFrust
 	if(playSoon)
 	{
 		sound.play();
-		std::cout<<"SOUND PLAY"<<std::endl;
+//		std::cout<<"SOUND PLAY"<<std::endl;
 		playSoon=false;
 	}
 }
@@ -72,7 +72,7 @@ void EntitySound::tick(const SimClock::time_point& next_tick_begin, TickServiceP
 	last_ticked = next_tick_begin;
 	if((!playSoon)&&sound.getStatus()==sf::Sound::Status::Stopped)
 	{
-		std::cout<<"sound request destroy"<<std::endl;
+//		std::cout<<"sound request destroy"<<std::endl;
 		requestDestroy(tsp->getIWorld());
 	}
 }
@@ -80,11 +80,11 @@ void EntitySound::tick(const SimClock::time_point& next_tick_begin, TickServiceP
 EntitySound::~EntitySound()
 {
 	if(attached) attached->unfollow(this);
-	if(sound.getStatus()==sf::Sound::Status::Playing)
-		std::cout<<"sound destroyed while playing"<<std::endl;
-	else if(playSoon)
-		std::cout<<"sound destroyed while waiting for draw"<<std::endl;
-	else
-		std::cout<<"sound destroyed normally"<<std::endl;
+//	if(sound.getStatus()==sf::Sound::Status::Playing)
+//		std::cout<<"sound destroyed while playing"<<std::endl;
+//	else if(playSoon)
+//		std::cout<<"sound destroyed while waiting for draw"<<std::endl;
+//	else
+//		std::cout<<"sound destroyed normally"<<std::endl;
 }
 

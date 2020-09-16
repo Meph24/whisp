@@ -40,7 +40,11 @@ MainApp::MainApp()
 
 
 	op.reset(new Operator(clock, "Dwengine", x, y, settings));
-	sim.reset(new Simulation_World(clock, &op->window));
+
+	int zombies=*cfg.getInt("test","zombies");
+	if(zombies>0) sim.reset(new Zombie_World(clock, &op->window));
+	else sim.reset(new Simulation_World(clock, &op->window));
+
 	op->operateSimulation(sim.get());
 }
 
