@@ -62,18 +62,19 @@ void Operator::operateSimulation(IGameMode* simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_E,
-		Act::AccumulateValue(&input_status.inventory)
+		Act::SendSignal(&input_status.inventory),
+		Cond::keyPressed
 	);
 	event_mapper->registerMapping( 
 		EVENT_ID_KEY_ARROW_UP,
-		Act::AccumulateValue(&input_status.selection_up),
-		Cond::StatusAsCondition(&input_status.selection_active, true)
+		Act::SendSignal(&input_status.selection_up),
+		Cond::statusAsCondition(&input_status.selection_active, true) && Cond::keyPressed
 	);
 
 	event_mapper->registerMapping( 
 		EVENT_ID_KEY_ARROW_DOWN,
-		Act::AccumulateValue(&input_status.selection_down),
-		Cond::StatusAsCondition(&input_status.selection_active, true)
+		Act::SendSignal(&input_status.selection_down),
+		Cond::StatusAsCondition(&input_status.selection_active, true) && Cond::keyPressed
 	);
 
 	event_mapper->registerMapping(

@@ -35,6 +35,8 @@ class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 	void setTP(bool on);
 
 	bool isPerspective=false;
+
+	SignalCounter prev_inventory_signal;
 public:
 
 	float defaultZoom=1;
@@ -82,6 +84,7 @@ public:
 
 	void switchWeapon(int dir);
 	void trigger(bool pulled, SimClock::time_point now,ITexture * tex,IWorld& iw);
+
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */

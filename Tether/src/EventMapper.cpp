@@ -23,13 +23,13 @@ EventMapping::Condition operator! (const EventMapping::Condition& c0)
 }
 
 
-eventmapping::actions::Toggle::Toggle(bool* to_toggle, eventmapping::actions::Toggle::Trigger trigger) : trigger(trigger), to_toggle(to_toggle){}
+eventmapping::actions::Toggle::Toggle(bool* to_toggle, eventmapping::actions::KeyTrigger trigger) : to_toggle(to_toggle), trigger(trigger){}
 void eventmapping::actions::Toggle::toggle(bool& b) { b = (b)? false : true; }
 void eventmapping::actions::Toggle::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) 
 {
 	if(	
-			((trigger & eventmapping::actions::Toggle::Trigger::on_key_press) && e.value > 0.0)
-		||	((trigger & eventmapping::actions::Toggle::Trigger::on_key_release) && e.value <= 0)
+			((trigger & eventmapping::actions::KeyTrigger::on_key_press) && e.value > 0.0)
+		||	((trigger & eventmapping::actions::KeyTrigger::on_key_release) && e.value <= 0)
 	) 
 	toggle(*to_toggle); 
 }
@@ -51,6 +51,13 @@ eventmapping::actions::AccumulateValue::AccumulateValue(float* accumulation_vari
 eventmapping::actions::AccumulateValue::AccumulateValue(float* accumulation_variable, float offset) : accumulation_variable(accumulation_variable), offset(offset) {}
 void eventmapping::actions::AccumulateValue::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *accumulation_variable += e.value + offset; }
 
+eventmapping::actions::SendSignal::SendSignal(SignalCounter* signal_counter) : signal_counter(signal_counter) {}
+void eventmapping::actions::SendSignal::sendSignal(SignalCounter* signal_counter) { (*signal_counter)++; }
+void eventmapping::actions::SendSignal::operator()(EVENTMAPPING_FUNCTION_PARAMETERS)
+{
+	sendSignal(signal_counter); 
+}
+
 bool eventmapping::conditions::CALL_alwaysTrue(EVENTMAPPING_FUNCTION_PARAMETERS) { return true; }
 bool eventmapping::conditions::CALL_keyPressedCall(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
 bool eventmapping::conditions::CALL_keyReleasedCall(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; }
@@ -63,6 +70,7 @@ eventmapping::conditions::StatusAsCondition::StatusAsCondition(bool* to_check, b
 	: to_check(to_check), expected(expected) {}
 bool eventmapping::conditions::StatusAsCondition::operator()( EVENTMAPPING_FUNCTION_PARAMETERS )
 { return *to_check == expected; } 
+
 
 
 EventMapping::Condition eventmapping::conditions::eventValueEquals(float expected) { return EventMapping::Condition(EventValueEquals(expected)); }

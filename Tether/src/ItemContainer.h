@@ -13,12 +13,14 @@
 
 #include "Item.h"
 
+#include "SimulationInputStatusSet.hpp"
+
 class ItemContainer: public Item
 {
 	unsigned int selected=0;//item slot selected
 	unsigned int firstInList=0;//item on top of scrollable list
 
-
+	SignalCounter prev_selection_up, prev_selection_down;
 
 protected:
 	const u32 maxListLen=32;

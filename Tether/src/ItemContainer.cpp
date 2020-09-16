@@ -12,13 +12,10 @@
 #include "EventMapper.hpp"
 #include "Graphics2D.h"
 
-ItemContainer::ItemContainer():
-items()
-{
-
-	// TODO Auto-generated constructor stub
-
-}
+ItemContainer::ItemContainer()
+: prev_selection_up(SimulationInputStatusSet().selection_up)
+, prev_selection_down(SimulationInputStatusSet().selection_down)
+{}
 
 u32 ItemContainer::maximumAdd(Item* item)
 {
@@ -160,8 +157,10 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 void ItemContainer::tick(const SimClock::time_point& t, TickServiceProvider* tsp)
 {
 	SimulationInputStatusSet& stati = *tsp->input_status;
-	i64 selectAdd=stati.getStatusAndReset(stati.selection_down);
-	selectAdd-=stati.getStatusAndReset(stati.selection_up);
+	i64 selectAdd = stati.selection_down - prev_selection_down;
+	selectAdd -= stati.selection_up - prev_selection_up;
+	if(stati.selection_up != prev_selection_up)stati.selection_up = prev_selection_up;
+	if(stati.selection_down != prev_selection_down)stati.selection_down = prev_selection_down;
 	if(items.size()<1) return;
 	while(selectAdd+selected<0) selectAdd+=items.size();
 	while(selectAdd+selected>=(i64)items.size()) selectAdd-=items.size();

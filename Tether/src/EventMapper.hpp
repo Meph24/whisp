@@ -54,17 +54,19 @@ namespace eventmapping
 {
 	namespace actions
 	{
+		enum KeyTrigger
+		{ 
+			on_key_press = 1,
+			on_key_release = 2, 
+			on_key_press_or_release = 3, 
+			NUM_KEYTRIGGER
+		};
+
 		struct Toggle
 		{
-			enum Trigger
-			{ 
-				on_key_press = 1,
-				on_key_release = 2, 
-				on_key_press_or_release = 3, 
-				NUM_TRIGGER
-			}trigger;
 			bool* to_toggle;
-			Toggle(bool* to_toggle, Trigger trigger = Trigger::on_key_press);
+			KeyTrigger trigger;
+			Toggle(bool* to_toggle, KeyTrigger trigger = KeyTrigger::on_key_press);
 			void toggle(bool& b);
 			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
@@ -100,6 +102,14 @@ namespace eventmapping
 		};
 
 		typedef Replace Hold;
+
+		struct SendSignal
+		{
+			SignalCounter* signal_counter;
+			SendSignal(SignalCounter* signal_counter);
+			void sendSignal(SignalCounter* signal_counter);
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
+		};
 	} /* namespace actions */
 
 	namespace conditions

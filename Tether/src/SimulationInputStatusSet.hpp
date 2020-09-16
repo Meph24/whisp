@@ -6,17 +6,18 @@ using std::array;
 
 #include "glmutils.hpp"
 
+using SignalCounter = unsigned int;
+
 //this struct shall be kept sendable, that means no dynamic allocation and pointers allowed
 struct SimulationInputStatusSet
 {
-	using SignalChannel = unsigned short;
 
 	//stati
 	bool debug_screen_active;
 	float restart;
-	float inventory;
-	float selection_up;
-	float selection_down;
+	SignalCounter inventory;
+	SignalCounter selection_up;
+	SignalCounter selection_down;
 	bool draw_aabbs;
 	float benchmark;
 	bool slomo;

@@ -37,7 +37,8 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 							float sensX,
 							float sensY,
 							float characterSpeed)
-	: speed(characterSpeed)
+	: prev_inventory_signal(SimulationInputStatusSet().inventory) 
+	, speed(characterSpeed)
 	, heldItem(0)
 	, inventory(0)
 {
@@ -250,8 +251,10 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	SimulationInputStatusSet& controlinputs = *tsp->input_status;
 	switchWeapon(controlinputs.getStatusAndReset(controlinputs.weapon_switch));
 
-	if(controlinputs.getStatusAndReset(controlinputs.inventory))
+	if(prev_inventory_signal != controlinputs.inventory)
 	{
+		prev_inventory_signal = controlinputs.inventory;
+
 		Item * temp=heldItem;//put inventory in hand or put it back
 		heldItem=inventory;
 		inventory=temp;
