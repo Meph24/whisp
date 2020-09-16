@@ -9,6 +9,7 @@ maxRenderTime=120.0
 
 
 [test]
+zombie_mode=0
 zombies=0
 zombieDist=50
 
@@ -17,4 +18,4 @@ sensitivityX=0.0431654676
 sensitivityY=0.0431654676
 
 [simulation]
-objects_count=64
+objects_count=0
