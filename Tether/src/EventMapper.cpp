@@ -23,9 +23,16 @@ EventMapping::Condition operator! (const EventMapping::Condition& c0)
 }
 
 
-eventmapping::actions::Toggle::Toggle(bool* to_toggle) : to_toggle(to_toggle) {}
+eventmapping::actions::Toggle::Toggle(bool* to_toggle, eventmapping::actions::Toggle::Trigger trigger) : trigger(trigger), to_toggle(to_toggle){}
 void eventmapping::actions::Toggle::toggle(bool& b) { b = (b)? false : true; }
-void eventmapping::actions::Toggle::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { toggle(*to_toggle); }
+void eventmapping::actions::Toggle::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) 
+{
+	if(	
+			((trigger & eventmapping::actions::Toggle::Trigger::on_key_press) && e.value > 0.0)
+		||	((trigger & eventmapping::actions::Toggle::Trigger::on_key_release) && e.value <= 0)
+	) 
+	toggle(*to_toggle); 
+}
 
 
 eventmapping::actions::Combinate::Combinate(float* hold_group_accumulation_variable)

@@ -50,8 +50,7 @@ void Operator::operateSimulation(IGameMode* simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_F3,
-		Act::Toggle(&input_status.debug_screen_active),
-		Cond::keyPressed
+		Act::Toggle(&input_status.debug_screen_active)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_R,
@@ -79,24 +78,20 @@ void Operator::operateSimulation(IGameMode* simulation)
 
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_B,
-		Act::Toggle(&input_status.draw_aabbs),
-		Cond::keyPressed
+		Act::Toggle(&input_status.draw_aabbs)
 	);
 
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_Z,
-		Act::Toggle(&input_status.slomo), 
-		Cond::keyPressed
+		Act::Toggle(&input_status.slomo)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_P,
-		Act::Toggle(&input_status.pause),
-		Cond::keyPressed
+		Act::Toggle(&input_status.pause)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_MOUSE_RMB,
-		Act::Toggle(&input_status.zoom),
-		Cond::keyPressed
+		Act::Toggle(&input_status.zoom)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_MOUSE_WHEEL,
@@ -108,8 +103,7 @@ void Operator::operateSimulation(IGameMode* simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_C,
-		Act::Toggle(&input_status.clip),
-		Cond::keyPressed
+		Act::Toggle(&input_status.clip)
 	);
 }
 
