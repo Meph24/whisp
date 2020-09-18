@@ -28,6 +28,11 @@ class ITexture;
 #include <SFML/Audio.hpp>
 
 #include "SimulationInputStatusSet.hpp"
+#include <memory>
+#include <vector>
+
+using std::unique_ptr;
+using std::vector;
 
 
 class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
@@ -57,10 +62,8 @@ public:
 	float speed=0;
 	float hitmark=0;
 
-	//TODO replace this section
-	int wCount;
-	Zombie_Gun ** guns;
-	int currentGun=0;
+	vector<unique_ptr<Zombie_Gun>> guns;
+	Zombie_Gun* current_gun = nullptr;
 
 	Item * heldItem;//to browse the inventory, "heldItem" is switched with "inventory"
 	Item * inventory;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
@@ -82,7 +85,7 @@ public:
 	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);
 
 
-	void switchWeapon(int dir);
+	void selectWeapon(size_t selection);
 	void trigger(bool pulled, SimClock::time_point now,ITexture * tex,IWorld& iw);
 
 };

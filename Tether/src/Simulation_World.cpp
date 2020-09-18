@@ -507,7 +507,7 @@ void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 {
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
-	player->guns[player->currentGun]->tick(next_tick_begin, player->cam,player,shot,*getIWorld());
+	player->current_gun->tick(next_tick_begin, player->cam,player,shot,*getIWorld());
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
 	pmLogic->registerTime(PM_LOGIC_SPAWN);
 	doPhysics(next_tick_begin);

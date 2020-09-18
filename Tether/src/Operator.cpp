@@ -97,7 +97,7 @@ void Operator::operateSimulation(IGameMode* simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_MOUSE_WHEEL,
-		Act::AccumulateValue(&input_status.weapon_switch)
+		Act::AccumulateValue<Index<8>>(&input_status.weapon_selection)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_MOUSE_LMB,

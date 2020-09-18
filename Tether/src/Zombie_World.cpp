@@ -322,7 +322,7 @@ void Zombie_World::doLogic(const SimClock::time_point& t)
 
 	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
 	pmLogic->registerTime(PM_LOGIC_PRECALC);
-	player->guns[player->currentGun]->tick(t,player->cam,player,shot,*getIWorld());
+	player->current_gun->tick(t,player->cam,player,shot,*getIWorld());
 	pmLogic->registerTime(PM_LOGIC_GUNTICK);
 	for(int i=0;i<40;i++)
 		if (0.03f> (rand() % 32768) / 32768.0f) spawnZombie(t);//TODO replace by better spawn mechanic
