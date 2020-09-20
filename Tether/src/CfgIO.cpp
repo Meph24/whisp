@@ -19,9 +19,9 @@ const std::regex CfgIO::re_str = std::regex(R"(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\
 const std::regex CfgIO::re_section = regex(R"(\s*\[\s*(.*)\s*\]\s*)");
 const std::regex CfgIO::re_key = regex(R"(\s*(\w*)\s*)");
 
-CfgIO::CfgIO(const string& filename)
+CfgIO::CfgIO(const fs::path& file)
 	:
-	m_filename(filename)
+	m_filename(file.string())
 {}
 
 CfgIO::CfgIO(const CfgIO& other)
