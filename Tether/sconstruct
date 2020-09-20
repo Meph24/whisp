@@ -107,7 +107,7 @@ headerFiles = []
 for root, dirnames, filenames in os.walk(source_root):
  for dirname in dirnames:
   sourceDirectories  = sourceDirectories + [root+'/'+dirname]
-  print('>>> add src dir ' + root + '/' + dirname + ' to the source directory list')
+  print('>>> additional source directory : ' + root + '/' + dirname + ' to the source directory list')
  for file in filenames:
   if file.endswith(('.c','.cpp')):
    sourceFiles.append(os.path.join(root,file).replace('\\', '/'))
@@ -145,9 +145,11 @@ if not testSources:
  print('No Tests found!')
 else:
  tests = { t.rsplit('/')[1].rsplit('.')[0] : t for t in testSources }
- print("TESTS:" + str(tests))
+ testmessage = "TESTS <" + str(len(tests))
+ if len(tests) < 11:
+  testmessage += " " + str(list(tests.keys()))
+ print(testmessage)
   
-
 
 variantSourceDirectories=[x.replace(source_root,build_root) for x in sourceDirectories]
 variantSourceFiles = [x.replace(source_root,build_root) for x in sourceFiles]
@@ -195,20 +197,12 @@ for testname in tests:
  obj = test_release_dir + '/' + testname + '.o'
  execpath = test_release_bin_dir + '/'
  releasetestobjects = [x for x in releaseobjects if not x.endswith('main.o')] + [obj]
-
- print(42* '-')
- print("Test executable name : " + execname)
- print("Obj : " + obj)
- print("To path : " + execpath)
- #print("Used objects : " + str(releasetestobjects))
-
  release_test_env.Object(obj, tests[testname])
  target = release_test_env.Program(execpath + execname, releasetestobjects)
  if get_platform() == "Windows":
   release_test_env.AddPostAction(target,  Copy(test_root + '/area/' + execname, execpath+execname))
  release_test_targets.append(target)
 
-Alias("test", release_test_targets)
 
 debug_test_targets = []
 for testname in tests:
@@ -216,20 +210,12 @@ for testname in tests:
  obj = test_debug_dir + '/' + testname + '.o'
  execpath = test_debug_bin_dir + '/'
  debugtestobjects = [x for x in debugobjects if not x.endswith('main.o')] + [obj]
-
- print(42* '-')
- print("Test executable name : " + execname)
- print("Obj : " + obj)
- print("To path : " + execpath)
- #print("Used objects : " + str(debugtestobjects))
-
  debug_test_env.Object(obj, tests[testname])
  target = debug_test_env.Program(execpath + execname, debugtestobjects)
  if get_platform() == "Windows":
   debug_test_env.AddPostAction(target,  Copy(test_root + '/area/' + execname, execpath+execname))
  debug_test_targets.append(target)
 
-Alias("test", debug_test_targets)
 
 
  
@@ -259,8 +245,11 @@ release_env.AddPostAction(release_target, Copy('./' + release_appname, './bin/' 
 debug_env.AddPostAction(debug_target, Delete('./'+ debug_appname ))
 debug_env.AddPostAction(debug_target, Copy('./' + debug_appname, './bin/' +debug_appname))
 
-Default([ release_target, debug_target ])
-
+Default( release_target + release_test_targets )
+Alias("debug", debug_target)
+Alias("all", [ release_target, debug_target ] + debug_test_targets, release_test_targets )
+Alias("test", release_test_targets)
+Alias("debug_test", debug_test_targets)
 #install_dir = "install"
 
 #h_d_map = {}
