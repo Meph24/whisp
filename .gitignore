@@ -39,3 +39,4 @@ deps
 *.dll
 dependency_install
 .vscode/
+Tether/test/area
