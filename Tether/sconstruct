@@ -251,6 +251,5 @@ Alias("debug_test", debug_test_targets)
 
 if get_platform() == "Windows":
  area_test_executables = [test_root + '/area/' + f for f in os.listdir(test_root + '/area/') if os.path.isfile(os.path.join(test_root + '/area/', f)) and f.endswith(platformExecutableExtention())]
- print("AREA EXEC " + str(area_test_executables))
-Clean( release_test_targets, area_test_executables )
+ Clean( release_test_targets, area_test_executables )
 Alias("clean", Clean('dirs', ['bin', 'build', 'install']))
