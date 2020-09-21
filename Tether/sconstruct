@@ -248,21 +248,9 @@ Alias("debug", debug_target)
 Alias("all", [ release_target, debug_target ] + debug_test_targets, release_test_targets )
 Alias("test", release_test_targets)
 Alias("debug_test", debug_test_targets)
-#install_dir = "install"
 
-#h_d_map = {}
-
-#for h in headerFiles:
- #install_location = "/".join(h.split("/")[1:-1])
- #if not install_location in h_d_map:
-  #h_d_map[install_location] = []
- #h_d_map[install_location] += [h]
-#
-#for d in h_d_map:
- #Alias("install", Install(dir=install_dir+"/"+d, source=h_d_map[d]))
-#
-#Alias("install", Install(dir=install_dir, source="bin/libmoar.a"))
-
+if get_platform() == "Windows":
+ area_test_executables = [test_root + '/area/' + f for f in os.listdir(test_root + '/area/') if os.path.isfile(os.path.join(test_root + '/area/', f)) and f.endswith(platformExecutableExtention())]
+ print("AREA EXEC " + str(area_test_executables))
+Clean( release_test_targets, area_test_executables )
 Alias("clean", Clean('dirs', ['bin', 'build', 'install']))
-
-
