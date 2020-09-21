@@ -173,17 +173,20 @@ for src in sourceFiles:
 
 ### TESTING
 
-test_env = release_env.Clone()
+debug_test_env = debug_env.Clone()
+release_test_env = release_env.Clone()
 
-test_env.Append(LIBS=['gtest','gtest_main', 'pthread'])
-test_env.Append(CPPDEFINES=['BUILD_UNITTEST'])
+release_test_env.Append(LIBS=['gtest','gtest_main', 'pthread'])
+release_test_env.Append(CPPDEFINES=['BUILD_UNITTEST'])
+debug_test_env.Append(LIBS=['gtest','gtest_main', 'pthread'])
+debug_test_env.Append(CPPDEFINES=['BUILD_UNITTEST'])
 
 if get_platform() == "Windows":
-    test_env.Append(CPPPATH=['./test/area/include'])
-    test_env.Append(LIBPATH=['./test/area/lib'])
+    release_test_env.Append(CPPPATH=['./test/area/include'])
+    release_test_env.Append(LIBPATH=['./test/area/lib'])
+    debug_test_env.Append(CPPPATH=['./test/area/include'])
+    debug_test_env.Append(LIBPATH=['./test/area/lib'])
 
-debug_test_env = test_env.Clone()
-release_test_env = test_env.Clone()
 
 test_release_dir = release_build_dir+'/test'
 test_release_bin_dir = 'bin/test'
@@ -211,14 +214,12 @@ for testname in tests:
  debug_test_env.Object(obj, tests[testname])
  target = debug_test_env.Program(execpath + execname, debugtestobjects)
  if get_platform() == "Windows":
-  debug_test_env.AddPostAction(target,  Copy(test_root + '/area/' + execname, execpath+execname))
+  debug_test_env.AddPostAction(target,  Copy(test_root + '/area/debug_' + execname, execpath+execname))
+
  debug_test_targets.append(target)
 
-## MAIN PROGRAM '''
 release_target = release_env.Program('bin/' + release_appname, releaseobjects)
-Alias("release", release_target)
 debug_target = debug_env.Program('bin/' + debug_appname, debugobjects)
-Alias("debug", debug_target)
 
 release_env.AddPostAction(release_target, Delete('./' + release_appname))
 release_env.AddPostAction(release_target, Copy('./' + release_appname, './bin/' + release_appname ))
@@ -226,10 +227,12 @@ debug_env.AddPostAction(debug_target, Delete('./'+ debug_appname ))
 debug_env.AddPostAction(debug_target, Copy('./' + debug_appname, './bin/' +debug_appname))
 
 Default( release_target + release_test_targets )
+Alias("release", release_target)
 Alias("debug", debug_target)
 Alias("all", [ release_target, debug_target ] + debug_test_targets, release_test_targets )
 Alias("test", release_test_targets)
 Alias("debug_test", debug_test_targets)
+Alias("dev", [debug_target] + debug_test_targets)
 
 if get_platform() == "Windows":
  area_test_executables = [test_root + '/area/' + f for f in os.listdir(test_root + '/area/') if os.path.isfile(os.path.join(test_root + '/area/', f)) and f.endswith(platformExecutableExtention())]
