@@ -25,7 +25,7 @@ struct RelativeClock
 	typedef typename BaseClock::duration::rep rep;
 	typedef typename BaseClock::duration::period period;
 	typedef std::chrono::time_point<RelativeClock<BaseClock>, duration> time_point;
-	static const bool is_steady = BaseClock::is_steady;
+	constexpr static bool is_steady = BaseClock::is_steady;
 
 	const BaseClock& baseclock;
 
