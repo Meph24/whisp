@@ -214,24 +214,6 @@ for testname in tests:
   debug_test_env.AddPostAction(target,  Copy(test_root + '/area/' + execname, execpath+execname))
  debug_test_targets.append(target)
 
-
-
- 
-def move_release_binary(target, src, env):
-	if os.path.isfile('bin/' + release_appname):
-		os.remove('./' + release_appname)
-		print('Deleted old release binary!')
-		shutil.copy('bin/' + release_appname, './' + release_appname)
-		print('Copied new release binary!')
-
-def move_debug_binary(target, src, env):
-	if os.path.isfile('bin/' + debug_appname):
-		os.remove('./' + debug_appname)
-		print('Deleted old debug binary!')
-		shutil.copy('bin/' + debug_appname, './' + debug_appname)
-		print('Copied new debug binary!')
-
-
 ## MAIN PROGRAM '''
 release_target = release_env.Program('bin/' + release_appname, releaseobjects)
 Alias("release", release_target)
