@@ -14,7 +14,7 @@ public:
 	typedef typename duration::rep rep;
 	typedef typename duration::period period;
 	typedef typename IntervallClock::time_point time_point;
-	static const bool is_steady = IntervallClock::is_steady;
+	constexpr static bool is_steady = IntervallClock::is_steady;
 private:
 	const IntervallClock& intervall_clock;
 	const system_clock& sysclock;

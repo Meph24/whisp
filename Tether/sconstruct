@@ -88,16 +88,16 @@ release_env = env.Clone()
 release_build_dir = build_root+"/release"
 release_env.Append(CPPDEFINES=['BUILD_RELEASE'])
 release_env.Append(CXXFLAGS=['-O3'])
-release_env.VariantDir(release_build_dir+'/main',source_root)
-release_env.VariantDir(release_build_dir+'/test',test_root)
+#release_env.VariantDir(release_build_dir+'/main',source_root)
+#release_env.VariantDir(release_build_dir+'/test',test_root)
 
 #debug configuration
 debug_env = env.Clone()
 debug_build_dir = build_root+"/debug"
 debug_env.Append(CPPDEFINES=['BUILD_DEBUG'])
 debug_env.Append(CXXFLAGS=['-g3'])
-debug_env.VariantDir(debug_build_dir+'/main',source_root)
-debug_env.VariantDir(debug_build_dir+'/test',test_root)
+#debug_env.VariantDir(debug_build_dir+'/main',source_root)
+#debug_env.VariantDir(debug_build_dir+'/test',test_root)
 
 
 ### Source Collection ###
@@ -107,50 +107,48 @@ headerFiles = []
 for root, dirnames, filenames in os.walk(source_root):
  for dirname in dirnames:
   sourceDirectories  = sourceDirectories + [root+'/'+dirname]
-  print('>>> add src dir ' + root + '/' + dirname + ' to the source directory list')
+  print('>>> additional source directory : ' + root + '/' + dirname + ' to the source directory list')
  for file in filenames:
   if file.endswith(('.c','.cpp')):
-   sourceFiles.append(os.path.join(root,file))
+   sourceFiles.append(os.path.join(root,file).replace('\\', '/'))
   if file.endswith(('.h', '.hpp')):
-   headerFiles.append(os.path.join(root, file))
+   headerFiles.append(os.path.join(root, file).replace('\\', '/'))
 
 if not sourceFiles:
- print('No Source files found !')
+ print("No Sources Found!")
 elif len(sourceFiles) > 10:
- print(str(len(sourceFiles)) + ' Source files found !')
+ print('src> ' + str(len(sourceFiles)) + ' found!')
 else:
- print('Sources found :')
- for src in sourceFiles:
-  print('s> '+src)
+ for f in sourceFiles:
+  print('src> ' + f)
 
 if not headerFiles:
  print('No Header files found !')
 elif len(headerFiles) > 10:
- print(str(len(headerFiles)) + ' Header files found !')
+ print('hdr> ' + str(len(headerFiles)) + ' found!')
 else:
- print('Headers found : ')
- for hdr in headerFiles:
-  print ('h> ' + hdr)
+ for f in headerFiles:
+  print('hdr> ' + f)
+
 
 ### Test Collection ###
 testSources = []
 for root, dirnames, filenames, in os.walk(test_root):
  for file in filenames:
   if os.path.basename(root) == 'test' and file.endswith(('.c','.cpp')):
-   testSources.append(os.path.join(root,file))
+   test_source = os.path.join(root,file)
+   test_source = test_source.replace("\\", "/")
+   testSources.append(test_source)
 
+tests = {}
 if not testSources:
  print('No Tests found!')
 else:
- print('Tests found :')
- for t in testSources:
-  n = t
-  if t.endswith('.cpp'):
-   n = t.replace('.cpp', '')
-  elif t.endswith('.c'):
-   n = t.replace('.c', '')
-  print('t> ' + n[len(test_root)+1:])
-
+ tests = { t.rsplit('/')[1].rsplit('.')[0] : t for t in testSources }
+ testmessage = "TESTS <" + str(len(tests))
+ if len(tests) < 11:
+  testmessage += " " + str(list(tests.keys()))
+ print(testmessage)
 
 variantSourceDirectories=[x.replace(source_root,build_root) for x in sourceDirectories]
 variantSourceFiles = [x.replace(source_root,build_root) for x in sourceFiles]
@@ -175,86 +173,68 @@ for src in sourceFiles:
 
 ### TESTING
 
+debug_test_env = debug_env.Clone()
 release_test_env = release_env.Clone()
+
 release_test_env.Append(LIBS=['gtest','gtest_main', 'pthread'])
 release_test_env.Append(CPPDEFINES=['BUILD_UNITTEST'])
-
-debug_test_env = debug_env.Clone()
 debug_test_env.Append(LIBS=['gtest','gtest_main', 'pthread'])
 debug_test_env.Append(CPPDEFINES=['BUILD_UNITTEST'])
+
+if get_platform() == "Windows":
+    release_test_env.Append(CPPPATH=['./test/area/include'])
+    release_test_env.Append(LIBPATH=['./test/area/lib'])
+    debug_test_env.Append(CPPPATH=['./test/area/include'])
+    debug_test_env.Append(LIBPATH=['./test/area/lib'])
+
 
 test_release_dir = release_build_dir+'/test'
 test_release_bin_dir = 'bin/test'
 test_debug_dir = debug_build_dir+'/test'
 test_debug_bin_dir = 'bin/test/debug'
 
-releasetestobjects = []
-releasetestmainobjects = releaseobjects
-releasetestmainobjects = [x for x in releasetestmainobjects if not x.endswith('main.o')]
-for test in testSources:
- objname = test.replace(test_root, test_release_dir,1)
- objname = objname.replace('.cpp', '.o')
- execname = test.replace(test_root+ platformSlash(), test_release_bin_dir+platformSlash())
- execname = execname.replace('.cpp','.test' + platformExecutableExtention())
- releasetestobjects = releasetestobjects + [objname]
- Alias("test", release_test_env.Object(objname, test))
- Alias("test", release_test_env.Program(execname, releasetestmainobjects+[objname]))
+release_test_targets = []
+for testname in tests:
+ execname = testname + platformExecutableExtention()
+ obj = test_release_dir + '/' + testname + '.o'
+ execpath = test_release_bin_dir + '/'
+ releasetestobjects = [x for x in releaseobjects if not x.endswith('main.o')] + [obj]
+ release_test_env.Object(obj, tests[testname])
+ target = release_test_env.Program(execpath + execname, releasetestobjects)
+ if get_platform() == "Windows":
+  release_test_env.AddPostAction(target,  Copy(test_root + '/area/' + execname, execpath+execname))
+ release_test_targets.append(target)
 
-debugtestobjects = []
-debugtestmainobjects = debugobjects
-debugtestmainobjects = [x for x in debugtestmainobjects if not x.endswith('/main.o')]
-for test in testSources:
- objname = test.replace(test_root, test_debug_dir,1)
- objname = objname.replace('.cpp', '.o')
- execname = test.replace(test_root+platformSlash(), test_debug_bin_dir+platformSlash())
- execname = execname.replace('.cpp','.test' + platformExecutableExtention())
- debugtestobjects = debugtestobjects + [objname]
- Alias("test", debug_test_env.Object(objname, test))
- Alias("test", debug_test_env.Program(execname, debugtestmainobjects+[objname]))
- 
-def move_release_binary(target, src, env):
-	if os.path.isfile('bin/' + release_appname):
-		os.remove('./' + release_appname)
-		print('Deleted old release binary!')
-		shutil.copy('bin/' + release_appname, './' + release_appname)
-		print('Copied new release binary!')
+debug_test_targets = []
+for testname in tests:
+ execname = testname + platformExecutableExtention()
+ obj = test_debug_dir + '/' + testname + '.o'
+ execpath = test_debug_bin_dir + '/'
+ debugtestobjects = [x for x in debugobjects if not x.endswith('main.o')] + [obj]
+ debug_test_env.Object(obj, tests[testname])
+ target = debug_test_env.Program(execpath + execname, debugtestobjects)
+ if get_platform() == "Windows":
+  debug_test_env.AddPostAction(target,  Copy(test_root + '/area/debug_' + execname, execpath+execname))
 
-def move_debug_binary(target, src, env):
-	if os.path.isfile('bin/' + debug_appname):
-		os.remove('./' + debug_appname)
-		print('Deleted old debug binary!')
-		shutil.copy('bin/' + debug_appname, './' + debug_appname)
-		print('Copied new debug binary!')
+ debug_test_targets.append(target)
 
-
-## MAIN PROGRAM '''
 release_target = release_env.Program('bin/' + release_appname, releaseobjects)
-Alias("release", release_target)
 debug_target = debug_env.Program('bin/' + debug_appname, debugobjects)
-Alias("debug", debug_target)
 
 release_env.AddPostAction(release_target, Delete('./' + release_appname))
 release_env.AddPostAction(release_target, Copy('./' + release_appname, './bin/' + release_appname ))
 debug_env.AddPostAction(debug_target, Delete('./'+ debug_appname ))
 debug_env.AddPostAction(debug_target, Copy('./' + debug_appname, './bin/' +debug_appname))
 
-Default([ release_target, debug_target ])
+Default( release_target + release_test_targets )
+Alias("release", release_target)
+Alias("debug", debug_target)
+Alias("all", [ release_target, debug_target ] + debug_test_targets, release_test_targets )
+Alias("test", release_test_targets)
+Alias("debug_test", debug_test_targets)
+Alias("dev", [debug_target] + debug_test_targets)
 
-#install_dir = "install"
-
-#h_d_map = {}
-
-#for h in headerFiles:
- #install_location = "/".join(h.split("/")[1:-1])
- #if not install_location in h_d_map:
-  #h_d_map[install_location] = []
- #h_d_map[install_location] += [h]
-#
-#for d in h_d_map:
- #Alias("install", Install(dir=install_dir+"/"+d, source=h_d_map[d]))
-#
-#Alias("install", Install(dir=install_dir, source="bin/libmoar.a"))
-
+if get_platform() == "Windows":
+ area_test_executables = [test_root + '/area/' + f for f in os.listdir(test_root + '/area/') if os.path.isfile(os.path.join(test_root + '/area/', f)) and f.endswith(platformExecutableExtention())]
+ Clean( release_test_targets, area_test_executables )
 Alias("clean", Clean('dirs', ['bin', 'build', 'install']))
-
-

@@ -47,10 +47,6 @@ eventmapping::actions::Replace::Replace(float* replace_target) :  replace_target
 eventmapping::actions::Replace::Replace(float* replace_target, float offset) : replace_target(replace_target), offset(offset) {}
 void eventmapping::actions::Replace::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *replace_target = (float)e.value + offset; }
 
-eventmapping::actions::AccumulateValue::AccumulateValue(float* accumulation_variable) :  accumulation_variable(accumulation_variable), offset(0.0) {}
-eventmapping::actions::AccumulateValue::AccumulateValue(float* accumulation_variable, float offset) : accumulation_variable(accumulation_variable), offset(offset) {}
-void eventmapping::actions::AccumulateValue::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *accumulation_variable += e.value + offset; }
-
 eventmapping::actions::SendSignal::SendSignal(SignalCounter* signal_counter) : signal_counter(signal_counter) {}
 void eventmapping::actions::SendSignal::sendSignal(SignalCounter* signal_counter) { (*signal_counter)++; }
 void eventmapping::actions::SendSignal::operator()(EVENTMAPPING_FUNCTION_PARAMETERS)

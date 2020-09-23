@@ -81,15 +81,14 @@ namespace eventmapping
 			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
 
+		template<typename AccumulationType>
 		struct AccumulateValue
 		{
-			float* accumulation_variable;
-			float offset;
+			AccumulationType* accumulation_variable;
 
-			AccumulateValue(float* accumulation_variable);
-			AccumulateValue(float* accumulation_variable, float offset);
+			AccumulateValue(AccumulationType* accumulation_variable) : accumulation_variable(accumulation_variable) {};
 
-			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS) { *accumulation_variable += (AccumulationType)e.value; };
 		};
 
 		struct Replace

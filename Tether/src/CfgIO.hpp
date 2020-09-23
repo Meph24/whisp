@@ -8,6 +8,10 @@
 #include <string>
 #include <utility>
 
+#include "filesystem.hpp"
+
+namespace fs = std::filesystem;
+
 using std::pair;
 using std::regex;
 using std::string;
@@ -35,8 +39,8 @@ private:
 public:
 	CfgIO() = default;
 	CfgIO(const CfgIO&);
+	CfgIO(const fs::path&);
 	CfgIO& operator= (const CfgIO&);
-	CfgIO(const string& filename);
 	const string& filename() const;
 	
 	virtual Cfg get() const;

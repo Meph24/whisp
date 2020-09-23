@@ -71,40 +71,35 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 	}
 	inventory=tli;//TODO reenable this line to enable inventory
 
-	wCount = 8;
-	guns = new Zombie_Gun * [wCount];
-	guns[0] = new Zombie_Gun(spawn_time,"Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f,1),false,{2,0.15f,0},{1,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[1] = new Zombie_Gun(spawn_time,"Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f,1),true,{0.2f,0,0},{0.05f,0.01f,0});//new Zombie_Gun(30000, 800,5.0f);
-	guns[2] = new Zombie_Gun(spawn_time,"American 180 .22",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f,1),true,{0.5f,0,0},{0.5f,0.5f,0});//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
-	guns[3] = new Zombie_Gun(spawn_time,"Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f,1),false,{5,0,0},{2,2,0});
-	guns[4] = new Zombie_Gun(spawn_time,"G3A3 .308",0.12f,"res/gunshot.wav",0.75f,new ItemAmmo(800, 200,0.0008f,1),true,{3,0,0},{1.5f,1.5f,0});
-	guns[5] = new Zombie_Gun(spawn_time,"Shotgun",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,45.0f,0.0022272754325748604f,9),true,{2.5f,0,0},{1.5f,1.5f,0});
-	guns[6] = new Zombie_Gun(spawn_time,"Shotgun with Birdshot",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,0.30f,0.0038f,900),true,{2.5f,0,0},{1.5f,1.5f,0});
-	guns[7] = new Zombie_Gun(spawn_time,"Cheat Blaster 180",0.08f,"res/gunshot.wav",0.5f,new ItemAmmo(600,200.30f,0.0018f,180),true,{0.5f,0,0},{0.5f,0.5f,0});
+	guns.emplace_back(new Zombie_Gun(spawn_time,"Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f,1),false,{2,0.15f,0},{1,0.5f,0}));//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns.emplace_back(new Zombie_Gun(spawn_time,"Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f,1),true,{0.2f,0,0},{0.05f,0.01f,0}));//new Zombie_Gun(30000, 800,5.0f);
+	guns.emplace_back(new Zombie_Gun(spawn_time,"American 180 .22",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f,1),true,{0.5f,0,0},{0.5f,0.5f,0}));//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns.emplace_back(new Zombie_Gun(spawn_time,"Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f,1),false,{5,0,0},{2,2,0}));
+	guns.emplace_back(new Zombie_Gun(spawn_time,"G3A3 .308",0.12f,"res/gunshot.wav",0.75f,new ItemAmmo(800, 200,0.0008f,1),true,{3,0,0},{1.5f,1.5f,0}));
+	guns.emplace_back(new Zombie_Gun(spawn_time,"Shotgun",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,45.0f,0.0022272754325748604f,9),true,{2.5f,0,0},{1.5f,1.5f,0}));
+	guns.emplace_back(new Zombie_Gun(spawn_time,"Shotgun with Birdshot",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,0.30f,0.0038f,900),true,{2.5f,0,0},{1.5f,1.5f,0}));
+	guns.emplace_back(new Zombie_Gun(spawn_time,"Cheat Blaster 180",0.08f,"res/gunshot.wav",0.5f,new ItemAmmo(600,200.30f,0.0018f,180),true,{0.5f,0,0},{0.5f,0.5f,0}));
 
+	current_gun = guns[0].get();
 }
 
 EntityPlayer::~EntityPlayer()
 {
 	delete cam;
 	delete mouseInp;
-	for(int i=0;i<wCount;i++)
-	{
-		delete guns[i];
-	}
-	delete guns;
 	if(heldItem) delete heldItem;
 	if(inventory) delete inventory;
 }
 
 
 
-void EntityPlayer::switchWeapon(int dir)
+void EntityPlayer::selectWeapon(size_t selection)
 {
-	if(dir==0) return;
-	guns[currentGun]->stopShooting();
-	currentGun=(currentGun+dir+wCount*1024)%wCount;//TODO
-	std::cout<<"gun switched to"<<currentGun<<std::endl;
+	Zombie_Gun* selected_gun =  guns[selection%guns.size()].get();
+	if( current_gun == selected_gun ) return;
+
+	current_gun->stopShooting();
+	current_gun = guns[selection%guns.size()].get();
 }
 
 
@@ -142,7 +137,7 @@ void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWor
 
 	glColor3f(1, 1, 0);
 	dsp->g->drawString("Weapon:", 0.6f, -0.66f, 0.1f);
-	dsp->g->drawString(guns[currentGun]->name, 0.6f, -0.82f, 0.1f);
+	dsp->g->drawString(current_gun->name, 0.6f, -0.82f, 0.1f);
 	glColor3f(0, 1, 0);
 	glPopMatrix();
 	float crosshairSize = 0.005f;
@@ -249,7 +244,7 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	ITerrain * it=tsp->getITerrain();
 
 	SimulationInputStatusSet& controlinputs = *tsp->input_status;
-	switchWeapon(controlinputs.getStatusAndReset(controlinputs.weapon_switch));
+	selectWeapon(controlinputs.weapon_selection);
 
 	if(prev_inventory_signal != controlinputs.inventory)
 	{
@@ -336,8 +331,8 @@ void EntityPlayer::trigger(bool pulled, SimClock::time_point now,ITexture * tex,
 {
 	if (!pulled)
 	{
-		guns[currentGun]->stopShooting();
+		current_gun->stopShooting();
 		return;
 	}
-	guns[currentGun]->tryShoot(now,cam,this,tex,iw);
+	current_gun->tryShoot(now,cam,this,tex,iw);
 }

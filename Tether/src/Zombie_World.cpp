@@ -324,8 +324,10 @@ void Zombie_World::doLogic(const SimClock::time_point& t)
 	iw->collideAlgo->verbose=iw->verbose;
 	iw->pushAlgo->verbose=iw->verbose;
 	logicOutside.registerTime();
-	player->guns[player->currentGun]->tick(t,player->cam,player,shot,*getIWorld());
+	player->current_gun->tick(t,player->cam,player,shot,*getIWorld());
 	logicGunTick.registerTime();
+
+
 	for(int i=0;i<40;i++)
 		if (0.03f> (rand() % 32768) / 32768.0f) spawnZombie(t);//TODO replace by better spawn mechanic
 	logicSpawn.registerTime();

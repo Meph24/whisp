@@ -507,7 +507,7 @@ void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 {
 	logicOutside.registerTime();
 
-	player->guns[player->currentGun]->tick(next_tick_begin, player->cam,player,shot,*getIWorld());
+	player->current_gun->tick(next_tick_begin, player->cam,player,shot,*getIWorld());
 	logicGunTick.registerTime();
 
 	doPhysics(next_tick_begin);
