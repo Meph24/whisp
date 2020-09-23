@@ -1,24 +1,66 @@
-#pragma once
+/*
+ * PerformanceMeter.h
+ *
+ *  Created on:	before 18.03.2017
+ *      Author:	HL65536
+ *     Version:	2.0
+ */
+
+#ifndef SRC_PERFORMANCEMETER_H_
+#define SRC_PERFORMANCEMETER_H_
+
+#include "Drawable.h"
+
+class Graphics2D;
 
 #include <SFML/Window.hpp>
 #include <string>
+#include <deque>
+#include "FloatSeconds.hpp"
 
 #define FLAG_NOW 1
 #define FLAG_RECENTAVG 2
 #define FLAG_SPIKES 4
 #define FLAG_ALL_TIME_MAX 8
 #define FLAG_ALL_TIME_MIN 16
-#define FLAG_TOTALAVG 32
 
-class PerformanceMeter
+class PerformanceMeter: public Drawable
 {
+	struct StepData
+	{
+		std::deque<float> times;
+		std::string name;
+		void registerTime(float time);
+		float getLastTime();
+		float getAVG();
+		float getRecentMax();
+		void clearMin();
+		void clearMax();
+		void clearAllTimeData();
+		void shrinkTimeBuffer(int by);
+		float min;
+		float max;
+		void draw(std::deque<float>& roundtrip,Graphics2D * g);
+		//TODO reenable float maxTolerated;
+	};
 public:
+	struct SingleTimer
+	{
+		PerformanceMeter * pm=0;//TODO make methods safe for null pointer
+		int myID=-1;
+		void registerTime();
+		void setAsRoundtripMarker(std::string roundtripName);
+		StepData& getData();
+	};
 
-	//collects data about the performance of a loop with [stepCount] internal steps
-	PerformanceMeter(int stepCount,int warmupPeriod=-1);//resets values after warmupPeriod (-1 means no reset)
+	//collects data about the performance of a loop with a certain number of internal steps
+	PerformanceMeter(FloatSeconds historyLength,FloatSeconds WarmupTime,bool BenchmarkMode=false);
 	~PerformanceMeter();
 
+	bool benchmarkMode;//if enabled, tries to exclude time spent within PerformanceMeter
+
 	/*
+	//TODO update
 	usage:
 	PerformanceMeter pm(3);
 	//[
@@ -45,87 +87,46 @@ public:
 
 
 
-	//return: if measurement exceeded maximum time
-	bool registerTime(int stepID);//TODO add more comments
-
 	//clear data about the maximum ever measured time for each step
 	void clearMax();
 
 	//clear data about the minimum ever measured time for each step
 	void clearMin();
 
-	//returns the last measured time for the given step (in us)
-	int getTime(int stepID);
-
-	//only works after having collected a lot of data, (time in us)
-	float getRecentAVG(int stepID);
-
-	//=max measured but with a half life time
-	float getSpikes(int stepID);
-
-	//returns maximum time ever measured for the given step (in us)
-	int getMaxMeasured(int stepID);
-
-	//returns minimum time ever measured for the given step (in us)
-	int getMinMeasured(int stepID);
-
-	void setMaxTolerated(int stepID, int us);
-
-	//gets inaccurate over time because of limited float precision //TODO add double option
-	float getTotalAVG(int stepID);
-	void clearTotalAVG();
-
-	//give a name to a step so this class can format a string for you
-	void setName(std::string name, int  stepID);
-
 	//returns a string describing the performance of the given step, ready to print
+	//works for a maximum time <100s
 	std::string getInfo(int stepID,int infoFlags);
-
-	//reset the timer to 0
-	void reset();
-
-	//clears all collected info
-	void clear();
-
-
-
 	int getStepCount();
 
-	void setSpikeHalfLifeTime(float seconds);
+	//draws graph of all time information
+	void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 
+	//reset the timer to 0
+	void resetTimer();
+
+	//clears all collected info
+	void clearTimeData();
+
+	SingleTimer createTimestep(std::string name);
 private:
-	
-	void exceededMax(int stepID);
 
-	int warmup;
-	int warmupCounter;
+	void registerTime(int stepID);//TODO add more comments
+
+	std::string getInfo(StepData& data,int infoFlags);
+
+	float warmupTime;
 
 	sf::Clock clock; //TODO replace
 
-	int n;
+	std::vector<StepData> stepData;
+	StepData roundtrip;
 
-	std::string * names; //TODO format shit (+' ')
+	float roundtripTime=0;
 
-	int * time;
-	int * maxTolerated;
-	int * maxMeasured;
-	int * minMeasured;
-	int * runs;
-	float * avgRecent;
-	float * sum;//TODO add double option or use long longs  (int is only ~1h)
-	float * spikes;
+	float historyLen;
+	int roundtripIndex=-1;//-1 means none specified
 
-	float spikeHalfLifeInv = 1.0f/10000000;
-	float spikeMultiplier=0.00000005f;
-public:
-
-	float roundtriptime;//addes as another time that can be queried (ID=n-1)//maybe put back to private
-	int roundtripUpdateIndex;//at which of the registerTime calls the roundtriptime averages, sipkes etc. should be updated
-
-	//avgRecent[stepID] = avgRecent[stepID] * (1 - avgWeight) + t * avgWeight;
-	float avgWeight = 0.01f;
-
-	//use faster algorithms (e.g. for applying the half life of spikes (inaccurate))
-	bool useFastApproximation = true;//TODO apply to other calculations
 };
 
+
+#endif /* SRC_PERFORMANCEMETER_H__ */

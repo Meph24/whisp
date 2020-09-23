@@ -74,28 +74,30 @@ Simulation_World::Simulation_World(const WallClock& reference_clock, sf::Window 
 	player=new EntityPlayer(timS,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
 	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getFlt("graphics","maxRenderTime")));//TODO not hard code
 
-	pmLogic = new PerformanceMeter(PM_LOGIC_CHUNKMOVE+1,1000);
-	pmGraphics = new PerformanceMeter(PM_GRAPHICS_FLUSH+1,1000);
-	pmLogic->roundtripUpdateIndex = 0;
-	pmGraphics->roundtripUpdateIndex = 0;
+	pmLogic = new PerformanceMeter(8s,1s);
+	logicOutside=pmLogic->createTimestep		("            other");
+
+	logicOutside.setAsRoundtripMarker			(" Total logic time");
+
+	logicGunTick=pmLogic->createTimestep		("        guns tick");
+	logicTick=pmLogic->createTimestep			("      entity tick");
+	logicIntersectEval=pmLogic->createTimestep	("   intersect eval");
+	logicRetick=pmLogic->createTimestep			("     re+post tick");
+	logicTerrain=pmLogic->createTimestep		("    terrain calcs");
 
 	dsLogic=new DebugScreen(pmLogic,&g);
+
+
+	pmGraphics = new PerformanceMeter(8s,1s);
+	graphicsOutside=pmGraphics->createTimestep	("            other");
+
+	graphicsOutside.setAsRoundtripMarker		("Total render time");
+
+	graphicsWorld=pmGraphics->createTimestep	("   world contents");
+	graphicsDebug=pmGraphics->createTimestep	("     debug screen");
+	graphicsFlush=pmGraphics->createTimestep	(" GPU work + syncs");
+
 	dsGraphics=new DebugScreen(pmGraphics,&g);
-
-	pmLogic->setName(" Total logic time",-1);
-	pmLogic->setName("  precalculations",PM_LOGIC_PRECALC);
-	pmLogic->setName("        guns tick",PM_LOGIC_GUNTICK);
-	pmLogic->setName("            spawn",PM_LOGIC_SPAWN);
-	pmLogic->setName("          physics",PM_LOGIC_PHYSICS);
-	pmLogic->setName(" chunk generation",PM_LOGIC_CHUNKGEN);
-	pmLogic->setName("   chunk movement",PM_LOGIC_CHUNKMOVE);
-	pmLogic->setName("            other",PM_LOGIC_OUTSIDE);
-
-	pmGraphics->setName("Total render time",-1);
-	pmGraphics->setName("   world contents",PM_GRAPHICS_WORLD);
-	pmGraphics->setName("     debug screen",PM_GRAPHICS_DRAWDEBUG);
-	pmGraphics->setName(" GPU work + syncs",PM_GRAPHICS_FLUSH);
-	pmGraphics->setName("            other",PM_GRAPHICS_OUTSIDE);
 
 	setCam(player->cam);
 }
@@ -139,7 +141,7 @@ void Simulation_World::render(const SimClock::time_point& render_time)
 	IWorld& iw=*getIWorld();
 
 	callbackList.clear();
-	float renderTime=(pmGraphics->getTime(PM_GRAPHICS_WORLD)+pmGraphics->getTime(PM_GRAPHICS_FLUSH))/1000000.0f;
+	float renderTime=graphicsWorld.getData().getLastTime()+graphicsFlush.getData().getLastTime();
 	float quality=adQ->getQuality(renderTime);
 	Frustum * viewFrustum=player->newFrustumApplyPerspective(render_time,true,this,quality);
 
@@ -421,20 +423,18 @@ void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
 	IWorld * iw=getIWorld();
 
 	bm->tick(next_tick_begin,this);
-
 	initNextTick();
-
 	iw->preTick(*this);
-
 	player->tick(next_tick_begin,this);//TODO insert into IWorld
-
 	iw->tick(next_tick_begin,this);
+	logicTick.registerTime();
 
 	iw->finishTick(*this);
+	logicIntersectEval.registerTime();
 
 	doReticks();
-
 	iw->postTick(*this);
+	logicRetick.registerTime();
 
 	bm->notifyTickEnded();
 }
@@ -505,16 +505,15 @@ void Simulation_World::drawGameOver()//TODO find new home
 
 void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 {
-	pmLogic->registerTime(PM_LOGIC_OUTSIDE);
-	pmLogic->registerTime(PM_LOGIC_PRECALC);
+	logicOutside.registerTime();
+
 	player->guns[player->currentGun]->tick(next_tick_begin, player->cam,player,shot,*getIWorld());
-	pmLogic->registerTime(PM_LOGIC_GUNTICK);
-	pmLogic->registerTime(PM_LOGIC_SPAWN);
+	logicGunTick.registerTime();
+
 	doPhysics(next_tick_begin);
-	pmLogic->registerTime(PM_LOGIC_PHYSICS);
+
 	getITerrain()->postTickTerrainCalcs(this,player->pos);
-	pmLogic->registerTime(PM_LOGIC_CHUNKGEN);
-	pmLogic->registerTime(PM_LOGIC_CHUNKMOVE);//TODO fix perf measurements
+	logicTerrain.registerTime();
 }
 
 void Simulation_World::doGraphics(const SimClock::time_point& t)
@@ -530,9 +529,9 @@ void Simulation_World::doGraphics(const SimClock::time_point& t)
 	else
 	{
 		//Timestamp t=tm.getSlaveTimestamp();
-		pmGraphics->registerTime(PM_GRAPHICS_OUTSIDE);
+		graphicsOutside.registerTime();
 		render(t);
-		pmGraphics->registerTime(PM_GRAPHICS_WORLD);
+		graphicsWorld.registerTime();
 		if(input_status->debug_screen_active)
 		{
 			transformViewToGUI(1);
@@ -544,13 +543,13 @@ void Simulation_World::doGraphics(const SimClock::time_point& t)
 			glDisable(GL_TEXTURE_2D);
 			revertView();
 		}
-		pmGraphics->registerTime(PM_GRAPHICS_DRAWDEBUG);
+		graphicsDebug.registerTime();
 	}
 
 	sf::Time waitt = sf::microseconds(1000);//TODO enable/disable depending on framerate
 	sf::sleep(waitt);
 	glFlush();
-	pmGraphics->registerTime(PM_GRAPHICS_FLUSH);
+	graphicsFlush.registerTime();
 }
 
 ICamera3D* Simulation_World::getHolderCamera()

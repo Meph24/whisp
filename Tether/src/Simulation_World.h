@@ -10,10 +10,10 @@ using std::unique_ptr;
 
 #include "ModelEntity.hpp"
 #include "Spacevec.h"
+#include "PerformanceMeter.h"
 
 
 class AdaptiveQuality;
-class PerformanceMeter;
 class DebugScreen;
 class EntityPlayer;
 class Mesh;
@@ -25,19 +25,6 @@ class BenchmarkManager;
 
 #include <SFML/Window.hpp>
 
-
-#define PM_GRAPHICS_OUTSIDE 0
-#define PM_GRAPHICS_WORLD 1
-#define PM_GRAPHICS_DRAWDEBUG 2
-#define PM_GRAPHICS_FLUSH 3
-
-#define PM_LOGIC_OUTSIDE 0
-#define PM_LOGIC_PRECALC 1
-#define PM_LOGIC_GUNTICK 2
-#define PM_LOGIC_SPAWN 3
-#define PM_LOGIC_PHYSICS 4
-#define PM_LOGIC_CHUNKGEN 5
-#define PM_LOGIC_CHUNKMOVE 6
 
 #include "SimulationInputStatusSet.hpp"
 
@@ -85,6 +72,18 @@ class Simulation_World: public DrawServiceProvider, public IGameMode
 	int test;//TODO remove
 
 public:
+	PerformanceMeter::SingleTimer logicOutside;
+	PerformanceMeter::SingleTimer logicGunTick;
+	PerformanceMeter::SingleTimer logicTick;
+	PerformanceMeter::SingleTimer logicIntersectEval;
+	PerformanceMeter::SingleTimer logicRetick;
+	PerformanceMeter::SingleTimer logicTerrain;
+
+	PerformanceMeter::SingleTimer graphicsOutside;
+	PerformanceMeter::SingleTimer graphicsWorld;
+	PerformanceMeter::SingleTimer graphicsDebug;
+	PerformanceMeter::SingleTimer graphicsFlush;
+
 	Simulation_World(const WallClock& reference_clock, sf::Window * w);
 	~Simulation_World();
 

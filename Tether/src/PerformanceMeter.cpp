@@ -1,78 +1,79 @@
+/*
+ * PerformanceMeter.cpp
+ *
+ *  Created on:	before 18.03.2017
+ *      Author:	HL65536
+ *     Version:	2.0
+ */
+
 #include "PerformanceMeter.h"
 #include <ctgmath>
+#include "myAssert.h"
 
-PerformanceMeter::PerformanceMeter(int stepCount,int warmupPeriod):
-warmup(warmupPeriod),warmupCounter(0)
+PerformanceMeter::PerformanceMeter(FloatSeconds historyLength,FloatSeconds WarmupTime,bool BenchmarkMode):
+benchmarkMode(BenchmarkMode)
 {
-	stepCount++;
-	n = stepCount;
-	time = new int[stepCount * 8];
-	maxTolerated = time + stepCount;
-	maxMeasured = time + stepCount * 2;
-	minMeasured = time + stepCount * 3;
-	avgRecent = (float *)(time + stepCount * 4);//dirty: blame HL65536
-	spikes = (float *)(time + stepCount * 5);
-	sum = (float *)(time + stepCount * 6);
-	runs = time + stepCount * 7;
-	names = new std::string[stepCount];
-	clear();
-	for (int i = 0; i < n; i++)
-		maxTolerated[i] = 99999999;
-	roundtripUpdateIndex = stepCount - 1;
+	historyLen=(float)historyLength;
+	warmupTime=(float)WarmupTime;
 }
 
 PerformanceMeter::~PerformanceMeter()
 {
-	delete[] time;
-	delete[] names;
 }
 
 void PerformanceMeter::clearMax()
 {
-	for (int i = 0; i < n; i++)
-		maxMeasured[i] = -1;
+	for(StepData& step: stepData)
+	{
+		step.clearMax();
+	}
 }
 void PerformanceMeter::clearMin()
 {
-	for (int i = 0; i < n; i++)
-		minMeasured[i] = ~(1 << 31);
-}
-void PerformanceMeter::clearTotalAVG()
-{
-	for (int i = 0; i < n; i++)
-		sum[i] = 0;
-}
-float PerformanceMeter::getTotalAVG(int stepID)
-{
-	return sum[stepID] / runs[stepID];
-}
-void PerformanceMeter::clear()
-{
-	for (int i = 0; i < n; i++)
+	for(StepData& step: stepData)
 	{
-		time[i] = 0;
-		maxMeasured[i] = -1;
-		minMeasured[i] = ~(1 << 31);
-		avgRecent[i] = 0;
-		sum[i] = 0;
-		runs[i] = 0;
-		spikes[i] = 0;
+		step.clearMin();
 	}
-	roundtriptime = 0;
+}
+void PerformanceMeter::clearTimeData()
+{
+	for(StepData& step: stepData)
+	{
+		step.clearAllTimeData();
+	}
 }
 
-//works for a maximum time <100s
 std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 {
-	if(stepID<0) stepID=n-1;
+	if(stepID<0) return getInfo(roundtrip,infoFlags);
+	else return getInfo(stepData[stepID],infoFlags);
+}
+
+PerformanceMeter::SingleTimer PerformanceMeter::createTimestep(std::string name)
+{
+	stepData.emplace_back();
+	stepData.back().name=name;
+	return {this,(int)(stepData.size()-1)};
+}
+
+int PerformanceMeter::getStepCount()
+{
+	return (int)stepData.size();
+}
+
+std::string PerformanceMeter::getInfo(StepData& data, int infoFlags)
+{
 	char format[9];
 	format[5] = '.';
-	std::string ret = names[stepID] + ':';
+	std::string ret = data.name + ':';
 	int num;
+	float unconverted;
 	if (infoFlags&FLAG_ALL_TIME_MIN)
 	{
 		infoFlags -= FLAG_ALL_TIME_MIN;
-		num = minMeasured[stepID];
+		unconverted = data.min;
+		if(unconverted>99.999999) unconverted=99.999999;
+		num=(int)(unconverted*1000000);
 		format[8] = '0' + (num % 10);
 		num /= 10;
 		format[7] = '0' + (num % 10);
@@ -100,7 +101,9 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 	if (infoFlags&FLAG_NOW)
 	{
 		infoFlags -= FLAG_NOW;
-		num = time[stepID];
+		unconverted = data.getLastTime();
+		if(unconverted>99.999999) unconverted=99.999999;
+		num=(int)(unconverted*1000000);
 		format[8] = '0' + (num % 10);
 		num /= 10;
 		format[7] = '0' + (num % 10);
@@ -128,7 +131,9 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 	if (infoFlags&FLAG_RECENTAVG)
 	{
 		infoFlags -= FLAG_RECENTAVG;
-		num = (int)(avgRecent[stepID] + 0.5f);
+		unconverted = data.getAVG();
+		if(unconverted>99.999999) unconverted=99.999999;
+		num=(int)(unconverted*1000000);
 		format[8] = '0' + (num % 10);
 		num /= 10;
 		format[7] = '0' + (num % 10);
@@ -153,39 +158,11 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 		if (infoFlags) ret = ret + avgString + "ms recent avg; ";
 		else ret = ret + avgString + "ms recent avg";
 	}
-	if (infoFlags&FLAG_TOTALAVG)
-	{
-		infoFlags -= FLAG_TOTALAVG;
-		int numRuns = runs[stepID];
-		if (numRuns == 0) num = 0;
-		else num = (int)(sum[stepID]/numRuns + 0.5f);
-		format[8] = '0' + (num % 10);
-		num /= 10;
-		format[7] = '0' + (num % 10);
-		num /= 10;
-		format[6] = '0' + (num % 10);
-		num /= 10;
-		format[4] = '0' + (num % 10);
-		num /= 10;
-		format[3] = '0' + (num % 10);
-		num /= 10;
-		format[2] = '0' + (num % 10);
-		num /= 10;
-		format[1] = '0' + (num % 10);
-		num /= 10;
-		format[0] = '0' + (num % 10);
-		for (int i = 0; i < 4; i++)
-		{
-			if (format[i] == '0') format[i] = ' ';
-			else break;
-		}
-		std::string avgString(format, 9);
-		if (infoFlags) ret = ret + avgString + "ms total avg; ";
-		else ret = ret + avgString + "ms total avg";
-	}
 	if (infoFlags&FLAG_SPIKES)
 	{
-		num = (int)(spikes[stepID]+0.5f);
+		unconverted = data.getRecentMax();
+		if(unconverted>99.999999) unconverted=99.999999;
+		num=(int)(unconverted*1000000);
 		format[8] = '0' + (num % 10);
 		num /= 10;
 		format[7] = '0' + (num % 10);
@@ -212,7 +189,9 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 	}
 	if (infoFlags&FLAG_ALL_TIME_MAX)
 	{
-		num = maxMeasured[stepID];
+		unconverted = data.max;
+		if(unconverted>99.999999) unconverted=99.999999;
+		num=(int)(unconverted*1000000);
 		format[8] = '0' + (num % 10);
 		num /= 10;
 		format[7] = '0' + (num % 10);
@@ -239,115 +218,200 @@ std::string PerformanceMeter::getInfo(int stepID,int infoFlags)
 	return ret;
 }
 
-bool PerformanceMeter::registerTime(int stepID) //4K/s; 500K budget
+#include <iostream>
+void PerformanceMeter::registerTime(int stepID)
 {
-	int t;
-	if(stepID!=(n-1))
+	float time=clock.restart().asMicroseconds()*0.000001f;//TODO replace: uses 2k processor cycles
+	stepData[stepID].registerTime(time);
+	roundtripTime+=time;
+	if(stepID==roundtripIndex)
 	{
-		t= clock.restart().asMicroseconds();//TODO replace: 2k cycles
-		roundtriptime += t - time[stepID];
-	}
-	else t=roundtriptime;
-	if(stepID==roundtripUpdateIndex)
-	{
-		registerTime(n-1);
-		if(warmupCounter==warmup)
+		roundtrip.registerTime(roundtripTime);
+		roundtripTime=0;
+		float avg=roundtrip.getAVG();
+		float allowedSteps=historyLen/avg;
+		if(roundtrip.times.size()>allowedSteps+1)
 		{
-			//reset certain time data
-			for (int i = 0; i < n; i++)
+			int deleteTimes=(int)(roundtrip.times.size()-allowedSteps);
+			//std::cout<<"delete times: "<<deleteTimes<<std::endl;
+			roundtrip.shrinkTimeBuffer(deleteTimes);
+			for(StepData& st: stepData)
 			{
-				maxMeasured[i] = -1;
-				minMeasured[i] = ~(1 << 31);
-				avgRecent[i] = 0;
-				sum[i] = 0;
-				runs[i] = 0;
-				spikes[i] = 0;
+				deleteTimes=(int)(st.times.size()-allowedSteps);
+				st.shrinkTimeBuffer(deleteTimes);
 			}
 		}
-		warmupCounter++;
-
+		if(warmupTime>0)
+		{
+			warmupTime-=time;
+			if(warmupTime<=0)
+			{
+				warmupTime=0;
+				clearTimeData();
+			}
+		}
+		if(benchmarkMode) resetTimer();
 	}
-	runs[stepID]++;
-	time[stepID] = t;
-	avgRecent[stepID] = avgRecent[stepID] * (1 - avgWeight) + t * avgWeight;
-	float spike = spikes[stepID];
-	float spklwd;
-	if (useFastApproximation)
-	{
-		spklwd =  spike - spike * roundtriptime * spikeMultiplier;
-	}
-	else
-	{
-		float f = roundtriptime*spikeHalfLifeInv;
-		spklwd = spike * powf(0.5f, f);
-	}
-	spikes[stepID] = spklwd;
-	if (spike<t) spikes[stepID] = t;
-	sum[stepID] += t;
-	if (t > maxMeasured[stepID]) maxMeasured[stepID] = t;
-	if (t < minMeasured[stepID]) minMeasured[stepID] = t;
-	bool tooLong = t > maxTolerated[stepID];
-	if (tooLong)
-	{
-		exceededMax(stepID);
-		return true;
-	}
-	return false;
 }
 
-void PerformanceMeter::setSpikeHalfLifeTime(float seconds)
-{
-	spikeHalfLifeInv = 0.000001f / seconds;
-	spikeMultiplier = 0.0000005f / seconds;
-}
 
-void PerformanceMeter::reset()
+void PerformanceMeter::resetTimer()
 {
 	clock.restart();//TODO replace, reason: bad performance
 }
 
-void PerformanceMeter::exceededMax(int stepID)
+void PerformanceMeter::StepData::registerTime(float time)
 {
-	//TODO listener
+	if(time<min) min=time;
+	if(time>max) max=time;
+	times.push_back(time);
+	//if(time>maxTolerated)
+	//{
+	//TODO
+	//}
 }
 
-void PerformanceMeter::setName(std::string name, int stepID)
+void PerformanceMeter::SingleTimer::registerTime()
 {
-	if(stepID<0) stepID=n-1;
-	names[stepID] = name;
+	assert(pm);
+	pm->registerTime(myID);
 }
 
-int PerformanceMeter::getMaxMeasured(int stepID)
+void PerformanceMeter::StepData::clearMin()
 {
-	return maxMeasured[stepID];
+	min=std::numeric_limits<float>::infinity();
 }
 
-int PerformanceMeter::getMinMeasured(int stepID)
+void PerformanceMeter::StepData::clearMax()
 {
-	return minMeasured[stepID];
+	max=0;
 }
 
-int PerformanceMeter::getTime(int stepID)
+float PerformanceMeter::StepData::getLastTime()
 {
-	return time[stepID];
+	if(times.empty()) return 0;
+	return times.back();
 }
 
-float PerformanceMeter::getRecentAVG(int stepID)
+float PerformanceMeter::StepData::getAVG()
 {
-	return avgRecent[stepID];
+	float size=times.size();
+	if(size==0) return 0;
+	float sum=0;
+	for(float t: times)
+	{
+		sum+=t;
+	}
+	return sum/size;
 }
 
-float PerformanceMeter::getSpikes(int stepID)
+float PerformanceMeter::StepData::getRecentMax()
 {
-	return spikes[stepID];
+	float max=0;
+	for(float t: times)
+	{
+		if(t>max) max=t;
+	}
+	return max;
 }
 
-
-int PerformanceMeter::getStepCount()
+void PerformanceMeter::StepData::clearAllTimeData()
 {
-	return n-1;
+	clearMin();
+	clearMax();
+	times.clear();
 }
-void PerformanceMeter::setMaxTolerated(int stepID, int us)
+
+void PerformanceMeter::SingleTimer::setAsRoundtripMarker(std::string roundtripName)
 {
-	maxTolerated[stepID] = us;
+	assert(pm);
+	pm->roundtripIndex=myID;
+	pm->roundtrip.name=roundtripName;
+}
+
+PerformanceMeter::StepData& PerformanceMeter::SingleTimer::getData()
+{
+	assert(pm);
+	return pm->stepData[myID];
+}
+
+void PerformanceMeter::StepData::shrinkTimeBuffer(int by)
+{
+	for(int i=0;i<by;i++)
+	{
+		times.pop_front();
+	}
+}
+
+#include <GL/glew.h>
+#include "Spacevec.h"
+#include "Frustum.h"
+#include "IWorld.h"
+#include "DrawServiceProvider.h"
+void PerformanceMeter::draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
+{
+	spacevec interPos=-viewFrustum->observerPos;
+	vec3 interPosMeters=iw.toMeters(interPos);
+	if(roundtrip.times.size()<2) return;
+	float offsetH=2.0f;// m
+	glPushMatrix();
+	glTranslatef(interPosMeters.x-8, interPosMeters.y+offsetH, interPosMeters.z);
+	glColor3f(1,1,1);//white
+	roundtrip.draw(roundtrip.times,dsp->g);
+	int size=stepData.size();
+	for(int i=0;i<size;i++)
+	{
+		glTranslatef(0,0,1);
+		float H=(255.0f*i)/size;//HSV conversion from https://gist.github.com/marukrap/7c361f2c367eaf40537a8715e3fd952a
+		float HPrime = std::fmod(H / 60, 6.f); // H'
+		float X = (1 - std::fabs(std::fmod(HPrime, 2.f) - 1));
+		float R=0,G=0,B=0;
+		switch (static_cast<int>(HPrime))
+		{
+		case 0: R = 1; G = X;        break; // [0, 1)
+		case 1: R = X; G = 1;        break; // [1, 2)
+		case 2:        G = 1; B = X; break; // [2, 3)
+		case 3:        G = X; B = 1; break; // [3, 4)
+		case 4: R = X;        B = 1; break; // [4, 5)
+		case 5: R = 1;        B = X; break; // [5, 6)
+		}
+		glColor3f(R,G,B);
+		stepData[i].draw(roundtrip.times,dsp->g);
+	}
+
+
+	glPopMatrix();
+}
+#include "Graphics2D.h"
+void PerformanceMeter::StepData::draw(std::deque<float>& roundtrip,Graphics2D * g)
+{
+	if(times.size()<2) return;
+	float scaleH=0.1f;// m/ms
+	float scaleW=0.5f;// m/ms
+	float lineSize=0.003f;// m
+	lineSize/=scaleH;
+
+	int steps=roundtrip.size();
+	if(steps>(int)times.size()) steps=times.size();
+	float pos=0;
+	glPushMatrix();
+	glTranslatef(0,0,-1);
+	g->drawString(name,pos,-0.25f,0.2f,20);
+	glPopMatrix();
+	for(int i=1;i<steps;i++)
+	{
+		float lineLength=roundtrip[i];
+		float lineHeightA=times[i-1]*1000;
+		float lineHeightB=times[i]*1000;
+		glPushMatrix();
+		glScalef(scaleW,scaleH,1);
+		glBegin(GL_QUADS);
+		glVertex3f(pos,lineHeightA-lineSize,0);
+		glVertex3f(pos,lineHeightA+lineSize,0);
+		pos+=lineLength;
+		glVertex3f(pos,lineHeightB+lineSize,0);
+		glVertex3f(pos,lineHeightB-lineSize,0);
+		glEnd();
+		glPopMatrix();
+	}
 }

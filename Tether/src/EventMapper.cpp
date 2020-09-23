@@ -78,7 +78,7 @@ EventMapping::Condition eventmapping::conditions::statusAsCondition(bool* to_che
 
 EventMapper::EventMapper(SimulationInputStatusSet& input_status)
 	: managed_stati(&input_status)
-	, pm(1)
+	, pm(8s,0s)
 {}
 
 void EventMapper::event(EventHandler::event& e)

@@ -11,6 +11,7 @@
 
 #include "InteractFilterAlgoSym.h"
 #include "BoxSort.h"
+#include "PerformanceMeter.h"
 
 
 template<typename PhysicsIF>
@@ -19,6 +20,10 @@ class FilterBoxSortSym: public InteractFilterAlgoSym<PhysicsIF>
 	std::vector<InteractFilterEntry<PhysicsIF>> registered;
 	BoxSort<PhysicsIF> b;
 public:
+	PerformanceMeter pm;
+	PerformanceMeter::SingleTimer timerOutside;
+	PerformanceMeter::SingleTimer timerBuildTree;
+	PerformanceMeter::SingleTimer timerRunQueries;
 	FilterBoxSortSym();
 	virtual ~FilterBoxSortSym();
 
@@ -29,8 +34,12 @@ public:
 
 template<typename PhysicsIF>
 inline FilterBoxSortSym<PhysicsIF>::FilterBoxSortSym():
-b(registered)
+b(registered),pm(10s,1s)
 {
+	timerOutside=pm.createTimestep("outside Boxsort");
+	timerOutside.setAsRoundtripMarker("Boxsort Roundtrip");
+	timerBuildTree=pm.createTimestep("timerBuildTree");
+	timerRunQueries=pm.createTimestep("timerRunQueries");
 }
 
 template<typename PhysicsIF>
@@ -54,11 +63,16 @@ template<typename PhysicsIF>
 inline void FilterBoxSortSym<PhysicsIF>::evaluationPhase(TickServiceProvider& tsp)
 {
 	if(registered.empty()) return;
+	//timerOutside.registerTime();
 	b.buildTree(registered.size(),this->verbose);
+	//timerBuildTree.registerTime();
 	for(InteractFilterEntry<PhysicsIF> fe: registered)
 	{
 		b.query(fe,tsp);
 	}
+	//timerRunQueries.registerTime();
+	//std::cout<<"Boxsort time BuildTree:"<<timerBuildTree.getData().getAVG()<<std::endl;
+	//std::cout<<"Boxsort time RunQueries:"<<timerRunQueries.getData().getAVG()<<std::endl;
 }
 
 #endif /* SRC_FILTERBOXSORTSYM_H_ */

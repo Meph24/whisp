@@ -34,6 +34,9 @@ class BenchmarkManager: public Tickable
 	IWorld * world;
 	PerformanceMeter pm;
 
+	PerformanceMeter::SingleTimer timerOutside;
+	PerformanceMeter::SingleTimer timerBenchmark;
+
 	SignalCounter prev_benchmark_signal = 0;
 
 	void nextPhase();

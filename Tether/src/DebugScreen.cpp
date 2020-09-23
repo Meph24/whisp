@@ -18,7 +18,6 @@ g(gr),pm(p),textSize(0.1f)
 
 DebugScreen::~DebugScreen()
 {
-	// TODO Auto-generated destructor stub
 }
 
 #include <sstream>

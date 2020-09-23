@@ -24,8 +24,10 @@
 
 BenchmarkManager::BenchmarkManager(IWorld* World)
 : world(World)
-, pm(2)
+, pm(1s,0s)
 {
+	timerOutside=pm.createTimestep("outside");
+	timerBenchmark=pm.createTimestep("benchmark");
 	{
 		auto algo=new InteractFilterDefaultSym<BenchSym>();
 		algo->verbose=false;
@@ -62,11 +64,11 @@ BenchmarkManager::BenchmarkManager(IWorld* World)
 		algo->verbose=false;
 		addAsymAlgo(algo,"box sort (slave only)");
 	}
-	{
-		auto algo=new FilterBoxSortAsym<BenchAsymMaster,BenchAsymSlave>(1);
-		algo->verbose=false;
-		addAsymAlgo(algo,"box sort (switch at 50:50)");
-	}
+//	{
+//		auto algo=new FilterBoxSortAsym<BenchAsymMaster,BenchAsymSlave>(1);
+//		algo->verbose=false;
+//		addAsymAlgo(algo,"box sort (switch at 50:50)");
+//	}
 
 	addScenario(new BenchScenarioUniform());
 	addScenario(new BenchScenarioUniformAsym());
@@ -114,14 +116,14 @@ void BenchmarkManager::tick(const SimClock::time_point& next_tick_begin, TickSer
 		evaluateData(tsp);
 		nextParam();
 	}
-	pm.registerTime(0);//start timer for benchmark
+	timerOutside.registerTime();//start timer for benchmark
 }
 
 void BenchmarkManager::notifyTickEnded()
 {
 	if(isInactivePhase()) return;
-	pm.registerTime(1);//stop timer for benchmark
-	lastTimeSeconds=pm.getTime(1)*0.000001f;//pm uses microseconds, therefore convert to seconds
+	timerBenchmark.registerTime();//stop timer for benchmark
+	lastTimeSeconds=timerBenchmark.getData().getLastTime();
 	repeatTimes.push_back(lastTimeSeconds);
 }
 

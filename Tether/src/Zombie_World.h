@@ -5,9 +5,9 @@
 #include "IGameMode.h"
 
 #include "Spacevec.h"
+#include "PerformanceMeter.h"
 
 class AdaptiveQuality;
-class PerformanceMeter;
 class DebugScreen;
 class EntityPlayer;
 class TexParamSet;
@@ -15,20 +15,6 @@ class IWorld;
 class WorldDefault;
 
 #include <SFML/Window.hpp>
-
-
-#define PM_GRAPHICS_OUTSIDE 0
-#define PM_GRAPHICS_WORLD 1
-#define PM_GRAPHICS_DRAWDEBUG 2
-#define PM_GRAPHICS_FLUSH 3
-
-#define PM_LOGIC_OUTSIDE 0
-#define PM_LOGIC_PRECALC 1
-#define PM_LOGIC_GUNTICK 2
-#define PM_LOGIC_SPAWN 3
-#define PM_LOGIC_TICK 4
-#define PM_LOGIC_EVAL 5
-#define PM_LOGIC_CHUNKMOVE 6
 
 #include "SimulationInputStatusSet.hpp"
 
@@ -71,6 +57,18 @@ class Zombie_World: public DrawServiceProvider, public IGameMode
 
 public:
 
+	PerformanceMeter::SingleTimer logicOutside;
+	PerformanceMeter::SingleTimer logicGunTick;
+	PerformanceMeter::SingleTimer logicSpawn;
+	PerformanceMeter::SingleTimer logicTick;
+	PerformanceMeter::SingleTimer logicIntersectEval;
+	PerformanceMeter::SingleTimer logicRetick;
+	PerformanceMeter::SingleTimer logicTerrain;
+
+	PerformanceMeter::SingleTimer graphicsOutside;
+	PerformanceMeter::SingleTimer graphicsWorld;
+	PerformanceMeter::SingleTimer graphicsDebug;
+	PerformanceMeter::SingleTimer graphicsFlush;
 
 	Zombie_World(const WallClock& reference_clock, sf::Window * w);
 	~Zombie_World();
