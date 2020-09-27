@@ -11,7 +11,7 @@
 #include <cstdlib>
 
 BenchScenario::BenchScenario():
-absoluteSize("absoluteSize"),objectCount("objectCount",1)
+absoluteSize("absoluteSize"),objectCount("objectCount",0.25f)
 {
 	objectCount.addValue(128);
 	objectCount.addValue(256);
@@ -47,7 +47,6 @@ float BenchScenario::randomFloat()
 
 bool BenchScenario::prepareNextParameters(float seconds)
 {
-//	srand(42);//fixed seed for reproducibility
 	for(auto p: params)
 	{
 		assert(p);
@@ -56,6 +55,20 @@ bool BenchScenario::prepareNextParameters(float seconds)
 	return true;
 }
 #include <iostream>
+
+int BenchScenario::getSeed()
+{
+	int nextMult=1;
+	int ret=0;
+	for(BenchScenarioParam * param: params)
+	{
+		ret+=nextMult*param->getSeed();
+		nextMult*=param->getSeedMax();
+	}
+	ret+=nextMult*name.at(0);
+	return ret;
+}
+
 std::ostream& operator <<(std::ostream& out, const BenchScenario& s)
 {
 	out<<"scenarioName = '"<<s.name<<"', scenarioParameters = { ";

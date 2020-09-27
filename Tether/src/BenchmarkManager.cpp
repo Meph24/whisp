@@ -55,12 +55,12 @@ BenchmarkManager::BenchmarkManager(IWorld* World)
 		addAsymAlgo(algo,"spatial hashing");
 	}
 	{
-		auto algo=new FilterBoxSortAsym<BenchAsymMaster,BenchAsymSlave>(MASTER_ONLY);
+		auto algo=new FilterBoxSortAsym<BenchAsymMaster,BenchAsymSlave>(onlyMaster);
 		algo->verbose=false;
 		addAsymAlgo(algo,"box sort (master only)");
 	}
 	{
-		auto algo=new FilterBoxSortAsym<BenchAsymMaster,BenchAsymSlave>(SLAVE_ONLY);
+		auto algo=new FilterBoxSortAsym<BenchAsymMaster,BenchAsymSlave>(onlySlave);
 		algo->verbose=false;
 		addAsymAlgo(algo,"box sort (slave only)");
 	}
@@ -104,6 +104,7 @@ void BenchmarkManager::tick(const SimClock::time_point& next_tick_begin, TickSer
 			assert(isSymPhase());
 			assert(w->benchAlgoAsym==asymAlgos[0]);
 			assert(w->benchAlgoSym==symAlgos[0]);
+			//std::cout<<rand()<<" "<<rand()<<std::endl;
 		}
 	}
 	if(isInactivePhase()) return;//if no benchmark is running, do nothing
@@ -157,13 +158,8 @@ void BenchmarkManager::nextParam()
 		nextScenario();
 		if(isInactivePhase()) return;
 	}
-	//debug start
-//	for(int i=0;i<2048;i++)
-//	{
-//		active->spawnEntities(world);
-//		clearEntities();
-//	}
-	//debug end
+
+	srand(42+active->getSeed());
 	active->spawnEntities(world);
 }
 
@@ -175,7 +171,7 @@ void BenchmarkManager::nextScenario()
 		scenarioNum=0;
 		nextAlgo();
 	}
-	active=(*activeSet)[0];
+	active=(*activeSet)[scenarioNum];
 }
 
 void BenchmarkManager::setAlgos(unsigned int indx)

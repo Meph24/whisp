@@ -11,9 +11,13 @@
 
 #include <cmath>
 
-#define MASTER_ONLY INFINITY
-#define SLAVE_ONLY 0
-
+enum TreeBuildMode
+{
+	onlyMaster,
+	onlySlave,
+	chooseMore,
+	chooseLess
+};
 
 #include "InteractFilterAlgoAsym.h"
 #include "BoxSort.h"
@@ -26,12 +30,13 @@ class FilterBoxSortAsym: public InteractFilterAlgoAsym<MasterIF,SlaveIF>
 	BoxSort<MasterIF> bm;
 	BoxSort<SlaveIF> bs;
 public:
-	float treeDecisionMasterMultiplier;
+	TreeBuildMode tbm;
+	float preferMasterBy;
 	//the number of registered master entities is multiplied with this value in order to determine
 	//which collection of entities the tree is built from
 	//e.g. more entities of master type -> tree built from master entities
 	//you can use MASTER_ONLY and SLAVE_ONLY to disable dynamic switching
-	FilterBoxSortAsym(float TreeDecisionMasterMultiplier=1);
+	FilterBoxSortAsym(TreeBuildMode t,float PreferMasterBy=1);
 	virtual ~FilterBoxSortAsym();
 
 	void reset();//called between tick rounds for data cleanup
@@ -41,8 +46,8 @@ public:
 };
 
 template<typename MasterIF, typename SlaveIF>
-inline FilterBoxSortAsym<MasterIF, SlaveIF>::FilterBoxSortAsym(float TreeDecisionMasterMultiplier):
-registeredMaster(),registeredSlave(),bm(registeredMaster),bs(registeredSlave),treeDecisionMasterMultiplier(TreeDecisionMasterMultiplier)
+inline FilterBoxSortAsym<MasterIF, SlaveIF>::FilterBoxSortAsym(TreeBuildMode t,float PreferMasterBy):
+registeredMaster(),registeredSlave(),bm(registeredMaster),bs(registeredSlave),tbm(t),preferMasterBy(PreferMasterBy)
 {
 }
 
@@ -75,9 +80,25 @@ inline void FilterBoxSortAsym<MasterIF, SlaveIF>::evaluationPhase(TickServicePro
 {
 	if(registeredMaster.empty()) return;
 	if(registeredSlave.empty()) return;
-	float masterValue=registeredMaster.size()*treeDecisionMasterMultiplier;
-	float slaveValue=registeredSlave.size();
-	if(masterValue>slaveValue)
+
+	bool chooseMaster=true;
+	switch(tbm)
+	{
+	case onlyMaster: chooseMaster=true; break;
+	case onlySlave: chooseMaster=false; break;
+	case chooseLess:
+		{float masterValue=registeredMaster.size();
+		float slaveValue=registeredSlave.size();
+		chooseMaster=masterValue<slaveValue*preferMasterBy;}
+		break;
+	case chooseMore:
+		{float masterValue=registeredMaster.size();
+		float slaveValue=registeredSlave.size();
+		chooseMaster=masterValue*preferMasterBy>slaveValue;}
+		break;
+
+	}
+	if(chooseMaster)
 	{
 		if(registeredSlave.empty()) return;
 		bm.buildTree(registeredSlave.size(),this->verbose);//the guy that thought it was a good idea to write in the C++ standard that just "verbose" would lead to a "was not declared in this scope" should face a life sentence for crimes against humanity
