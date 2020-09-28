@@ -29,6 +29,9 @@ public:
 
 	operator float();
 
+	int getSeed();
+	int getSeedMax();
+
 	//skips last values if given time>MaxTime
 	BenchScenarioParam(std::string Name,float MaxTime=-1);
 	virtual ~BenchScenarioParam();

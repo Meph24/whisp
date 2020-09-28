@@ -36,6 +36,7 @@ BenchScenarioParam::BenchScenarioParam(std::string Name,float MaxTime):
 skipWhenTooMuchTime(MaxTime>=0),maxTime(MaxTime),name(Name)
 {}
 
+
 BenchScenarioParam::~BenchScenarioParam()
 {
 }
@@ -43,4 +44,14 @@ BenchScenarioParam::~BenchScenarioParam()
 BenchScenarioParam::operator float()
 {
 	return getCurValue();
+}
+
+int BenchScenarioParam::getSeed()
+{
+	return indx;
+}
+
+int BenchScenarioParam::getSeedMax()
+{
+	return (int)values.size();
 }

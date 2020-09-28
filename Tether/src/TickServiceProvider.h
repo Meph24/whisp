@@ -32,8 +32,8 @@ class TickServiceProvider
 	std::vector<Retickable *> retickRequests;
 	SoundManager * sm;
 public:
-	unsigned long long interactionCounter=0;//for benchmark purposes
-	unsigned long long arbitraryNumber=0;//for benchmark purposes
+	volatile unsigned long long interactionCounter=0;//for benchmark purposes
+	volatile unsigned long long arbitraryNumber=0;//for benchmark purposes
 
 	unique_ptr<SimulationInputStatusSet> input_status;
 

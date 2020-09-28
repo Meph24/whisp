@@ -32,6 +32,9 @@ public:
 	virtual void spawnEntities(IWorld * w)=0;
 	virtual bool isSym()=0;
 
+	int getSeed();
+
+
 	friend std::ostream& operator<<(std::ostream &out,const BenchScenario& s);
 };
 
