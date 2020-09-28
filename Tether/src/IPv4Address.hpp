@@ -40,6 +40,8 @@ public:
     static const IPv4Address any;
 };
 
+using Port = uint16_t;
+
 } /* namespace network */
 
 #endif // IPV4ADDRESS_HPP
