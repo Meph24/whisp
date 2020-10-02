@@ -40,7 +40,6 @@ bool operator!=(const MinkowskiPoint& first, const MinkowskiPoint& second);
 
 ostream& operator<< (ostream& os, const MinkowskiPoint& p);
 
-
 template<typename VertexIterator0, typename VertexIterator1, typename IndexIterator0, typename IndexIterator1>
 class MinkowskiGenerator
 {
@@ -69,11 +68,10 @@ public:
 		IndexIterator0 iter0; IndexIterator1 iter1;
 		MinkowskiPoint point;
 
-
 		void updatePoint()
 		{
 			point = MinkowskiPoint (
-					vec3((*(source->v0_begin + (*iter0))) - (source->relpos + *(source->v1_begin + (*iter1)))),
+					*(source->v0_begin + (*iter0)) - (source->relpos + *(source->v1_begin + (*iter1))),
 					*iter0, *iter1);
 		}
 	public:
@@ -98,6 +96,7 @@ public:
 			{
 				iter1 = source->i1_begin;
 				iter0++;
+				if(iter0 == source->i0_end) return *this;
 			}
 
 			updatePoint();
@@ -405,8 +404,6 @@ bool intersection(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIt
 		supports.emplace_back(minkowskipoint);
 	}
 
-
-
 	vec3 direction;
 
 	unsigned int iter_depth = 0;
@@ -416,8 +413,6 @@ bool intersection(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIt
 
 		//all the lines the new support impies have to be directed in the search direction
 		
-		
-
 		if(glm::dot(new_support, direction) < 0) 
 		{
 			return false;
