@@ -11,7 +11,7 @@ using glm::mat4x3;
 
 using std::array;
 
-typedef vec4 Vertex;
+typedef vec3 Vertex;
 
 struct Edge : array<Vertex, 2>
 {

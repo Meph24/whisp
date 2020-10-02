@@ -51,14 +51,7 @@ Model::ConvexPart::ConvexPart(const Model& source, set<unsigned int> indices)
 
 Model::Model(const Mesh& mesh)
 {
-	m_vertices.clear();
-	m_vertices.reserve(mesh.vertices.size());
-	for(const vec3& v : mesh.vertices)
-	{
-		Vertex newv (v.x, v.y, v.z, 1.0f);
-		m_vertices.push_back(Vertex(v.x, v.y, v.z, 1.0f));
-	}
-
+	m_vertices = mesh.vertices;
 	m_indices = mesh.indices;
 
 	m_vertices.shrink_to_fit();
