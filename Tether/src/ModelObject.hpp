@@ -16,7 +16,6 @@ class ModelObject
 	mat4 to_apply_transformation;
 	void updateVertices() const;
 
-
 	mutable pair<vec3, vec3> m_extent;
 
 	mutable bool extent_is_outdated;
@@ -34,7 +33,5 @@ public:
 	void drawNative() const;
 	void drawHere() const;
 };
-
-
 
 #endif /* MODELOBJECT_HPP */

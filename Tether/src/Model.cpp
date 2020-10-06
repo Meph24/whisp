@@ -145,7 +145,6 @@ void Model::drawNative() const
 
 	for(const FaceRef& fr : faces())	
 	{
-
 		vec3 color = color_list[0];
 		//find the convex_part the object is in
 		unsigned int j = 0;

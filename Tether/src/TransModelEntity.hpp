@@ -55,6 +55,4 @@ public:
 	void react(float tick_time);
 };
 
-
-
 #endif /* TRANSMODELENTITY_HPP */
