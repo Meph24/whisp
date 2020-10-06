@@ -24,20 +24,6 @@ public:
 
 	virtual void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp) = 0;
 
-	enum TYPE
-	{
-		rigid,
-		transformable,
-		animated,
-		NUM
-	};
-
-	/**
-	 * @brief Returns the type of representation underlying the collider.
-	 * This is done to limit expectations of the caller to certain calls to this interface.
-	 */
-	virtual TYPE type() const = 0;
-
 	//TODO optimize copys in vertices() (shared_ptr idea, custom smart pointer idea)
 	/**
 	 * @brief Get vertex-positions of this collider at a specific time.

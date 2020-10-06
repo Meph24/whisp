@@ -129,8 +129,6 @@ void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickSer
 }
 
 
-Collider::TYPE ModelEntity::type() const { return Collider::TYPE::rigid; }
-
 vector<Vertex> ModelEntity::vertices (float tick_time) const
 {
 	return m_model.vertices();

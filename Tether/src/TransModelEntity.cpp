@@ -115,11 +115,6 @@ void TransModelEntity::collide(DualPointer<Collider> other, float delta_time, Ti
 	react(collision_time);
 	other.pIF->react(collision_time);
 }
-
-Collider::TYPE TransModelEntity::type() const
-{
-	return Collider::TYPE::transformable;
-}
 	
 vector<Vertex> TransModelEntity::vertices (float tick_time) const
 {

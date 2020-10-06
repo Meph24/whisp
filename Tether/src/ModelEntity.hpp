@@ -59,8 +59,6 @@ public:
 	
 	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
 
-	Collider::TYPE type() const; 
-
 	vector<Model::ConvexPart> convexParts() const;
 	
 	vector<Vertex> vertices (float tick_time) const;
