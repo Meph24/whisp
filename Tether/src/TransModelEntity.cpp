@@ -138,4 +138,3 @@ void TransModelEntity::react(float tick_time)
 	drot = vec3(0.0f);
 	dscale = vec3(0.0f);
 }
-
