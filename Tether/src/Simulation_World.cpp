@@ -43,6 +43,7 @@
 #include <glm/gtc/random.hpp>
 
 #include "FloatSeconds.hpp"
+#include "Grid.hpp"
 
 
 Simulation_World::Simulation_World(const WallClock& reference_clock, sf::Window * w)
@@ -416,6 +417,37 @@ void Simulation_World::init()
 			spawn(prism_moving, iw->fromMeters(start + (float)i * experiments_offset + moving_offset*(float)i + moving_down));
 		}
 	}
+	//grid
+	{
+		Grid<32> grid;
+		grid(0,0,0).existence = true;
+		grid(1,0,0).existence = true;
+		grid(-1,0,0).existence = true;
+		grid(0,1,0).existence = true;
+		grid(0,-1,0).existence = true;
+		grid(0,0,1).existence = true;
+		grid(0,0,-1).existence = true;
+		GridEntity* ge = new GridEntity( grid );
+
+		spawn(ge, iw->fromMeters( vec3(20.0f, 20.0f, 20.0f) ));
+	}
+	//oxel
+	{
+		OxelTree t( 0 );
+		Oxel* oxp = &(t.root);
+		for (size_t i = 0; i < 5; i++)
+		{
+			oxp->finer();
+			oxp->children()[3].full = true;
+			oxp->children()[5].full = true;
+			oxp->children()[6].full = true;
+
+			oxp = &(oxp->children()[0]);
+		}
+		OxelEntity* oxele = new OxelEntity(t);
+		spawn( oxele, iw->fromMeters( vec3(-10.0f, 0.0f, 0.0f) ) );
+	}
+
 }
 
 void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
