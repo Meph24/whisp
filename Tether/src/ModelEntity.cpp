@@ -91,43 +91,11 @@ void ModelEntity::tick	(
 	float tick_seconds = (float) FloatSeconds(next_tick_begin - last_ticked);
 	last_ticked = next_tick_begin;
 
-	tick_begin_pos = pos;
-	tick_begin_v = v;
-
 	//the collider needs to save the old state of the entity
 	//to use it for its calculations
 
-	IWorld* iw = tsp->getIWorld();
 	bb = aabb(tick_seconds, tsp);
-
-	//entity attribute changes go here
-	//this is code for collision simulation
-	//entities turn around after flying away too far
-	if(glm::length(iw->toMeters(pos)) > 500)
-		v = v * -1.0f;
-
-	//apply pos by velocity
-	pos += v*tick_seconds;
-
-	iw->collideAlgo->doChecks(
-			(Collider*) this, (Entity*) this,
-			tick_seconds, *tsp);
 }
-
-// implementation of the Collider Interface
-
-void ModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
-{
-	gjk::RelColliders relcolliders(makeDualPointer((Entity*) this,(Collider*) this), other, tsp);
-	float collision_time;
-	//if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
-	if(! gjk::firstRoot(relcolliders, 0.0f, delta_time, collision_time, 4))
-		return;	
-
-	react(collision_time);
-	other.pIF->react(collision_time);
-}
-
 
 vector<Vertex> ModelEntity::vertices (float tick_time) const
 {
@@ -142,10 +110,4 @@ vector<EdgeRef> ModelEntity::edges(float tick_time) const
 vector<FaceRef> ModelEntity::faces(float tick_time) const
 {
 	return m_model.faces();
-}
-
-void ModelEntity::react(float tick_time)
-{
-	pos = pos + v * (tick_time);
-	v.set0();
 }

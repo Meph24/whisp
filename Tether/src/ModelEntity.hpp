@@ -19,7 +19,7 @@
 using glm::vec3;
 
 
-class ModelEntity : public Entity , public Collider
+class ModelEntity : public Entity
 {
 	const Model& m_model;
 
@@ -57,8 +57,6 @@ public:
 
 	//ColliderInterface
 	
-	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
-
 	vector<Model::ConvexPart> convexParts() const;
 	
 	vector<Vertex> vertices (float tick_time) const;
@@ -66,8 +64,6 @@ public:
 	vector<EdgeRef> edges(float tick_time) const;
 
 	vector<FaceRef> faces(float tick_time) const;
-
-	void react(float tick_time);
 };
 
 #endif /* ENTITYDIAMOND_HPP */
