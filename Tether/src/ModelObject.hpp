@@ -10,16 +10,15 @@ using std::vector;
 class ModelObject
 {
 	const Model& m_model;
-	mutable vector<Vertex> m_vertices;
-	mutable mat4 vertex_transformation;
+	vector<Vertex> m_vertices;
+	mat4 vertex_transformation;
+	pair<vec3, vec3> m_extent;
 
 	mat4 to_apply_transformation;
-	void updateVertices() const;
+	void updateVertices();
+	void updateExtent();
+	void update();
 
-	mutable pair<vec3, vec3> m_extent;
-
-	mutable bool extent_is_outdated;
-	void updateExtent() const;
 public:
 	ModelObject(const Model&);
 
