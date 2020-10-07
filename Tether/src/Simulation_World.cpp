@@ -211,16 +211,14 @@ void Simulation_World::init()
 		Mesh m (meshio.get());
 		models.emplace_back(new Model( m ));
 	}
-
-/*	
- *	for ( int i = 0; i < 5; ++i )
+/*
+ 	for ( int i = 0; i < 5; ++i )
 	{
 		//create 6 more models by random
 		models.emplace_back(new Model(Mesh ( randommodel::randomMesh(20, 3.0f))));
 		
 	}
-	*/
-
+*/
 	float fi = 0.0;
 	for(auto& m_uptr : models)
 	{
@@ -447,7 +445,6 @@ void Simulation_World::init()
 		OxelEntity* oxele = new OxelEntity(t);
 		spawn( oxele, iw->fromMeters( vec3(-10.0f, 0.0f, 0.0f) ) );
 	}
-
 }
 
 void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)

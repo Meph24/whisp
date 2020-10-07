@@ -20,13 +20,12 @@ class TransModelEntity : public Entity, public Collider
 
 	spacevec tick_begin_pos, tick_begin_v;
 	vec3 tick_begin_rot, tick_begin_drot;
-	vec3 tick_begin_scale, tick_begin_dscale;
 public:
 	TransModelEntity(const Model& model);
 
 	const ModelObject& modelObject() const;
 
-	vec3 rot, scale, drot, dscale;
+	vec3 rot, scale, drot;
 
 	AABB aabb(float tick_seconds, TickServiceProvider* tsp);
 

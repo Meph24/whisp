@@ -21,7 +21,7 @@ vector<Model::ConvexPart> TransModelEntity::convexParts() const
 
 TransModelEntity::TransModelEntity(const Model& model)
 	: mo(model),
-	rot(0.0f), scale(1.0f), drot(0.0f), dscale(0.0f)
+	rot(0.0f), scale(1.0f), drot(0.0f)
 {
 	pos.set0();
 	v.set0();
@@ -57,10 +57,6 @@ void TransModelEntity::draw(	const SimClock::time_point& ts,
 
 	//apply position
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
-	//rotation already done by matrixmult in model.draw()
-	//glRotatef(m_rot.x, 1.0f, 0.0f, 0.0f);
-	//glRotatef(m_rot.y, 0.0f, 1.0f, 0.0f);
-	//glRotatef(m_rot.z, 0.0f, 0.0f, 1.0f);
 	mo.drawHere();
 
 	glPopMatrix();
@@ -76,8 +72,6 @@ void TransModelEntity::tick(	const SimClock::time_point& next_tick_begin,
 	tick_begin_v = v;
 	tick_begin_rot = rot;
 	tick_begin_drot = drot;
-	tick_begin_scale = scale;
-	tick_begin_dscale = dscale;
 
 	IWorld* iw = tsp->getIWorld();
 	
@@ -91,12 +85,10 @@ void TransModelEntity::tick(	const SimClock::time_point& next_tick_begin,
 
 	pos += v*tick_seconds;
 	rot += drot* tick_seconds;
-	scale += dscale * tick_seconds;
 	mo.setTransform(		glm::rotate(glm::radians(rot.x), vec3(1,0,0))
 							*	glm::rotate(glm::radians(rot.y), vec3(0,1,0))
 							*	glm::rotate(glm::radians(rot.z), vec3(0,0,1))
-							*	glm::scale(scale));
-
+	);
 	iw->collideAlgo->doChecks(
 		(Collider*) this, (Entity*) this,
 		tick_seconds, *tsp);
@@ -134,7 +126,7 @@ vector<FaceRef> TransModelEntity::faces(float tick_time) const
 void TransModelEntity::react(float tick_time)
 {
 	pos = pos + (v*(tick_time));
+	rot = rot + (drot*(tick_time));
 	v.set0();
 	drot = vec3(0.0f);
-	dscale = vec3(0.0f);
 }

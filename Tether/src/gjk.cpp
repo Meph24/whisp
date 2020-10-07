@@ -101,44 +101,52 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 
 	if(initial_samples == 1) return false;
 
+
+	bool found = false;
 	float timespan = t1 - t0;
 	float timestep = timespan / (initial_samples - 1);
-	for( int sample = 1 ; sample < initial_samples; sample++ )
+	int sample;
+	for( sample = 1 ; sample < initial_samples; sample++ )
 	{
 		time1 = t0+timestep*sample;
 		dist1 = nonConvexDistance(relcolliders, time1);
 		if (dist1 <= 0.0f)
 		{
+			found = true;
 			break;
-		}
-
-		if(sample == initial_samples - 1)
-		{
-			return false;
 		}
 
 		dist0 = dist1;
 		time0 = time1;
 	}
 
-	while(time1-time0 > epsilon)
-	{
-		float time05 = time0 + (time1-time0) * 0.5;
-		float dist05 = nonConvexDistance(relcolliders, time05);
-		if(dist05 <= 0.0f)
+	if(!found) return false;
+	else
+	{	
+		while(time1-time0 > epsilon)
 		{
-			time1 = time05;
-			dist1 = dist05;
+			float time05 = time0 + (time1-time0) * 0.5;
+			float dist05 = nonConvexDistance(relcolliders, time05);
+			if(dist05 <= 0.0f)
+			{
+				time1 = time05;
+				dist1 = dist05;
+			}
+			else
+			{
+				time0 = time05;
+				dist0 = dist05;
+			}
 		}
+		time_out = time0;
+		if( dist1 <= 0.0f )
+			return true;
 		else
-		{
-			time0 = time05;
-			dist0 = dist05;
-		}
+			return false;
 	}
 
-	time_out = time0;
-	return true;
+	return false;
+	
 }
 
 

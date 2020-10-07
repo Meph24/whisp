@@ -111,12 +111,12 @@ public:
 			return newiter;
 		}
 
-		MinkowskiPoint& operator*()
+		const MinkowskiPoint& operator*() const
 		{
 			return point;
 		}
 
-		MinkowskiPoint& operator->()
+		const MinkowskiPoint& operator->() const
 		{
 			return point;
 		}
@@ -184,12 +184,8 @@ inline bool sameDirection(const vec3& d0, const vec3& d1)
 inline bool doPoint(vector<MinkowskiPoint>& supports, vec3& direction)
 {
 	const vec3& a = supports.back();
+	if ( vecEquals (vec3(0.0f), a) ) return true;
 	direction = -a;
-	if(vecEquals(direction, vec3(0.0f)))
-		return true;
-#ifdef GJK_RUNTIME_ASSERTS
-		if(!sameDirection(-a, direction)) cout << "[POINT DIRECTION ASSERT FAILED!]" << -a << ']';
-#endif /* GJK_RUNTIME_ASSERTS */
 	return false;
 }
 
@@ -203,16 +199,6 @@ inline bool doLine(vector<MinkowskiPoint>& supports, vec3& direction)
 	{
 		direction = glm::cross(glm::cross(ab, -a), ab);
 		if(vecEquals(direction,vec3(0.0f))) return true;
-
-#ifdef GJK_RUNTIME_ASSERTS
-		if(!sameDirection(-a, direction)) cout << "[LINE DIRECTION ASSERT FAILED! \n-a:" << glm::to_string(-a) << "\ndir:" << glm::to_string(direction) << "\nab x -a :" << glm::to_string(glm::cross(ab, -a)) << '\n';
-		if(glm::dot(fcross, ab) != 0.0) cout << "[LINE DIRECTION ASSERT FAILED! fcross not orthogonal to line!]" << "\nfcross:" << glm::to_string(fcross) << "\nfcross dot ab :" << glm::dot(fcross, ab) << '\n';
-
-
-	if(glm::dot(direction, ab) != 0.0) cout << "[LINE DIRECTION ASSERT FAILED! direction not orthogonal to line!]" << "\ndir:" << glm::to_string(direction) << "\ndirection dot ab :" << glm::dot(direction, ab) << '\n';
-
-#endif /* GJK_RUNTIME_ASSERTS */
-
 		return false;
 	}
 	else //origin nearer to the newest point
@@ -450,6 +436,43 @@ bool intersection(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIt
 
 template<typename MinkowskiPointIterator>
 float distance(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIterator& mp_end, std::vector<MinkowskiPoint>* supports_out = nullptr)
+{
+	MinkowskiPoint start = *mp_begin;
+	vector<MinkowskiPoint> supports = { start }; supports.reserve(4);
+	vec3 direction = -start;
+	float dist = doDistance(supports);
+
+	while( dist > 0.0f )
+	{	
+		MinkowskiPoint next_support = maxSupport(mp_begin, mp_end, direction);
+		if( std::find(supports.begin(), supports.end(), next_support) == supports.end() ) supports.push_back( next_support );
+		if (closestSimplex( supports, direction ))
+		{
+			//typically closestSimplex() only is true when the origin could be enclosed
+			if(supports_out) *supports_out = supports;
+			return 0.0f;
+		}
+		float new_dist = doDistance(supports);
+		if( new_dist >= dist )
+		{			
+			if(supports_out) *supports_out = supports;
+			return dist;
+		}
+		if( supports.size() == 4 )
+		{
+			//definitely enclosed
+			if(supports_out) *supports_out = supports;
+			return dist;
+		}
+		dist = new_dist;
+		//new direction has been set by closestSimplex()
+	}
+	if(supports_out) *supports_out = supports;
+	return dist;
+}
+
+template<typename MinkowskiPointIterator>
+float distance2(const MinkowskiPointIterator& mp_begin, const MinkowskiPointIterator& mp_end, std::vector<MinkowskiPoint>* supports_out = nullptr)
 {
 	std::vector<MinkowskiPoint> supports; 
 	supports.reserve(4);
