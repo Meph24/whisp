@@ -11,7 +11,7 @@ struct test_GeoFeatures : public ::testing::Test
 	vector<Vertex> vertices;
 
 	test_GeoFeatures()
-		: vertices{vec4(0,0,0,1), vec4(1,0,0,1), vec4(0,1,0,1), vec4(0,0,1,1), vec4(1,0,0,1), vec4(1,1,0,1)}
+		: vertices{vec3(0,0,0), vec3(1,0,0), vec3(0,1,0), vec3(0,0,1), vec3(1,0,0), vec3(1,1,0)}
 	{
 	}
 };
@@ -19,7 +19,7 @@ struct test_GeoFeatures : public ::testing::Test
 TEST_F(test_GeoFeatures, EdgeRef)
 {
 	EdgeRef er (0,1);
-	Edge expected = {vec4(0,0,0,1), vec4(1,0,0,1)};
+	Edge expected = {vec3(0,0,0), vec3(1,0,0)};
 	EXPECT_EQ	(	expected,
 					er.edge(vertices.begin(), vertices.end())
 				);
@@ -30,7 +30,7 @@ TEST_F(test_GeoFeatures, EdgeRef)
 TEST_F(test_GeoFeatures, FaceRef)
 {
 	FaceRef fr (0,1,3);
-	Face expected = {vec4(0,0,0,1), vec4(1,0,0,1), vec4(0,0,1,1)};
+	Face expected = {vec3(0,0,0), vec3(1,0,0), vec3(0,0,1)};
 	EXPECT_EQ	(	expected,
 					fr.face(vertices.begin(), vertices.end())
 				);

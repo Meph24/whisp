@@ -1,4 +1,4 @@
-#include "../src/NetworkConnection.hpp"
+#include "../src/IPv4Address.hpp"
 
 #include <gtest/gtest.h>
 

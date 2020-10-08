@@ -5,80 +5,183 @@
 
 using std::unique_ptr;
 
-#include <array>
-#include <cstdint>
-#include <regex>
-#include <string>
+#include <SFML/Network.hpp>
 
-using std::array;
-using std::regex;
-using std::smatch;
-using std::string;
-using std::to_string;
-using std::stoi;
-using std::regex_search;
+#include "IPv4Address.hpp"
 
-#include "error.hpp"
+#include <list>
+using std::list;
 
 namespace network
 {
 
-class IPv4Address
+struct TcpSocket : public ::sf::TcpSocket {};
+
+struct ConnectionHead
 {
-    uint32_t v;
-public:
-    static regex re_ipv4;
-    static uint32_t parseIPv4String(const string&);
-    static uint32_t combineBytesToIPv4(uint8_t, uint8_t, uint8_t, uint8_t);
-    IPv4Address();
-    IPv4Address(uint8_t, uint8_t, uint8_t, uint8_t);
-    IPv4Address(uint32_t);
-    IPv4Address(const string&);
-    IPv4Address(const IPv4Address&) = default;
-    IPv4Address& operator=(const IPv4Address&) = default;
+    unique_ptr<TcpSocket> tcpsocket;
 
-    bool operator<(const IPv4Address& other) const;
-    bool operator>(const IPv4Address& other) const;
-    bool operator<=(const IPv4Address& other) const;
-    bool operator>=(const IPv4Address& other) const;
-    bool operator==(const IPv4Address& other) const;
-    bool operator!=(const IPv4Address& other) const;
-
-    uint32_t value() const;
-
-    explicit operator uint32_t () const;
-    explicit operator string () const;
+    ConnectionHead( unique_ptr<TcpSocket>&& );
 };
 
-regex IPv4Address::re_ipv4 = regex(R"x(^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)x");
-uint32_t IPv4Address::parseIPv4String(const string& addr)
-{
-    smatch sm;
-    if(! regex_search(addr, sm, re_ipv4) )
-    {
-        throw input_format_error("Ipv4Address: Input string was not recognized as a valid ipv4-address!"); 
-    }
-    return combineBytesToIPv4(stoi(sm[0]), stoi(sm[1]), stoi(sm[2]), stoi(sm[3]));
-}
-uint32_t IPv4Address::combineBytesToIPv4(uint8_t b3, uint8_t b2, uint8_t b1, uint8_t b0)
-{
-    return  (uint32_t) 0 + ((uint32_t) b3 << 24) + ((uint32_t) b2 << 16) + ((uint32_t) b1 << 8) + ((uint32_t) b0);
-}
-IPv4Address::IPv4Address() : v(0) {}
-IPv4Address::IPv4Address(uint8_t b3, uint8_t b2, uint8_t b1, uint8_t b0)
-: v (combineBytesToIPv4(b3, b2, b1, b0)) {}
-IPv4Address::IPv4Address(uint32_t addr) : v(addr) {}
-IPv4Address::IPv4Address(const string& addr) : v(parseIPv4String(addr)) {}
+ConnectionHead::ConnectionHead( unique_ptr<TcpSocket>&& socket ) : tcpsocket( ::std::move(socket) ) {}
 
-bool IPv4Address::operator<(const IPv4Address& other) const { return v < other.v; }
-bool IPv4Address::operator>(const IPv4Address& other) const { return v > other.v; }
-bool IPv4Address::operator<=(const IPv4Address& other) const { return v <= other.v; }
-bool IPv4Address::operator>=(const IPv4Address& other) const { return v >= other.v; }
-bool IPv4Address::operator==(const IPv4Address& other) const { return v == other.v; }
-bool IPv4Address::operator!=(const IPv4Address& other) const { return v != other.v; }
-uint32_t IPv4Address::value() const { return v; }
-IPv4Address::operator uint32_t () const { return v; }
-IPv4Address::operator string () const { return to_string(v >> 24 & 0xFF) + string(".") + to_string(v >> 16 & 0xFF) + string(".") + to_string(v >> 8 & 0xFF) + string(".") + to_string(v & 0xFF); }
+
+struct TcpListener
+{
+    ::sf::TcpListener listener;
+    void listen(Port tcp_port);
+    unique_ptr<TcpSocket> nonBlockingNext();
+};
+
+void TcpListener::listen(Port tcp_port) { listener.listen(tcp_port); }
+unique_ptr<TcpSocket> TcpListener::nonBlockingNext() 
+{
+    unique_ptr<TcpSocket> new_socket (new TcpSocket) ;
+    listener.setBlocking(false);
+    if( listener.accept(*new_socket) == ::sf::Socket::Status::Done) 
+    {
+        new_socket->setBlocking(false);
+        std::cout << "Connection established! " << new_socket.get() << "\n";
+        return new_socket;
+    }
+    return nullptr;
+}
+
+class ConnectionReception
+{
+    void processNewTcpConnection( unique_ptr<TcpSocket>&& );
+    
+    TcpListener listener;
+public:
+    void listen( Port tcp_port );
+    bool isListening() const;
+
+    list <ConnectionHead> heads;
+
+    bool processNextIncoming();
+};
+
+void ConnectionReception::listen ( Port tcp_port )
+{
+    listener.listen( tcp_port );
+}
+
+void ConnectionReception::processNewTcpConnection( unique_ptr<TcpSocket>&& socket )
+{
+    //TODO default allow is bad
+    heads.emplace_back( ::std::move(socket) );
+}
+
+bool ConnectionReception::processNextIncoming()
+{
+    unique_ptr<TcpSocket> new_socket (listener.nonBlockingNext());
+    std::cout << " and then " << new_socket.get() << "\n";
+    if( !new_socket ) return false;
+
+    processNewTcpConnection( ::std::move(new_socket) );
+    return true;
+}
+
+/*
+
+
+struct TcpListener : public Socket
+{
+    enum Status{ Fine, Error, NUM_STATI };
+    virtual Status status() const;
+
+    virtual void listen(unsigned short port, const IPv4Address& address = IPv4Address::any) = 0;
+    virtual unique_ptr<TcpSocket> incoming() = 0;
+    virtual void close() = 0;
+};
+
+#include "SFML/Network.hpp"
+#include "SFML/System/Time.hpp"
+
+class SFMLTcpSocket : public TcpSocket
+{
+    sf::TcpSocket socket;
+    TcpSocket::Status current_status;
+public:
+    SFMLTcpSocket();
+
+    TcpSocket::Status status() const;
+
+    void setBlocking(bool blocking = true);
+    bool isBlocking() const;
+    Port localPort() const;
+    IPv4Address remoteAddress() const;
+    Port remotePort() const;
+
+    Status connect(const IPv4Address&, const Port&, const milliseconds&);
+    void disconnect();
+
+    void send(const void* data, size_t size);
+    void send(const void* data, size_t size, size_t& sent);
+    void receive(void* data, size_t size, size_t& received);
+};
+
+SFMLTcpSocket::SFMLTcpSocket() : current_status( TcpSocket::Status::Disconnected ) {}
+virtual Status SFMLTcpSocket::status() const { return current_status; }
+void SFMLTcpSocket::setBlocking(bool blocking = true) { socket.setBlocking(blocking); }
+bool SFMLTcpSocket::isBlocking() const { return socket.isBlocking(); }
+Port SFMLTcpSocket::SFMLTcpSocket::localPort() const { return socket.getLocalPort(); }
+IPv4Address SFMLTcpSocket::remoteAddress() const { return IPv4Address( socket.getRemoteAddress().toInteger() ); }
+Port SFMLTcpSocket::remotePort() const { return socket.getRemotePort(); }
+
+TcpSocket::Status SFMLTcpSocket::connect(const IPv4Address& addr, const Port& port, const milliseconds& timeout = milliseconds(0) )
+{ 
+    if(timeout == milliseconds(0)) socket.connect(addr, port); 
+    else socket.connect(addr, port, sf::milliseconds(timeout.count()));
+}
+void SFMLTcpSocket::disconnect() { socket.disconnect(); }
+
+TcpSocket::Status SFMLTcpSocket::send(const void* data, size_t size) { return (TcpSocket::SendStatus) socket.send(data, size); }
+TcpSocket::Status SFMLTcpSocket::send(const void* data, size_t size, size_t& sent) { return (TcpSocket::SendStatus) socket.send(data, size, sent); }
+TcpSocket::Status SFMLTcpSocket::receive(void* data, size_t size, size_t& received) { return (TcpSocket::SendStatus) socket.receive(data, size, received); };
+
+class SFMLTcpListener : public TcpListener
+{
+    sf::TcpListener socket;
+    unique_ptr<SFMLTcpSocket> to_construct_socket;
+    TcpListener::Status current_status;
+public:
+    SFMLTcpListener();
+    virtual void setBlocking(bool blocking = true) ;
+    virtual bool isBlocking() const;
+    virtual Port localPort() const;
+
+    virtual void listen(unsigned short port, const IPv4Address& address = IPv4Address::any);
+    virtual unique_ptr<TcpSocket> incoming();
+    virtual void close() = 0;
+};
+
+
+SFMLTcpListener::SFMLTcpListener() : to_construct_socket( new SFMLTcpSocket ), current_status( TcpListener::Status::Fine ) {}
+void SFMLTcpListener::setBlocking(bool blocking = true) { socket.setBlocking(blocking); }
+bool SFMLTcpListener::isBlocking() const { return socket.isBlocking(); }
+Port SFMLTcpListener::localPort() const { return socket.getLocalPort(); }
+
+void SFMLTcpListener::listen(unsigned short port, const IPv4Address& address = IPv4Address::any) { return socket.listen(port, address); }
+unique_ptr<TcpSocket> SFMLTcpListener::incoming()
+{
+    if(socket.accept( *to_construct_socket ) == sf::Socket::Done )
+    {
+        unique_ptr<TcpSocket> temp ( move(to_construct_socket) );
+        to_construct_socket.reset( new SFMLTcpSocket );
+        return move(temp);
+    }
+    return unique_ptr<TcpSocket>(nullptr);
+}
+void SFMLTcpListener::close() { socket.close(); }
+
+
+*/
+
+
+
+
 
 } /* namespace network */
 #endif // NETWORKCONNECTION_HPP

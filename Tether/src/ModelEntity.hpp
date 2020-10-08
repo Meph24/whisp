@@ -17,7 +17,6 @@
 #include "gjk.hpp"
 
 using glm::vec3;
-using glm::vec4;
 
 
 class ModelEntity : public Entity , public Collider

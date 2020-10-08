@@ -38,10 +38,10 @@ TEST(MinkowskiPoint, implicit_operators)
 
 TEST(test_gjk, MinkowskiGenerator)
 {
-	vector<Vertex> vertices0 = { Vertex(1.0f, 1.0f, 1.0f, 1.0f),
-									  Vertex(-0.75f, -0.75f, 0.75f, 1.0f)};
-	vector<Vertex> vertices1 = { Vertex(0.5f, 0.5f, 0.5f, 1.0f),
-									  Vertex(-0.25f, -0.25f, -0.25f, 1.0f)	};
+	vector<Vertex> vertices0 = { Vertex(1.0f, 1.0f, 1.0f),
+									  Vertex(-0.75f, -0.75f, 0.75f)};
+	vector<Vertex> vertices1 = { Vertex(0.5f, 0.5f, 0.5f),
+									  Vertex(-0.25f, -0.25f, -0.25f)};
 	vector<unsigned int> indices0 = {0};
 	vector<unsigned int> indices1 = {0, 1};
 
@@ -62,25 +62,25 @@ TEST(test_gjk, MinkowskiGenerator)
 
 	EXPECT_EQ(expect, result);
 
-	EXPECT_EQ(Vertex(1.0f, 1.0f, 1.0f, 1.0f), (*(vertices0.begin() + result[0].i0)));
-	EXPECT_EQ(Vertex(0.5f, 0.5f, 0.5f, 1.0f), (*(vertices1.begin() + result[0].i1)));
+	EXPECT_EQ(Vertex(1.0f, 1.0f, 1.0f), (*(vertices0.begin() + result[0].i0)));
+	EXPECT_EQ(Vertex(0.5f, 0.5f, 0.5f), (*(vertices1.begin() + result[0].i1)));
 
 
-	EXPECT_EQ(Vertex(1.0f, 1.0f, 1.0f, 1.0f), (*(vertices0.begin() + result[1].i0)));
-	EXPECT_EQ(Vertex(-0.25f, -0.25f, -0.25f, 1.0f), (*(vertices1.begin() + result[1].i1)));
+	EXPECT_EQ(Vertex(1.0f, 1.0f, 1.0f), (*(vertices0.begin() + result[1].i0)));
+	EXPECT_EQ(Vertex(-0.25f, -0.25f, -0.25f), (*(vertices1.begin() + result[1].i1)));
 }
 
 TEST(test_gjk, support)
 {
 	//for simplicitly we use only 2d
-	vector<Vertex> vertices0 = {	Vertex(1.0f, 0.0f, 0.0f, 1.0f),
-									Vertex(0.0f, 0.0f, 0.0f, 1.0f),
-									Vertex(0.5f, 1.0f, 0.0f, 1.0f)
+	vector<Vertex> vertices0 = {	Vertex(1.0f, 0.0f, 0.0f),
+									Vertex(0.0f, 0.0f, 0.0f),
+									Vertex(0.5f, 1.0f, 0.0f)
 								};
 
-	vector<Vertex> vertices1 = {	Vertex(1.0f, 0.0f, 0.0f, 1.0f),
-									Vertex(0.0f, 0.0f, 0.0f, 1.0f),
-									Vertex(0.5f, 1.0f, 0.0f, 1.0f)
+	vector<Vertex> vertices1 = {	Vertex(1.0f, 0.0f, 0.0f),
+									Vertex(0.0f, 0.0f, 0.0f),
+									Vertex(0.5f, 1.0f, 0.0f)
 								};
 
 	vector<unsigned int> indices0 = {0,1,2};
@@ -384,17 +384,17 @@ struct test_GJK_intersection : ::testing::Test
 	test_GJK_intersection()
 	{
 		vertices0 = {	
-						Vertex(0.0f, 0.0f, 0.0f, 1.0f),
-						Vertex(1.0f, 0.0f, 0.0f, 1.0f),
-						Vertex(0.5f, 1.0f, 0.5f, 1.0f),
-						Vertex(0.5f, 0.0f, 1.0f, 1.0f)
+						Vertex(0.0f, 0.0f, 0.0f),
+						Vertex(1.0f, 0.0f, 0.0f),
+						Vertex(0.5f, 1.0f, 0.5f),
+						Vertex(0.5f, 0.0f, 1.0f)
 					};
 
 		vertices1 = {
-						Vertex(0.0f, 0.0f, 0.0f, 1.0f),
-						Vertex(1.0f, 0.0f, 0.0f, 1.0f),
-						Vertex(0.5f, 1.0f, 0.5f, 1.0f),
-						Vertex(0.5f, 0.0f, 1.0f, 1.0f)
+						Vertex(0.0f, 0.0f, 0.0f),
+						Vertex(1.0f, 0.0f, 0.0f),
+						Vertex(0.5f, 1.0f, 0.5f),
+						Vertex(0.5f, 0.0f, 1.0f)
 					};
 
 		indices0 = {0,1,2,3};
@@ -472,14 +472,14 @@ struct test_GJK_distance : ::testing::Test
 	test_GJK_distance()
 	{
 		vertices0 = {	
-						Vertex(0.0f, 0.0f, 0.0f, 1.0f),
-						Vertex(1.0f, 0.0f, 0.0f, 1.0f),
-						Vertex(0.5f, 1.0f, 0.5f, 1.0f),
-						Vertex(0.5f, 0.0f, 1.0f, 1.0f)
+						Vertex(0.0f, 0.0f, 0.0f),
+						Vertex(1.0f, 0.0f, 0.0f),
+						Vertex(0.5f, 1.0f, 0.5f),
+						Vertex(0.5f, 0.0f, 1.0f)
 					};
 
 		vertices1 = {
-						Vertex(0.0f, 0.0f, 0.0f, 1.0f),
+						Vertex(0.0f, 0.0f, 0.0f),
 					};
 
 		indices0 = {0,1,2,3};

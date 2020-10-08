@@ -38,11 +38,15 @@ public:
 		}
 		test_dir = fs::current_path() / "TEST_CFG";
 		fs::create_directory(test_dir);
+		fs::permissions(test_dir, fs::perms::all);
 	}
 
 	~test_CfgIO()
 	{
-		fs::remove_all(fs::current_path() / "TEST_CFG");
+		// not possible in current compiler on Windows MinGw 7.3.0 (a seemed dependency of SFML)
+		//under current investigation
+		//this test should work without it, the directory will not be deleted, however
+		//fs::remove_all( test_dir );
 	}
 };
 
