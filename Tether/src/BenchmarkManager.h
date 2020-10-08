@@ -74,7 +74,7 @@ class BenchmarkManager: public Tickable
 
 	float lastTimeSeconds=0;
 public:
-	unsigned int repeats=16;//how often is the same experiment repeated
+	unsigned int repeats=5;//how often is the same experiment repeated
 
 	void tick(const SimClock::time_point& next_tick_begin,TickServiceProvider * tsp);//call before ticks, when it is safe to modify required values
 	void notifyTickEnded();

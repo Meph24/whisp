@@ -29,6 +29,7 @@ public:
 
 #include "Spacevec.h"
 #include "IWorld.h"
+#include "BenchmarkTest.h"
 template<typename T>
 inline void BenchScenarioUniform::spawnUniform(unsigned int count, IWorld* w)
 {
@@ -37,11 +38,13 @@ inline void BenchScenarioUniform::spawnUniform(unsigned int count, IWorld* w)
 	unitLength.floatpart=0;
 	unitLength.intpart=1;
 
+	//BenchmarkTest test;
+
 	float averageObjectSizeMeters=w->toMeters(unitLength)*absoluteSize;
 	float averageDistanceMeters=averageObjectSizeMeters/density;
 	float spawnAreaSize=averageDistanceMeters*cbrt(objectCount);
 
-	for(int i=0;i<objectCount;i++)
+	for(unsigned int i=0;i<count;i++)
 	{
 		vec3 positionVec(randomFloat(),randomFloat(),randomFloat());
 		positionVec*=spawnAreaSize;
@@ -54,9 +57,11 @@ inline void BenchScenarioUniform::spawnUniform(unsigned int count, IWorld* w)
 
 		float sizeMeters=randomFloat()*2*averageObjectSizeMeters;
 		sizeVec*=sizeMeters;
-
-		w->requestEntitySpawn(new T(w->fromMeters(sizeVec),w->fromMeters(positionVec)));
+		T * e=new T(w->fromMeters(sizeVec),w->fromMeters(positionVec));
+		//test.registerEntity(e);
+		w->requestEntitySpawn(e);
 	}
+	//std::cout<<test;
 }
 
 #endif /* SRC_BENCHSCENARIOUNIFORM_H_ */

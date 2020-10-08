@@ -14,6 +14,8 @@
 #include "FilterBoxSortSym.h"
 #include "FilterHashSym.h"
 #include "FilterHashAsym.h"
+#include "InteractFilterNoneS.h"
+#include "InteractFilterNoneA.h"
 
 IWorld::IWorld()
 {
@@ -32,8 +34,8 @@ IWorld::~IWorld()
 void IWorld::initAlgos()
 {
 	pushAlgo=new FilterHashSym<Pushable>();//new FilterBoxSortSym<Pushable>();//InteractFilterDefaultSym<Pushable>();//TODO placeholder
-	projectileAlgo=new FilterHashAsym<Projectile,Hittable>();//new FilterBoxSortAsym<Projectile,Hittable>(onlySlave);//InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
-	collideAlgo=new FilterBoxSortSym<Collider>();//InteractFilterDefaultSym<Collider>();//TODO placeholder
+	projectileAlgo=new FilterHashAsym<Projectile,Hittable>();//new InteractFilterNoneA<Projectile,Hittable>();//new FilterBoxSortAsym<Projectile,Hittable>(onlySlave);//InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
+	collideAlgo=new FilterBoxSortSym<Collider>();//new InteractFilterNoneS<Collider>();//InteractFilterDefaultSym<Collider>();//TODO placeholder
 	benchAlgoSym=new InteractFilterDefaultSym<BenchSym>();
 	benchAlgoAsym=new InteractFilterDefaultAsym<BenchAsymMaster,BenchAsymSlave>();
 }
