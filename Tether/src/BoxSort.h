@@ -90,7 +90,7 @@ inline void BoxSort<PhysicsIF>::check(InteractFilterEntry<QueryIF> qe,InteractFi
 	if(!(qe.e.e->bb.doesIntersect(entry.e.e->bb))) return;
 	if constexpr(std::is_same<QueryIF, PhysicsIF>::value)//if QueryIF==PhysicsIF
 	{
-		if(qe.e.e==entry.e.e) return;//in symmetric case intersection with self must be filtered out
+		if(qe.e.e>=entry.e.e) return;//in symmetric case intersections must be filtered out: with self; 1 of the 2 possible ways
 	}
 	intersections++;
 
