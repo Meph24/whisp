@@ -21,7 +21,8 @@ vector<Model::ConvexPart> TransModelEntity::convexParts() const
 
 TransModelEntity::TransModelEntity(const Model& model)
 	: mo(model),
-	rot(0.0f), scale(1.0f), drot(0.0f), dscale(0.0f)
+	rot(0.0f), scale(1.0f), drot(0.0f), dscale(0.0f),
+	physics(true)
 {
 	pos.set0();
 	v.set0();
@@ -95,9 +96,12 @@ void TransModelEntity::tick(	const SimClock::time_point& next_tick_begin,
 							*   glm::scale( scale )
 	);
 
-	iw->collideAlgo->doChecks(
+	if(physics)
+	{
+		iw->collideAlgo->doChecks(
 		(Collider*) this, (Entity*) this,
 		tick_seconds, *tsp);
+	}
 
 	last_ticked = next_tick_begin;
 }
@@ -158,4 +162,6 @@ void TransModelEntity::react(float tick_time)
 	);
 	v.set0();
 	drot = vec3(0.0f);
+
+	physics = false;
 }

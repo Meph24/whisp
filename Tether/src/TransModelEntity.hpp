@@ -28,6 +28,8 @@ public:
 
 	vec3 rot, scale, drot, dscale;
 
+	bool physics;
+
 	AABB aabb(float tick_seconds, TickServiceProvider* tsp);
 
 	void draw(	const SimClock::time_point& ts, 

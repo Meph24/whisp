@@ -228,7 +228,7 @@ void Simulation_World::init()
 		spawn(me, iw->fromMeters(vec3(20.0f, 4.0f, fi*2.5f)));
 		fi += 1.0f;
 	}
-
+/*
 	for ( int i = 0; i < objects_count; ++i )
 	{
 		TransModelEntity* me = new TransModelEntity(*(models[rand() % models.size()]));
@@ -389,6 +389,7 @@ void Simulation_World::init()
 		spawn(me0, iw->fromMeters(pos0));
 		spawn(me1, iw->fromMeters(pos1));
 	}
+	*/
 	//prisms
 	{
 		vec3 moving_offset(5.0f, 0.0f, 0.0f);
@@ -411,6 +412,7 @@ void Simulation_World::init()
 			spawn(prism_moving, iw->fromMeters(start + (float)i * experiments_offset + moving_offset*(float)i + moving_down));
 		}
 	}
+	/*
 	//grid
 	{
 		Grid<32> grid;
@@ -441,6 +443,7 @@ void Simulation_World::init()
 		OxelEntity* oxele = new OxelEntity(t);
 		spawn( oxele, iw->fromMeters( vec3(-10.0f, 0.0f, 0.0f) ) );
 	}
+	*/
 }
 
 void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)

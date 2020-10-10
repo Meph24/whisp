@@ -123,7 +123,7 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 	if(!found) return false;
 	else
 	{	
-		while(time1-time0 > epsilon)
+		while(dist1-dist0 > epsilon)
 		{
 			float time05 = time0 + (time1-time0) * 0.5;
 			float dist05 = nonConvexDistance(relcolliders, time05);
