@@ -105,28 +105,4 @@ Entity::~Entity()
 	}
 }
 
-/*
-void Entity::standardMove(float time,ChunkManager * cm)
-{
-	if(isInAir)
-	{
-		v.y-=cm->getGravity()*time;//apply gravity
-	}
-	else if(selfMovement)
-	{
-		//apply wanted movement;
-	}
-	pos+=v*time;
-	//apply movement
-
-
-	//TODO
-	//move according to movement vector, wanted movement, gravity
-	//does not apply custom forces like air friction
-}
-
-void Entity::move(float time, ChunkManager* cm)
-{
-	standardMove(time,cm);
-}
-*/
+void Entity::onSpawn(TickServiceProvider* tsp) {}

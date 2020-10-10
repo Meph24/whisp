@@ -184,7 +184,8 @@ inline bool sameDirection(const vec3& d0, const vec3& d1)
 inline bool doPoint(vector<MinkowskiPoint>& supports, vec3& direction)
 {
 	const vec3& a = supports.back();
-	if ( vecEquals (vec3(0.0f), a) ) return true;
+	if ( vecEquals (vec3(0.0f), a) )
+		return true;
 	direction = -a;
 	return false;
 }
@@ -193,12 +194,21 @@ inline bool doLine(vector<MinkowskiPoint>& supports, vec3& direction)
 {
 	const vec3& b = supports.front();
 	const vec3& a = supports.back();
+
+	if( glm::vecEquals(a, b) )
+	{
+		//vertices are the same
+		supports.pop_back();
+		return doPoint( supports, direction );
+	}
+
 	vec3 ab = b-a;
 	//AB same direction as A0
 	if(sameDirection(ab, -a)) //origin near the line
 	{
 		direction = glm::cross(glm::cross(ab, -a), ab);
-		if(vecEquals(direction,vec3(0.0f))) return true;
+		if(vecEquals(direction,vec3(0.0f))) 
+			return true;
 		return false;
 	}
 	else //origin nearer to the newest point
@@ -217,12 +227,18 @@ inline bool doTriangle(vector<MinkowskiPoint>& supports, vec3& direction)
 	const vec3 ac = c-a;
 	const vec3 abc = glm::cross(ab, ac);
 
+	if( glm::vecEquals(abc, vec3(0.0f)) )
+	{
+		//vertices are colinear
+		// this is the fault of the newcomer, since the line bc was already chosen before
+		//removing a and proceding as line
+		supports.pop_back();
+		return doLine( supports, direction );
+		
+	}
+
 
 	const vec3 ac_orth = glm::cross(abc, ac);
-#ifdef GJK_RUNTIME_ASSERTS
-		if(!sameDirection(ac_orth, a-b)) cout << "[TRIANGLE LINE AC (sd: BA) DIRECTION ASSERT FAILED!]";
-		if(!sameDirection(ac_orth, c-b)) cout << "[TRIANGLE LINE AC (sd: CB) DIRECTION ASSERT FAILED!]";
-#endif /* GJK_RUNTIME_ASSERTS */
 	
 	// we might need to change the direction here, as we defined the smaller feature (simplex with less points) to be including
 	// the border points, where the dot is 0
@@ -238,31 +254,22 @@ inline bool doTriangle(vector<MinkowskiPoint>& supports, vec3& direction)
 	else 
 	{	
 		vec3 ab_orth = glm::cross(abc, -ab);
-#ifdef GJK_RUNTIME_ASSERTS
-		if(!sameDirection(ab_orth, a-c)) cout << "[TRIANGLE LINE AB (sd: CA) DIRECTION ASSERT FAILED!]";
-		if(!sameDirection(ab_orth, b-c)) cout << "[TRIANGLE LINE AB (sd: CB) DIRECTION ASSERT FAILED!]";
-#endif /* GJK_RUNTIME_ASSERTS */
 		if(!sameDirection(-ab_orth, -a))
 		{
 			supports = {supports[1], supports[2]};
-			auto ret = doLine(supports, direction);
-			return ret;
+			return doLine(supports, direction);
 		}
 	
 		else
 		{
 			if(!sameDirection(-abc, -a))
 			{
-
-
 				//supports stay the same
 				direction = abc;
 
-				if(std::abs(glm::dot(abc, -a)) < 0.0001)
+				float d = std::abs(glm::dot(abc, -a));
+				if(d < 0.0001)
 					return true;
-#ifdef GJK_RUNTIME_ASSERTS
-			if(!sameDirection(-a, direction)) cout << "[TRIANGLE DIRECTION ASSERT FAILED!]";
-#endif /* GJK_RUNTIME_ASSERTS */
 				return false;
 			}
 			else
@@ -270,9 +277,6 @@ inline bool doTriangle(vector<MinkowskiPoint>& supports, vec3& direction)
 				//supports stay the same
 				std::swap(supports[0], supports[1]);
 				direction = -abc;
-#ifdef GJK_RUNTIME_ASSERTS
-			if(!sameDirection(-a, direction)) cout << "[TRIANGLE DIRECTION ASSERT FAILED!]";
-#endif /* GJK_RUNTIME_ASSERTS */
 				return false;
 			}
 		}
@@ -291,18 +295,33 @@ inline bool doTetrahedron(vector<MinkowskiPoint>& supports, vec3& direction)
 	const vec3 ac = c-a;
 	const vec3 ad = d-a;
 
+	//check if a coplanar
+	//typically only a can be at fault, since bcd where known and
+	// checked beforehand
+
+	const vec3 cb = b - c;
+	const vec3 cd = d - c;
+	const vec3 cbd = glm::cross(cb, cd);
+	//any vector dependent on a should dot != 0
+	if( std::abs(glm::dot(cbd, ab)) < 0.001 )
+	{
+		//a is coplanar
+		supports.pop_back();
+		return doTriangle( supports, direction );
+	}
+
 	const vec3 abc = glm::cross(ab, ac);
 	const vec3 acd = glm::cross(ac, ad);
 	const vec3 adb = glm::cross(ad, ab);
 
 	if(!sameDirection(-abc, -a))
 	{
-		supports = {supports[1], supports[2], supports[3]};
+		supports.erase( supports.begin() );
 		return doTriangle(supports, direction);
 	}
 	else if(!sameDirection(-acd, -a))
 	{
-		supports = {supports[0], supports[1], supports[3]};
+		supports.erase( supports.begin() + 2 );
 		return doTriangle(supports, direction);
 	}
 	else if(!sameDirection(-adb, -a))

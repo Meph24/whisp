@@ -156,8 +156,8 @@ struct GridEntity : public Entity
 
         IWorld* iw = tsp->getIWorld();
         
-        bb.low = iw->fromMeters(-vec3(8.0f,8.0f,8.0f)) + pos;
-        bb.high = iw->fromMeters(vec3(8.0f,8.0f,8.0f)) + pos;
+        bb.low = iw->fromMeters(-vec3(2.0f,2.0f,2.0f)) + pos;
+        bb.high = iw->fromMeters(vec3(2.0f,2.0f,2.0f)) + pos;
 
         //simulation testing code
         //TODO remove

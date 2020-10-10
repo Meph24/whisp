@@ -219,7 +219,6 @@ void Simulation_World::init()
 		
 	}
 */
-/*
 	float fi = 0.0;
 	for(auto& m_uptr : models)
 	{
@@ -232,7 +231,7 @@ void Simulation_World::init()
 
 	for ( int i = 0; i < objects_count; ++i )
 	{
-		ModelEntity* me = new ModelEntity(*(models[rand() % models.size()]));
+		TransModelEntity* me = new TransModelEntity(*(models[rand() % models.size()]));
 		me->v = iw->fromMeters(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f)
@@ -252,7 +251,7 @@ void Simulation_World::init()
 	
 	//moving diamond
 	{
-		ModelEntity* me = new ModelEntity(*(models[0]));
+		TransModelEntity* me = new TransModelEntity(*(models[0]));
 		me->v = iw->fromMeters(	vec3( 0.3f, 0.0f, 0.0f));
 		spawn
 		(	me,
@@ -262,22 +261,22 @@ void Simulation_World::init()
 	
 	//moving cross
 	{
-		ModelEntity* me = new ModelEntity(*(models[1]));
+		TransModelEntity* me = new TransModelEntity(*(models[1]));
 		//TODO because of some fucking reason the cross vanishes
 		// when the velocity vector gets a negative x
 		// so i guess its not moving
 		// the test still works with only 1 moving part so duh, but this needs to be fixed
 		me->v = iw->fromMeters(	vec3( 0.0f, 0.0f, 0.0f));
 		spawn
-		(	me,
-			iw->fromMeters	(	vec3( 10.0f, 9.0f, 1.0f) )
-
+		(	
+			me,
+			iw->fromMeters	( vec3( 10.0f, 9.0f, 1.0f) )
 		);
 	}
 	//still diamond
 	{
 
-		ModelEntity* me = new ModelEntity(*(models[0]));
+		TransModelEntity* me = new TransModelEntity(*(models[0]));
 		spawn
 		(	me,
 			iw->fromMeters	(vec3(2.0f, 3.0f, 1.0f ))
@@ -287,7 +286,7 @@ void Simulation_World::init()
 	//still cross
 	{
 
-		ModelEntity* me = new ModelEntity(*(models[1]));
+		TransModelEntity* me = new TransModelEntity(*(models[1]));
 		spawn
 		(	me,
 			iw->fromMeters	(	vec3( 10.0f, 3.0f, 1.0f))
@@ -307,7 +306,7 @@ void Simulation_World::init()
 
 	//diamond moving through donut
 	{
-		ModelEntity* me = new ModelEntity(*(models[0]));
+		TransModelEntity* me = new TransModelEntity(*(models[0]));
 		me->v = iw->fromMeters(	vec3( 0.0f, -0.2f, 0.0f));
 		spawn
 		(	me,
@@ -326,7 +325,6 @@ void Simulation_World::init()
 
 		);
 	}
-
 	//orrery
 	{
 		vec3 pos(15.0f, 15.0f, 15.0f);
@@ -340,11 +338,10 @@ void Simulation_World::init()
 					(	vec3(-360.0f, -360.0f, -360.0f), 
 						vec3(360.0f, 360.0f, 360.0f));
 			me->scale = vec3(factor, factor, factor);
-			factor/=2.0f;
+			factor/=2.5f;
 			spawn(me, iw->fromMeters( pos ));
 		}
 	}
-
 
 	//cogged crosses
 	{
@@ -371,7 +368,6 @@ void Simulation_World::init()
 		spawn(me0, iw->fromMeters(pos0));
 		spawn(me1, iw->fromMeters(pos1));
 	}
-
 	//cogged crosses intersecting
 	{
 		TransModelEntity* me0 = new TransModelEntity(*(models[1]));
@@ -392,9 +388,7 @@ void Simulation_World::init()
 		me0->drot = rotational_velocity0;
 		spawn(me0, iw->fromMeters(pos0));
 		spawn(me1, iw->fromMeters(pos1));
-
 	}
-	*/
 	//prisms
 	{
 		vec3 moving_offset(5.0f, 0.0f, 0.0f);
@@ -404,7 +398,7 @@ void Simulation_World::init()
 		vec3 start(1.0f, 1.0f, 1.0f);
 		vec3 experiments_offset(0.0f, 0.0f, 3.0f);
 
-		for ( int i = 1; i <= 1; i+=2 )
+		for ( int i = 1; i <= 64; i+=2 )
 		{
 			TransModelEntity* prism_static = new TransModelEntity(*(models[3]));
 			TransModelEntity* prism_moving = new TransModelEntity(*(models[3]));
@@ -417,7 +411,6 @@ void Simulation_World::init()
 			spawn(prism_moving, iw->fromMeters(start + (float)i * experiments_offset + moving_offset*(float)i + moving_down));
 		}
 	}
-	/*
 	//grid
 	{
 		Grid<32> grid;
@@ -448,7 +441,6 @@ void Simulation_World::init()
 		OxelEntity* oxele = new OxelEntity(t);
 		spawn( oxele, iw->fromMeters( vec3(-10.0f, 0.0f, 0.0f) ) );
 	}
-	*/
 }
 
 void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
@@ -603,6 +595,8 @@ void Simulation_World::spawn(Entity* e, spacevec pos)
 {
 	e->pos=pos;
 	e->last_ticked = clock.now();
+	e->bb = AABB(e->pos);
+	e->onSpawn( this );
 	getIWorld()->requestEntitySpawn(e);
 }
 

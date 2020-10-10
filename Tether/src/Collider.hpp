@@ -32,7 +32,7 @@ public:
 	 *
 	 * @return Collection of vertices relative to the colliders own origin/position at the given time (getPosition(tick_time)).
 	 */
-	virtual vector<Vertex> vertices (float tick_time) const = 0;
+	virtual vector<Vertex> vertices (float tick_time) = 0;
 
 
 	/**

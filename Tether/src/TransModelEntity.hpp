@@ -20,12 +20,13 @@ class TransModelEntity : public Entity, public Collider
 
 	spacevec tick_begin_pos, tick_begin_v;
 	vec3 tick_begin_rot, tick_begin_drot;
+	vec3 tick_begin_scale, tick_begin_dscale;
 public:
 	TransModelEntity(const Model& model);
 
 	const ModelObject& modelObject() const;
 
-	vec3 rot, scale, drot;
+	vec3 rot, scale, drot, dscale;
 
 	AABB aabb(float tick_seconds, TickServiceProvider* tsp);
 
@@ -43,13 +44,15 @@ public:
 
 	vector<Model::ConvexPart> convexParts() const;
 
-	vector<Vertex> vertices (float tick_time) const;
+	vector<Vertex> vertices (float tick_time);
 
 	vector<EdgeRef> edges(float tick_time) const;
 
 	vector<FaceRef> faces(float tick_time) const;
 
 	void react(float tick_time);
+
+	void onSpawn( TickServiceProvider* tsp );
 };
 
 #endif /* TRANSMODELENTITY_HPP */

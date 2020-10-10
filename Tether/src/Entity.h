@@ -93,6 +93,8 @@ public:
 
 	Entity();
 	virtual ~Entity();
+
+	void onSpawn( TickServiceProvider* tsp );
 };
 
 #endif /* SRC_ENTITY_H_ */

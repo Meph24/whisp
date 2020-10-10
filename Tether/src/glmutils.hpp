@@ -47,7 +47,6 @@ inline glm::vec3 operator*(const mat4& m, const vec3& b)
 	return vec3(temp.x, temp.y, temp.z);
 }
 
-
 inline glm::vec3 operator*(const glm::vec3& b, const glm::mat4& a)
 { return a*b; }
 
