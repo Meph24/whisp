@@ -13,6 +13,8 @@
 #include "BenchEntityMaster.h"
 #include "BenchEntitySlave.h"
 
+#include "BenchmarkTest.h"
+
 #include <cmath>
 
 BenchScenarioShotgun::BenchScenarioShotgun():
@@ -51,6 +53,8 @@ void BenchScenarioShotgun::spawnEntities(IWorld* w)
 	float averageDistanceMeters=averageVictimSizeMeters/density;
 	float victimSpawnAreaSize=averageDistanceMeters*cbrt(victimCount);
 
+	//BenchmarkTest test;
+
 	for(int i=0;i<victimCount;i++)
 	{
 		vec3 positionVec(randomFloat(),randomFloat(),randomFloat());
@@ -65,8 +69,13 @@ void BenchScenarioShotgun::spawnEntities(IWorld* w)
 		float sizeMeters=randomFloat()*2*averageVictimSizeMeters;
 		sizeVec*=sizeMeters;
 
-		w->requestEntitySpawn(new BenchEntitySlave(w->fromMeters(sizeVec),w->fromMeters(positionVec)));
+		BenchEntitySlave * e=new BenchEntitySlave(w->fromMeters(sizeVec),w->fromMeters(positionVec));
+		//test.registerEntity(e);
+		w->requestEntitySpawn(e);
 	}
+
+	//std::cout<<"Slave (victim):\n"<<test;
+	//test.reset();
 
 	float projecileSpawnAreaSize=averageDistanceMeters*cbrt(patternVictimNumber);
 	vec3 spawnLocVec(randomFloat(),randomFloat(),randomFloat());
@@ -85,8 +94,12 @@ void BenchScenarioShotgun::spawnEntities(IWorld* w)
 
 		AABB bb(w->fromMeters(positionVec1));
 		bb.extend(w->fromMeters(positionVec2));
-		w->requestEntitySpawn(new BenchEntityMaster(bb));
+		BenchEntityMaster * e=new BenchEntityMaster(bb);
+		//test.registerEntity(e);
+		w->requestEntitySpawn(e);
 	}
+
+	//std::cout<<"Master (projectile):\n"<<test;
 }
 
 bool BenchScenarioShotgun::isSym()

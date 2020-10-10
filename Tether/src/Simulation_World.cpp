@@ -528,8 +528,15 @@ void Simulation_World::drawGameOver()//TODO find new home
 	revertView();
 }
 
+#include "InteractFilterAlgoAsym.h"
+#include "InteractFilterAlgoSym.h"
 void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 {
+	IWorld * iw=getIWorld();
+	iw->verbose=input_status->verbose;
+	iw->projectileAlgo->verbose=iw->verbose;
+	iw->collideAlgo->verbose=iw->verbose;
+	iw->pushAlgo->verbose=iw->verbose;
 	logicOutside.registerTime();
 
 	player->current_gun->tick(next_tick_begin, player->cam,player,shot,*getIWorld());

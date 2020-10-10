@@ -19,8 +19,10 @@ class BenchScenario
 {
 protected:
 	float randomFloat();
+	BenchScenarioParam runNumber;//increase sample size by using different seeds while otherwise doing the same experiment
 	BenchScenarioParam absoluteSize;//average size of object in largest dimension
 	BenchScenarioParam objectCount;
+
 public:
 	std::string name="unnamed";
 	std::vector<BenchScenarioParam *> params;

@@ -11,8 +11,14 @@
 #include <cstdlib>
 
 BenchScenario::BenchScenario():
-absoluteSize("absoluteSize"),objectCount("objectCount",0.25f)
+runNumber("runNumber"),absoluteSize("absoluteSize"),objectCount("objectCount",0.25f)
 {
+	for(int i=0;i<5;i++)
+	{
+		runNumber.addValue(i);
+	}
+	params.push_back(&runNumber);
+
 	objectCount.addValue(128);
 	objectCount.addValue(256);
 	objectCount.addValue(512);
