@@ -84,7 +84,7 @@ void TransModelEntity::tick(	const SimClock::time_point& next_tick_begin,
 	//simulation testing code
 	//TODO remove
 	
-	if(glm::length(iw->toMeters(pos)) > 500)
+	if(glm::length(iw->toMeters(pos)) > 1000)
 		v = -v;
 
 	pos += v*tick_seconds;
@@ -121,7 +121,7 @@ void TransModelEntity::collide(DualPointer<Collider> other, float delta_time, Ti
 	gjk::RelColliders relcolliders(makeDualPointer((Entity*) this,(Collider*) this), other, tsp);
 	float collision_time;
 	//if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
-	if(! gjk::firstRoot(relcolliders, 0.0f, delta_time, collision_time, 5))
+	if(! gjk::firstRoot(relcolliders, 0.0f, delta_time, collision_time, 16))
 		return;	
 
 	react(collision_time);
