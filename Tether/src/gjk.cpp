@@ -93,14 +93,13 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 
 	dist0 = nonConvexDistance(relcolliders, t0);
 
-	if(dist0 <= 0.0f)
+	if(dist0 < epsilon)
 	{
 		time_out = t0;
 		return true;
 	}
 
 	if(initial_samples == 1) return false;
-
 
 	bool found = false;
 	float timespan = t1 - t0;
@@ -123,32 +122,24 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 	if(!found) return false;
 	else
 	{	
-		while(dist1-dist0 > epsilon)
+		while( time1 - time0 > epsilon )
 		{
 			float time05 = time0 + (time1-time0) * 0.5;
 			float dist05 = nonConvexDistance(relcolliders, time05);
-			if(dist05 <= 0.0f)
-			{
-				time1 = time05;
-				dist1 = dist05;
-			}
-			else
+			if(dist05 > 0.0f)
 			{
 				time0 = time05;
 				dist0 = dist05;
 			}
+			else
+			{
+				time1 = time05;
+			}
 		}
 		time_out = time0;
-		if( dist1 <= 0.0f )
-			return true;
-		else
-			return false;
+		return true;
 	}
-
 	return false;
-	
 }
-
-
 
 } /* namespace gjk */

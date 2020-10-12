@@ -152,9 +152,9 @@ vector<FaceRef> TransModelEntity::faces(float tick_time) const
 
 void TransModelEntity::react(float tick_time)
 {
-	pos = pos + (v*(tick_time));
-	rot = rot + (drot*(tick_time));
-	scale = scale + (dscale*(tick_time));
+	pos = tick_begin_pos + (tick_begin_v*(tick_time));
+	rot = tick_begin_rot + (tick_begin_drot*(tick_time));
+	scale = tick_begin_scale + (tick_begin_dscale*(tick_time));
 	mo.setTransform(		glm::rotate(glm::radians(rot.x), vec3(1,0,0))
 							*	glm::rotate(glm::radians(rot.y), vec3(0,1,0))
 							*	glm::rotate(glm::radians(rot.z), vec3(0,0,1))
@@ -162,6 +162,5 @@ void TransModelEntity::react(float tick_time)
 	);
 	v.set0();
 	drot = vec3(0.0f);
-
-	physics = false;
+	dscale = vec3(0.0f);
 }

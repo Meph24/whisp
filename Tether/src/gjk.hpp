@@ -594,7 +594,7 @@ public:
 
 bool staticIntersectionAtTickBegin(const RelColliders& relcolliders, float t0, float& time_out);
 float rootFindingSample(const RelColliders& relcolliders, float tick_seconds);
-bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time_out, int initial_samples = 10, float epsilon = 0.001);
+bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time_out, int initial_samples = 10, float epsilon = 0.00001);
 
 
 } /* namespace gjk */
