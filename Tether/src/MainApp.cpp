@@ -55,12 +55,6 @@ MainApp::MainApp()
 	op->operateSimulation(sim.get());
 }
 
-void MainApp::tick(int us)
-{
-	counter += us*0.000001f;
-	//do stuff
-}
-
 void MainApp::run()
 {
 	GLenum err = glewInit();
@@ -80,9 +74,6 @@ void MainApp::run()
 	glAlphaFunc(GL_GREATER, 0.02f);
 	glEnable(GL_ALPHA_TEST);
 
-
-	sf::Clock clock;
-
 	sim->init();
 	srand(time(0));
 
@@ -92,12 +83,6 @@ void MainApp::run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		sim->loop();
 		op->display();
-
-		//tick
-		sf::Time elapsed = clock.restart();
-		int us = elapsed.asMicroseconds();
-		if (us > PHYSICS_MAX_TICKLENGTH) us = PHYSICS_MAX_TICKLENGTH;
-		tick(us);
 
 		//handle events
 		op->pollEvents();	

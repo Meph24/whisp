@@ -76,7 +76,6 @@ istream& operator>> (istream& is, Mesh& m)
 		is >> y >> z;
 		vec3 newv (x, y , z);
 		m.vertices.push_back(newv);
-		cout << "vec  " << glm::to_string(newv) << '\n';
 	}
 	unsigned int i;	
 	while(is >> s)

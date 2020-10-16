@@ -76,7 +76,6 @@ void ConnectionReception::processNewTcpConnection( unique_ptr<TcpSocket>&& socke
 bool ConnectionReception::processNextIncoming()
 {
     unique_ptr<TcpSocket> new_socket (listener.nonBlockingNext());
-    std::cout << " and then " << new_socket.get() << "\n";
     if( !new_socket ) return false;
 
     processNewTcpConnection( ::std::move(new_socket) );
