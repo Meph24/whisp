@@ -430,10 +430,9 @@ void Simulation_World::init()
 		Oxel* oxp = &(t.root);
 		for (size_t i = 0; i < 5; i++)
 		{
-			oxp->finer();
-			oxp->children()[3].full = true;
-			oxp->children()[5].full = true;
-			oxp->children()[6].full = true;
+			oxp->children()[3].fill();
+			oxp->children()[5].fill();
+			oxp->children()[6].fill();
 
 			oxp = &(oxp->children()[0]);
 		}

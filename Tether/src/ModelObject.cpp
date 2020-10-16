@@ -1,11 +1,34 @@
 #include "ModelObject.hpp"
 
 #include <numeric>
+#include <utility>
 
 ModelObject::ModelObject(const Model& model)
 	: m_model(model)
 	, vertex_transformation(mat4(1.0f))
-{}
+{
+	calcRadialExtentAndSizeFromMid(model);
+}
+
+float ModelObject::sizeFromMid() const
+{
+	return size_from_mid;
+}
+void ModelObject::calcRadialExtentAndSizeFromMid(const Model& model)
+{
+	float maxlen = std::numeric_limits<float>::min();
+	for(const Vertex& v : model.vertices())
+	{
+		float newlen = glm::length( v );
+		if(maxlen < newlen)
+		{
+			maxlen = newlen;
+		}	
+	}
+	size_from_mid = maxlen;
+	vec3 high = glm::normalize(vec3(1, 1, 1)) * maxlen * 1.42 * 1.42;
+	m_radial_extent = std::make_pair(-high, high);
+}
 
 #include <algorithm>
 
@@ -26,6 +49,7 @@ void ModelObject::setTransform(const mat4& transformation_matrix)
 
 pair<vec3, vec3> ModelObject::extent() const
 {
+	/*
 	if (m_model.vertices().empty()) return std::make_pair( vec3(0.0f), vec3(0.0f) );
 	
 	pair<vec3, vec3> extent;
@@ -50,6 +74,8 @@ pair<vec3, vec3> ModelObject::extent() const
 		if(v.z < min.z) min.z = v.z;
 	}
 	return extent;
+	*/
+	return m_radial_extent;
 }
 
 void ModelObject::drawNative() const

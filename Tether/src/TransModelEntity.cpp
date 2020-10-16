@@ -121,7 +121,7 @@ void TransModelEntity::collide(DualPointer<Collider> other, float delta_time, Ti
 	gjk::RelColliders relcolliders(makeDualPointer((Entity*) this,(Collider*) this), other, tsp);
 	float collision_time;
 	//if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
-	if(! gjk::firstRoot(relcolliders, 0.0f, delta_time, collision_time, 16))
+	if(! gjk::firstRoot(relcolliders, 0.0f, delta_time, collision_time, 4 ))
 		return;	
 
 	react(collision_time);
@@ -163,4 +163,6 @@ void TransModelEntity::react(float tick_time)
 	v.set0();
 	drot = vec3(0.0f);
 	dscale = vec3(0.0f);
+
+	physics = false;
 }

@@ -207,26 +207,33 @@ struct GridEntity : public Entity
 
 class Oxel
 {
-    shared_ptr<array<Oxel, 8>> m_children = nullptr;
-    
-public:
-    array<Oxel, 8>& children() const { return *m_children; }
+    const Oxel* m_parent = nullptr;
+    mutable shared_ptr<array<Oxel, 8>> m_children = nullptr;
 
     bool full;
+public:
+    array<Oxel, 8>& children() { if(!isFiner()) finer(); return const_cast<array<Oxel, 8>&>(*m_children); }
+    const array<Oxel, 8>& children() const { if(!isFiner()) finer(); return *m_children; }
 
-    Oxel()
-        : m_children(nullptr)
+    Oxel( const Oxel* parent )
+        : m_parent(parent)
+        , m_children(nullptr)
         , full(false)
     {}
+    Oxel() : Oxel(nullptr) {}
 
+    bool isRoot() const { return !m_parent; }
+    bool isEmpty() const { return !full; }
     bool isFiner() const { return (bool) m_children; }
     void rougher() { m_children.reset(); }
-    void finer() 
+    void finer() const
     { 
-        if(m_children) return;
+        if(isFiner()) return;
         m_children.reset( new array<Oxel, 8> );
-        m_children->fill( Oxel() );
+        if(full) m_children->fill( Oxel(*this) );
     }
+
+    void fill( bool b = true ) { full = b; }
 
     void drawHere() const
     {
