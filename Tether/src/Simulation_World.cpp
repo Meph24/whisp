@@ -139,21 +139,7 @@ Simulation_World::~Simulation_World()
 
 void Simulation_World::render(const SimClock::time_point& render_time)
 {
-	IWorld& iw=*getIWorld();
-
-	callbackList.clear();
-	float renderTime=graphicsWorld.getData().getLastTime()+graphicsFlush.getData().getLastTime();
-	float quality=adQ->getQuality(renderTime);
-	Frustum * viewFrustum=player->newFrustumApplyPerspective(render_time,true,this,quality);
-
-	grass->bind();
-	//cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
-
-	iw.draw(render_time,viewFrustum,iw,this);
-	player->draw(render_time,viewFrustum,iw,this);//TODO  this is the job of an instance of IWorld
-	doTransparentCallbacks(render_time,viewFrustum,iw);//TODO bugs here
-
-	delete viewFrustum;
+	
 }
 
 void Simulation_World::init()
@@ -492,7 +478,6 @@ void Simulation_World::loop()
 		//if(!test)
 			doLogic(new_tick_begin);
 	}
-	doGraphics(new_tick_begin);
 }
 
 void Simulation_World::trigger(bool pulled)
@@ -559,8 +544,23 @@ void Simulation_World::doGraphics(const SimClock::time_point& t)
 	else
 	{
 		//Timestamp t=tm.getSlaveTimestamp();
+
 		graphicsOutside.registerTime();
-		render(t);
+
+		callbackList.clear();
+		float renderTime=graphicsWorld.getData().getLastTime()+graphicsFlush.getData().getLastTime();
+		float quality=adQ->getQuality(renderTime);
+		Frustum * viewFrustum=player->newFrustumApplyPerspective(t,true,this,quality);
+
+		grass->bind();
+		//cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
+
+		iw->draw(t,viewFrustum,*iw,this);
+		player->draw(t,viewFrustum,*iw,this);//TODO  this is the job of an instance of IWorld
+		doTransparentCallbacks(t,viewFrustum,*iw);//TODO bugs here
+
+		delete viewFrustum;
+
 		graphicsWorld.registerTime();
 		if(input_status->debug_screen_active)
 		{

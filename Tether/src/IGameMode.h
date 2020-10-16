@@ -27,6 +27,8 @@ public:
 	virtual void loop()=0;
 	virtual void init()=0;
 	virtual void trigger(bool pulled)=0;
+
+	virtual void doGraphics(const SimClock::time_point& t) = 0;
 };
 
 #endif /* SRC_IGAMEMODE_H_ */

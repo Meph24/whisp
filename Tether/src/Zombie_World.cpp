@@ -129,24 +129,10 @@ Zombie_World::~Zombie_World()
 	delete adQ;
 	delete player;
 }
+
 void Zombie_World::render(const SimClock::time_point& t)
 {
-	IWorld& iw=*getIWorld();
-
-	callbackList.clear();
-	float renderTime=graphicsWorld.getData().getLastTime()+graphicsFlush.getData().getLastTime();
-	float quality=adQ->getQuality(renderTime);
-	Frustum * viewFrustum=player->newFrustumApplyPerspective(t,true,this,quality);
-
-	grass->bind();
-	cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
-
-	iw.draw(t,viewFrustum,iw,this);
-	if(input_status->debug_screen_active) pmLogic->draw(t,viewFrustum,iw,this);
-	player->draw(t,viewFrustum,iw,this);//TODO  this is the job of an instance of IWorld
-	doTransparentCallbacks(t,viewFrustum,iw);//TODO bugs here
-
-	delete viewFrustum;
+	
 }
 
 void Zombie_World::init()
@@ -234,7 +220,6 @@ void Zombie_World::loop()
 	{
 			doLogic(sim_tick_begin);
 	}
-	doGraphics(sim_tick_begin);
 }
 
 
@@ -351,7 +336,22 @@ void Zombie_World::doGraphics(const SimClock::time_point& t)
 	{
 //		const SimClock::time_point& t=tm.getSlaveconst SimClock::time_point&();
 		graphicsOutside.registerTime();
-		render(t);
+
+		callbackList.clear();
+		float renderTime=graphicsWorld.getData().getLastTime()+graphicsFlush.getData().getLastTime();
+		float quality=adQ->getQuality(renderTime);
+		Frustum * viewFrustum=player->newFrustumApplyPerspective(t,true,this,quality);
+
+		grass->bind();
+		cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
+
+		iw->draw(t,viewFrustum,*iw,this);
+		if(input_status->debug_screen_active) pmLogic->draw(t,viewFrustum,*iw,this);
+		player->draw(t,viewFrustum,*iw,this);//TODO  this is the job of an instance of IWorld
+		doTransparentCallbacks(t,viewFrustum,*iw);//TODO bugs here
+
+		delete viewFrustum;
+
 		graphicsWorld.registerTime();
 		if(input_status->debug_screen_active)
 		{

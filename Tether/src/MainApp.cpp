@@ -80,8 +80,9 @@ void MainApp::run()
 	while (op->window.isOpen())
 	{
 		//render
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		sim->loop();
+		op->render();
+		sim->doGraphics(sim->clock.now());
 		op->display();
 
 		//handle events

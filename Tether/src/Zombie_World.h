@@ -53,7 +53,6 @@ class Zombie_World: public DrawServiceProvider, public IGameMode
 
 	void drawGameOver();
 	void doLogic(const SimClock::time_point& t);
-	void doGraphics(const SimClock::time_point& t);
 
 public:
 
@@ -86,6 +85,7 @@ public:
 	void trigger(bool pulled);
 
 	void loop();
+	void doGraphics(const SimClock::time_point& t);
 
 	//from DrawServiceProvider:
 	virtual ITexture * suggestFont();//returns 0 if no suggestion is made

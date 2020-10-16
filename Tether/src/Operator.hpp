@@ -27,10 +27,7 @@ struct Operator : public IMediaHandle
 	void postHandleEvent(sf::Event& e);
 	void preHandleEvent(sf::Event& e);
 public:
-
 	unique_ptr<EventMapper> event_mapper;
-
-
 
 	sf::ContextSettings contextSettings;
 	sf::Window window;
@@ -45,6 +42,8 @@ public:
 	void pollEvents();
 	void setContextToMyThread();
 	void display();
+
+	void render();
 };
 
 #endif /* OPERATOR_HPP */
