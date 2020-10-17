@@ -15,7 +15,7 @@ using std::string;
 
 #include "EventDefines.h"
 
-void Operator::operateSimulation(IGameMode* simulation)
+void LocalOperator::operateSimulation(IGameMode* simulation)
 {
 	SimulationInputStatusSet& input_status = *simulation->input_status;
 	event_mapper.reset(new EventMapper(input_status));
@@ -114,24 +114,22 @@ void Operator::operateSimulation(IGameMode* simulation)
 	);
 }
 
-void Operator::disconnectSimulation()
+void LocalOperator::disconnectSimulation()
 {
 	event_handler.reset(nullptr);
 }
 
-Operator::Operator(	WallClock&		wallclock,
+LocalOperator::LocalOperator(	WallClock&		wallclock,
 						string		name, 
 						int			reswidth, 
 						int			resheight, 
 						IMediaHandle::ContextSettings& settings) 
-	: wallclock(&wallclock)
+	: Operator(wallclock)
 	, contextSettings(24, 8, 0, 3, 3)
-	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
-{
-	//important because of the ability to activate the context in another thread
-}
+	, m_window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
+{}
 
-void Operator::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
+void LocalOperator::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
 {
 	contextSettings.depthBits = settings.depth;
 	contextSettings.stencilBits = settings.stencil;
@@ -140,13 +138,13 @@ void Operator::createWindow(std::string name, int reswidth, int resheight, IMedi
 	contextSettings.minorVersion = settings.openglminor;
 
 	
-	window.create(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings);
+	m_window.create(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings);
 
 	//important because of the ability to activate the context in another thread
-	window.setActive(false);
+	m_window.setActive(false);
 }
 
-void Operator::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
+void LocalOperator::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
 {
 	if(!event_handler) return;
 
@@ -232,7 +230,7 @@ void Operator::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::
 	}
 }
 
-void Operator::pollEvents()
+void LocalOperator::pollEvents()
 {
 
 	if(!event_handler) return;
@@ -241,7 +239,7 @@ void Operator::pollEvents()
 	//handle events
 
 	EventHandler::event retEvent;
-	while (window.pollEvent(e))
+	while (m_window.pollEvent(e))
 	{
 		preHandleEvent(e);
 		
@@ -260,7 +258,7 @@ void Operator::pollEvents()
 	}
 }
 
-void Operator::preHandleEvent(sf::Event& e)
+void LocalOperator::preHandleEvent(sf::Event& e)
 {
 
 	//switch (e.type)
@@ -272,11 +270,11 @@ void Operator::preHandleEvent(sf::Event& e)
     //
 	//	case sf::Event::EventType::Resized:
 	//	//hardcursorhandle.updateLockPosition();
-	//	std::cout << Operator.window.getSize().x << "/" << Operator.window.getSize().y;
+	//	std::cout << LocalOperator.m_window.getSize().x << "/" << LocalOperator.m_window.getSize().y;
 	//	break;
     //
 	//	case sf::Event::EventType::GainedFocus:
-	//	//hardcursorhandle.updateLockPosition();	// no way to check if window was moved
+	//	//hardcursorhandle.updateLockPosition();	// no way to check if m_window was moved
 	//	std::cout<< "Stuff !!";
 	//	break;
     //
@@ -284,7 +282,7 @@ void Operator::preHandleEvent(sf::Event& e)
 	//	case sf::Event::EventType::KeyPressed:
 	//	if (e.key.code == sf::Keyboard::Key::L) hardcursorhandle.setLocked(true);
 	//	if (e.key.code == sf::Keyboard::Key::U) hardcursorhandle.setLocked(false);
-	//	if (e.key.code == sf::Keyboard::Key::R) Operator.window.setSize (sf::Vector2u(400, 400));
+	//	if (e.key.code == sf::Keyboard::Key::R) LocalOperator.m_window.setSize (sf::Vector2u(400, 400));
 	//	break;
     //
 	//	*/
@@ -295,13 +293,13 @@ void Operator::preHandleEvent(sf::Event& e)
 
 }
 
-void Operator::postHandleEvent(sf::Event& e)
+void LocalOperator::postHandleEvent(sf::Event& e)
 {
 	switch (e.type)
 	{
 		case sf::Event::EventType::Closed:
 		disconnectSimulation();
-		window.close();
+		m_window.close();
 		break;
 
 		// for testing
@@ -313,18 +311,20 @@ void Operator::postHandleEvent(sf::Event& e)
 	}
 }
 
-void Operator::setContextToMyThread()
+void LocalOperator::setContextToMyThread()
 {
-	window.setActive(true);
+	m_window.setActive(true);
 }
 
-void Operator::display()
+void LocalOperator::display()
 {
-	window.display();
+	m_window.display();
 }
 
 
-void Operator::render()
+void LocalOperator::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
+
+sf::Window& LocalOperator::window() { return m_window; }
