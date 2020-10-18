@@ -26,7 +26,7 @@ using glm::vec3;
 #include "DrawServiceProvider.h"
 #include "Zombie_Gun.h"
 #include "Graphics2D.h"
-#include "Zombie_MouseInput.h"
+//#include "Zombie_MouseInput.h"
 #include "ItemAmmo.h"
 #include "InteractFilterAlgoSym.h"
 #include "FloatSeconds.hpp"
@@ -55,8 +55,8 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 	cam->maxView=1024*8;
 	setTP(false);
 	cam->zoom=defaultZoom;
-	mouseInp = new Zombie_MouseInput(this, w,sensX,sensY);
-	mouseInp->enable();
+	//mouseInp = new Zombie_MouseInput(this, w,sensX,sensY);
+	//mouseInp->enable();
 	HP=maxHP;
 
 	pushRadius=0.4f;
@@ -86,7 +86,7 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 EntityPlayer::~EntityPlayer()
 {
 	delete cam;
-	delete mouseInp;
+	//delete mouseInp;
 	if(heldItem) delete heldItem;
 	if(inventory) delete inventory;
 }
@@ -198,7 +198,7 @@ Frustum * EntityPlayer::newFrustumApplyPerspective(SimClock::time_point t,bool f
 	float zoomMult=8;
 	bool zoomed=controlinputs.zoom;
 	float zoomFactor=zoomed?zoomMult:1;
-	mouseInp->setSensitivityMultiplier(1.0f/zoomFactor);
+	//mouseInp->setSensitivityMultiplier(1.0f/zoomFactor);
 	cam->zoom=defaultZoom/zoomFactor;
 	IWorld * iw=tsp->getIWorld();
 	float time=(float)FloatSeconds(t-last_ticked);
@@ -282,6 +282,14 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 		wantedV = cam->getNormal(wantedV);
 	}
 	pos+=iw->fromMeters(wantedV * speed )*time;
+
+	if(controlinputs.turn != prev_wanted_turn)
+	{
+		cam->alpha = controlinputs.turn.x;
+		cam->beta = controlinputs.turn.y;
+		//cam->gamma = controlinputs.turn.z;
+		prev_wanted_turn = controlinputs.turn;
+	}
 
 	if(controlinputs.clip)
 	{

@@ -48,6 +48,22 @@ void LocalOperator::operateSimulation(IGameMode* simulation)
 		EVENT_ID_KEY_CTRL,
 		Act::Combinate(&input_status.walk.y, -1.0)
 	);
+
+	setMouseInputAsDiff(true);
+	const double* sensptr = cfg.getFlt("input", "sensitivityX");
+	float sensx = (sensptr) ? *sensptr : mouse_sensitivity.x; //default already stored in mouse_sensitivity at init
+	sensptr = cfg.getFlt("input", "sensitivityY");
+	float sensy = (sensptr) ? *sensptr : mouse_sensitivity.y;
+	mouse_sensitivity = { sensx, sensy };
+	event_mapper->registerMapping(
+		EVENT_ID_MOUSE_X,
+		Act::MouseDiffInput( *this, &input_status.turn.y, Act::MouseDiffInput::Axis::X )
+	);
+	event_mapper->registerMapping(
+		EVENT_ID_MOUSE_Y,
+		Act::MouseDiffInput( *this, &input_status.turn.x, Act::MouseDiffInput::Axis::Y )
+	);
+
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_F3,
 		Act::Toggle(&input_status.debug_screen_active)
@@ -119,17 +135,31 @@ void LocalOperator::disconnectSimulation()
 	event_handler.reset(nullptr);
 }
 
-LocalOperator::LocalOperator(	WallClock&		wallclock,
+Operator::Operator(		WallClock&		wallclock,
+						const Cfg& cfg,
 						string		name, 
 						int			reswidth, 
 						int			resheight, 
 						IMediaHandle::ContextSettings& settings) 
-	: Operator(wallclock)
+	: wallclock( &wallclock )
+	, cfg(cfg)
+	, event_handler( nullptr )
+	, mouseinputasdiff( false )
 	, contextSettings(24, 8, 0, 3, 3)
-	, m_window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
+	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
+	, mouse_sensitivity( 0.0431654676, 0.0431654676 )
 {}
 
-void LocalOperator::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
+LocalOperator::LocalOperator( 	WallClock&		wallclock,
+						const Cfg& cfg,
+						string		name, 
+						int			reswidth, 
+						int			resheight, 
+						IMediaHandle::ContextSettings& settings )
+	: Operator ( wallclock, cfg, name, reswidth, resheight, settings )
+{}
+
+void Operator::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
 {
 	contextSettings.depthBits = settings.depth;
 	contextSettings.stencilBits = settings.stencil;
@@ -138,13 +168,13 @@ void LocalOperator::createWindow(std::string name, int reswidth, int resheight, 
 	contextSettings.minorVersion = settings.openglminor;
 
 	
-	m_window.create(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings);
+	window.create(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings);
 
 	//important because of the ability to activate the context in another thread
-	m_window.setActive(false);
+	window.setActive(false);
 }
 
-void LocalOperator::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
+void Operator::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
 {
 	if(!event_handler) return;
 
@@ -230,16 +260,15 @@ void LocalOperator::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHand
 	}
 }
 
-void LocalOperator::pollEvents()
+void Operator::pollEvents()
 {
-
 	if(!event_handler) return;
 	sf::Event e;
 	Buffer < EventHandler::event, 4 >  eventBuffer;
 	//handle events
 
 	EventHandler::event retEvent;
-	while (m_window.pollEvent(e))
+	while (window.pollEvent(e))
 	{
 		preHandleEvent(e);
 		
@@ -258,7 +287,7 @@ void LocalOperator::pollEvents()
 	}
 }
 
-void LocalOperator::preHandleEvent(sf::Event& e)
+void Operator::preHandleEvent(sf::Event& e)
 {
 
 	//switch (e.type)
@@ -293,17 +322,18 @@ void LocalOperator::preHandleEvent(sf::Event& e)
 
 }
 
-void LocalOperator::postHandleEvent(sf::Event& e)
+void Operator::postHandleEvent(sf::Event& e)
 {
 	switch (e.type)
 	{
 		case sf::Event::EventType::Closed:
-		disconnectSimulation();
-		m_window.close();
+			disconnectSimulation();
+			window.close();
 		break;
 
-		// for testing
-		case sf::Event::EventType::MouseButtonPressed:
+		case sf::Event::MouseMoved:
+			if(mouseinputasdiff) 
+				sf::Mouse::setPosition( (window.getPosition()) + ((sf::Vector2i)window.getSize())/2 );
 		break;
 
 		default: break;//warning suppression
@@ -311,14 +341,14 @@ void LocalOperator::postHandleEvent(sf::Event& e)
 	}
 }
 
-void LocalOperator::setContextToMyThread()
+void Operator::setContextToMyThread()
 {
-	m_window.setActive(true);
+	window.setActive(true);
 }
 
-void LocalOperator::display()
+void Operator::display()
 {
-	m_window.display();
+	window.display();
 }
 
 
@@ -326,5 +356,3 @@ void LocalOperator::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
-
-sf::Window& LocalOperator::window() { return m_window; }

@@ -54,6 +54,26 @@ void eventmapping::actions::SendSignal::operator()(EVENTMAPPING_FUNCTION_PARAMET
 	sendSignal(signal_counter); 
 }
 
+#include "Operator.hpp"
+
+eventmapping::actions::MouseDiffInput::MouseDiffInput(Operator& op, float* diff_accumulation, Axis window_axis) 
+				: op(op)
+				, diff_accumulation(diff_accumulation)
+				, window_axis(window_axis)
+{}
+
+void eventmapping::actions::MouseDiffInput::operator()(EVENTMAPPING_FUNCTION_PARAMETERS)
+{
+	int pos = e.value;
+	auto sizev = op.window.getSize();
+	int size = (window_axis) ? sizev.y : sizev.x;
+	float sensitivity = (window_axis) ? op.mouse_sensitivity.y : op.mouse_sensitivity.x;
+	//size from mid gets accumulated
+	float addition = ((float)(pos - size/2)) * sensitivity;
+	*diff_accumulation += addition;
+	//note reset of mouse cursor to middle of window is done in post event processing (currently in Operator::postHandleEvent())
+}
+
 bool eventmapping::conditions::CALL_alwaysTrue(EVENTMAPPING_FUNCTION_PARAMETERS) { return true; }
 bool eventmapping::conditions::CALL_keyPressedCall(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
 bool eventmapping::conditions::CALL_keyReleasedCall(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; }

@@ -42,13 +42,14 @@ class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 	bool isPerspective=false;
 
 	SignalCounter prev_inventory_signal;
+	vec3 prev_wanted_turn;
 public:
 
 	float defaultZoom=1;
 
 	int score=0;
 
-	Zombie_MouseInput * mouseInp;
+	//Zombie_MouseInput * mouseInp;
 
 	CameraTP * cam;
 	float minTPdist=2;

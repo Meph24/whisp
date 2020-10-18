@@ -39,17 +39,17 @@ MainApp::MainApp()
 	int y=*cfg.getInt("graphics", "resolutionY");
 
 
-	op = std::make_unique<LocalOperator>(clock, "Dwengine", x, y, settings);
+	op = std::make_unique<LocalOperator>(clock, cfg, "Dwengine", x, y, settings);
 
 	int zombie_mode = *cfg.getInt("test", "zombie_mode");
 	if(zombie_mode) 
 	{
-		sim.reset(new Zombie_World(clock, &op->window()));
+		sim.reset(new Zombie_World(clock, &op->window));
 		sim->input_status->clip = true;
 	}
 	else 
 	{
-		sim.reset(new Simulation_World(clock, &op->window()));
+		sim.reset(new Simulation_World(clock, &op->window));
 	}
 
 	op->operateSimulation(sim.get());
@@ -77,7 +77,7 @@ void MainApp::run()
 	sim->init();
 	srand(time(0));
 
-	while (op->window().isOpen())
+	while (op->window.isOpen())
 	{
 		//render
 		sim->loop();

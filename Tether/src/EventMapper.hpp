@@ -20,6 +20,7 @@ using std::function;
 using std::unordered_map;
 using std::vector;
 
+class Operator;
 
 #include "SimulationInputStatusSet.hpp"
 
@@ -107,6 +108,16 @@ namespace eventmapping
 			SignalCounter* signal_counter;
 			SendSignal(SignalCounter* signal_counter);
 			void sendSignal(SignalCounter* signal_counter);
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
+		};
+
+		struct MouseDiffInput
+		{
+			::Operator& op;
+			float* diff_accumulation;
+			enum Axis{ X = 0, Y = 1, NUM_AXES };
+			Axis window_axis;
+			MouseDiffInput(Operator& op, float* diff_accumulation, Axis window_axis);
 			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
 	} /* namespace actions */
