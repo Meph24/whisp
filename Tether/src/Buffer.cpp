@@ -95,7 +95,7 @@ bool Buffer<T, size>::nodata() const
 }
 
 template <typename T, int size>
-void Buffer<T, size>::empty()
+void Buffer<T, size>::clear()
 {
 	borderOffset = writePtrOffset;
 }

@@ -252,7 +252,7 @@ void LocalOperator::pollEvents()
 				event_handler->handle(retEvent);
 			}
 		}
-		eventBuffer.empty();
+		eventBuffer.clear();
 
 		postHandleEvent(e);
 	}

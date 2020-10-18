@@ -101,7 +101,7 @@ public:
 	/*
 	//	empties the buffer completely from data
 	*/
-	void empty();
+	void clear();
 
 
 	//_test_begin
