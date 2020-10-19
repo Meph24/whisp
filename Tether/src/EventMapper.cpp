@@ -115,5 +115,10 @@ void EventMapper::registerMapping(int eventid, EventMapping::Action action, Even
 	registerMapping(eventid, EventMapping(action, condition));	
 }
 
+void EventMapper::clearMappings( int eventid )
+{
+	event_id_mappings[eventid].clear();
+}
+
 void EventMapper::clearAllMappings(){ event_id_mappings.clear(); }
 

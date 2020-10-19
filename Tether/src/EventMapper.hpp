@@ -155,16 +155,15 @@ namespace eventmapping
 
 class EventMapper
 {
-	SimulationInputStatusSet* managed_stati;//the output/condition input
 public:
+	SimulationInputStatusSet* managed_stati;//the output/condition input
+
 	unordered_map<int, vector<EventMapping>> event_id_mappings;
 
 	PerformanceMeter pm;
 
 	EventMapper(SimulationInputStatusSet& input_status_);
 	void changeManaged(SimulationInputStatusSet& input_status);
-
-	SimulationInputStatusSet& stati();
 
 	void event(EventHandler::event& e);
 
@@ -174,6 +173,8 @@ public:
 	// if some other condition would be considered a sensible default in your context (like for example toggle is usally paired with keyPressed) it is not advisable to use this function
 	// with the default condition and rather specify the condition, or even pass a complete EventMapping object as stated in another method.
 	void registerMapping(int eventid, EventMapping::Action action, EventMapping::Condition condition = eventmapping::conditions::alwaysTrue);
+
+	void clearMappings( int eventid );
 
 	void clearAllMappings();
 };

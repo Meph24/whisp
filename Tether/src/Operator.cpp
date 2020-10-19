@@ -49,21 +49,6 @@ void LocalOperator::operateSimulation(IGameMode* simulation)
 		Act::Combinate(&input_status.walk.y, -1.0)
 	);
 
-	setMouseInputAsDiff(true);
-	const double* sensptr = cfg.getFlt("input", "sensitivityX");
-	float sensx = (sensptr) ? *sensptr : mouse_sensitivity.x; //default already stored in mouse_sensitivity at init
-	sensptr = cfg.getFlt("input", "sensitivityY");
-	float sensy = (sensptr) ? *sensptr : mouse_sensitivity.y;
-	mouse_sensitivity = { sensx, sensy };
-	event_mapper->registerMapping(
-		EVENT_ID_MOUSE_X,
-		Act::MouseDiffInput( *this, &input_status.turn.y, Act::MouseDiffInput::Axis::X )
-	);
-	event_mapper->registerMapping(
-		EVENT_ID_MOUSE_Y,
-		Act::MouseDiffInput( *this, &input_status.turn.x, Act::MouseDiffInput::Axis::Y )
-	);
-
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_F3,
 		Act::Toggle(&input_status.debug_screen_active)
@@ -128,6 +113,64 @@ void LocalOperator::operateSimulation(IGameMode* simulation)
 		Act::Toggle(&input_status.verbose),
 		Cond::keyPressed
 	);
+
+	auto& container = mouse_mode_mappings[ MouseMode::diff ];
+	container.emplace_back(
+		EVENT_ID_MOUSE_X,
+		EventMapping(Act::MouseDiffInput( *this, &input_status.turn.y, Act::MouseDiffInput::Axis::X ), Cond::alwaysTrue)
+	);
+	container.emplace_back(
+		EVENT_ID_MOUSE_Y,
+		EventMapping(Act::MouseDiffInput( *this, &input_status.turn.x, Act::MouseDiffInput::Axis::Y ), Cond::alwaysTrue)
+	);
+
+	//TODO MousePointingdevice
+
+	setMouseMode( MouseMode::diff );
+
+}
+
+void LocalOperator::setMouseMode( MouseMode mode )
+{
+	if(mousemode == mode) return;
+
+	const double* sensptr = cfg.getFlt("input", "sensitivityX");
+	float sensx = (sensptr) ? *sensptr : mouse_sensitivity.x; //default already stored in mouse_sensitivity at init
+	sensptr = cfg.getFlt("input", "sensitivityY");
+	float sensy = (sensptr) ? *sensptr : mouse_sensitivity.y;
+	mouse_sensitivity = { sensx, sensy };
+
+	//remove all other mouse related mappings
+	{
+		for( const auto& e : mouse_mode_mappings )
+		{
+			if(e.first == mode) continue;
+
+			for(const pair<int, EventMapping>& p: e.second)
+			{
+				event_mapper->clearMappings(p.first);
+			}
+		}
+	}
+
+	//add this modes mappings
+	for(pair<int, EventMapping>& m : mouse_mode_mappings[mode])
+	{
+		event_mapper->registerMapping(m.first, m.second);
+	}
+
+	switch( mode )
+	{ 
+		case MouseMode::diff:
+			window.setMouseCursorVisible(false); 
+		break;
+		default:
+		case MouseMode::pointer:
+			window.setMouseCursorVisible(true);
+		break;
+	}
+
+	mousemode = mode;
 }
 
 void LocalOperator::disconnectSimulation()
@@ -144,11 +187,13 @@ Operator::Operator(		WallClock&		wallclock,
 	: wallclock( &wallclock )
 	, cfg(cfg)
 	, event_handler( nullptr )
-	, mouseinputasdiff( false )
+	, mousemode( MouseMode::pointer )
 	, contextSettings(24, 8, 0, 3, 3)
 	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
 	, mouse_sensitivity( 0.0431654676, 0.0431654676 )
-{}
+{
+
+}
 
 LocalOperator::LocalOperator( 	WallClock&		wallclock,
 						const Cfg& cfg,
@@ -332,7 +377,7 @@ void Operator::postHandleEvent(sf::Event& e)
 		break;
 
 		case sf::Event::MouseMoved:
-			if(mouseinputasdiff) 
+			if(mousemode == MouseMode::diff) 
 				sf::Mouse::setPosition( (window.getPosition()) + ((sf::Vector2i)window.getSize())/2 );
 		break;
 

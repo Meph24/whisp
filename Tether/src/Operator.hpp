@@ -17,6 +17,9 @@
 #include <glm/vec2.hpp>
 using glm::vec2;
 
+#include <utility>
+using std::pair;
+
 using std::unique_ptr;
 
 class Operator : public IMediaHandle
@@ -25,7 +28,11 @@ protected:
 	WallClock* wallclock;
 	const Cfg& cfg;
 	unique_ptr<EventHandler> event_handler;
-	bool mouseinputasdiff;
+	enum MouseMode
+	{
+		pointer, diff, NUM_MOUSEMODES
+	} mousemode ;
+
 
 	sf::ContextSettings contextSettings;
 public:
@@ -40,12 +47,12 @@ public:
 				int resheight, 
 				IMediaHandle::ContextSettings& settings	);
 
+
 	virtual void operateSimulation(IGameMode* simulation) = 0;
 	virtual void disconnectSimulation() = 0;
 
 	virtual void render() = 0;
 
-	void setMouseInputAsDiff( bool b = true ) { mouseinputasdiff = b; }
 	void mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer);
 	void postHandleEvent(sf::Event& e);
 	void preHandleEvent(sf::Event& e);
@@ -59,10 +66,13 @@ public:
 struct LocalOperator : public Operator
 {
 	unique_ptr<EventMapper> event_mapper;
+	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
+	void setMouseMode( MouseMode mode );
 
 	LocalOperator() = default;
 	LocalOperator(WallClock& wallclock, const Cfg& cfg, std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
 
+	
 	void operateSimulation(IGameMode* simulation);
 	void disconnectSimulation();
 	void render();
