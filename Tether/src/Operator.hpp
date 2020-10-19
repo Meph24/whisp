@@ -31,6 +31,7 @@ protected:
 
 
 	sf::ContextSettings contextSettings;
+	vec2 turn_sensitivity;
 public:
 	enum MouseMode
 	{
@@ -41,7 +42,13 @@ public:
 	void setMouseMode( MouseMode mode );
 
 	sf::Window window;
-	vec2 mouse_sensitivity;
+
+	vec2 turnSensitivity() const 
+	{ 
+		float modifier = 1.0f;
+		if( event_mapper && event_mapper->managed_stati->zoom ) modifier = 1.0f / 8; 
+		return turn_sensitivity * modifier; 
+	}
 
 	unique_ptr<EventMapper> event_mapper;
 

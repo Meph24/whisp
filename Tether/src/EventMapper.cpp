@@ -67,7 +67,7 @@ void eventmapping::actions::MouseDiffInput::operator()(EVENTMAPPING_FUNCTION_PAR
 	int pos = e.value;
 	auto sizev = op.window.getSize();
 	int size = (window_axis) ? sizev.y : sizev.x;
-	float sensitivity = (window_axis) ? op.mouse_sensitivity.y : op.mouse_sensitivity.x;
+	float sensitivity = (window_axis) ? op.turnSensitivity().y : op.turnSensitivity().x;
 	//size from mid gets accumulated
 	float addition = ((float)(pos - size/2)) * sensitivity;
 	*diff_accumulation += addition;

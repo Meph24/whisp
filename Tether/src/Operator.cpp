@@ -191,13 +191,13 @@ Operator::Operator(		WallClock&		wallclock,
 	, contextSettings(24, 8, 0, 3, 3)
 	, mousemode( MouseMode::pointer )
 	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
-	, mouse_sensitivity( 0.0431654676, 0.0431654676 )
+	, turn_sensitivity( 0.0431654676, 0.0431654676 )
 {
 	const double* sensptr = cfg.getFlt("input", "sensitivityX");
-	float sensx = (sensptr) ? *sensptr : mouse_sensitivity.x; //default already stored in mouse_sensitivity at init
+	float sensx = (sensptr) ? *sensptr : turn_sensitivity.x; //default already stored in mouse_sensitivity at init
 	sensptr = cfg.getFlt("input", "sensitivityY");
-	float sensy = (sensptr) ? *sensptr : mouse_sensitivity.y;
-	mouse_sensitivity = { sensx, sensy };
+	float sensy = (sensptr) ? *sensptr : turn_sensitivity.y;
+	turn_sensitivity = { sensx, sensy };
 }
 
 LocalOperator::LocalOperator( 	WallClock&		wallclock,
