@@ -124,22 +124,23 @@ void LocalOperator::operateSimulation(IGameMode* simulation)
 		EventMapping(Act::MouseDiffInput( *this, &input_status.turn.x, Act::MouseDiffInput::Axis::Y ), Cond::alwaysTrue)
 	);
 
-	//TODO MousePointingdevice
+	event_mapper->registerMapping(
+		EVENT_ID_KEY_ESCAPE,
+		Act::ToggleMouseMode( *this )
+	);
 
+	
 	setMouseMode( MouseMode::diff );
 
 }
 
-void LocalOperator::setMouseMode( MouseMode mode )
+void Operator::setMouseMode( MouseMode mode )
 {
 	if(mousemode == mode) return;
 
-	const double* sensptr = cfg.getFlt("input", "sensitivityX");
-	float sensx = (sensptr) ? *sensptr : mouse_sensitivity.x; //default already stored in mouse_sensitivity at init
-	sensptr = cfg.getFlt("input", "sensitivityY");
-	float sensy = (sensptr) ? *sensptr : mouse_sensitivity.y;
-	mouse_sensitivity = { sensx, sensy };
+	
 
+	if(event_mapper)
 	//remove all other mouse related mappings
 	{
 		for( const auto& e : mouse_mode_mappings )
@@ -151,12 +152,12 @@ void LocalOperator::setMouseMode( MouseMode mode )
 				event_mapper->clearMappings(p.first);
 			}
 		}
-	}
 
-	//add this modes mappings
-	for(pair<int, EventMapping>& m : mouse_mode_mappings[mode])
-	{
-		event_mapper->registerMapping(m.first, m.second);
+		//add this modes mappings
+		for(pair<int, EventMapping>& m : mouse_mode_mappings[mode])
+		{
+			event_mapper->registerMapping(m.first, m.second);
+		}
 	}
 
 	switch( mode )
@@ -187,12 +188,16 @@ Operator::Operator(		WallClock&		wallclock,
 	: wallclock( &wallclock )
 	, cfg(cfg)
 	, event_handler( nullptr )
-	, mousemode( MouseMode::pointer )
 	, contextSettings(24, 8, 0, 3, 3)
+	, mousemode( MouseMode::pointer )
 	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
 	, mouse_sensitivity( 0.0431654676, 0.0431654676 )
 {
-
+	const double* sensptr = cfg.getFlt("input", "sensitivityX");
+	float sensx = (sensptr) ? *sensptr : mouse_sensitivity.x; //default already stored in mouse_sensitivity at init
+	sensptr = cfg.getFlt("input", "sensitivityY");
+	float sensy = (sensptr) ? *sensptr : mouse_sensitivity.y;
+	mouse_sensitivity = { sensx, sensy };
 }
 
 LocalOperator::LocalOperator( 	WallClock&		wallclock,

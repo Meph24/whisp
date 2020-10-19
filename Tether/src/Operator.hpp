@@ -28,17 +28,22 @@ protected:
 	WallClock* wallclock;
 	const Cfg& cfg;
 	unique_ptr<EventHandler> event_handler;
-	enum MouseMode
-	{
-		pointer, diff, NUM_MOUSEMODES
-	} mousemode ;
 
 
 	sf::ContextSettings contextSettings;
 public:
+	enum MouseMode
+	{
+		pointer, diff, NUM_MOUSEMODES
+	} mousemode ; //make private
+
+	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
+	void setMouseMode( MouseMode mode );
 
 	sf::Window window;
 	vec2 mouse_sensitivity;
+
+	unique_ptr<EventMapper> event_mapper;
 
 	Operator(	WallClock& wallclock, 
 				const Cfg& cfg, 
@@ -65,9 +70,6 @@ public:
 
 struct LocalOperator : public Operator
 {
-	unique_ptr<EventMapper> event_mapper;
-	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
-	void setMouseMode( MouseMode mode );
 
 	LocalOperator() = default;
 	LocalOperator(WallClock& wallclock, const Cfg& cfg, std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings);

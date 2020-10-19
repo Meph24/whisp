@@ -120,6 +120,14 @@ namespace eventmapping
 			MouseDiffInput(Operator& op, float* diff_accumulation, Axis window_axis);
 			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
+		struct ToggleMouseMode
+		{
+			Operator& op;
+			KeyTrigger trigger;
+			ToggleMouseMode(Operator& op, KeyTrigger trigger = KeyTrigger::on_key_press);
+			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
+		};
+
 	} /* namespace actions */
 
 	namespace conditions

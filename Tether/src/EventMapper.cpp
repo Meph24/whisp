@@ -74,6 +74,19 @@ void eventmapping::actions::MouseDiffInput::operator()(EVENTMAPPING_FUNCTION_PAR
 	//note reset of mouse cursor to middle of window is done in post event processing (currently in Operator::postHandleEvent())
 }
 
+eventmapping::actions::ToggleMouseMode::ToggleMouseMode(Operator& op, eventmapping::actions::KeyTrigger trigger) : op(op), trigger(trigger){}
+void eventmapping::actions::ToggleMouseMode::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) 
+{
+	if(	
+			((trigger & eventmapping::actions::KeyTrigger::on_key_press) && e.value > 0.0)
+		||	((trigger & eventmapping::actions::KeyTrigger::on_key_release) && e.value <= 0)
+	) 
+	{
+		op.setMouseMode( op.mousemode == Operator::MouseMode::pointer ? Operator::MouseMode::diff : Operator::MouseMode::pointer );
+	}
+	
+}
+
 bool eventmapping::conditions::CALL_alwaysTrue(EVENTMAPPING_FUNCTION_PARAMETERS) { return true; }
 bool eventmapping::conditions::CALL_keyPressedCall(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value > 0.0f; }
 bool eventmapping::conditions::CALL_keyReleasedCall(EVENTMAPPING_FUNCTION_PARAMETERS) { return e.value <= 0.0f; }
