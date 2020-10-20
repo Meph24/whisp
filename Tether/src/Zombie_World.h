@@ -82,8 +82,6 @@ public:
 
 	void init();
 
-	void trigger(bool pulled);
-
 	void loop();
 	void doGraphics(const SimClock::time_point& t);
 

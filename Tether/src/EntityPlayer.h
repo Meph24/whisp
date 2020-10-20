@@ -87,8 +87,6 @@ public:
 
 
 	void selectWeapon(size_t selection);
-	void trigger(bool pulled, SimClock::time_point now,ITexture * tex,IWorld& iw);
-
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */

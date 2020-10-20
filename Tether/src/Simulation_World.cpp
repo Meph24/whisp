@@ -480,11 +480,6 @@ void Simulation_World::loop()
 	}
 }
 
-void Simulation_World::trigger(bool pulled)
-{
-	player->trigger(pulled, clock.now() ,shot,*getIWorld());
-}
-
 Entity* Simulation_World::getTarget(Entity* me)
 {
 	return (Entity *)player;
@@ -522,7 +517,7 @@ void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 	iw->pushAlgo->verbose=iw->verbose;
 	logicOutside.registerTime();
 
-	player->current_gun->tick(next_tick_begin, player->cam,player,shot,*getIWorld());
+	player->current_gun->tick(next_tick_begin, player->cam,player,*getIWorld());
 	logicGunTick.registerTime();
 
 	doPhysics(next_tick_begin);

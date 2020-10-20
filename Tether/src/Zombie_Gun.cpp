@@ -56,7 +56,7 @@ Zombie_Gun::~Zombie_Gun()
 
 #include <iostream>
 #define recoilDampeningTime 0.5f
-void Zombie_Gun::tryShoot(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw)
+void Zombie_Gun::tryShoot(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, IWorld& iw)
 {
 	trigger=true;
 	if (timer <= 0)
@@ -124,7 +124,7 @@ void Zombie_Gun::tryShoot(const SimClock::time_point& call_time,ICamera3D * cam,
 	recoilM.registerRecoil(recoil,recoilRand,{0,0,0});
 }
 
-void Zombie_Gun::tick(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, ITexture * tex,IWorld& iw)
+void Zombie_Gun::tick(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, IWorld& iw)
 {
 	float sec = (float)FloatSeconds(call_time-last_time);
 	vec3 recoilMod=recoilM.getRecoilDiff(sec);
@@ -142,7 +142,7 @@ void Zombie_Gun::tick(const SimClock::time_point& call_time,ICamera3D * cam,Enti
 	{
 		if(trigger)
 		{
-			tryShoot(call_time,cam,player,tex, iw);
+			tryShoot(call_time,cam,player,iw);
 		}
 	}
 	last_time=call_time;

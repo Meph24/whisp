@@ -307,6 +307,16 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 			pos=it->clip(oldPos+iw->fromMeters(flat*speedModA*speedModB),true);
 		}
 	}
+
+	if (controlinputs.trigger)
+	{
+		current_gun->tryShoot(next_tick_begin,cam,this,*iw);
+	}
+	else
+	{
+		current_gun->stopShooting();
+		return; 
+	}
 	
 	if(time>0.0000000001f)
 		v=(pos-oldPos)/time;
@@ -333,14 +343,4 @@ void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,Hittable
 	{
 		hitmark=1;
 	}
-}
-
-void EntityPlayer::trigger(bool pulled, SimClock::time_point now,ITexture * tex,IWorld& iw)
-{
-	if (!pulled)
-	{
-		current_gun->stopShooting();
-		return;
-	}
-	current_gun->tryShoot(now,cam,this,tex,iw);
 }

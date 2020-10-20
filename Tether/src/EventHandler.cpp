@@ -60,23 +60,6 @@ void EventHandler::Filter::updateFilter(event e)
 void EventHandler::sendOn(EventHandler::event e)
 {
 	if(event_mapper) event_mapper->event(e);
-	//Zombie_MouseInput * mouseInp=0;
-	//if(sim) if(sim->player) mouseInp=sim->player->mouseInp;
-	/* if (e.ID == 2048)
-	{
-		if (mouseInp)
-			mouseInp->mouseMovedX(e.value);
-	}
-	else if (e.ID == 2049)
-	{
-		if (mouseInp)
-			mouseInp->mouseMovedY(e.value);
-	}
-	else */
-	if (e.ID == 2052)
-	{
-		if(sim) sim->trigger(e.value);
-	}
 }
 
 void EventHandler::handle(EventHandler::event e)

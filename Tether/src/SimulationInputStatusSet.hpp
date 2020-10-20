@@ -61,13 +61,13 @@ struct SimulationInputStatusSet
 	bool slomo = false;
 	bool pause = false;
 	bool menu = false;
-	float trigger = 0.0f;
 	Index<8> weapon_selection = 0;
 	bool zoom = false;
 	bool clip = false;
 	bool verbose = false;
 	vec3 walk = vec3(0.0f);
 	vec3 turn = vec3(0.0f);
+	bool trigger = false;
 
 	//this needs to go as it is assigned from the wrong direction as of now (issue #36)
 	bool selection_active = 0;

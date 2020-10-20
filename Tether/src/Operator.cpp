@@ -102,7 +102,7 @@ void LocalOperator::operateSimulation(IGameMode* simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_MOUSE_LMB,
-		Act::Combinate(&input_status.trigger)
+		Act::Toggle(&input_status.trigger, Act::KeyTrigger::on_key_press_or_release)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_C,
@@ -129,7 +129,6 @@ void LocalOperator::operateSimulation(IGameMode* simulation)
 		Act::ToggleMouseMode( *this )
 	);
 
-	
 	setMouseMode( MouseMode::diff );
 
 }
@@ -137,8 +136,6 @@ void LocalOperator::operateSimulation(IGameMode* simulation)
 void Operator::setMouseMode( MouseMode mode )
 {
 	if(mousemode == mode) return;
-
-	
 
 	if(event_mapper)
 	//remove all other mouse related mappings
@@ -337,40 +334,7 @@ void Operator::pollEvents()
 	}
 }
 
-void Operator::preHandleEvent(sf::Event& e)
-{
-
-	//switch (e.type)
-	//{
-	//	/*
-	//	case sf::Event::EventType::MouseMoved:
-	//	//hardcursorhandle.cursorMoved(e);
-	//	break;
-    //
-	//	case sf::Event::EventType::Resized:
-	//	//hardcursorhandle.updateLockPosition();
-	//	std::cout << LocalOperator.m_window.getSize().x << "/" << LocalOperator.m_window.getSize().y;
-	//	break;
-    //
-	//	case sf::Event::EventType::GainedFocus:
-	//	//hardcursorhandle.updateLockPosition();	// no way to check if m_window was moved
-	//	std::cout<< "Stuff !!";
-	//	break;
-    //
-	//	// _test_begin
-	//	case sf::Event::EventType::KeyPressed:
-	//	if (e.key.code == sf::Keyboard::Key::L) hardcursorhandle.setLocked(true);
-	//	if (e.key.code == sf::Keyboard::Key::U) hardcursorhandle.setLocked(false);
-	//	if (e.key.code == sf::Keyboard::Key::R) LocalOperator.m_window.setSize (sf::Vector2u(400, 400));
-	//	break;
-    //
-	//	*/
-	//	// _test_end
-    //
-	//}
-
-
-}
+void Operator::preHandleEvent(sf::Event& e){}
 
 void Operator::postHandleEvent(sf::Event& e)
 {

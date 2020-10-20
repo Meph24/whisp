@@ -222,18 +222,6 @@ void Zombie_World::loop()
 	}
 }
 
-
-
-void Zombie_World::trigger(bool pulled)
-{
-	player->trigger(pulled, clock.now( ),shot,*getIWorld());
-//	if (!pulled)
-//	{
-//		player->guns[player->currentGun]->stopShooting();
-//		return;
-//	}
-//	player->guns[player->currentGun]->tryShoot(tm.getSlaveconst SimClock::time_point&(),player->cam,player,shot,*getIWorld());
-}
 void Zombie_World::spawnZombie(const SimClock::time_point& t)
 {
 	IWorld * iw=getIWorld();
@@ -309,7 +297,7 @@ void Zombie_World::doLogic(const SimClock::time_point& t)
 	iw->collideAlgo->verbose=iw->verbose;
 	iw->pushAlgo->verbose=iw->verbose;
 	logicOutside.registerTime();
-	player->current_gun->tick(t,player->cam,player,shot,*getIWorld());
+	player->current_gun->tick(t,player->cam,player,*getIWorld());
 	logicGunTick.registerTime();
 
 
