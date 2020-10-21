@@ -65,8 +65,7 @@ eventmapping::actions::MouseDiffInput::MouseDiffInput(Operator& op, float* diff_
 void eventmapping::actions::MouseDiffInput::operator()(EVENTMAPPING_FUNCTION_PARAMETERS)
 {
 	int pos = e.value;
-	auto sizev = op.window.getSize();
-	int size = (window_axis) ? sizev.y : sizev.x;
+	int size = (window_axis) ? op.window->height() : op.window->width();
 	float sensitivity = (window_axis) ? op.turnSensitivity().y : op.turnSensitivity().x;
 	//size from mid gets accumulated
 	float addition = ((float)(pos - size/2)) * sensitivity;
@@ -82,7 +81,7 @@ void eventmapping::actions::ToggleMouseMode::operator()(EVENTMAPPING_FUNCTION_PA
 		||	((trigger & eventmapping::actions::KeyTrigger::on_key_release) && e.value <= 0)
 	) 
 	{
-		op.setMouseMode( op.mousemode == Operator::MouseMode::pointer ? Operator::MouseMode::diff : Operator::MouseMode::pointer );
+		op.setMouseMode( op.mouseMode() == Operator::MouseMode::pointer ? Operator::MouseMode::diff : Operator::MouseMode::pointer );
 	}
 	
 }

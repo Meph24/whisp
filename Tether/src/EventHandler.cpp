@@ -6,8 +6,6 @@
 
 #include <iostream>
 
-EventHandler::EventHandler(IGameMode* sim, EventMapper* event_mapper) : sim(sim), event_mapper(event_mapper) {}
-
 EventHandler::Filter::Filter()
 {
 	prevValue = new float[NUM_EVENTTYPES << EVENTHANDLER_LOWID_BITS];
@@ -47,7 +45,7 @@ bool EventHandler::Filter::filter(EventHandler::event e)
 	}
 }
 
-void EventHandler::Filter::updateFilter(event e)
+void EventHandler::Filter::update(event e)
 {
 	prevValue[e.ID] = e.value;
 }
@@ -55,21 +53,6 @@ void EventHandler::Filter::updateFilter(event e)
 #include "Zombie_MouseInput.h"
 
 #include "CameraTP.h"
-
-
-void EventHandler::sendOn(EventHandler::event e)
-{
-	if(event_mapper) event_mapper->event(e);
-}
-
-void EventHandler::handle(EventHandler::event e)
-{
-	if (Filter.filter(e))
-	{
-		Filter.updateFilter(e);
-		sendOn(e);
-	}
-}
 
 EventHandler::event EventHandler::createEvent(EventHandler::eventType type, int lowID, float value)
 {

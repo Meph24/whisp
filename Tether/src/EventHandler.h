@@ -42,7 +42,6 @@ public:
 		//insert additonal above
 		NUM_EVENTTYPES
 	};
-private:
 
 	/*
 	//	Filter class which will provide a method to
@@ -58,7 +57,7 @@ private:
 		Filter();
 		~Filter();
 		
-		void updateFilter(event e);
+		void update(event e);
 		bool filter(event e);
 	}Filter;
 
@@ -66,22 +65,13 @@ private:
 	//	Method to pass on the event to further use
 	*/
 
-	void sendOn(event e);
 public:
 	IGameMode* sim;
 	EventMapper* event_mapper;
 
 	//This constructor only holds parameters because of legacy code
 	//namely Zombie_KeyInput, Zombie_MouseInput und IGameMode.trigger()
-	EventHandler(IGameMode* sim, EventMapper* event_mapper);
-
-
-	/*
-	//	The method to get events handled in further processes
-	//	Includes filtering of events, which do not bring new values
-	*/
-
-	void handle(event e);
+	EventHandler() = default;
 
 	/*
 	//	Method to ease creation of events from type and lower ID Parts
@@ -89,7 +79,7 @@ public:
 	//	Note: this method contains no further processes
 	*/
 
-	event createEvent(eventType type, int lowiD, float value);
+	static event createEvent(eventType type, int lowiD, float value);
 
 };
 

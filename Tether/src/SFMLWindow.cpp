@@ -1,4 +1,5 @@
 #include "SFMLWindow.hpp"
+#include <SFML/Window/WindowStyle.hpp>
 
 bool SFMLWindow::isOpen() const { return w.isOpen(); }
 void SFMLWindow::close() { w.close(); }
@@ -8,12 +9,12 @@ float SFMLWindow::width() const { return w.getSize().x; }
 float SFMLWindow::height() const { return w.getSize().y; }
 void SFMLWindow::activate() { w.setActive(true); }
 
-SFMLWindow::SFMLWindow(unsigned int width, unsigned int height, string title, const WallClock& wallclock)
-	: w(sf::VideoMode(400, 300), title)
-	, wallclock(wallclock)
+SFMLWindow::SFMLWindow(unsigned int width, unsigned int height, string title, uint32_t style, sf::ContextSettings contextsettings )
+	: w(sf::VideoMode(width, height), title, style, contextsettings)
 	, event_poll_counter(0) {}
 
 
+/*
 vector<InputEvent> SFMLWindow::mapSFEventToInputEvents( const sf::Event& sfe, const WallClock::time_point& poll_time)
 {
 	using namespace InputEventSpec;
@@ -99,30 +100,93 @@ vector<InputEvent> SFMLWindow::mapSFEventToInputEvents( const sf::Event& sfe, co
 	}
 return ret;
 }
+*/
 
+#define MOUSE_WHEEL_OFFSET 2
+#define MOUSE_BUTTON_OFFSET 4 
+#define JOYSTICK_ID_OFFSET 48
+#define JOYSTICK_BUTTON_OFFSET 8
 
-bool SFMLWindow::pollNext(InputEvent& e_out)
+void SFMLWindow::mapSFEventToEventHandlerEvents( const sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
 {
-	if(!backlog.empty()) 
+	switch (e.type)
 	{
-		e_out = backlog.front();
-		event_poll_counter++;
-		return true;
+	case sf::Event::EventType::Closed:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 0, 1));
+		break;
+
+	case sf::Event::EventType::Resized:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 1, e.size.width));
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 2, e.size.height));
+		break;
+
+	case sf::Event::EventType::LostFocus:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 3, 1));
+		break;
+
+	case sf::Event::EventType::GainedFocus:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 3, 0));
+		break;
+
+	case sf::Event::EventType::TextEntered:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 4, e.text.unicode));
+		break;
+
+	case sf::Event::EventType::MouseEntered:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 5, 1));
+		break;
+
+	case sf::Event::EventType::MouseLeft:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 5, 0));
+		break;
+
+	case sf::Event::EventType::JoystickDisconnected:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 6 + e.joystickConnect.joystickId, 1));
+		break;
+
+	case sf::Event::EventType::JoystickConnected:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::System, 6 + e.joystickConnect.joystickId, 0));
+		break;
+
+	case sf::Event::EventType::KeyPressed:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::Keyboard, e.key.code, 1));
+		break;
+
+	case sf::Event::EventType::KeyReleased:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::Keyboard, e.key.code, 0));
+		break;
+
+	case sf::Event::EventType::MouseMoved:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::Mouse, 0, e.mouseMove.x));
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::Mouse, 1, e.mouseMove.y));
+		break;
+
+	case sf::Event::EventType::MouseWheelScrolled:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::Mouse, MOUSE_WHEEL_OFFSET + e.mouseWheelScroll.wheel, e.mouseWheelScroll.delta));
+		break;
+
+	case sf::Event::EventType::MouseButtonPressed:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 1));
+		break;
+
+	case sf::Event::EventType::MouseButtonReleased:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 0));
+		break;
+
+	case sf::Event::EventType::JoystickMoved:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::Joystick, e.joystickMove.joystickId*JOYSTICK_ID_OFFSET + e.joystickMove.axis, e.joystickMove.position));
+		break;
+
+	case sf::Event::EventType::JoystickButtonPressed:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId*JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 1));
+		break;
+
+	case sf::Event::EventType::JoystickButtonReleased:
+		eventBuffer.write(EventHandler::createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId *JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 0));
+		break;
+	
+	default :
+        break;
+
 	}
-
-	sf::Event sfe;
-	vector<InputEvent> mapped_events;
-	do
-	{
-	if(!w.pollEvent(sfe)) return false;
-
-	mapped_events = mapSFEventToInputEvents(sfe, wallclock.now());
-	} while (mapped_events.empty());
-
-	backlog.insert(backlog.end(), mapped_events.begin()+1, mapped_events.end());
-	e_out = mapped_events.front();
-	++event_poll_counter;
-	return true;
 }
-
-unsigned long long SFMLWindow::polled() const{ return event_poll_counter; }

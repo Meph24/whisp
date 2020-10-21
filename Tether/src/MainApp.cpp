@@ -9,7 +9,6 @@
 #include "CfgIO.hpp"
 
 #include "EventHandler.h"
-#include "IMediaHandle.h"
 
 #include "Simulation_World.h"
 #include "Zombie_World.h"
@@ -19,19 +18,6 @@
 MainApp::MainApp()
 	: clock(base_clock)
 {
-	IMediaHandle::ContextSettings settings;
-	settings.depth = 24;
-	settings.stencil = 8;
-	settings.antialiasing = 1;
-	settings.openglmajor = 2;
-	settings.openglminor = 0;
-
-	//void * pointer=malloc(1024*1024);//This worked
-	//Cfg * cfg=new (pointer) Cfg({ "./res/config.txt" });
-    //
-	//int x=*(cfg->getint("graphics", "resolutionX"));
-	//int y=*(cfg->getint("graphics", "resolutionY"));
-	//free(pointer);
 	CfgIO cfgio ( "./res/config.txt" );
 	Cfg cfg = cfgio.get();
 
@@ -39,17 +25,17 @@ MainApp::MainApp()
 	int y=*cfg.getInt("graphics", "resolutionY");
 
 
-	op = std::make_unique<Operator>(clock, cfg, "Dwengine", x, y, settings);
+	op = std::make_unique<LocalOperator>(clock, cfg, "Dwengine", x, y);
 
 	int zombie_mode = *cfg.getInt("test", "zombie_mode");
 	if(zombie_mode) 
 	{
-		sim.reset(new Zombie_World(clock, &op->window));
+		sim.reset(new Zombie_World(clock, &op->window->getSFWindow()));
 		sim->input_status->clip = true;
 	}
 	else 
 	{
-		sim.reset(new Simulation_World(clock, &op->window));
+		sim.reset(new Simulation_World(clock, &op->window->getSFWindow()));
 	}
 
 	op->operateSimulation(sim.get());
@@ -77,7 +63,7 @@ void MainApp::run()
 	sim->init();
 	srand(time(0));
 
-	while (op->window.isOpen())
+	while (op->window->isOpen())
 	{
 		//render
 		sim->loop();

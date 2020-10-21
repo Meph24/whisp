@@ -7,19 +7,12 @@
 
 using std::string;
 
-#define MOUSE_WHEEL_OFFSET 2
-#define MOUSE_BUTTON_OFFSET 4 
-#define JOYSTICK_ID_OFFSET 48
-#define JOYSTICK_BUTTON_OFFSET 8
-
-
 #include "EventDefines.h"
 
-void Operator::operateSimulation(IGameMode* simulation)
+void LocalOperator::operateSimulation(IGameMode* simulation)
 {
 	SimulationInputStatusSet& input_status = *simulation->input_status;
 	event_mapper.reset(new EventMapper(input_status));
-	event_handler.reset(new EventHandler(simulation, event_mapper.get()));
 
 	namespace Act = eventmapping::actions;
 	namespace Cond = eventmapping::conditions;
@@ -133,7 +126,9 @@ void Operator::operateSimulation(IGameMode* simulation)
 
 }
 
-void Operator::setMouseMode( MouseMode mode )
+Operator::MouseMode LocalOperator::mouseMode() const { return mousemode; }
+
+void LocalOperator::setMouseMode( MouseMode mode )
 {
 	if(mousemode == mode) return;
 
@@ -160,163 +155,81 @@ void Operator::setMouseMode( MouseMode mode )
 	switch( mode )
 	{ 
 		case MouseMode::diff:
-			window.setMouseCursorVisible(false); 
+			window->setMouseCursorVisible(false); 
 		break;
 		default:
 		case MouseMode::pointer:
-			window.setMouseCursorVisible(true);
+			window->setMouseCursorVisible(true);
 		break;
 	}
 
 	mousemode = mode;
 }
 
-void Operator::disconnectSimulation()
+void LocalOperator::disconnectSimulation()
 {
-	event_handler.reset(nullptr);
+	event_mapper.reset();
 }
+
+#include "SFMLWindow.hpp"
 
 Operator::Operator(		WallClock&		wallclock,
 						const Cfg& cfg,
 						string		name, 
 						int			reswidth, 
-						int			resheight, 
-						IMediaHandle::ContextSettings& settings) 
+						int			resheight) 
 	: wallclock( &wallclock )
 	, cfg(cfg)
-	, event_handler( nullptr )
 	, contextSettings(24, 8, 0, 3, 3)
 	, turn_sensitivity( 0.0431654676, 0.0431654676 )
-	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
-	, mousemode( MouseMode::pointer )
+	, window(nullptr)
 {
 	const double* sensptr = cfg.getFlt("input", "sensitivityX");
 	float sensx = (sensptr) ? *sensptr : turn_sensitivity.x; //default already stored in mouse_sensitivity at init
 	sensptr = cfg.getFlt("input", "sensitivityY");
 	float sensy = (sensptr) ? *sensptr : turn_sensitivity.y;
 	turn_sensitivity = { sensx, sensy };
+
+
 }
 
-void Operator::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
-{
-	contextSettings.depthBits = settings.depth;
-	contextSettings.stencilBits = settings.stencil;
-	contextSettings.antialiasingLevel = settings.antialiasing;
-	contextSettings.majorVersion = settings.openglmajor;
-	contextSettings.minorVersion = settings.openglminor;
-
-	
-	window.create(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings);
-
-	//important because of the ability to activate the context in another thread
-	window.setActive(false);
+LocalOperator::LocalOperator(
+						WallClock&		wallclock,
+						const Cfg& cfg,
+						string		name, 
+						int			reswidth, 
+						int			resheight
+						)	
+	: Operator( wallclock, cfg, name, reswidth, resheight)
+	, mousemode(MouseMode::pointer)
+	, sfmlwindow( reswidth, resheight, name, sf::Style::None, contextSettings )
+	, event_source( &sfmlwindow )
+{	
+	window = &sfmlwindow;
 }
 
-void Operator::mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer)
+void LocalOperator::pollEvents()
 {
-	if(!event_handler) return;
-
-	switch (e.type)
-	{
-	case sf::Event::EventType::Closed:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 0, 1));
-		break;
-
-	case sf::Event::EventType::Resized:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 1, e.size.width));
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 2, e.size.height));
-		break;
-
-	case sf::Event::EventType::LostFocus:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 3, 1));
-		break;
-
-	case sf::Event::EventType::GainedFocus:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 3, 0));
-		break;
-
-	case sf::Event::EventType::TextEntered:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 4, e.text.unicode));
-		break;
-
-	case sf::Event::EventType::MouseEntered:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 5, 1));
-		break;
-
-	case sf::Event::EventType::MouseLeft:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 5, 0));
-		break;
-
-	case sf::Event::EventType::JoystickDisconnected:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 6 + e.joystickConnect.joystickId, 1));
-		break;
-
-	case sf::Event::EventType::JoystickConnected:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::System, 6 + e.joystickConnect.joystickId, 0));
-		break;
-
-	case sf::Event::EventType::KeyPressed:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::Keyboard, e.key.code, 1));
-		break;
-
-	case sf::Event::EventType::KeyReleased:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::Keyboard, e.key.code, 0));
-		break;
-
-	case sf::Event::EventType::MouseMoved:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::Mouse, 0, e.mouseMove.x));
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::Mouse, 1, e.mouseMove.y));
-		break;
-
-	case sf::Event::EventType::MouseWheelScrolled:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::Mouse, MOUSE_WHEEL_OFFSET + e.mouseWheelScroll.wheel, e.mouseWheelScroll.delta));
-		break;
-
-	case sf::Event::EventType::MouseButtonPressed:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 1));
-		break;
-
-	case sf::Event::EventType::MouseButtonReleased:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::Mouse, MOUSE_BUTTON_OFFSET + e.key.code, 0));
-		break;
-
-	case sf::Event::EventType::JoystickMoved:
-		eventBuffer.write(event_handler->createEvent(EventHandler::Joystick, e.joystickMove.joystickId*JOYSTICK_ID_OFFSET + e.joystickMove.axis, e.joystickMove.position));
-		break;
-
-	case sf::Event::EventType::JoystickButtonPressed:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId*JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 1));
-		break;
-
-	case sf::Event::EventType::JoystickButtonReleased:
-		eventBuffer.write(event_handler->createEvent(EventHandler::eventType::Joystick, e.joystickButton.joystickId *JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 0));
-		break;
-	
-	default :
-        break;
-
-	}
-}
-
-void Operator::pollEvents()
-{
-	if(!event_handler) return;
 	sf::Event e;
 	Buffer < EventHandler::event, 4 >  eventBuffer;
 	//handle events
 
 	EventHandler::event retEvent;
-	while (window.pollEvent(e))
+	while (event_source->pollEvent(e))
 	{
 		preHandleEvent(e);
 		
-		mapSFEventToEventHandlerEvent(e, eventBuffer);
+		event_source->mapSFEventToEventHandlerEvents(e, eventBuffer);
 		//handle mapped events
 		while (!eventBuffer.nodata())
 		{
 			if (eventBuffer.read(retEvent))
 			{
-				event_handler->handle(retEvent);
+				if(event_handler.Filter.filter(retEvent))
+				{
+					event_handler.Filter.update(retEvent);
+					if(event_mapper) event_mapper->event(retEvent);
+				}
 			}
 		}
 		eventBuffer.clear();
@@ -325,20 +238,19 @@ void Operator::pollEvents()
 	}
 }
 
-void Operator::preHandleEvent(sf::Event& e){}
-
-void Operator::postHandleEvent(sf::Event& e)
+void LocalOperator::preHandleEvent(sf::Event& e){}
+void LocalOperator::postHandleEvent(sf::Event& e)
 {
 	switch (e.type)
 	{
 		case sf::Event::EventType::Closed:
 			disconnectSimulation();
-			window.close();
+			window->close();
 		break;
 
 		case sf::Event::MouseMoved:
-			if(mousemode == MouseMode::diff) 
-				sf::Mouse::setPosition( (window.getPosition()) + ((sf::Vector2i)window.getSize())/2 );
+			if(mouseMode() == MouseMode::diff) 
+				sf::Mouse::setPosition( (window->pos()) + ((sf::Vector2i)window->size())/2 );
 		break;
 
 		default: break;//warning suppression
@@ -348,12 +260,12 @@ void Operator::postHandleEvent(sf::Event& e)
 
 void Operator::setContextToMyThread()
 {
-	window.setActive(true);
+	window->setActive(true);
 }
 
 void Operator::display()
 {
-	window.display();
+	window->display();
 }
 
 

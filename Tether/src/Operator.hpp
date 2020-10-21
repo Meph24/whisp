@@ -1,8 +1,6 @@
 #ifndef OPERATOR_HPP
 #     define OPERATOR_HPP
 
-#include "IMediaHandle.h"
-
 #include "EventHandler.h"
 #include "EventMapper.hpp"
 #include "Buffer.h"
@@ -22,81 +20,80 @@ using std::pair;
 
 using std::unique_ptr;
 
-class Operator : public IMediaHandle
+#include "Window.hpp"
+#include "SFMLWindow.hpp"
+
+class Operator
 {
 protected:
 	WallClock* wallclock;
 	const Cfg& cfg;
-	unique_ptr<EventHandler> event_handler;
 	sf::ContextSettings contextSettings;
 	vec2 turn_sensitivity;
 public:
-	sf::Window window;
+	Window* window;
 	enum MouseMode
 	{
 		pointer, diff, NUM_MOUSEMODES
-	} mousemode ; //make private
+	}; //make private
 
-	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
-	void setMouseMode( MouseMode mode );
-
-
-	vec2 turnSensitivity() const 
-	{ 
-		float modifier = 1.0f;
-		if( event_mapper && event_mapper->managed_stati->zoom ) modifier = 1.0f / 8; 
-		return turn_sensitivity * modifier; 
-	}
-
-	unique_ptr<EventMapper> event_mapper;
+	virtual void setMouseMode( MouseMode mode ) = 0;
+	virtual MouseMode mouseMode() const = 0;
+	virtual vec2 turnSensitivity() const = 0;
 
 	Operator(	WallClock& wallclock, 
 				const Cfg& cfg, 
 				std::string name, 
 				int reswidth, 
-				int resheight, 
-				IMediaHandle::ContextSettings& settings	);
+				int resheight
+				);
 
-	void mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer);
-	void postHandleEvent(sf::Event& e);
-	void preHandleEvent(sf::Event& e);
-	void pollEvents();
+	virtual void pollEvents() = 0;
 	void display();
 
-	void createWindow(std::string name,  int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
 	void setContextToMyThread();
 	
-	void operateSimulation(IGameMode* simulation);
-	void disconnectSimulation();
 	void render();
+	virtual void operateSimulation(IGameMode* simulation) = 0;
+	virtual void disconnectSimulation() = 0;
 };
 
-/*
-namespace RemoteOperator
+struct LocalOperator : public Operator
 {
-	class Server : public Operator
-	{
-		void operateSimulation(IGameMode* simulation);
-		void disconnectSimulation();
+	vec2 turnSensitivity() const
+	{ 
+		float modifier = 1.0f;
+		if( event_mapper && event_mapper->managed_stati->zoom ) modifier = 1.0f / 8; 
+		return turn_sensitivity * modifier; 
+	}
+private:
+	MouseMode mousemode;
+public:
 
-		void createWindow(std::string name,  int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
-		void pollEvents();
-		void setContextToMyThread();
-		void display();
+	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
+	void setMouseMode( MouseMode mode );
+	MouseMode mouseMode() const;
 
-		void render();
-	};
-	class Client
-	{
-		// handler of the events
-		unique_ptr<EventHandler> event_handler;
 
-		void mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer);
-		void postHandleEvent(sf::Event& e);
-		void preHandleEvent(sf::Event& e);
-	};
-} // namespace RemoteOperator
-*/
+	SFMLWindow sfmlwindow;
+	EventHandler event_handler;
+	unique_ptr<EventMapper> event_mapper;
+	EventSource* event_source;
+	void operateSimulation(IGameMode* simulation);
+	void disconnectSimulation();
+	void pollEvents();
+
+
+	void preHandleEvent(sf::Event& e);
+	void postHandleEvent(sf::Event& e);
+
+	LocalOperator(	WallClock& wallclock, 
+				const Cfg& cfg, 
+				std::string name, 
+				int reswidth, 
+				int resheight 
+	);
+};
 
 #endif /* OPERATOR_HPP */
 
