@@ -173,13 +173,13 @@ void LocalOperator::disconnectSimulation()
 
 #include "SFMLWindow.hpp"
 
-Operator::Operator(		WallClock&		wallclock,
+Operator::Operator(		
 						const Cfg& cfg,
 						string		name, 
 						int			reswidth, 
-						int			resheight) 
-	: wallclock( &wallclock )
-	, cfg(cfg)
+						int			resheight
+					) 
+	: cfg(cfg)
 	, contextSettings(24, 8, 0, 3, 3)
 	, turn_sensitivity( 0.0431654676, 0.0431654676 )
 	, window(nullptr)
@@ -194,13 +194,12 @@ Operator::Operator(		WallClock&		wallclock,
 }
 
 LocalOperator::LocalOperator(
-						WallClock&		wallclock,
 						const Cfg& cfg,
 						string		name, 
 						int			reswidth, 
 						int			resheight
 						)	
-	: Operator( wallclock, cfg, name, reswidth, resheight)
+	: Operator( cfg, name, reswidth, resheight)
 	, mousemode(MouseMode::pointer)
 	, sfmlwindow( reswidth, resheight, name, sf::Style::None, contextSettings )
 	, event_source( &sfmlwindow )

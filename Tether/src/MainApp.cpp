@@ -25,7 +25,7 @@ MainApp::MainApp()
 	int y=*cfg.getInt("graphics", "resolutionY");
 
 
-	op = std::make_unique<LocalOperator>(clock, cfg, "Dwengine", x, y);
+	op = std::make_unique<LocalOperator>(cfg, "Dwengine", x, y);
 
 	int zombie_mode = *cfg.getInt("test", "zombie_mode");
 	if(zombie_mode) 

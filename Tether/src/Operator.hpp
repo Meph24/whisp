@@ -26,7 +26,6 @@ using std::unique_ptr;
 class Operator
 {
 protected:
-	WallClock* wallclock;
 	const Cfg& cfg;
 	sf::ContextSettings contextSettings;
 	vec2 turn_sensitivity;
@@ -41,7 +40,7 @@ public:
 	virtual MouseMode mouseMode() const = 0;
 	virtual vec2 turnSensitivity() const = 0;
 
-	Operator(	WallClock& wallclock, 
+	Operator(	
 				const Cfg& cfg, 
 				std::string name, 
 				int reswidth, 
@@ -58,22 +57,20 @@ public:
 	virtual void disconnectSimulation() = 0;
 };
 
-struct LocalOperator : public Operator
+class LocalOperator : public Operator
 {
+	MouseMode mousemode;
+public:
 	vec2 turnSensitivity() const
 	{ 
 		float modifier = 1.0f;
 		if( event_mapper && event_mapper->managed_stati->zoom ) modifier = 1.0f / 8; 
 		return turn_sensitivity * modifier; 
 	}
-private:
-	MouseMode mousemode;
-public:
 
 	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
 	void setMouseMode( MouseMode mode );
 	MouseMode mouseMode() const;
-
 
 	SFMLWindow sfmlwindow;
 	EventHandler event_handler;
@@ -83,17 +80,23 @@ public:
 	void disconnectSimulation();
 	void pollEvents();
 
-
 	void preHandleEvent(sf::Event& e);
 	void postHandleEvent(sf::Event& e);
 
-	LocalOperator(	WallClock& wallclock, 
+	LocalOperator(	
 				const Cfg& cfg, 
 				std::string name, 
 				int reswidth, 
 				int resheight 
 	);
 };
+
+/*
+struct RemoteControlReceiverOperator : public Operator
+{
+	RemoteControlReceiverOperator() 
+};
+*/
 
 #endif /* OPERATOR_HPP */
 
