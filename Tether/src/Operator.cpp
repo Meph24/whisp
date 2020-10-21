@@ -15,7 +15,7 @@ using std::string;
 
 #include "EventDefines.h"
 
-void LocalOperator::operateSimulation(IGameMode* simulation)
+void Operator::operateSimulation(IGameMode* simulation)
 {
 	SimulationInputStatusSet& input_status = *simulation->input_status;
 	event_mapper.reset(new EventMapper(input_status));
@@ -171,7 +171,7 @@ void Operator::setMouseMode( MouseMode mode )
 	mousemode = mode;
 }
 
-void LocalOperator::disconnectSimulation()
+void Operator::disconnectSimulation()
 {
 	event_handler.reset(nullptr);
 }
@@ -186,9 +186,9 @@ Operator::Operator(		WallClock&		wallclock,
 	, cfg(cfg)
 	, event_handler( nullptr )
 	, contextSettings(24, 8, 0, 3, 3)
-	, mousemode( MouseMode::pointer )
-	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
 	, turn_sensitivity( 0.0431654676, 0.0431654676 )
+	, window(sf::VideoMode(reswidth, resheight), name, sf::Style::None, contextSettings)
+	, mousemode( MouseMode::pointer )
 {
 	const double* sensptr = cfg.getFlt("input", "sensitivityX");
 	float sensx = (sensptr) ? *sensptr : turn_sensitivity.x; //default already stored in mouse_sensitivity at init
@@ -196,15 +196,6 @@ Operator::Operator(		WallClock&		wallclock,
 	float sensy = (sensptr) ? *sensptr : turn_sensitivity.y;
 	turn_sensitivity = { sensx, sensy };
 }
-
-LocalOperator::LocalOperator( 	WallClock&		wallclock,
-						const Cfg& cfg,
-						string		name, 
-						int			reswidth, 
-						int			resheight, 
-						IMediaHandle::ContextSettings& settings )
-	: Operator ( wallclock, cfg, name, reswidth, resheight, settings )
-{}
 
 void Operator::createWindow(std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings)
 {
@@ -366,7 +357,7 @@ void Operator::display()
 }
 
 
-void LocalOperator::render()
+void Operator::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

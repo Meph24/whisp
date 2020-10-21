@@ -28,11 +28,10 @@ protected:
 	WallClock* wallclock;
 	const Cfg& cfg;
 	unique_ptr<EventHandler> event_handler;
-
-
 	sf::ContextSettings contextSettings;
 	vec2 turn_sensitivity;
 public:
+	sf::Window window;
 	enum MouseMode
 	{
 		pointer, diff, NUM_MOUSEMODES
@@ -41,7 +40,6 @@ public:
 	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
 	void setMouseMode( MouseMode mode );
 
-	sf::Window window;
 
 	vec2 turnSensitivity() const 
 	{ 
@@ -59,12 +57,6 @@ public:
 				int resheight, 
 				IMediaHandle::ContextSettings& settings	);
 
-
-	virtual void operateSimulation(IGameMode* simulation) = 0;
-	virtual void disconnectSimulation() = 0;
-
-	virtual void render() = 0;
-
 	void mapSFEventToEventHandlerEvent(sf::Event& e, Buffer<EventHandler::event, 4>& eventBuffer);
 	void postHandleEvent(sf::Event& e);
 	void preHandleEvent(sf::Event& e);
@@ -73,14 +65,6 @@ public:
 
 	void createWindow(std::string name,  int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
 	void setContextToMyThread();
-};
-
-struct LocalOperator : public Operator
-{
-
-	LocalOperator() = default;
-	LocalOperator(WallClock& wallclock, const Cfg& cfg, std::string name, int reswidth, int resheight, IMediaHandle::ContextSettings& settings);
-
 	
 	void operateSimulation(IGameMode* simulation);
 	void disconnectSimulation();
