@@ -23,6 +23,8 @@ using std::vector;
 class Operator;
 
 #include "SimulationInputStatusSet.hpp"
+#include "InputDeviceConfigurator.hpp"
+#include "Window.hpp"
 
 #define EVENTMAPPING_FUNCTION_PARAMETERS EventHandler::event& e, SimulationInputStatusSet& stati
 
@@ -113,18 +115,19 @@ namespace eventmapping
 
 		struct MouseDiffInput
 		{
-			::Operator& op;
+			InputDeviceConfigurator& conf;
+			Window& window;
 			float* diff_accumulation;
 			enum Axis{ X = 0, Y = 1, NUM_AXES };
 			Axis window_axis;
-			MouseDiffInput(Operator& op, float* diff_accumulation, Axis window_axis);
+			MouseDiffInput(Window& window, InputDeviceConfigurator& conf, float* diff_accumulation, Axis window_axis);
 			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
 		struct ToggleMouseMode
 		{
-			Operator& op;
+			InputDeviceConfigurator& conf;
 			KeyTrigger trigger;
-			ToggleMouseMode(Operator& op, KeyTrigger trigger = KeyTrigger::on_key_press);
+			ToggleMouseMode(InputDeviceConfigurator& conf, KeyTrigger trigger = KeyTrigger::on_key_press);
 			void operator()(EVENTMAPPING_FUNCTION_PARAMETERS);
 		};
 

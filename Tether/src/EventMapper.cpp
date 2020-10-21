@@ -56,8 +56,9 @@ void eventmapping::actions::SendSignal::operator()(EVENTMAPPING_FUNCTION_PARAMET
 
 #include "Operator.hpp"
 
-eventmapping::actions::MouseDiffInput::MouseDiffInput(Operator& op, float* diff_accumulation, Axis window_axis) 
-				: op(op)
+eventmapping::actions::MouseDiffInput::MouseDiffInput(Window& window, InputDeviceConfigurator& conf, float* diff_accumulation, Axis window_axis) 
+				: conf(conf)
+				, window(window)
 				, diff_accumulation(diff_accumulation)
 				, window_axis(window_axis)
 {}
@@ -65,15 +66,15 @@ eventmapping::actions::MouseDiffInput::MouseDiffInput(Operator& op, float* diff_
 void eventmapping::actions::MouseDiffInput::operator()(EVENTMAPPING_FUNCTION_PARAMETERS)
 {
 	int pos = e.value;
-	int size = (window_axis) ? op.window->height() : op.window->width();
-	float sensitivity = (window_axis) ? op.turnSensitivity().y : op.turnSensitivity().x;
+	int size = (window_axis) ? window.height() : window.width();
+	float sensitivity = (window_axis) ? conf.turnSensitivity().y : conf.turnSensitivity().x;
 	//size from mid gets accumulated
 	float addition = ((float)(pos - size/2)) * sensitivity;
 	*diff_accumulation += addition;
 	//note reset of mouse cursor to middle of window is done in post event processing (currently in Operator::postHandleEvent())
 }
 
-eventmapping::actions::ToggleMouseMode::ToggleMouseMode(Operator& op, eventmapping::actions::KeyTrigger trigger) : op(op), trigger(trigger){}
+eventmapping::actions::ToggleMouseMode::ToggleMouseMode(InputDeviceConfigurator& conf, eventmapping::actions::KeyTrigger trigger) : conf(conf), trigger(trigger){}
 void eventmapping::actions::ToggleMouseMode::operator()(EVENTMAPPING_FUNCTION_PARAMETERS) 
 {
 	if(	
@@ -81,7 +82,7 @@ void eventmapping::actions::ToggleMouseMode::operator()(EVENTMAPPING_FUNCTION_PA
 		||	((trigger & eventmapping::actions::KeyTrigger::on_key_release) && e.value <= 0)
 	) 
 	{
-		op.setMouseMode( op.mouseMode() == Operator::MouseMode::pointer ? Operator::MouseMode::diff : Operator::MouseMode::pointer );
+		conf.setMouseMode( conf.mouseMode() == InputDeviceConfigurator::MouseMode::pointer ? InputDeviceConfigurator::MouseMode::diff : InputDeviceConfigurator::MouseMode::pointer );
 	}
 	
 }
