@@ -47,9 +47,11 @@ public:
 	operator IndexType() { return value(); }
 };
 
+#include "WallClock.hpp"
 //this struct shall be kept sendable, that means no dynamic allocation and pointers allowed
 struct SimulationInputStatusSet
 {
+	WallClock::time_point::rep timestamp = 0;
 	//stati
 	bool debug_screen_active = false;
 	SignalCounter restart = 0;

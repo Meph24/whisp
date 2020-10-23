@@ -21,6 +21,7 @@ struct SFMLWindow : public Window, public EventSource
 	float width() const;
 	float height() const;
 	sf::Vector2i pos(){ return w.getPosition(); }
+	virtual void setPos( sf::Vector2i pos ) { w.setPosition(pos); }
 	sf::Vector2u size(){ return w.getSize(); };
 	void activate();
 
@@ -45,7 +46,7 @@ struct SFMLWindow : public Window, public EventSource
 
 	void setMouseCursorVisible( bool b = true ) { w.setMouseCursorVisible(b); }
 
-	void setActive(bool b) { w.setActive(b); };
+	void setActive(bool b = true) { w.setActive(b); };
 };
 
 #endif /* WINDOW_HPP */

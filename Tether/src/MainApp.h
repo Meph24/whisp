@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <stdexcept>
+
 #include "Operator.hpp"
 #include <memory>
 #include "WallClock.hpp"
@@ -7,33 +10,54 @@
 
 using std::unique_ptr;
 
-class MainApp
-{
-	SFMLClock base_clock;
-	WallClock clock;
+#include "commandline.hpp"
 
-	/*
-	//	Media Handle Instance, encapsulation of the Media Layer
-	*/
-	unique_ptr<Operator> op;
+struct App
+{
+	WallClock& wallclock;
+	Cfg& cfg;
+
+	App(WallClock& wallclock, Cfg& cfg);
 
 	unique_ptr<IGameMode> sim;
+	Operator* op;
 
-	// _test_begin
-	float counter;
-	// _test_end
+	virtual void run();
+};
 
-	// executes logic int the main loop
-	//_probably unnecessary due to rearrangement of loops
-	void tick(int us);
-public:
-	MainApp();
+struct DefaultApp : public App
+{
+	LocalOperator local_operator;
+	DefaultApp( WallClock& wallclock, Cfg& cfg );
+};
 
-	/*
-	//	run() MUST be called explicitly
-	//	starts to run the application
-	*/
+#include "IPv4Address.hpp"
+
+struct RemoteControlReceiverApp : public App
+{
+	RemoteControlReceiverOperator rc_operator;
+	RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg);
+};
+
+struct RemoteControlSenderApp : public App
+{
+	RemoteControlSender rc_sender;
+	RemoteControlSenderApp( WallClock& wallclock, Cfg& cfg, IPv4Address& addr, Port port = 55555 );
 	void run();
-	
+};
 
+class Main
+{
+	static unordered_map<string, unsigned int> command_line_argument_flags;
+	CommandLineArgumentInterpreter commandline_argument_interpreter;
+
+	SFMLClock base_clock;
+	WallClock clock;
+	Cfg cfg;
+
+	unique_ptr<App> app;
+	
+public:
+	Main(int argc, char** argv);
+	void run();
 };

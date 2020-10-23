@@ -4,21 +4,9 @@
 #include <iostream>
 #include <exception>
 
-int main()
+int main(int argc, char** argv)
 {
-	
-	try
-	{
-		MainApp A;
-		A.run();
-	}
-
-	catch (std::exception& e)
-	{
-		std::cout << e.what() << std::endl;
-	}
-	
-
-	//getchar();
+	Main A(argc, argv);
+	A.run();
 	return 0;
 }

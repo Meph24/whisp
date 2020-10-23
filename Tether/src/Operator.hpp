@@ -77,21 +77,54 @@ public:
 	);
 };
 
+#include "IPv4Address.hpp"
+#include "NetworkConnection.hpp"
+using network::IPv4Address;
+using network::Port;
+using network::UdpSocket;
+
 struct RemoteControlReceiverOperator : public Operator
 {
 	SimulationInputStatusSet* managed_status;
 
 	SFMLWindow sfmlwindow;
 
+	SimulationInputStatusSet current_receive;
+	size_t received;
+	UdpSocket udpsocket;
+
 	RemoteControlReceiverOperator( std::string name, int reswidth, int resheight );
 	void operateSimulation(IGameMode* simulation) { managed_status = simulation->input_status.get(); }
 	void disconnectSimulation(){ managed_status = nullptr; }
-	void pollEvents() { /* noting to do here, done on sender, this call will hopefully be smth different in the future*/ }
-
+	void pollEvents() 
+	{ 
+		if(!managed_status) return;
+		sf::IpAddress addr; Port port;
+		size_t this_received = 1;
+		char * data = (char*)&current_receive + received;
+		while(this_received)
+		{
+			this_received = 0;
+			udpsocket.receive(data, sizeof(SimulationInputStatusSet) - received, this_received, addr, port);
+			if(!this_received) return;
+			received += this_received;
+			if(received == sizeof(SimulationInputStatusSet))
+			{
+				if(managed_status->timestamp > current_receive.timestamp)
+				{
+					*managed_status = current_receive;
+				}
+				received = 0;
+			}
+		}
+	}
 };
+
 struct RemoteControlSender : public InputDeviceConfigurator
 {
+	WallClock& clock;
 	SFMLWindow window;
+
 	EventHandler event_handler;
 	EventMapper event_mapper;
 	EventSource* event_source;
@@ -99,27 +132,22 @@ struct RemoteControlSender : public InputDeviceConfigurator
 	SimulationInputStatusSet status_set;
 	SimulationInputStatusSet* receiver_status_set;
 
-	RemoteControlSender( const Cfg& cfg )
-	: InputDeviceConfigurator(cfg)
-	, window( 200, 200, "whisp-remote-control-at-someipidontknowrightnow", sf::Style::None, sf::ContextSettings())
-	, event_mapper( status_set )
-	, event_source( &window )
-	, receiver_status_set( nullptr )
-	{
-		
-	}
+	IPv4Address receiver_addr;
+	Port receiver_port;
+	UdpSocket udpsocket;
+
+	RemoteControlSender( WallClock& wallclock, Cfg& cfg);
 
 	vec2 turnSensitivity() const;
 	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
+
+	MouseMode mousemode;
 	void setMouseMode( MouseMode mode );
 	MouseMode mouseMode() const;
 
-	void connect( RemoteControlReceiverOperator& rcro );
-
-	void sync()
-	{
-		*receiver_status_set = status_set;
-	}
+	void connect(IPv4Address&, Port);
+	void sync();
+	void processEvents();
 };
 
 #endif /* OPERATOR_HPP */

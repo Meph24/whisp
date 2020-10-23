@@ -13,7 +13,7 @@ struct RenderTarget
 
 	virtual float width() const = 0;
 	virtual float height() const = 0;
-	virtual void setActive(bool b) = 0;
+	virtual void setActive(bool b = true) = 0;
 };
 
 struct EventSource
@@ -27,6 +27,7 @@ struct Window : public RenderTarget
 	virtual bool isOpen() const = 0;
 	virtual void close() = 0;
 	virtual sf::Vector2i pos() = 0;
+	virtual void setPos( sf::Vector2i ) = 0;
 	virtual sf::Vector2u size() = 0;
 
 	virtual sf::Window& getSFWindow() = 0; // TODO Hack remove in future, when Gamemodes do not require a window anymore
