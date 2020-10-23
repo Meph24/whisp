@@ -113,6 +113,7 @@ struct RemoteControlReceiverOperator : public Operator
 			received += this_received;
 			if(received == sizeof(SimulationInputStatusSet))
 			{
+				std::cout << "Received Status!\n";
 				if(managed_status->timestamp < current_receive.timestamp)
 				{
 					*managed_status = current_receive;

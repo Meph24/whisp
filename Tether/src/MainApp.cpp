@@ -152,6 +152,12 @@ RemoteControlSenderApp::RemoteControlSenderApp(WallClock& wallclock, Cfg& cfg, I
 
 void RemoteControlSenderApp::run()
 {
+	GLenum err = glewInit();
+	if (err != GLEW_OK)
+	{
+		std::cerr << "GLEW failed to initialize !" << std::endl;
+	}
+
 	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 	while(rc_sender.window.isOpen())
 	{
