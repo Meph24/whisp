@@ -280,7 +280,7 @@ vec2 RemoteControlSender::turnSensitivity() const
 		return turn_sensitivity * modifier; 
 }
 
-void RemoteControlSender::connect(IPv4Address& addr, Port port)
+void RemoteControlSender::tunein(IPv4Address& addr, Port port)
 {
 	receiver_addr = addr; receiver_port = port;
 	namespace Act = eventmapping::actions;
@@ -445,7 +445,6 @@ RemoteControlSender::RemoteControlSender( WallClock& wallclock, Cfg& cfg )
 	, window( 200, 200, string("remote control device") , sf::Style::None, sf::ContextSettings())
 	, event_mapper( status_set )
 	, event_source( &window )
-	, receiver_status_set( nullptr )
 	, mousemode(MouseMode::pointer)
 {
 	udpsocket.setBlocking(true);	

@@ -94,7 +94,10 @@ struct RemoteControlReceiverOperator : public Operator
 	UdpSocket udpsocket;
 
 	RemoteControlReceiverOperator( std::string name, int reswidth, int resheight );
-	void operateSimulation(IGameMode* simulation) { managed_status = simulation->input_status.get(); }
+	void operateSimulation(IGameMode* simulation) 
+	{ 
+		managed_status = simulation->input_status.get();
+	}
 	void disconnectSimulation(){ managed_status = nullptr; }
 	void pollEvents() 
 	{ 
@@ -110,7 +113,7 @@ struct RemoteControlReceiverOperator : public Operator
 			received += this_received;
 			if(received == sizeof(SimulationInputStatusSet))
 			{
-				if(managed_status->timestamp > current_receive.timestamp)
+				if(managed_status->timestamp < current_receive.timestamp)
 				{
 					*managed_status = current_receive;
 				}
@@ -130,7 +133,6 @@ struct RemoteControlSender : public InputDeviceConfigurator
 	EventSource* event_source;
 
 	SimulationInputStatusSet status_set;
-	SimulationInputStatusSet* receiver_status_set;
 
 	IPv4Address receiver_addr;
 	Port receiver_port;
@@ -145,7 +147,7 @@ struct RemoteControlSender : public InputDeviceConfigurator
 	void setMouseMode( MouseMode mode );
 	MouseMode mouseMode() const;
 
-	void connect(IPv4Address&, Port);
+	void tunein(IPv4Address&, Port);
 	void sync();
 	void processEvents();
 };

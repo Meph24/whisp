@@ -144,10 +144,10 @@ RemoteControlSenderApp::RemoteControlSenderApp(WallClock& wallclock, Cfg& cfg, I
 		: App(wallclock, cfg)
 		, rc_sender(wallclock, cfg)
 {
-	rc_sender.connect(addr, port);
 	rc_sender.setMouseMode( InputDeviceConfigurator::MouseMode::diff );
 	cout << "Initializing RemoteControlSender Application !\n";
 	rc_sender.window.setPos(sf::Vector2i(0,0));
+	rc_sender.tunein(addr, port);
 }
 
 void RemoteControlSenderApp::run()
@@ -155,9 +155,9 @@ void RemoteControlSenderApp::run()
 	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 	while(rc_sender.window.isOpen())
 	{
-		rc_sender.processEvents();
-		rc_sender.sync();
 		glClear( GL_COLOR_BUFFER_BIT );
 		rc_sender.window.display();
+		rc_sender.processEvents();
+		rc_sender.sync();
 	}
 }
