@@ -93,7 +93,7 @@ struct RemoteControlReceiverOperator : public Operator
 	size_t received;
 	UdpSocket udpsocket;
 
-	RemoteControlReceiverOperator( std::string name, int reswidth, int resheight );
+	RemoteControlReceiverOperator( std::string name, int reswidth, int resheight, Port try_port );
 	void operateSimulation(IGameMode* simulation) 
 	{ 
 		managed_status = simulation->input_status.get();

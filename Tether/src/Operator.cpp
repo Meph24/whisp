@@ -259,7 +259,7 @@ void Operator::render()
 }
 
 RemoteControlReceiverOperator::RemoteControlReceiverOperator(
-	 std::string name, int reswidth, int resheight 
+	 std::string name, int reswidth, int resheight, Port try_port
 	)
 	: Operator (name + string(" - remote controlled receiver"), reswidth, resheight)
 	, managed_status(nullptr)
@@ -269,7 +269,7 @@ RemoteControlReceiverOperator::RemoteControlReceiverOperator(
 	window = &sfmlwindow;
 	udpsocket.setBlocking(false);
 	
-	udpsocket.bind(55555);
+	udpsocket.bind(try_port);
 	std::cout << "RemoteControlReceiverOperator : Bound at port <" << udpsocket.getLocalPort() << ">\n";
 }
 

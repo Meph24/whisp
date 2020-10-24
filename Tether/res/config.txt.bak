@@ -19,3 +19,8 @@ sensitivityY=0.0431654676
 
 [simulation]
 objects_count=0
+
+
+[network]
+default_ip_remote_control_sender="127.0.0.1"
+default_port_remote_control=55555

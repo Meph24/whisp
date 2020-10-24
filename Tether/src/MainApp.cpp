@@ -17,8 +17,10 @@
 
 unordered_map<string, unsigned int> Main::command_line_argument_flags = 
 {  
-	{"remote-control-sender", 2},
-	{"remote-control-receiver", 0}	
+	{"remote-control-sender", 0},
+	{"remote-control-receiver", 0},
+	{"addr", 1},
+	{"port", 1}
 };
 
 Main::Main(int argc, char** argv)
@@ -28,6 +30,16 @@ Main::Main(int argc, char** argv)
 	CfgIO cfgio ( "./res/config.txt" );
 	cfg = cfgio.get();
 
+	Port port = (*cfg.getInt("network", "default_port_remote_control"));
+	if(port < 0 || port > 65535)
+		throw std::runtime_error( " Port loaded from cfg " + std::to_string(port) + "is not a port!\n" );
+	if(commandline_argument_interpreter.args.find("port") != commandline_argument_interpreter.args.end() )
+	{
+		port = std::stoi(commandline_argument_interpreter.args["port"][0]);
+		if(port < 0 || port > 65535)
+			throw std::runtime_error( " Port inserted as commandline argument " + std::to_string(port) + "is not a port!\n" );
+	}
+
 	switch( commandline_argument_interpreter.execution_mode )
 	{
 		default:
@@ -36,13 +48,15 @@ Main::Main(int argc, char** argv)
 		break;
 		case CommandLineArgumentInterpreter::ExecutionMode::RemoteControlSender:
 		{
-			IPv4Address addr(commandline_argument_interpreter.args["remote-control-sender"][0]); 
-			Port port = std::stoi(commandline_argument_interpreter.args["remote-control-sender"][1]);
+			IPv4Address addr ( *cfg.getStr( "network", "default_ip_remote_control_sender" ) );
+			if( commandline_argument_interpreter.args.find("addr") != commandline_argument_interpreter.args.end() )
+				addr = IPv4Address(commandline_argument_interpreter.args["addr"][0]);
+
 			app = std::make_unique<RemoteControlSenderApp>(clock, cfg, addr, port);
 		}
 		break;
 		case CommandLineArgumentInterpreter::ExecutionMode::RemoteControlReceiver:
-			app = std::make_unique<RemoteControlReceiverApp>(clock, cfg);
+			app = std::make_unique<RemoteControlReceiverApp>(clock, cfg, port);
 		break;
 	}
 }
@@ -120,9 +134,9 @@ DefaultApp::DefaultApp( WallClock& wallclock, Cfg& cfg )
 	op->operateSimulation(sim.get());
 }
 
-RemoteControlReceiverApp::RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg)
+RemoteControlReceiverApp::RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg, Port port)
 	: App(wallclock, cfg)
-	, rc_operator( "Dwengine - remote controlled",  *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY") )
+	, rc_operator( "Dwengine - remote controlled",  *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"), port )
 {
 		cout << "Initializing RemoteControlReceiver Application !\n";
 		op = &rc_operator;

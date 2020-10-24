@@ -36,7 +36,7 @@ struct DefaultApp : public App
 struct RemoteControlReceiverApp : public App
 {
 	RemoteControlReceiverOperator rc_operator;
-	RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg);
+	RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg, Port port);
 };
 
 struct RemoteControlSenderApp : public App
