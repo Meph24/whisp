@@ -144,10 +144,11 @@ RemoteControlSenderApp::RemoteControlSenderApp(WallClock& wallclock, Cfg& cfg, I
 		: App(wallclock, cfg)
 		, rc_sender(wallclock, cfg)
 {
-	rc_sender.setMouseMode( InputDeviceConfigurator::MouseMode::diff );
 	cout << "Initializing RemoteControlSender Application !\n";
 	rc_sender.window.setPos(sf::Vector2i(0,0));
 	rc_sender.tunein(addr, port);
+	rc_sender.operateRemote();
+	rc_sender.setMouseMode( InputDeviceConfigurator::MouseMode::diff );
 }
 
 void RemoteControlSenderApp::run()

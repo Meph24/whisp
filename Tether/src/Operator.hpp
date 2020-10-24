@@ -164,6 +164,7 @@ struct RemoteControlSender : public InputDeviceConfigurator
 	void setMouseMode( MouseMode mode );
 	MouseMode mouseMode() const;
 
+	void operateRemote();
 	void tunein(IPv4Address&, Port);
 	void sync();
 	void processEvents();

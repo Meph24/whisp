@@ -283,6 +283,10 @@ vec2 RemoteControlSender::turnSensitivity() const
 void RemoteControlSender::tunein(IPv4Address& addr, Port port)
 {
 	receiver_addr = addr; receiver_port = port;
+}
+
+void RemoteControlSender::operateRemote()
+{
 	namespace Act = eventmapping::actions;
 	namespace Cond = eventmapping::conditions;
 
