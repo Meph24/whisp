@@ -15,7 +15,7 @@ uint32_t IPv4Address::parseIPv4String(const string& addr)
     {
         throw input_format_error("Ipv4Address: Input string was not recognized as a valid ipv4-address!"); 
     }
-    return combineBytesToIPv4(stoi(sm[0]), stoi(sm[1]), stoi(sm[2]), stoi(sm[3]));
+    return combineBytesToIPv4( stoi(sm[1]), stoi(sm[2]), stoi(sm[3]), stoi(sm[4]) );
 }
 uint32_t IPv4Address::combineBytesToIPv4(uint8_t b3, uint8_t b2, uint8_t b1, uint8_t b0)
 {

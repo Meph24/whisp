@@ -280,8 +280,11 @@ vec2 RemoteControlSender::turnSensitivity() const
 		return turn_sensitivity * modifier; 
 }
 
+#include <iostream>
+
 void RemoteControlSender::tunein(IPv4Address& addr, Port port)
 {
+	std::cout << "Tuning in to " << (string) addr << ':' << port << '\n';
 	receiver_addr = addr; receiver_port = port;
 }
 

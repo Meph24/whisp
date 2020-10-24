@@ -91,6 +91,15 @@ TEST(test_Ipv4Address, explicitly_to_string)
     EXPECT_EQ(s, got);
 }
 
+TEST(test_Ipv4Address, string_bug_occurences)
+{
+    string s = "192.168.2.111";
+    IPv4Address addr(s);
+    string got = (string) addr;
+
+    EXPECT_EQ(s, got);
+}
+
 TEST(test_Ipv4Address, string_format_exception)
 {
     int exception_counter = 0;
