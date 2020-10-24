@@ -406,6 +406,7 @@ void RemoteControlSender::sync()
 	if(ts - last_synced < 20ms) return;
 	status_set.timestamp = ts.time_since_epoch().count(); 
 	udpsocket.send( &status_set, sizeof(SimulationInputStatusSet), sf::IpAddress((uint32_t)receiver_addr), receiver_port );
+	last_synced = ts;
 }
 
 void RemoteControlSender::processEvents()
