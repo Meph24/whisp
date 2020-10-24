@@ -109,16 +109,29 @@ struct RemoteControlReceiverOperator : public Operator
 		{
 			this_received = 0;
 			udpsocket.receive(data, sizeof(SimulationInputStatusSet) - received, this_received, addr, port);
-			if(!this_received) return;
+			if(!this_received) break;
 			received += this_received;
 			if(received == sizeof(SimulationInputStatusSet))
 			{
-				std::cout << "Received Status!\n";
 				if(managed_status->timestamp < current_receive.timestamp)
 				{
 					*managed_status = current_receive;
 				}
 				received = 0;
+			}
+		}
+
+		sf::Event e;
+		while(sfmlwindow.pollEvent(e))
+		{
+			switch (e.type)
+			{
+				case sf::Event::EventType::Closed:
+					disconnectSimulation();
+					window->close();
+				break;
+
+				default: break;//warning suppression
 			}
 		}
 	}
@@ -139,12 +152,15 @@ struct RemoteControlSender : public InputDeviceConfigurator
 	Port receiver_port;
 	UdpSocket udpsocket;
 
+	MouseMode mousemode;
+
+	WallClock::time_point last_synced;
+
 	RemoteControlSender( WallClock& wallclock, Cfg& cfg);
 
 	vec2 turnSensitivity() const;
 	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
 
-	MouseMode mousemode;
 	void setMouseMode( MouseMode mode );
 	MouseMode mouseMode() const;
 

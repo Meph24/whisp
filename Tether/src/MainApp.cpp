@@ -71,8 +71,8 @@ void App::run()
 			std::cerr << "GLEW failed to initialize !" << std::endl;
 		}
 
-		glClearDepth(1.f);
-		glClearColor(0.f, 0.f, 0.25f, 0.f);
+		glClearDepth(1.0f);
+		glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);

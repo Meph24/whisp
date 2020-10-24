@@ -68,7 +68,7 @@ struct SimulationInputStatusSet
 	bool clip = false;
 	bool verbose = false;
 	vec3 walk = vec3(0.0f);
-	vec3 turn = vec3(0.0f);
+	vec3 turn = vec3(0.0f, 0.1f, 0.0f);
 	bool trigger = false;
 
 	//this needs to go as it is assigned from the wrong direction as of now (issue #36)
