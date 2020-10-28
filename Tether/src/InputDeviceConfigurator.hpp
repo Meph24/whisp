@@ -15,7 +15,7 @@ struct InputDeviceConfigurator
 	virtual MouseMode mouseMode() const = 0;
 
     vec2 turn_sensitivity;
-	virtual vec2 turnSensitivity() 
+	virtual vec2 turnSensitivity() const 
     { 
         return turn_sensitivity; 
     };
