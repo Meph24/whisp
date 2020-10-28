@@ -445,7 +445,11 @@ void RemoteControlSender::processEvents()
 
 			case sf::Event::MouseMoved:
 				if(mouseMode() == MouseMode::diff) 
-					sf::Mouse::setPosition( (window.pos()) + ((sf::Vector2i)window.size())/2 );
+				{
+					sf::Vector2i to_set ( (window.pos()) + ((sf::Vector2i)window.size())/2 );
+					if( sf::Mouse::getPosition() == to_set ) break;
+					sf::Mouse::setPosition( to_set );
+				}
 			break;
 
 			default: break;//warning suppression
