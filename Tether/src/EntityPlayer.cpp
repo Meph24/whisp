@@ -315,7 +315,6 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	else
 	{
 		current_gun->stopShooting();
-		return; 
 	}
 	
 	if(time>0.0000000001f)
