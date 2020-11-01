@@ -21,7 +21,7 @@ bool AABB::doesIntersect(AABB other)
 {
 	unsigned int otherIsLower=low>other.high;
 	unsigned int otherIsHigher=high<other.low;
-	return !(otherIsLower||otherIsHigher);
+	return !(((bool)otherIsLower)|((bool)otherIsHigher));
 }
 
 bool AABB::doesIntersect(AABB * other)
@@ -190,7 +190,7 @@ std::ostream& operator<< (std::ostream& os, const AABB& bb)
 
 bool AABB::contains(spacevec s)
 {
-	return (!(low>s))&&(!(high<s));
+	return (bool)((!(low>s))&(!(high<s)));
 }
 
 AABB::AABB(spacevec posT0, spacevec posT1, spacevec lowBorderOffset,spacevec highBorderOffset)

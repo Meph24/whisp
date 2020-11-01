@@ -33,8 +33,8 @@ IWorld::~IWorld()
 
 void IWorld::initAlgos()
 {
-	pushAlgo=new FilterHashSym<Pushable>();//new FilterBoxSortSym<Pushable>();//InteractFilterDefaultSym<Pushable>();//TODO placeholder
-	projectileAlgo=new FilterHashAsym<Projectile,Hittable>();//new InteractFilterNoneA<Projectile,Hittable>();//new FilterBoxSortAsym<Projectile,Hittable>(onlySlave);//InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
+	pushAlgo=new FilterBoxSortSym<Pushable>();//new FilterHashSym<Pushable>();//new FilterBoxSortSym<Pushable>();//InteractFilterDefaultSym<Pushable>();//TODO placeholder
+	projectileAlgo=new FilterBoxSortAsym<Projectile,Hittable>(onlySlave);//new FilterHashAsym<Projectile,Hittable>();//new InteractFilterNoneA<Projectile,Hittable>();//new FilterBoxSortAsym<Projectile,Hittable>(onlySlave);//InteractFilterDefaultAsym<Projectile,Hittable>();//TODO placeholder
 	collideAlgo=new FilterBoxSortSym<Collider>();//new FilterHashSym<Collider>();//new InteractFilterNoneS<Collider>();//InteractFilterDefaultSym<Collider>();//TODO placeholder
 	benchAlgoSym=new InteractFilterDefaultSym<BenchSym>();
 	benchAlgoAsym=new InteractFilterDefaultAsym<BenchAsymMaster,BenchAsymSlave>();

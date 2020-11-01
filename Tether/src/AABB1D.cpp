@@ -11,9 +11,9 @@
 
 bool AABB1D::doesIntersect(spacelen spacevec::*dim, AABB bb)
 {
-	unsigned int otherIsLower=low>bb.high.*dim;
-	unsigned int otherIsHigher=high<bb.low.*dim;
-	return !(otherIsLower||otherIsHigher);
+	bool otherIsLower=low>bb.high.*dim;
+	bool otherIsHigher=high<bb.low.*dim;
+	return !(otherIsLower|otherIsHigher);
 }
 
 bool AABB1D::doesIntersect(spacelen spacevec::*dim, AABB* bb)
@@ -25,8 +25,12 @@ void AABB1D::extend(spacelen spacevec::*dim, AABB bb)
 {
 	spacelen otherLow=bb.low.*dim;
 	spacelen otherHigh=bb.high.*dim;
-	if(otherLow<low) low=otherLow;
-	if(otherHigh>high) high=otherHigh;
+	auto lower=otherLow<low;
+	auto higher=otherHigh>high;
+	low.intpart=otherLow.intpart*(lower)+low.intpart*(!lower);
+	low.floatpart=otherLow.floatpart*(lower)+low.floatpart*(!lower);
+	high.intpart=otherHigh.intpart*(higher)+high.intpart*(!higher);
+	high.floatpart=otherHigh.floatpart*(higher)+high.floatpart*(!higher);
 }
 
 void AABB1D::extend(spacelen spacevec::*dim, AABB* bb)

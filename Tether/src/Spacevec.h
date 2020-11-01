@@ -92,31 +92,31 @@ inline void intfloat<I, F>::operator -=(intfloat<I, F> other)
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator <(intfloat<I, F> other) const
 {
-	return (intpart<other.intpart)||((intpart==other.intpart)&&(floatpart<other.floatpart));
+	return (intpart<other.intpart)|((intpart==other.intpart)&(floatpart<other.floatpart));
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator <=(intfloat<I, F> other) const
 {
-	return (intpart<other.intpart)||((intpart==other.intpart)&&(floatpart<=other.floatpart));
+	return (intpart<other.intpart)|((intpart==other.intpart)&(floatpart<=other.floatpart));
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator >(intfloat<I, F> other) const
 {
-	return (intpart>other.intpart)||((intpart==other.intpart)&&(floatpart>other.floatpart));
+	return (intpart>other.intpart)|((intpart==other.intpart)&(floatpart>other.floatpart));
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator >=(intfloat<I, F> other) const
 {
-	return (intpart>other.intpart)||((intpart==other.intpart)&&(floatpart>=other.floatpart));
+	return (intpart>other.intpart)|((intpart==other.intpart)&(floatpart>=other.floatpart));
 }
 
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator !=(intfloat<I, F> other) const
 {
-	return (intpart!=other.intpart)||(floatpart!=other.floatpart);
+	return (intpart!=other.intpart)|(floatpart!=other.floatpart);
 }
 
 template<typename I, typename F>
@@ -192,7 +192,7 @@ inline void intfloat<I, F>::operator /=(double scalar)
 template<typename I, typename F>
 inline bool intfloat<I, F>::operator ==(intfloat<I, F> other) const
 {
-	return (intpart==other.intpart)&&(floatpart==other.floatpart);
+	return (intpart==other.intpart)&(floatpart==other.floatpart);
 }
 
 template<typename I, typename F>
@@ -222,10 +222,11 @@ inline std::ostream& operator<<(std::ostream& out, const struct intfloat<I, F> v
 template<typename I, typename F>
 inline bool intfloat<I, F>::equalsZero() const
 {
-	if(intpart!=0) return false;
-	if(floatpart>0.0000000001f) return false;
-	if(floatpart<-0.0000000001f) return false;
-	return true;
+	int reasonsForFalse=0;
+	reasonsForFalse+=(intpart!=0);
+	reasonsForFalse+=(floatpart>0.0000000001f);
+	reasonsForFalse+=(floatpart<-0.0000000001f);
+	return reasonsForFalse==0;
 }
 
 template<typename I,typename F>
@@ -318,7 +319,7 @@ inline void vec3if<I, F>::operator -=(vec3if<I, F> other)
 template<typename I, typename F>
 inline bool vec3if<I, F>::equalsZero() const
 {
-	return x.equalsZero()&&y.equalsZero()&&z.equalsZero();
+	return x.equalsZero()&y.equalsZero()&z.equalsZero();
 }
 
 template<typename I, typename F>
@@ -496,10 +497,12 @@ template<typename I, typename F>
 inline vec3if<I, F> vec3if<I, F>::selectWhere(int boolvec)
 {
 	vec3if<I, F> ret;
-	ret.set0();
-	if(boolvec&1) ret.x=x;
-	if(boolvec&2) ret.y=y;
-	if(boolvec&4) ret.z=z;
+	ret.x.floatpart=x.floatpart*!!(boolvec&1);
+	ret.x.intpart=	x.intpart*!!(boolvec&1);
+	ret.y.floatpart=y.floatpart*!!(boolvec&2);
+	ret.y.intpart=	y.intpart*!!(boolvec&2);
+	ret.z.floatpart=z.floatpart*!!(boolvec&4);
+	ret.z.intpart=	z.intpart*!!(boolvec&4);
 	return ret;
 }
 
@@ -528,7 +531,7 @@ inline chunkCoordinate<I, F>::chunkCoordinate(const struct vec3if<I, F>& from)
 template<typename I, typename F>
 inline bool chunkCoordinate<I, F>::operator ==(chunkCoordinate<I, F> other) const
 {
-	return (x==other.x)&&(y==other.y)&&(z==other.z);
+	return (x==other.x)&(y==other.y)&(z==other.z);
 }
 
 template<typename I, typename F>
