@@ -65,6 +65,7 @@ inline void FilterBoxSortSym<PhysicsIF>::evaluationPhase(TickServiceProvider& ts
 	if(registered.empty()) return;
 	//timerOutside.registerTime();
 	b.buildTree(registered.size(),this->verbose);
+	registered.push_back(*(b.root->e));//gets deleted in algorithm, so it must be restored
 	//timerBuildTree.registerTime();
 	for(InteractFilterEntry<PhysicsIF> fe: registered)
 	{

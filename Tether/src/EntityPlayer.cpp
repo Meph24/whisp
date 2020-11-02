@@ -331,7 +331,7 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 void EntityPlayer::push(spacevec amount, TickServiceProvider& tsp)
 {
 	pos+=amount;
-	std::cout<<"amount"<<amount<<" | "<<tsp.getIWorld()->toMeters(amount);
+	//std::cout<<"amount"<<amount<<" | "<<tsp.getIWorld()->toMeters(amount);
 //	HP -= 15625*glm::sqlen(tsp.getChunkManager()->toMeters(amount));
 }
 #include <iostream>
