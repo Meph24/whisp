@@ -42,17 +42,17 @@ public:
 						TickServiceProvider* tsp
 					 );
 
-	void collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp);
+	void collide(DualPointer<Collider> other, microseconds delta_time, TickServiceProvider& tsp);
 
 	vector<Model::ConvexPart> convexParts() const;
 
-	vector<Vertex> vertices (float tick_time);
+	vector<Vertex> vertices (microseconds tick_time);
 
-	vector<EdgeRef> edges(float tick_time) const;
+	vector<EdgeRef> edges() const;
 
-	vector<FaceRef> faces(float tick_time) const;
+	vector<FaceRef> faces() const;
 
-	void react(float tick_time);
+	void react(microseconds tick_time);
 
 	void onSpawn( TickServiceProvider* tsp );
 };

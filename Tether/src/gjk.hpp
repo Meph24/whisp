@@ -587,14 +587,14 @@ private:
 public:
 	RelColliders(DualPointer<Collider> c0, DualPointer<Collider> c1, TickServiceProvider& tsp);
 
-	vec3 pos0(float tick_seconds) const;
-	vec3 pos1(float tick_seconds) const;
+	vec3 pos0(microseconds tick_time) const;
+	vec3 pos1(microseconds tick_time) const;
 };
 
 
 bool staticIntersectionAtTickBegin(const RelColliders& relcolliders, float t0, float& time_out);
-float rootFindingSample(const RelColliders& relcolliders, float tick_seconds);
-bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time_out, int initial_samples = 8, float epsilon = 0.000001);
+float rootFindingSample(const RelColliders& relcolliders, microseconds tick_time);
+bool firstRoot(const RelColliders& relcolliders, microseconds t0, microseconds t1, microseconds& time_out, int initial_samples = 8, microseconds epsilon = 4us);
 
 
 } /* namespace gjk */

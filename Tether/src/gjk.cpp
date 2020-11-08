@@ -34,18 +34,20 @@ RelColliders::RelColliders(DualPointer<Collider> c0, DualPointer<Collider> c1, T
 		, m_v1(tsp.getIWorld()->toMeters(c1.e->v - c0.e->v))
 	{}
 
-vec3 RelColliders::pos0(float tick_seconds) const
+vec3 RelColliders::pos0(microseconds tick_time) const
 {
 	return vec3(0.0f);
 }
-vec3 RelColliders::pos1(float tick_seconds) const
+
+#include "FloatSeconds.hpp"
+
+vec3 RelColliders::pos1(microseconds tick_time) const
 {
-	return m_pos1 + m_v1*tick_seconds;
+	return m_pos1 + m_v1* (double)FloatSeconds(tick_time);
 }
 
-float nonConvexDistance(const RelColliders& relcolliders, float tick_seconds)
+float nonConvexDistance(const RelColliders& relcolliders, microseconds tick_time)
 {
-
 	vector<Model::ConvexPart> m0_convex_parts, m1_convex_parts;
 	m0_convex_parts = relcolliders.c0.pIF->convexParts();
 	m1_convex_parts = relcolliders.c1.pIF->convexParts();
@@ -58,9 +60,9 @@ float nonConvexDistance(const RelColliders& relcolliders, float tick_seconds)
 	{
 		for(auto m1_cp : m1_convex_parts)
 		{
-			auto m0_vertices = relcolliders.c0.pIF->vertices(tick_seconds);
-			auto m1_vertices = relcolliders.c1.pIF->vertices(tick_seconds);
-			vec3 relpos = relcolliders.pos1(tick_seconds) - relcolliders.pos0(tick_seconds);
+			auto m0_vertices = relcolliders.c0.pIF->vertices(tick_time);
+			auto m1_vertices = relcolliders.c1.pIF->vertices(tick_time);
+			vec3 relpos = relcolliders.pos1(tick_time) - relcolliders.pos0(tick_time);
 			MinkowskiGenerator mg (	m0_vertices.begin(), m0_vertices.end(),
 									m1_vertices.begin(), m1_vertices.end(),
 									m0_cp.indices.begin(), m0_cp.indices.end(),
@@ -75,7 +77,7 @@ float nonConvexDistance(const RelColliders& relcolliders, float tick_seconds)
 	return dist;
 }
 
-bool staticIntersectionAtTickBegin(const RelColliders& relcolliders, float t0, float& time_out)
+bool staticIntersectionAtTickBegin(const RelColliders& relcolliders, microseconds t0, float& time_out)
 {
 	float distance = nonConvexDistance(relcolliders, t0);
 	if(distance > 0.0f)
@@ -83,12 +85,14 @@ bool staticIntersectionAtTickBegin(const RelColliders& relcolliders, float t0, f
 	return true;
 }
 
-bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time_out, int initial_samples, float epsilon)
+bool firstRoot(const RelColliders& relcolliders, microseconds t0, microseconds t1, microseconds& time_out, int initial_samples, microseconds epsilon)
 {
 	if(initial_samples < 1) return false;
 	//time, distance
 
-	float time0, time1, dist0, dist1;
+	microseconds time0, time1;
+	float dist0, dist1;
+
 	time0 = t0; time1 = t1;
 
 	dist0 = nonConvexDistance(relcolliders, time0);
@@ -102,8 +106,8 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 	if(initial_samples == 1) return false;
 
 	bool found = false;
-	float timespan = time1 - time0;
-	float timestep = timespan / (initial_samples - 1);
+	microseconds timespan = time1 - time0;
+	microseconds timestep = timespan / (initial_samples - 1);
 	int sample;
 	for( sample = 1 ; sample < initial_samples; sample++ )
 	{
@@ -126,7 +130,7 @@ bool firstRoot(const RelColliders& relcolliders, float t0, float t1, float& time
 		while( time1 - time0 > epsilon)
 		{
 			depth ++;
-			float time05 = time0 + (time1-time0) * 0.5;
+			microseconds time05 = duration_cast<microseconds>(time0 + (time1-time0) * 0.5);
 			float dist05 = nonConvexDistance(relcolliders, time05);
 			if(dist05 > 0.0f)
 			{

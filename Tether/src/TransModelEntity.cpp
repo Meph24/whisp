@@ -48,7 +48,7 @@ void TransModelEntity::draw(	const SimClock::time_point& ts,
 						DrawServiceProvider* dsp
 					 )
 {
-	float tickOffset = (float)FloatSeconds(ts-last_ticked);
+	float tickOffset = (double)FloatSeconds(ts-last_ticked);
 	if(!viewFrustum->inside(bb,iw)) return;
 	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;
 	vec3 interPosMeters = iw.toMeters(interPos);
@@ -68,7 +68,8 @@ void TransModelEntity::tick(	const SimClock::time_point& next_tick_begin,
 						TickServiceProvider* tsp
 					 )
 {
-	float tick_seconds = (float) FloatSeconds(next_tick_begin - last_ticked);
+	SimClock::duration tick_duration = next_tick_begin - last_ticked;
+	float tick_seconds = (double) FloatSeconds(tick_duration);
 
 	tick_begin_pos = pos;
 	tick_begin_v = v;
@@ -116,22 +117,23 @@ void TransModelEntity::onSpawn( TickServiceProvider* tsp )
 	bb = aabb( 0.0f, tsp );
 }
 
-void TransModelEntity::collide(DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
+void TransModelEntity::collide(DualPointer<Collider> other, microseconds delta_time, TickServiceProvider& tsp)
 {
 	gjk::RelColliders relcolliders(makeDualPointer((Entity*) this,(Collider*) this), other, tsp);
-	float collision_time;
+	microseconds collision_time;
 	//if(! gjk::firstRoot( relcolliders, 0.0f, delta_time, collision_time))
-	if(! gjk::firstRoot(relcolliders, 0.0f, delta_time, collision_time, 4 ))
+	if(! gjk::firstRoot(relcolliders, 0ms, delta_time, collision_time, 4 ))
 		return;	
 
 	react(collision_time);
 	other.pIF->react(collision_time);
 }
 	
-vector<Vertex> TransModelEntity::vertices (float tick_time)
+vector<Vertex> TransModelEntity::vertices (microseconds tick_time)
 {
-	auto r = tick_begin_rot + tick_time * tick_begin_drot;
-	auto sc = tick_begin_scale + tick_time * tick_begin_dscale;
+	double seconds = (double) FloatSeconds( tick_time );
+	auto r = tick_begin_rot + seconds * tick_begin_drot;
+	auto sc = tick_begin_scale + seconds * tick_begin_dscale;
 	mo.setTransform(		glm::rotate(glm::radians(r.x), vec3(1,0,0))
 							*	glm::rotate(glm::radians(r.y), vec3(0,1,0))
 							*	glm::rotate(glm::radians(r.z), vec3(0,0,1))
@@ -140,21 +142,22 @@ vector<Vertex> TransModelEntity::vertices (float tick_time)
 	return mo.vertices();
 }
 
-vector<EdgeRef> TransModelEntity::edges(float tick_time) const
+vector<EdgeRef> TransModelEntity::edges() const
 {
 	return mo.model().edges();
 }
 
-vector<FaceRef> TransModelEntity::faces(float tick_time) const
+vector<FaceRef> TransModelEntity::faces() const
 {
 	return mo.model().faces();
 }
 
-void TransModelEntity::react(float tick_time)
+void TransModelEntity::react(microseconds tick_time)
 {
-	pos = tick_begin_pos + (tick_begin_v*(tick_time));
-	rot = tick_begin_rot + (tick_begin_drot*(tick_time));
-	scale = tick_begin_scale + (tick_begin_dscale*(tick_time));
+	double seconds = (double) FloatSeconds(tick_time);
+	pos = tick_begin_pos + tick_begin_v*seconds;
+	rot = tick_begin_rot + tick_begin_drot*seconds;
+	scale = tick_begin_scale + (tick_begin_dscale*seconds);
 	mo.setTransform(		glm::rotate(glm::radians(rot.x), vec3(1,0,0))
 							*	glm::rotate(glm::radians(rot.y), vec3(0,1,0))
 							*	glm::rotate(glm::radians(rot.z), vec3(0,0,1))

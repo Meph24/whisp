@@ -11,9 +11,11 @@
 #include "Entity.h"
 #include "InteractionManager.h"
 #include "ChunkManager.h"
+#include "FloatSeconds.hpp"
 
 void Collider::interact(Entity * self,DualPointer<Collider> other, float delta_time, TickServiceProvider& tsp)
 {
 	//l2 collision detection
-	collide(other, delta_time, tsp);
+	microseconds tick_duration = duration_cast<microseconds>(FloatSeconds (delta_time));
+	collide(other, tick_duration, tsp);
 }
