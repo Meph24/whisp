@@ -43,7 +43,8 @@
 #include <glm/gtc/random.hpp>
 
 #include "FloatSeconds.hpp"
-#include "Grid.hpp"
+#include "GridEntity.hpp"
+#include "OxelEntity.hpp"
 
 
 Simulation_World::Simulation_World(const WallClock& reference_clock, sf::Window * w)
@@ -416,9 +417,9 @@ void Simulation_World::init()
 		Oxel* oxp = &(t.root);
 		for (size_t i = 0; i < 5; i++)
 		{
-			oxp->children()[3].fill();
-			oxp->children()[5].fill();
-			oxp->children()[6].fill();
+			oxp->children()[3].form.full = true;
+			oxp->children()[5].form.full = true;
+			oxp->children()[6].form.full = true;
 
 			oxp = &(oxp->children()[0]);
 		}
