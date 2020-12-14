@@ -412,6 +412,7 @@ void Simulation_World::init()
 		spawn(ge, iw->fromMeters( vec3(20.0f, 20.0f, 20.0f) ));
 	}
 	//oxel
+	/* Quarantined due to Oxel and Octree changes
 	{
 		OxelTree t( 0 );
 		Oxel* oxp = &(t.root);
@@ -426,6 +427,7 @@ void Simulation_World::init()
 		OxelEntity* oxele = new OxelEntity(t);
 		spawn( oxele, iw->fromMeters( vec3(-10.0f, 0.0f, 0.0f) ) );
 	}
+	*/
 }
 
 void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
