@@ -231,6 +231,7 @@ Alias("release", release_target)
 Alias("debug", debug_target)
 Alias("all", [ release_target, debug_target ] + debug_test_targets, release_test_targets )
 Alias("test", release_test_targets)
+Alias("release_test", release_test_targets)
 Alias("debug_test", debug_test_targets)
 Alias("dev", [debug_target] + debug_test_targets)
 
