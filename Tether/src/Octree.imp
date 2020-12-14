@@ -1,0 +1,221 @@
+#ifndef OCTREE_IMP
+#define OCTREE_IMP
+
+#include "utils.hpp"
+
+template<typename T>
+Octree<T>::Node::Node()
+    : Mchildren()
+    , Mparent(nullptr)
+    , value()
+{}
+
+template<typename T>
+Octree<T>::Node::Node(Node& parent)
+    : Mchildren()
+    , Mparent(&parent)
+    , value()
+{}
+
+template<typename T>
+bool Octree<T>::Node::isLeaf() const { return !(bool) Mchildren; }
+template<typename T>
+bool Octree<T>::Node::isRoot() const { return !(bool) Mparent; }
+
+template<typename T>
+uint8_t Octree<T>::Node::nodeIndex() const
+{
+    if( !Mparent ) return 0;
+    Node* begin = Mparent->children()->data();
+    if(this < begin || this >= (begin + 8))
+    { throw std::range_error("Octree<T0>::Node : could not determine node index. This node seems not to be known to its parent. Tree corrupted."); }
+    return this - begin;
+}
+    
+template<typename T>
+typename Octree<T>::Node* Octree<T>::Node::parent() { return Mparent; }
+
+template<typename T>
+array< typename Octree<T>::Node, 8 >* Octree<T>::Node::children() { return Mchildren.get(); }
+
+template<typename T>
+typename Octree<T>::Node* Octree<T>::Node::child( uint8_t node_index ){ return Mchildren ? &Mchildren->at(node_index) : nullptr; }
+
+template<typename T>
+typename Octree<T>::Node* Octree<T>::Node::operator[](uint8_t node_index){ return child(node_index); }
+
+template<typename T>
+typename Octree<T>::Node* Octree<T>::Node::cousin( int64_t x, int64_t y, int64_t z )
+{
+    if(isRoot()) return nullptr;
+
+    uint8_t target_node_index = nodeIndex() ^
+    x && x%2 ? 0x1 : 0x0 ^
+    y && y%2 ? 0x2 : 0x0 ^
+    z && z%2 ? 0x4 : 0x0;
+
+    x = signedrshift(x, 1);
+    y = signedrshift(y, 1);
+    z = signedrshift(z, 1);
+
+    Node* target_parent = nullptr;
+    if(x || y || z)     target_parent = target_parent->cousin(x, y, z);
+    else                target_parent = parent();
+    if(!target_parent)  return nullptr;
+    return target_parent->child(target_node_index);
+}
+
+template<typename T>
+void Octree<T>::Node::collapse() { Mchildren.reset(); }
+template<typename T>
+void Octree<T>::Node::expand()
+{ 
+    if( !isLeaf() ) return;
+    Mchildren.reset( new array<Node, 8>{} );
+    Mchildren->fill( Node(*this) );
+}
+
+template<typename T>
+bool Octree<T>::higher(uint8_t supplant_index)
+{
+    Node newnode;
+    *newnode.child(supplant_index) = std::move(root);
+    root = std::move(newnode);
+
+    root.child(supplant_index)->Mparent = &root;
+    return true;
+}
+
+template<typename T>
+void Octree<T>::lower( uint8_t supplant_index )
+{
+    if(supplant_index < 0 || supplant_index >= 8) return;
+
+    root = std::move(*root.child(supplant_index));
+    root.Mparent = nullptr;
+}
+
+template<typename T>
+void Octree<T>::PostOrderIterator::advancePostorder()
+{
+    if( node->isLeaf() )
+    {
+        Node* ancestry_runner = node;
+        while( ancestry_runner->nodeIndex() >= 7 && ancestry_runner != tree_root )
+        {
+            ancestry_runner = node->parent();
+        }
+        if( ancestry_runner == tree_root ) { node = nullptr; return; }
+        node = ancestry_runner->parent()->child( ancestry_runner->nodeIndex()+1 );
+    }
+    else{ node = node->child(0); return; }
+}
+
+template<typename T>
+Octree<T>::PostOrderIterator::PostOrderIterator()
+    : node(nullptr)
+    , tree_root(nullptr)
+{}
+
+template<typename T>
+Octree<T>::PostOrderIterator::PostOrderIterator( Node* tree_root )
+    : node( tree_root )
+    , tree_root( tree_root )
+{}
+
+template<typename T>
+typename Octree<T>::PostOrderIterator& Octree<T>::PostOrderIterator::operator++()
+{
+    this->advancePostorder(); 
+    return *this;
+}
+
+template<typename T>
+typename Octree<T>::PostOrderIterator Octree<T>::PostOrderIterator::operator++(int)
+{
+    PostOrderIterator ret;
+    ret.advancePostorder();
+    return ret; 
+}
+
+template<typename T>
+T& Octree<T>::PostOrderIterator::operator*() { return node->value; }
+
+template<typename T>
+T* Octree<T>::PostOrderIterator::operator->() { return &node->value; }
+
+template<typename T>
+vector< typename Octree<T>::Node* > Octree<T>::Node::ancestry()
+{
+    Node* current = this;
+    vector<Node*> this_ancestors;
+    while(current->Mparent)
+    {
+        this_ancestors.push_back(current->Mparent);
+        current = current->Mparent;
+    }
+    return this_ancestors;
+}
+
+template<typename T>
+bool Octree<T>::PostOrderIterator::operator< (const PostOrderIterator& other) const
+{
+    vector<typename Octree<T>::Node*> this_ancestors( std::move( this->node->ancestry() ) );
+    this_ancestors.insert(this_ancestors.begin(), this->node );
+    vector<typename Octree<T>::Node*> other_ancestors( std::move( other.node->ancestry() ) );
+    other_ancestors.insert(other_ancestors.begin(), other.node);
+
+    //lexicographical compare
+    //we cannot use std:: implmentation, as it uses < on pointers
+    // node1 < node2 => &node1 < &node2 does only hold true, if node1.parent == node2.parent
+    // as for then they are stored contiguously. This holds not true for any other nodes
+    typename vector<typename Octree<T>::Node*>::reverse_iterator first1, last1, first2, last2;
+    first1 = this_ancestors.rbegin(); last1 = this_ancestors.rend();
+    first2 = other_ancestors.rbegin(); last2 = other_ancestors.rend();
+    for( ; (first1 != last1) && (first2 != last2); ++first1, (void) ++first2 )
+    {
+        if (*first1 == *first2) continue;
+        if (*first1 < *first2) return true;
+        if (*first2 < *first1) return false;
+    }
+    return (first1 != last1) && (first2 != last2);
+}
+
+template<typename T>
+bool Octree<T>::PostOrderIterator::operator>= (const PostOrderIterator& other) const { return !(*this < other); }
+
+template<typename T>
+bool Octree<T>::PostOrderIterator::operator> (const PostOrderIterator& other) const
+{
+    vector<typename Octree<T>::Node*> this_ancestors( std::move( this->node->ancestry() ) );
+    vector<typename Octree<T>::Node*> other_ancestors( std::move( other.node->ancestry() ) );
+
+    //lexicographical compare
+    //we cannot use std:: implmentation, as it uses < on pointers
+    // node1 < node2 => &node1 < &node2 does only hold true, if node1.parent == node2.parent
+    // as for then they are stored contiguously. This holds not true for any other nodes
+    typename vector<typename Octree<T>::Node*>::reverse_iterator first1, last1, first2, last2;
+    first1 = other_ancestors.rbegin(); last1 = other_ancestors.rend();
+    first2 = this_ancestors.rbegin(); last2 = this_ancestors.rend();
+    for( ; (first1 != last1) && (first2 != last2); ++first1, (void) ++first2)
+    {
+        if (*first1 == *first2) continue;
+        if (*first1 < *first2) return true;
+        if (*first2 < *first1) return false;
+    }
+    return (first1 != last1) && (first2 != last2);
+}
+
+template<typename T>
+bool Octree<T>::PostOrderIterator::operator<= (const PostOrderIterator& other) const { return !(*this > other); }
+template<typename T>
+bool Octree<T>::PostOrderIterator::operator== (const PostOrderIterator& other) const { return this->node == other.node; }
+template<typename T>
+bool Octree<T>::PostOrderIterator::operator!= (const PostOrderIterator& other) const { return !(*this==other); }
+
+template<typename T>
+typename Octree<T>::PostOrderIterator Octree<T>::begin() { return Iterator( &this->root ); }
+template<typename T>
+typename Octree<T>::PostOrderIterator Octree<T>::end() { return Iterator(); }
+
+#endif // OCTREE_IMP
