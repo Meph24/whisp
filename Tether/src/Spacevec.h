@@ -24,6 +24,9 @@ struct intfloat
 	I intpart;
 	F floatpart;
 
+	intfloat();
+	intfloat(const I&, const F&);
+
 	void correct();
 	void correctPos();
 
@@ -52,6 +55,12 @@ struct intfloat
 
 	bool equalsZero() const;//tiny epsilon tolerance
 };
+
+template<typename I, typename F>
+inline intfloat<I, F>::intfloat() : intpart(0), floatpart(0.0) {}
+
+template<typename I, typename F>
+inline intfloat<I, F>::intfloat(const I& i, const F& f) : intpart(i), floatpart(f) {}
 
 template<typename I, typename F>
 inline intfloat<I, F> intfloat<I, F>::operator +(intfloat<I, F> other) const
@@ -169,6 +178,12 @@ inline intfloat<I, F> intfloat<I, F>::operator *(double scalar) const
 	return ret;
 }
 
+template<typename I, typename F>
+inline intfloat<I, F> operator*(double scalar, const intfloat<I, F>& v)
+{
+	return v * scalar;
+}
+
 template<typename I,typename F>
 std::ostream& operator<<(std::ostream &out, const struct intfloat<I, F> v);
 
@@ -236,6 +251,8 @@ struct vec3if
 	intfloat<I, F> y;
 	intfloat<I, F> z;
 
+	vec3if() = default;
+	vec3if(const intfloat<I, F>&, const intfloat<I, F>&, const intfloat<I, F>& );
 
 	vec3if<I,F> operator+(vec3if<I,F> other) const;
 	vec3if<I,F> operator-(vec3if<I,F> other) const;
@@ -275,6 +292,10 @@ struct vec3if
 
 	vec3if<I, F> selectWhere(int boolvec);
 };
+
+
+template<typename I,typename F>
+vec3if<I, F>::vec3if(const intfloat<I, F>& x, const intfloat<I, F>& y, const intfloat<I, F>& z ) : x(x), y(y), z(z) {}
 
 template<typename I,typename F>
 std::ostream& operator<<(std::ostream &out, const struct vec3if<I, F> v);
