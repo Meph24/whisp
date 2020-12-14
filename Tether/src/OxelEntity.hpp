@@ -33,7 +33,7 @@ public:
 
         IWorld* iw = tsp->getIWorld();
 
-        float aabblength = t.base_width * 1.5; //approx sqrt of 2
+        float aabblength = t.oxelWidth(t.root_granularity) * 1.5; //approx sqrt of 2
         bb.low = iw->fromMeters(-vec3(aabblength, aabblength, aabblength)) + pos;
         bb.high = iw->fromMeters(vec3(aabblength, aabblength, aabblength)) + pos;
 
@@ -45,10 +45,12 @@ public:
 
         pos += v*tick_seconds;
         rot += drot* tick_seconds;
+        /*
         t.setTransform(		glm::rotate(glm::radians(rot.x), vec3(1,0,0))
                             *	glm::rotate(glm::radians(rot.y), vec3(0,1,0))
                             *	glm::rotate(glm::radians(rot.z), vec3(0,0,1))
         );
+        */
 
     /*
         iw->collideAlgo->doChecks(
@@ -75,11 +77,12 @@ public:
 
         //apply position
         glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
-        t.drawHere();
+       // t.drawHere();
 
         glPopMatrix();
     }
 
 };
+
 
 #endif // OXELENTITY_HPP
