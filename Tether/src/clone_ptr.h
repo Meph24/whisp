@@ -1,0 +1,129 @@
+#ifndef CLONE_PTR_H
+#define CLONE_PTR_H
+
+#include <memory>
+#include <type_traits>
+#include <utility>
+
+#ifdef __cpp_concepts
+#define ISOCPP_P1950_REQUIRES(x) requires x
+#else
+#define ISOCPP_P1950_REQUIRES(x)
+#endif
+
+namespace isocpp_p1950 {
+
+template <class T>
+struct default_copy {
+  T* operator()(const T& t) const { return new T(t); }
+};
+
+template <class T, class C = default_copy<T>,
+          bool CanBeEmptyBaseClass = std::is_empty_v<C> && !std::is_final_v<C>>
+class indirect_value_base {
+ protected:
+  template <class U = C,
+            class = std::enable_if_t<std::is_default_constructible_v<U>>>
+  indirect_value_base() noexcept(noexcept(C())) {}
+  indirect_value_base(C c) : c_(std::move(c)) {}
+  C& get_Copy() noexcept { return c_; }
+  const C& get_Copy() const noexcept { return c_; }
+  C c_;
+};
+
+template <class T, class C>
+class indirect_value_base<T, C, true> : private C {
+ protected:
+  template <class U = C,
+            class = std::enable_if_t<std::is_default_constructible_v<U>>>
+  indirect_value_base() noexcept(noexcept(C())) {}
+  indirect_value_base(C c) : C(std::move(c)) {}
+  C& get_Copy() noexcept { return *this; }
+  const C& get_Copy() const noexcept { return *this; }
+};
+
+template <class T, class C = default_copy<T>, class D = std::default_delete<T>>
+class indirect_value : private indirect_value_base<T, C> {
+  using base = indirect_value_base<T, C>;
+
+  std::unique_ptr<T, D> ptr_;
+
+ public:
+  indirect_value() = default;
+
+  template <class... Ts>
+  explicit indirect_value(std::in_place_t, Ts&&... ts) {
+    ptr_ = std::unique_ptr<T, D>(new T(std::forward<Ts>(ts)...), D{});
+  }
+
+  template <class U, class = std::enable_if_t<std::is_same_v<T, U>>>
+  explicit indirect_value(U* u, C c = C{}, D d = D{}) noexcept
+      : base(std::move(c)), ptr_(std::unique_ptr<T, D>(u, std::move(d))) {}
+
+  explicit indirect_value(const indirect_value& i)
+      ISOCPP_P1950_REQUIRES(std::is_copy_constructible_v<T>)
+      : base(get_c()) {
+    if (i.ptr_) {
+      ptr_ = std::unique_ptr<T, D>(get_c()(*i.ptr_), D{});
+    }
+  }
+
+ void reset() noexcept { ptr_.reset(); }
+ void reset (T* p) { ptr_.reset(p); }
+ void reset (T* p, D del) { ptr_.reset(p, del); }
+ T* get() { return ptr_.get(); }
+
+  explicit indirect_value(indirect_value&& i) noexcept
+      : base(std::move(i)), ptr_(std::exchange(i.ptr_, nullptr)) {}
+
+  indirect_value& operator=(const indirect_value& i)
+      ISOCPP_P1950_REQUIRES(std::is_copy_assignable_v<T>) {
+    base::operator=(i);
+    if (i.ptr_) {
+      if (!ptr_) {
+        ptr_ = std::unique_ptr<T, D>(get_c()(*i.ptr_), D{});
+      } else {
+        ptr_.reset(get_c()(*i.ptr_));
+      }
+    }
+    return *this;
+  }
+
+  indirect_value& operator=(indirect_value&& i) noexcept {
+    base::operator=(std::move(i));
+    ptr_ = std::exchange(i.ptr_, nullptr);
+    return *this;
+  }
+
+  ~indirect_value() = default;
+
+  T* operator->() noexcept { return ptr_.operator->(); }
+
+  const T* operator->() const noexcept { return ptr_.operator->(); }
+
+  T& operator*() { return *ptr_; }
+
+  const T& operator*() const { return *ptr_; }
+
+  explicit constexpr operator bool() const noexcept { return ptr_ != nullptr; }
+
+  friend void swap(indirect_value& lhs, indirect_value& rhs) {
+    using std::swap;
+    swap(lhs.get_c(), rhs.get_c());
+    swap(lhs.ptr_, rhs.ptr_);
+  }
+
+ private:
+  C& get_c() noexcept { return base::get_Copy(); }
+  const C& get_c() const noexcept { return base::get_Copy(); }
+};
+
+template <class T>
+indirect_value(T*) -> indirect_value<T>;
+
+}  // namespace isocpp_p1950
+
+template <class T, class C = isocpp_p1950::default_copy<T>, class D = std::default_delete<T>>
+using clone_ptr=isocpp_p1950::indirect_value<T,C,D>;
+
+#endif  // CLONE_PTR_H
