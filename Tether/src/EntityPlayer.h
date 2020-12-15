@@ -47,7 +47,7 @@ public:
 
 	float defaultZoom=1;
 
-	int score=0;
+	double score=0;
 
 	//Zombie_MouseInput * mouseInp;
 

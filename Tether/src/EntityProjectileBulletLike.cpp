@@ -139,10 +139,10 @@ bool EntityProjectileBulletLike::collide(HittableBulletLike* hittable,Projectile
 	}
 	ze->checkProjectile(this,*tsp);//TODO
 	//some calculations
-	float vSqBefore=glm::sqlen(tsp->getIWorld()->toMeters(v));
-	float vSqAfter=0;//TODO
-	float deltaE=0.5*typeB.mass*(vSqBefore*vSqBefore-vSqAfter*vSqAfter);
-	float dmg=deltaE*(typeB.dmgPerJd0*(1-deformation)+typeB.dmgPerJd1*deformation);
+	//float vSqBefore=glm::sqlen(tsp->getIWorld()->toMeters(v));
+	//float vSqAfter=0;//TODO
+	//float deltaE=0.5*typeB.mass*(vSqBefore*vSqBefore-vSqAfter*vSqAfter);
+	float dmg=typeB.dmgPerJd0;//deltaE*(typeB.dmgPerJd0*(1-deformation)+typeB.dmgPerJd1*deformation);
 
 //	std::cout<<"hello projectile; dmg: "<<dmg<<std::endl;
 	if(!source) std::cout<<"source 0"<<std::endl;
