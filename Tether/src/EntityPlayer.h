@@ -34,6 +34,9 @@ class ITexture;
 using std::unique_ptr;
 using std::vector;
 
+#include "diamondMesh.hpp"
+#include "Mesh.hpp"
+#include "Model.hpp"
 
 class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 {
@@ -43,6 +46,9 @@ class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 
 	SignalCounter prev_inventory_signal;
 	vec3 prev_wanted_turn;
+
+	Mesh player_mesh;
+	Model player_model;
 public:
 
 	float defaultZoom=1;

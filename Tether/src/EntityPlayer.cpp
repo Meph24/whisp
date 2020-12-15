@@ -31,13 +31,16 @@ using glm::vec3;
 #include "InteractFilterAlgoSym.h"
 #include "FloatSeconds.hpp"
 
+
 EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 							spacevec startPos,
 							sf::Window * w,
 							float sensX,
 							float sensY,
 							float characterSpeed)
-	: prev_inventory_signal(SimulationInputStatusSet().inventory) 
+	: prev_inventory_signal(SimulationInputStatusSet().inventory)
+	, player_mesh (diamondMesh(3, 0.6, 1.8))
+	, player_model( player_mesh )
 	, speed(characterSpeed)
 	, heldItem(0)
 	, inventory(0)
@@ -118,6 +121,10 @@ void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWor
 	if(drawSkin)
 	{
 		//TODO draw player skin
+		glPushMatrix();
+		glTranslatef(0.0f, -characterEyeHeight/2, 0.0f);
+		player_model.drawHere();	
+		glPopMatrix();
 	}
 
 	if(!drawGUI) return;//only GUI draw calls follow
