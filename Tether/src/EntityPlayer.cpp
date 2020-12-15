@@ -105,12 +105,22 @@ void EntityPlayer::selectWeapon(size_t selection)
 
 void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw, DrawServiceProvider* dsp)
 {
+	bool drawSkin=false;
+	bool drawGUI=isPerspective;
+
+	if(isPerspective) isPerspective=false;//reset for next frame
+	else drawSkin=true;//perspective of other player means drawing skin of this player is required
+
+	if(cam->dist>minTPdist)	drawSkin=true;//if third person is active, draw skin of this player
+
 	//float tickOffset=t-lastTick;
-	if(isPerspective || cam->dist>minTPdist)
+
+	if(drawSkin)
 	{
-		//TODO draw yourself
-		isPerspective=false;
+		//TODO draw player skin
 	}
+
+	if(!drawGUI) return;//only GUI draw calls follow
 
 	glEnable(GL_TEXTURE_2D);
 	dsp->transformViewToGUI();
@@ -341,5 +351,6 @@ void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,Hittable
 	else if(dmg>0 && victim->fac==FACTION_ZOMBIES)
 	{
 		hitmark=1;
+		score+=dmg+kill*100;
 	}
 }
