@@ -1,57 +1,97 @@
 #ifndef OXEL_HPP
 #define OXEL_HPP
 
-#include <array>
-#include <memory>
+#include <functional>
+
 #include "glmutils.hpp"
+#include "Octree.hpp"
 
-using std::array;
-using std::shared_ptr;
-using glm::mat4;
+using std::function;
 
-class Oxel
+struct Oxel
 {
-    mutable shared_ptr<array<Oxel, 8>> m_children = nullptr;
-
-public:
-    struct Form
-    {
-        bool is_leaf = true;
-        bool full = false;
-        bool empty() const;
-    }form;
-
-    Oxel();
-
-    bool isLeaf() const;
-    const array<Oxel, 8>& children() const;
-
-    array<Oxel, 8>& children();
-    void collapse();
-    void expand() const;
-    void drawHere() const;
-
-    friend class OxelTree;
+    enum Material { Air, Rock, NUM_MATERIALS } 
+    material = Air;
 };
 
 struct OxelTree
 {
-    Oxel root;
-    Oxel& operator*();
-    Oxel& operator->();
+    typedef vec3 VecType;
+    typedef float LenType;
+    //TODO evaluate fixpoint decimals as a valid type
+    // float will no be enough at some point
 
-    int8_t root_granularity;
-    float base_width;
+    Octree<Oxel> tree;
+    int8_t root_granularity = 0;
 
-    void higher( uint8_t supplant_index );
-    void lower( uint8_t supplant_index );
+    //the width of an oxel with granularity = 0
+    LenType baselen = 1.0f;
+    LenType oxelWidth(int8_t granularity);
 
-    mat4 transform;
+    OxelTree() = default;
 
-    OxelTree( int8_t root_granularity );
-    void drawOxel(const Oxel& oxel, int8_t granularity, int8_t mingranularity = 0) const;
-    void drawHere() const;
-    void setTransform( const mat4& transform );
+private:
+    //helpers
+
+    static VecType calculateParentCenter(int8_t this_granularity, const VecType& this_center, uint8_t this_index);
+    static VecType calculateChildCenter(int8_t this_granularity, const VecType& this_center, uint8_t child_index);
+
+public:
+    struct Crawler_Base
+    {
+        OxelTree* tree = nullptr;
+        Octree<Oxel>::Node* node_ = nullptr;
+
+        int8_t granularity = std::numeric_limits<int8_t>::max();
+        OxelTree::VecType center = VecType(0.0f);
+
+        bool valid() const;
+        operator bool() const;
+
+        Octree<Oxel>::Node& node();
+        Oxel& value();
+    };
+    
+
+    struct Creator;
+    struct Viewer : public Crawler_Base
+    {
+        Viewer() = default;
+        Viewer( OxelTree& );
+        Viewer( const Viewer& ) = default;
+        Viewer& operator=( const Viewer& ) = default;
+        Viewer( const OxelTree::Creator& );
+        Viewer& operator=( const OxelTree::Creator& );
+
+        Viewer child ( uint8_t node_index ) const;
+        Viewer parent() const;
+        Viewer decendant( const vector<uint8_t>& decendant_route ) const;
+        Viewer ancestor( unsigned int generations ) const;
+        Viewer cousin( int64_t, int64_t, int64_t ) const;
+
+        const Octree<Oxel>::Node& node() const;
+        const Oxel& value() const;
+    };
+    struct Creator : public Crawler_Base
+    {
+        using OxelInitializer = std::function<Oxel (const Creator&)>;
+        static OxelInitializer default_oxel_initializer;
+        OxelInitializer initializer = default_oxel_initializer;
+
+        Creator() = default;
+        Creator( OxelTree& );
+        Creator( OxelTree&, OxelInitializer);
+        Creator( const Creator& ) = default;
+        Creator& operator=( const Creator& other ) = default;
+        Creator( const OxelTree::Viewer&, OxelInitializer );
+
+        Creator child ( uint8_t node_index ) const;
+        Creator parent() const;
+        Creator decendant( const vector<uint8_t>& decendant_route ) const;
+        Creator ancestor( uint8_t generations ) const;
+        Creator cousin( int64_t, int64_t, int64_t ) const;
+    };
 };
+
 
 #endif // OXEL_HPP

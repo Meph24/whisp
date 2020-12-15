@@ -17,6 +17,32 @@ class OxelEntity : public Entity
 	spacevec tick_begin_pos, tick_begin_v;
 	vec3 tick_begin_rot, tick_begin_drot;
 
+    void drawOxelTree( const OxelTree::Viewer& viewer, const int8_t& mingranularity = -5 )
+    {
+        if( viewer.granularity < mingranularity ) return;
+        if( !viewer.node().isLeaf() )
+        {
+            glPushMatrix();
+            glScalef( 0.5, 0.5, 0.5 );
+            for (size_t i = 0; i < 8; i++)
+            {
+                glPushMatrix();
+                glTranslatef( 
+                    (i & 0x1) ? 0.5 : -0.5, 
+                    (i & 0x2) ? 0.5 : -0.5,
+                    (i & 0x4) ? 0.5 : -0.5 
+                );
+                drawOxelTree( viewer.child(i), mingranularity );
+                glPopMatrix();
+            }
+            glPopMatrix();
+        }
+        else
+        {
+            if( viewer.value().material == Oxel::Material::Rock ) drawCube();
+        }
+    }
+
 public:
     OxelEntity( const OxelTree& t ) : t(t) {}
 
@@ -45,18 +71,7 @@ public:
 
         pos += v*tick_seconds;
         rot += drot* tick_seconds;
-        /*
-        t.setTransform(		glm::rotate(glm::radians(rot.x), vec3(1,0,0))
-                            *	glm::rotate(glm::radians(rot.y), vec3(0,1,0))
-                            *	glm::rotate(glm::radians(rot.z), vec3(0,0,1))
-        );
-        */
 
-    /*
-        iw->collideAlgo->doChecks(
-            (Collider*) this, (Entity*) this,
-            tick_seconds, *tsp);
-    */
         last_ticked = next_tick_begin;
     }
 
@@ -76,13 +91,17 @@ public:
         glPushMatrix();
 
         //apply position
+        float scale = t.oxelWidth(t.root_granularity);
+        glScalef( scale, scale, scale );
+        rotateDraw( rot.x,  rot.y, rot.z );
         glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
-       // t.drawHere();
+
+        OxelTree::Viewer v (t);
+        drawOxelTree(v);
 
         glPopMatrix();
     }
 
 };
-
 
 #endif // OXELENTITY_HPP

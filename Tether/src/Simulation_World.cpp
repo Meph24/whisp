@@ -412,22 +412,21 @@ void Simulation_World::init()
 		spawn(ge, iw->fromMeters( vec3(20.0f, 20.0f, 20.0f) ));
 	}
 	//oxel
-	/* Quarantined due to Oxel and Octree changes
 	{
-		OxelTree t( 0 );
-		Oxel* oxp = &(t.root);
+		OxelTree t;
+
+		OxelTree::Creator c ( t );
 		for (size_t i = 0; i < 5; i++)
 		{
-			oxp->children()[3].form.full = true;
-			oxp->children()[5].form.full = true;
-			oxp->children()[6].form.full = true;
+			c.child(3).value().material = Oxel::Material::Rock;
+			c.child(5).value().material = Oxel::Material::Rock;
+			c.child(6).value().material = Oxel::Material::Rock;
 
-			oxp = &(oxp->children()[0]);
+			c = c.child(0);
 		}
 		OxelEntity* oxele = new OxelEntity(t);
 		spawn( oxele, iw->fromMeters( vec3(-10.0f, 0.0f, 0.0f) ) );
 	}
-	*/
 }
 
 void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
