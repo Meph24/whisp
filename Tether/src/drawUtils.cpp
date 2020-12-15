@@ -2,6 +2,13 @@
 
 #include <GL/glew.h>
 
+void rotateDraw( float x, float y, float z )
+{
+    glRotatef( x, 1.0f, 0.0f, 0.0f );
+    glRotatef( x, 0.0f, 1.0f, 0.0f );
+    glRotatef( x, 0.0f, 0.0f, 1.0f );
+}
+
 void drawCube() 
 {
     glBegin(GL_POLYGON);
