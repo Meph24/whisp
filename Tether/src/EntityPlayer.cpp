@@ -31,6 +31,8 @@ using glm::vec3;
 #include "InteractFilterAlgoSym.h"
 #include "FloatSeconds.hpp"
 
+#include "drawUtils.hpp"
+
 
 EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 							spacevec startPos,
@@ -56,7 +58,7 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 	cam->height=w->getSize().y;
 	cam->width=w->getSize().x;
 	cam->maxView=1024*8;
-	setTP(false);
+	setTP(true);
 	cam->zoom=defaultZoom;
 	//mouseInp = new Zombie_MouseInput(this, w,sensX,sensY);
 	//mouseInp->enable();
@@ -122,7 +124,8 @@ void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWor
 	{
 		//TODO draw player skin
 		glPushMatrix();
-		glTranslatef(0.0f, -characterEyeHeight/2, 0.0f);
+		glTranslatef(0.0f, characterEyeHeight/2, 0.0f);
+		glRotatef( -cam->beta + 180, 0.0f, 1.0f, 0.0f ); // 180° shifted, so that an edge of the model is pointed forward
 		player_model.drawHere();	
 		glPopMatrix();
 	}
