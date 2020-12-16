@@ -5,8 +5,8 @@
 void rotateDraw( float x, float y, float z )
 {
     glRotatef( x, 1.0f, 0.0f, 0.0f );
-    glRotatef( x, 0.0f, 1.0f, 0.0f );
-    glRotatef( x, 0.0f, 0.0f, 1.0f );
+    glRotatef( y, 0.0f, 1.0f, 0.0f );
+    glRotatef( z, 0.0f, 0.0f, 1.0f );
 }
 
 void drawCube() 
