@@ -30,8 +30,8 @@ using glm::vec3;
 #include "ItemAmmo.h"
 #include "InteractFilterAlgoSym.h"
 #include "FloatSeconds.hpp"
-
 #include "drawUtils.hpp"
+#include "EventDefines.h"
 
 
 EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
@@ -96,8 +96,6 @@ EntityPlayer::~EntityPlayer()
 	if(inventory) delete inventory;
 }
 
-
-
 void EntityPlayer::selectWeapon(size_t selection)
 {
 	Zombie_Gun* selected_gun =  guns[selection%guns.size()].get();
@@ -106,7 +104,6 @@ void EntityPlayer::selectWeapon(size_t selection)
 	current_gun->stopShooting();
 	current_gun = guns[selection%guns.size()].get();
 }
-
 
 void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw, DrawServiceProvider* dsp)
 {
@@ -182,7 +179,6 @@ void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWor
 	if(heldItem) heldItem->draw(t,viewFrustum,iw,dsp);
 }
 
-
 void EntityPlayer::setTP(bool on)
 {
 	if(on)
@@ -211,7 +207,7 @@ spacevec EntityPlayer::getCamPos()
 {
 	return pos+characterEyeOffset;
 }
-#include "EventDefines.h"
+
 Frustum * EntityPlayer::newFrustumApplyPerspective(SimClock::time_point t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction)
 {
 	SimulationInputStatusSet& controlinputs = *(tsp->input_status);
@@ -257,7 +253,7 @@ Frustum * EntityPlayer::newFrustumApplyPerspective(SimClock::time_point t,bool f
 	}
 	return ret;
 }
-#include "EventDefines.h"
+
 void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	IWorld * iw=tsp->getIWorld();
@@ -354,7 +350,7 @@ void EntityPlayer::push(spacevec amount, TickServiceProvider& tsp)
 	//std::cout<<"amount"<<amount<<" | "<<tsp.getIWorld()->toMeters(amount);
 //	HP -= 15625*glm::sqlen(tsp.getChunkManager()->toMeters(amount));
 }
-#include <iostream>
+
 void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,HittableBulletLike* victim)
 {
 	if(!victim) std::cout<<"victim 0"<<std::endl;
