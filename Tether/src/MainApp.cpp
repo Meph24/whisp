@@ -67,96 +67,132 @@ void Main::run()
 	app->run();
 }
 
-App::App(WallClock& wallclock, Cfg& cfg) 
-		: wallclock(wallclock)
-		, cfg(cfg) 
-		{}
-
-void App::run()
-{
-		if(!op || !sim) 
-		{
-			throw std::runtime_error(string(" App: Failure in application initialization <sim:") + string((sim ? "ok" : "missing")) + string("|op:") + string(op? "ok" : "missing") + string(">\n"));
-		}
-
-		GLenum err = glewInit();
-		if (err != GLEW_OK)
-		{
-			std::cerr << "GLEW failed to initialize !" << std::endl;
-		}
-
-		glClearDepth(1.0f);
-		glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
-
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);
-		glEnable(GL_DEPTH_TEST);
-		glDepthMask(GL_TRUE);
-		glAlphaFunc(GL_GREATER, 0.02f);
-		glEnable(GL_ALPHA_TEST);
-
-		sim->init();
-		srand(time(0));
-
-		while (op->window->isOpen())
-		{
-			//render
-			sim->loop();
-
-			op->render();
-			sim->doGraphics(sim->clock.now());
-			op->display();
-
-			//handle events
-			op->pollEvents();	
-		}
-}
-
 DefaultApp::DefaultApp( WallClock& wallclock, Cfg& cfg )
-	: App(wallclock, cfg)
-	, local_operator(cfg, "Dwengine", *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"))
+	: wallclock(wallclock)
+	, cfg(cfg)
+	, op(cfg, "Dwengine", *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"))
 {
 	cout << "Initializing Default Application !\n";
 
-	op = &local_operator;
 
 	int zombie_mode = *cfg.getInt("test", "zombie_mode");
 	if(zombie_mode) 
 	{
-		sim = std::make_unique<Zombie_World>(wallclock, &op->window->getSFWindow());
+		sim = std::make_unique<Zombie_World>(wallclock, &op.window->getSFWindow());
 		sim->input_status->clip = true;
 	}
 	else 
 	{
-		sim = std::make_unique<Simulation_World>(wallclock, &op->window->getSFWindow());
+		sim = std::make_unique<Simulation_World>(wallclock, &op.window->getSFWindow());
 	}
 
-	op->operateSimulation(sim.get());
+	op.operateSimulation(sim.get());
+}
+
+void DefaultApp::run()
+{
+	cout << "Initializing Default Application!\n";
+	if(!sim) 
+	{
+		throw std::runtime_error( "App: Failure in application initialization < No Simulation to simulate >!" );
+	}
+
+	GLenum err = glewInit();
+	if (err != GLEW_OK)
+	{
+		std::cerr << "GLEW failed to initialize !" << std::endl;
+	}
+
+	glClearDepth(1.0f);
+	glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glAlphaFunc(GL_GREATER, 0.02f);
+	glEnable(GL_ALPHA_TEST);
+
+	sim->init();
+	srand(time(0));
+
+	while (op.window->isOpen())
+	{
+		//render
+		sim->loop();
+
+		op.render();
+		sim->doGraphics(sim->clock.now());
+		op.display();
+
+		//handle events
+		op.pollEvents();	
+	}
 }
 
 RemoteControlReceiverApp::RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg, Port port)
-	: App(wallclock, cfg)
-	, rc_operator( "Dwengine - remote controlled",  *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"), port )
+	: wallclock(wallclock)
+	, cfg(cfg)
+	, op( "Dwengine - remote controlled",  *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"), port )
 {
-		cout << "Initializing RemoteControlReceiver Application !\n";
-		op = &rc_operator;
 
-		int zombie_mode = *cfg.getInt("test", "zombie_mode");
-		if(zombie_mode) 
-		{
-			sim = std::make_unique<Zombie_World>(wallclock, &op->window->getSFWindow());
-			sim->input_status->clip = true;
-		}
-		else 
-		{
-			sim = std::make_unique<Simulation_World>(wallclock, &op->window->getSFWindow());
-		}
-		op->operateSimulation( sim.get() );
+	int zombie_mode = *cfg.getInt("test", "zombie_mode");
+	if(zombie_mode) 
+	{
+		sim = std::make_unique<Zombie_World>(wallclock, &op.window->getSFWindow());
+		sim->input_status->clip = true;
+	}
+	else 
+	{
+		sim = std::make_unique<Simulation_World>(wallclock, &op.window->getSFWindow());
+	}
+	op.operateSimulation( sim.get() );
+}
+
+void RemoteControlReceiverApp::run()
+{
+	cout << "Initializing RemoteControlReceiver Application !\n";
+
+	if(!sim) 
+	{
+		throw std::runtime_error( "App: Failure in application initialization < No Simulation to simulate >!" );
+	}
+
+	GLenum err = glewInit();
+	if (err != GLEW_OK)
+	{
+		std::cerr << "GLEW failed to initialize !" << std::endl;
+	}
+
+	glClearDepth(1.0f);
+	glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glAlphaFunc(GL_GREATER, 0.02f);
+	glEnable(GL_ALPHA_TEST);
+
+	sim->init();
+	srand(time(0));
+
+	while (op.window->isOpen())
+	{
+		//render
+		sim->loop();
+
+		op.render();
+		sim->doGraphics(sim->clock.now());
+		op.display();
+
+		//handle events
+		op.pollEvents();
+	}
 }
 
 RemoteControlSenderApp::RemoteControlSenderApp(WallClock& wallclock, Cfg& cfg, IPv4Address& addr, Port port)
-		: App(wallclock, cfg)
-		, rc_sender(wallclock, cfg)
+		: rc_sender(wallclock, cfg)
 {
 	cout << "Initializing RemoteControlSender Application !\n";
 	rc_sender.window.setPos(sf::Vector2i(0,0));
