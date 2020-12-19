@@ -232,7 +232,6 @@ void Simulation_World::init()
 							)
 
 		);
-
 	}
 	
 	//moving diamond

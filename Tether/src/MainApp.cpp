@@ -12,6 +12,7 @@
 
 #include "Simulation_World.h"
 #include "Zombie_World.h"
+#include "remoteControl.hpp"
 
 #define PHYSICS_MAX_TICKLENGTH 20000
 
@@ -127,94 +128,5 @@ void DefaultApp::run()
 
 		//handle events
 		op.pollEvents();	
-	}
-}
-
-RemoteControlReceiverApp::RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg, Port port)
-	: wallclock(wallclock)
-	, cfg(cfg)
-	, op( "Dwengine - remote controlled",  *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"), port )
-{
-
-	int zombie_mode = *cfg.getInt("test", "zombie_mode");
-	if(zombie_mode) 
-	{
-		sim = std::make_unique<Zombie_World>(wallclock, &op.window->getSFWindow());
-		sim->input_status->clip = true;
-	}
-	else 
-	{
-		sim = std::make_unique<Simulation_World>(wallclock, &op.window->getSFWindow());
-	}
-	op.operateSimulation( sim.get() );
-}
-
-void RemoteControlReceiverApp::run()
-{
-	cout << "Initializing RemoteControlReceiver Application !\n";
-
-	if(!sim) 
-	{
-		throw std::runtime_error( "App: Failure in application initialization < No Simulation to simulate >!" );
-	}
-
-	GLenum err = glewInit();
-	if (err != GLEW_OK)
-	{
-		std::cerr << "GLEW failed to initialize !" << std::endl;
-	}
-
-	glClearDepth(1.0f);
-	glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
-	glAlphaFunc(GL_GREATER, 0.02f);
-	glEnable(GL_ALPHA_TEST);
-
-	sim->init();
-	srand(time(0));
-
-	while (op.window->isOpen())
-	{
-		//render
-		sim->loop();
-
-		op.render();
-		sim->doGraphics(sim->clock.now());
-		op.display();
-
-		//handle events
-		op.pollEvents();
-	}
-}
-
-RemoteControlSenderApp::RemoteControlSenderApp(WallClock& wallclock, Cfg& cfg, IPv4Address& addr, Port port)
-		: rc_sender(wallclock, cfg)
-{
-	cout << "Initializing RemoteControlSender Application !\n";
-	rc_sender.window.setPos(sf::Vector2i(0,0));
-	rc_sender.tunein(addr, port);
-	rc_sender.operateRemote();
-	rc_sender.setMouseMode( InputDeviceConfigurator::MouseMode::diff );
-}
-
-void RemoteControlSenderApp::run()
-{
-	GLenum err = glewInit();
-	if (err != GLEW_OK)
-	{
-		std::cerr << "GLEW failed to initialize !" << std::endl;
-	}
-
-	glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
-	while(rc_sender.window.isOpen())
-	{
-		glClear( GL_COLOR_BUFFER_BIT );
-		rc_sender.window.display();
-		rc_sender.processEvents();
-		rc_sender.sync();
 	}
 }

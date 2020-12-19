@@ -29,37 +29,6 @@ struct DefaultApp : public App
 	void run();
 };
 
-#include "IPv4Address.hpp"
-
-struct RemoteControlReceiverApp : public App
-{
-	WallClock& wallclock;
-	Cfg& cfg;
-
-	unique_ptr<IGameMode> sim;
-	RemoteControlReceiverOperator op;
-
-	RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg, Port port);
-	void run();
-};
-
-struct RemoteControlSenderApp : public App
-{
-	RemoteControlSender rc_sender;
-
-	RemoteControlSenderApp( WallClock& wallclock, Cfg& cfg, IPv4Address& addr, Port port = 55555 );
-	void run();
-};
-
-/*
-struct ServerApp : public App
-{
-	SimulationServer simserver;
-	ServerApp( WallClock& wallclock, Cfg& cfg, Port port );
-	void run();
-};
-*/
-
 class Main
 {
 	static unordered_map<string, unsigned int> command_line_argument_flags;
