@@ -44,7 +44,7 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 	, player_mesh (diamondMesh(3, 0.6, 1.8))
 	, player_model( player_mesh )
 	, speed(characterSpeed)
-	, heldItem(0)
+	, heldItem(nullptr)
 	, inventory()
 {
 	surviveClearing=true;
@@ -93,7 +93,6 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 EntityPlayer::~EntityPlayer()
 {
 	delete cam;
-	//delete mouseInp;
 }
 
 void EntityPlayer::selectWeapon(size_t selection)
