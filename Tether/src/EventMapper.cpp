@@ -2,6 +2,8 @@
 #include <iostream>
 #include "SFML/Window.hpp"
 
+#include "User.hpp"
+
 void EventMapping::map(EVENTMAPPING_FUNCTION_PARAMETERS)
 {
 	if(! condition(e, stati)) return;
@@ -54,7 +56,6 @@ void eventmapping::actions::SendSignal::operator()(EVENTMAPPING_FUNCTION_PARAMET
 	sendSignal(signal_counter); 
 }
 
-#include "Operator.hpp"
 
 eventmapping::actions::MouseDiffInput::MouseDiffInput(Window& window, InputDeviceConfigurator& conf, float* diff_accumulation, Axis window_axis) 
 				: conf(conf)
@@ -71,7 +72,7 @@ void eventmapping::actions::MouseDiffInput::operator()(EVENTMAPPING_FUNCTION_PAR
 	//size from mid gets accumulated
 	float addition = ((float)(pos - size/2)) * sensitivity;
 	*diff_accumulation += addition;
-	//note reset of mouse cursor to middle of window is done in post event processing (currently in Operator::postHandleEvent())
+	//note reset of mouse cursor to middle of window is done in post event processing (currently in User::postHandleEvent())
 }
 
 eventmapping::actions::ToggleMouseMode::ToggleMouseMode(InputDeviceConfigurator& conf, eventmapping::actions::KeyTrigger trigger) : conf(conf), trigger(trigger){}

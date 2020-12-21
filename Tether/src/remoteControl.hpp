@@ -8,7 +8,7 @@ using network::IPv4Address;
 using network::Port;
 using network::UdpSocket;
 
-struct RemoteControlReceiverOperator : public Operator
+struct RemoteControlReceiverUser : public User
 {
 	SimulationInputStatusSet* managed_status;
 
@@ -18,7 +18,7 @@ struct RemoteControlReceiverOperator : public Operator
 	size_t received;
 	UdpSocket udpsocket;
 
-	RemoteControlReceiverOperator( std::string name, int reswidth, int resheight, Port try_port );
+	RemoteControlReceiverUser( std::string name, int reswidth, int resheight, Port try_port );
 	void operateSimulation(IGameMode* simulation);
 	void disconnectSimulation();
 	void pollEvents();
@@ -63,7 +63,7 @@ struct RemoteControlReceiverApp : public App
 	Cfg& cfg;
 
 	unique_ptr<IGameMode> sim;
-	RemoteControlReceiverOperator op;
+	RemoteControlReceiverUser op;
 
 	RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg, Port port);
 	void run();

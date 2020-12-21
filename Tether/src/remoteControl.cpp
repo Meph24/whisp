@@ -7,14 +7,14 @@
 
 #include <iostream>
 
-void RemoteControlReceiverOperator::operateSimulation(IGameMode* simulation) 
+void RemoteControlReceiverUser::operateSimulation(IGameMode* simulation) 
 { 
     managed_status = simulation->input_status.get();
 }
 
-void RemoteControlReceiverOperator::disconnectSimulation(){ managed_status = nullptr; }
+void RemoteControlReceiverUser::disconnectSimulation(){ managed_status = nullptr; }
 
-void RemoteControlReceiverOperator::pollEvents() 
+void RemoteControlReceiverUser::pollEvents() 
 { 
     if(!managed_status) return;
     sf::IpAddress addr; Port port;
@@ -140,10 +140,10 @@ void RemoteControlSenderApp::run()
 	}
 }
 
-RemoteControlReceiverOperator::RemoteControlReceiverOperator(
+RemoteControlReceiverUser::RemoteControlReceiverUser(
 	 std::string name, int reswidth, int resheight, Port try_port
 	)
-	: Operator (name + string(" - remote controlled receiver"), reswidth, resheight)
+	: User (name + string(" - remote controlled receiver"), reswidth, resheight)
 	, managed_status(nullptr)
 	, sfmlwindow( reswidth, resheight, name, sf::Style::None, contextSettings )
 	, received(0)
@@ -152,7 +152,7 @@ RemoteControlReceiverOperator::RemoteControlReceiverOperator(
 	udpsocket.setBlocking(false);
 	
 	udpsocket.bind(try_port);
-	std::cout << "RemoteControlReceiverOperator : Bound at port <" << udpsocket.getLocalPort() << ">\n";
+	std::cout << "RemoteControlReceiverUser : Bound at port <" << udpsocket.getLocalPort() << ">\n";
 }
 
 vec2 RemoteControlSender::turnSensitivity() const

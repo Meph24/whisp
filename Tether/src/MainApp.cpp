@@ -127,6 +127,6 @@ void DefaultApp::run()
 		op.display();
 
 		//handle events
-		op.pollEvents();	
+		op.pollEvents();
 	}
 }

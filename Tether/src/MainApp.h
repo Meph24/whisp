@@ -3,7 +3,7 @@
 #include <string>
 #include <stdexcept>
 
-#include "Operator.hpp"
+#include "User.hpp"
 #include <memory>
 #include "WallClock.hpp"
 #include "SFMLClock.hpp"
@@ -23,7 +23,7 @@ struct DefaultApp : public App
 	Cfg& cfg;
 
 	unique_ptr<IGameMode> sim;
-	LocalOperator op;
+	LocalUser op;
 
 	DefaultApp( WallClock& wallclock, Cfg& cfg );
 	void run();

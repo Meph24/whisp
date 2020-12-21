@@ -20,7 +20,7 @@ using std::function;
 using std::unordered_map;
 using std::vector;
 
-class Operator;
+class User;
 
 #include "SimulationInputStatusSet.hpp"
 #include "InputDeviceConfigurator.hpp"
