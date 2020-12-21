@@ -11,10 +11,11 @@
 #include "DrawServiceProvider.h"
 #include "EventMapper.hpp"
 #include "Graphics2D.h"
+#include "ShortNames.h"
+#include "WarnErrReporter.h"
+#include <iostream>
 
 ItemContainer::ItemContainer()
-: prev_selection_up(SimulationInputStatusSet().selection_up)
-, prev_selection_down(SimulationInputStatusSet().selection_down)
 {}
 
 u32 ItemContainer::maximumAdd(Item* item)
@@ -86,9 +87,6 @@ void ItemContainer::insertR(Item* it)
 	}
 }
 
-#include "ShortNames.h"
-#include "WarnErrReporter.h"
-#include <iostream>
 
 void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
 {
@@ -153,20 +151,22 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 
 	dsp->revertView();
 }
-#include "EventDefines.h"
+
+void ItemContainer::selectRelative( i64 select_add )
+{
+	consumable_select_add += select_add;	
+}
+
 void ItemContainer::tick(const SimClock::time_point& t, TickServiceProvider* tsp)
 {
-	SimulationInputStatusSet& stati = *tsp->input_status;
-	i64 selectAdd = stati.selection_down - prev_selection_down;
-	selectAdd -= stati.selection_up - prev_selection_up;
-	if(stati.selection_up != prev_selection_up)stati.selection_up = prev_selection_up;
-	if(stati.selection_down != prev_selection_down)stati.selection_down = prev_selection_down;
+	i64& select_add = consumable_select_add;
 	if(items.size()<1) return;
-	while(selectAdd+selected<0) selectAdd+=items.size();
-	while(selectAdd+selected>=(i64)items.size()) selectAdd-=items.size();
-	selected=(u32)(selectAdd+selected);
+	while(select_add+selected<0) select_add+=items.size();
+	while(select_add+selected>=(i64)items.size()) select_add-=items.size();
+	selected=(u32)(select_add+selected);
 	if(selected<firstInList) firstInList=selected;
 	if(selected>=firstInList+maxListLen) firstInList=selected-maxListLen+1;
+	consumable_select_add = 0;
 }
 
 ItemContainer::~ItemContainer()

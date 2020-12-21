@@ -20,7 +20,7 @@ class ItemContainer: public Item
 	unsigned int selected=0;//item slot selected
 	unsigned int firstInList=0;//item on top of scrollable list
 
-	SignalCounter prev_selection_up, prev_selection_down;
+	i64 consumable_select_add = 0;
 
 protected:
 	const u32 maxListLen=32;
@@ -32,6 +32,8 @@ public:
 	virtual u32 maximumAdd(Item * item);
 	virtual Item * addItem(Item * item);
 	virtual Item * removeNextItem(u32 maxCount);//returns the last item with up to an amount of maxCount
+	
+	void selectRelative( i64 select_add );
 
 	virtual Item * newClone();
 	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);//when held by player: must draw GUI and/or the physical item

@@ -38,18 +38,20 @@ using std::vector;
 #include "Mesh.hpp"
 #include "Model.hpp"
 
+#include "TopLevelInventory.h"
+
 class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 {
 	void setTP(bool on);
 
 	bool isPerspective=false;
 
-	SignalCounter prev_inventory_signal;
-	vec3 prev_wanted_turn;
+	SimulationInputStatusSet prev_input_status;
 
 	Mesh player_mesh;
 	Model player_model;
 public:
+
 
 	float defaultZoom=1;
 
@@ -73,7 +75,7 @@ public:
 	Zombie_Gun* current_gun = nullptr;
 
 	Item * heldItem;//to browse the inventory, "heldItem" is switched with "inventory"
-	Item * inventory;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
+	unique_ptr<TopLevelInventory> inventory;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
 
 	EntityPlayer(SimClock::time_point spawn_time,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
 	~EntityPlayer();

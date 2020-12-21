@@ -40,12 +40,12 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 							float sensX,
 							float sensY,
 							float characterSpeed)
-	: prev_inventory_signal(SimulationInputStatusSet().inventory)
+	: prev_input_status()
 	, player_mesh (diamondMesh(3, 0.6, 1.8))
 	, player_model( player_mesh )
 	, speed(characterSpeed)
 	, heldItem(0)
-	, inventory(0)
+	, inventory()
 {
 	surviveClearing=true;
 	last_ticked=spawn_time;
@@ -69,12 +69,14 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 
 	bb=AABB(pos);
 
-	TopLevelInventory * tli=new TopLevelInventory(this);
-	for(int i=0;i<42;i++)
+	inventory = std::make_unique<TopLevelInventory>(this);//comment this line to disable inventory
+	if(inventory)
 	{
-		tli->items.push_back(new ItemDummy("Duftkerze Nummer "+std::to_string(i)));
+		for(int i=0;i<42;i++)
+		{
+			inventory->items.push_back(new ItemDummy("Duftkerze Nummer "+std::to_string(i)));
+		}
 	}
-	inventory=tli;//TODO reenable this line to enable inventory
 
 	guns.emplace_back(new Zombie_Gun(spawn_time,"Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f,1),false,{2,0.15f,0},{1,0.5f,0}));//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
 	guns.emplace_back(new Zombie_Gun(spawn_time,"Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f,1),true,{0.2f,0,0},{0.05f,0.01f,0}));//new Zombie_Gun(30000, 800,5.0f);
@@ -92,8 +94,6 @@ EntityPlayer::~EntityPlayer()
 {
 	delete cam;
 	//delete mouseInp;
-	if(heldItem) delete heldItem;
-	if(inventory) delete inventory;
 }
 
 void EntityPlayer::selectWeapon(size_t selection)
@@ -262,13 +262,24 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	SimulationInputStatusSet& controlinputs = *tsp->input_status;
 	selectWeapon(controlinputs.weapon_selection);
 
-	if(prev_inventory_signal != controlinputs.inventory)
+	if(inventory.get() == heldItem)
 	{
-		prev_inventory_signal = controlinputs.inventory;
+		i64 selectAdd = controlinputs.selection_down - prev_input_status.selection_down;
+		selectAdd -= controlinputs.selection_up - prev_input_status.selection_up;
+		if(controlinputs.selection_up != prev_input_status.selection_up)
+			controlinputs.selection_up = prev_input_status.selection_up;
+		if(controlinputs.selection_down != prev_input_status.selection_down)
+			controlinputs.selection_down = prev_input_status.selection_down;
+		inventory->selectRelative(selectAdd);
+	}
+	
 
-		Item * temp=heldItem;//put inventory in hand or put it back
-		heldItem=inventory;
-		inventory=temp;
+	if(prev_input_status.inventory != controlinputs.inventory)
+	{
+		prev_input_status.inventory = controlinputs.inventory;
+
+		if(heldItem) heldItem = nullptr;
+		else heldItem = inventory.get();
 
 		//this writes to controlinputs, which shall not be permitted in the future ( issue #36 )
 		//this line will need to go
@@ -299,12 +310,12 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	}
 	pos+=iw->fromMeters(wantedV * speed )*time;
 
-	if(controlinputs.turn != prev_wanted_turn)
+	if(controlinputs.turn != prev_input_status.turn)
 	{
 		cam->alpha = controlinputs.turn.x;
 		cam->beta = controlinputs.turn.y;
 		//cam->gamma = controlinputs.turn.z;
-		prev_wanted_turn = controlinputs.turn;
+		prev_input_status.turn = controlinputs.turn;
 	}
 
 	if(controlinputs.clip)
