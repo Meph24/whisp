@@ -265,10 +265,10 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	{
 		i64 selectAdd = controlinputs.selection_down - prev_input_status.selection_down;
 		selectAdd -= controlinputs.selection_up - prev_input_status.selection_up;
-		if(controlinputs.selection_up != prev_input_status.selection_up)
-			controlinputs.selection_up = prev_input_status.selection_up;
-		if(controlinputs.selection_down != prev_input_status.selection_down)
-			controlinputs.selection_down = prev_input_status.selection_down;
+		if( prev_input_status.selection_up != controlinputs.selection_up )
+			prev_input_status.selection_up = controlinputs.selection_up;
+		if( prev_input_status.selection_down != controlinputs.selection_down )
+			prev_input_status.selection_down = controlinputs.selection_down;
 		inventory->selectRelative(selectAdd);
 	}
 	
