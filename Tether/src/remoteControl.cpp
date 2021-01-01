@@ -9,7 +9,7 @@
 
 using std::cout;
 
-void RemoteControlReceiverUser::operateSimulation(IGameMode* simulation) 
+void RemoteControlReceiverUser::operateSimulation(Simulation* simulation) 
 {
 	if(!simulation) return;
 

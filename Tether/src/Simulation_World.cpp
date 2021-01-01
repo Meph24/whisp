@@ -48,7 +48,7 @@
 #include <utility>
 
 Simulation_World::Simulation_World(const WallClock& reference_clock, Cfg& cfg)
-	: IGameMode(reference_clock, cfg)
+	: Simulation(reference_clock, cfg)
 	, world_(16)
 	, bm_(&world_)
 	, terrain_(&world_, world_.fromMeters(0))

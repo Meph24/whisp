@@ -24,7 +24,7 @@ using glm::vec2;
 using std::pair;
 using std::unique_ptr;
 
-class IGameMode;
+class Simulation;
 
 class User
 {
@@ -33,7 +33,7 @@ protected:
 public:
 	string name;
 	Window* window;
-	IGameMode* simulation;
+	Simulation* simulation;
 	unique_ptr<Perspective> perspective;
 
 	SimulationInputStatusSet input_status;
@@ -48,7 +48,7 @@ public:
 	void setContextToMyThread();
 	
 	virtual void pollEvents() = 0;
-	virtual void operateSimulation(IGameMode* simulation) = 0;
+	virtual void operateSimulation(Simulation* simulation) = 0;
 	virtual void disconnectSimulation() = 0;
 };
 
@@ -67,7 +67,7 @@ public:
 	unique_ptr<EventMapper> event_mapper;
 	EventSource* event_source;
 
-	void operateSimulation(IGameMode* simulation);
+	void operateSimulation(Simulation* simulation);
 	void disconnectSimulation();
 	void pollEvents();
 

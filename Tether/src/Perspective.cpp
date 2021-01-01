@@ -1,22 +1,22 @@
 #include "Perspective.hpp"
-#include "WarnErrReporter.h"
-#include "ICamera3D.h"
-#include "Zombie_Gun.h"
-#include "Graphics2D.h"
 
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
 
-#include "TextureStatic2D.h"
 #include "EntityProjectileBulletLike.h"
-#include "IGameMode.h"
+#include "Frustum.h"
+#include "Graphics2D.h"
+#include "ICamera3D.h"
 #include "IWorld.h"
 #include "MainApp.h"
-#include "Frustum.h"
+#include "Simulation.hpp"
+#include "TextureStatic2D.h"
+#include "WarnErrReporter.h"
+#include "Zombie_Gun.h"
 
 const float Perspective::default_zoom = 1.0f;
 
-Perspective::Perspective(sf::Window* window, EntityPlayer* observing_entity, IGameMode* simulation)
+Perspective::Perspective(sf::Window* window, EntityPlayer* observing_entity, Simulation* simulation)
 	: avatar(observing_entity)
 	, simulation(simulation)
 	, graphics2d(64, window->getSize().x / window->getSize().y)
@@ -30,10 +30,8 @@ Perspective::Perspective(sf::Window* window, EntityPlayer* observing_entity, IGa
 	camera->maxView=1024*8;
 	camera->zoom=Perspective::default_zoom;
 
-	timer_graphics=pmGraphics.createTimestep	("            other");
-
-	timer_graphics.setAsRoundtripMarker		("Total render time");
-
+	timer_graphics=pmGraphics.createTimestep		("            other");
+	timer_graphics.setAsRoundtripMarker				("Total render time");
 	timer_graphics_world=pmGraphics.createTimestep	("   world contents");
 	timer_graphics_debug=pmGraphics.createTimestep	("     debug screen");
 	timer_graphics_flush=pmGraphics.createTimestep	(" GPU work + syncs");

@@ -4,7 +4,7 @@
 
 #include "ChunkManager.h"
 #include "Perspective.hpp"
-#include "IGameMode.h"
+#include "Simulation.hpp"
 #include "PerformanceMeter.h"
 #include "SimulationInputStatusSet.hpp"
 #include "Spacevec.h"
@@ -17,7 +17,7 @@ class IWorld;
 class TexParamSet;
 class WorldDefault;
 
-class Zombie_World: public IGameMode
+class Zombie_World: public Simulation
 {
 	ChunkManager cm_;
 	WorldTerrainDisplayer world_;

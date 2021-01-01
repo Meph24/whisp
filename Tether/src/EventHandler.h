@@ -7,7 +7,7 @@
 */
 #define EVENTHANDLER_LOWID_BITS 10
 
-class IGameMode;
+class Simulation;
 class EventMapper;
 
 class EventHandler
@@ -67,7 +67,7 @@ public:
 	*/
 
 public:
-	IGameMode* sim;
+	Simulation* sim;
 	EventMapper* event_mapper;
 
 	//This constructor only holds parameters because of legacy code

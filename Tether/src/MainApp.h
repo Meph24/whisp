@@ -22,9 +22,8 @@ struct DefaultApp : public App
 	WallClock& wallclock;
 	Cfg& cfg;
 
-	unique_ptr<IGameMode> sim;
+	unique_ptr<Simulation> sim;
 	LocalUser op;
-
 
 	DefaultApp( WallClock& wallclock, Cfg& cfg );
 	void run();

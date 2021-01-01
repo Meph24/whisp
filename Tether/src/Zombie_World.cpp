@@ -30,7 +30,7 @@ using std::cout;
 const float Zombie_World::chunk_size = 16;
 
 Zombie_World::Zombie_World(const WallClock& reference_clock, Cfg& cfg)
-	: IGameMode(reference_clock, cfg)
+	: Simulation(reference_clock, cfg)
 	, cm_(	cfg,
 			chunk_size,
 			*cfg.getInt("graphics", "physicsDistance") * 2,

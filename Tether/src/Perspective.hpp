@@ -20,6 +20,7 @@ using glm::vec3;
 using std::unique_ptr;
 
 class ITexture;
+class Simulation;
 
 //use with caution: when using this, code sections outside of these regions are called twice
 #define TRANSPARENT_SECTION_DO_LATER(priority) \
@@ -47,7 +48,7 @@ struct Perspective
 	float third_person_distance_max = 20;
 
 	EntityPlayer* avatar = nullptr;
-	IGameMode* simulation = nullptr;
+	Simulation* simulation = nullptr;
 
 	Graphics2D graphics2d;
 	unique_ptr<CameraTP> camera;
@@ -68,7 +69,7 @@ struct Perspective
 
 //----------------------
 
-	 Perspective(sf::Window* window, EntityPlayer* observing_entity, IGameMode* simulation);
+	 Perspective(sf::Window* window, EntityPlayer* observing_entity, Simulation* simulation);
 
 	void enableAABBDrawing(bool b = false);
 	void enableDebugScreen(bool b = false);

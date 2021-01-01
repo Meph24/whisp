@@ -1,16 +1,14 @@
 #include "User.hpp"
 
-#include <GL/glew.h>
 #include <iostream>
-
 #include <string>
 
+#include <GL/glew.h>
+
 #include "EventDefines.h"
-
-#include "SFMLWindow.hpp"
 #include "IPv4Address.hpp"
-
-#include "IGameMode.h"
+#include "SFMLWindow.hpp"
+#include "Simulation.hpp"
 
 using std::string;
 
@@ -103,7 +101,7 @@ vec2 LocalUser::turnSensitivity() const
 		return turn_sensitivity * modifier; 
 }
 
-void LocalUser::operateSimulation(IGameMode* simulation)
+void LocalUser::operateSimulation(Simulation* simulation)
 {
 	if(!simulation) return;
 

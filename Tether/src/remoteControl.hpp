@@ -17,7 +17,7 @@ struct RemoteControlReceiverUser : public User
 	UdpSocket udpsocket;
 
 	RemoteControlReceiverUser( std::string name, int reswidth, int resheight, Port try_port );
-	void operateSimulation(IGameMode* simulation);
+	void operateSimulation(Simulation* simulation);
 	void disconnectSimulation();
 	void pollEvents();
 };
@@ -60,7 +60,7 @@ struct RemoteControlReceiverApp : public App
 	WallClock& wallclock;
 	Cfg& cfg;
 
-	unique_ptr<IGameMode> sim;
+	unique_ptr<Simulation> sim;
 	RemoteControlReceiverUser op;
 
 	RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg, Port port);

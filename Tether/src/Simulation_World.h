@@ -1,14 +1,15 @@
 #pragma once
 
 #include <memory>
-#include "IGameMode.h"
-#include "PerformanceMeter.h"
-#include "SimulationInputStatusSet.hpp"
-#include "WorldDefault.h"
+
 #include "BenchmarkManager.h"
 #include "Model.hpp"
 #include "Mesh.hpp"
+#include "PerformanceMeter.h"
+#include "Simulation.hpp"
+#include "SimulationInputStatusSet.hpp"
 #include "TerrainDummy.h"
+#include "WorldDefault.h"
 
 using std::unique_ptr;
 
@@ -19,7 +20,7 @@ class Mesh;
 class TerrainDummy;
 class WorldDefault;
 
-class Simulation_World: public IGameMode
+class Simulation_World: public Simulation
 {
 	WorldDefault world_;
 	BenchmarkManager bm_;
