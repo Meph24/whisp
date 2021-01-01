@@ -7,11 +7,12 @@ chunkLoadRate=40
 terrainQuality=0.5
 maxRenderTime=120.0
 
-
 [test]
 zombie_mode=0
 zombies=10
 zombieDist=50
+verbose=0
+debug_movement=0
 
 [input]
 sensitivityX=0.0431654676
@@ -19,7 +20,6 @@ sensitivityY=0.0431654676
 
 [simulation]
 objects_count=0
-
 
 [network]
 default_ip_remote_control_sender="127.0.0.1"
