@@ -46,7 +46,7 @@ void Perspective::enableThirdPerson(bool on)
 {
 	if(on)
 	{
-		setThirdPersonDistance(camera->dist);
+		setThirdPersonDistance(4.0f);
 		camera->minView=0.5f;
 	}
 	else

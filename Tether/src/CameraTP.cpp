@@ -59,9 +59,9 @@ void CameraTP::apply()
 	applyFrustum();
 	glMatrixMode(GL_MODELVIEW);
 	glTranslatef(0, 0, -dist);
-	glRotatef(eye->rotation.z, 0, 0, 1);
 	glRotatef(eye->rotation.x, 1, 0, 0);
 	glRotatef(eye->rotation.y, 0, 1, 0);
+	glRotatef(eye->rotation.z, 0, 0, 1);
 	const vec3& pos = eye->offsetFromEntity();
 	glTranslatef(-pos.x, -pos.y, -pos.z);
 }

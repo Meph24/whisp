@@ -29,7 +29,7 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 							float sensX,
 							float sensY,
 							float characterSpeed)
-	: player_mesh (diamondMesh(3, 0.6, 1.8))
+	: player_mesh (diamondMesh(3, 0.2, 0.5))
 	, player_model( player_mesh )
 	, eye(*this)
 	, speed(characterSpeed)
@@ -79,18 +79,19 @@ void EntityPlayer::selectWeapon(size_t selection)
 void EntityPlayer::draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw, Perspective& perspective)
 {
 	float tickOffset = (float) FloatSeconds(draw_time-last_ticked);
-	if(!viewFrustum->inside(bb,iw)) return;
-	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;
-	vec3 interPosMeters = iw.toMeters(interPos);
 
-	float character_height = eye.offsetFromEntity().y;
+	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;
+	vec3 draw_pos = iw.toMeters(interPos) + eye.offsetFromEntity();
 
 	glPushMatrix();
 
 	//apply position
-	glTranslatef(interPosMeters.x, interPosMeters.y + character_height/2, interPosMeters.z);
+	glTranslatef( draw_pos.x, draw_pos.y, draw_pos.z );
 
-	glRotatef( eye.rotation.x, 90.0f, 0.0f, 0.0f );
+	glRotatef( -eye.rotation.z, 0.0f, 0.0f, 1.0f );
+	glRotatef( -eye.rotation.y, 0.0f, 1.0f, 0.0f );
+	glRotatef( -eye.rotation.x + 90, 1.0f, 0.0f, 0.0f );
+
 	player_model.drawHere();	
 
 	glPopMatrix();
