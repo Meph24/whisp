@@ -25,6 +25,7 @@ Perspective::Perspective(sf::Window* window, EntityPlayer* observing_entity, Sim
 	, dsGraphics(&pmGraphics, &graphics2d)
 	, dsLogic(&simulation->pmLogic, &graphics2d)
 {
+	enableThirdPerson(enable_third_person);
 	camera->height=window->getSize().y;
 	camera->width=window->getSize().x;
 	camera->maxView=1024*8;
@@ -97,6 +98,7 @@ unique_ptr<Frustum> Perspective::newFrustumApplyPerspective(	SimClock::time_poin
 	float time=(float)FloatSeconds(t-avatar->last_ticked);
 	spacevec curPos= avatar->pos + avatar->v*time;
 
+
 	if(fresh) camera->applyFresh();
 	else camera->apply();
 	vec3 fwd=camera->getForwardVector();
@@ -143,6 +145,8 @@ void Perspective::draw()
 void Perspective::drawAvatarPerspective()
 {
 	const SimClock::time_point t = simulation->clock.now();
+
+	enableThirdPerson(enable_third_person);
 
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
 

@@ -37,8 +37,8 @@ struct Perspective
 
 	bool enable_aabbs = false;
 	bool enable_hud = true;
-	bool enable_third_person = false;
 	bool enable_debug = false;
+	bool enable_third_person = false;
 	bool zoomed = false;
 	float zoom_mult = 8.0f;
 
@@ -69,15 +69,13 @@ struct Perspective
 
 //----------------------
 
-	 Perspective(sf::Window* window, EntityPlayer* observing_entity, Simulation* simulation);
+	Perspective(sf::Window* window, EntityPlayer* observing_entity, Simulation* simulation);
 
 	void enableAABBDrawing(bool b = false);
 	void enableDebugScreen(bool b = false);
 	void enableHUD(bool b = true);
-	void enableThirdPerson(bool b = false);
 	bool isThirdPerson() const;
 
-	void setThirdPersonDistance(float meters);
 
 	vec3 forwardVec();
 	vec3 upVec();
@@ -98,6 +96,10 @@ private:
 	PerformanceMeter::SingleTimer timer_graphics_flush;
 	DebugScreen dsGraphics;
 	DebugScreen dsLogic;
+
+	//helps setting camera values correctly
+	void enableThirdPerson(bool b = false);
+	void setThirdPersonDistance(float meters);
 };
 
 #endif /* SRC_DRAWSERVICEPROVIDER_H_ */

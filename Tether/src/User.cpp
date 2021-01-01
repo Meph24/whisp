@@ -198,6 +198,10 @@ void LocalUser::operateSimulation(Simulation* simulation)
 		EVENT_ID_KEY_C,
 		Act::Toggle(&input_status.clip)
 	);
+	event_mapper->registerMapping(
+		EVENT_ID_KEY_F2,
+		Act::Toggle(&perspective->enable_third_person)
+	);
 
 	auto& container = mouse_mode_mappings[ InputDeviceConfigurator::MouseMode::diff ];
 	container.emplace_back(

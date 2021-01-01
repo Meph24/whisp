@@ -10,6 +10,7 @@
 #define SRC_EVENTDEFINES_H_
 
 //event IDs
+#define EVENT_ID_KEY_F2 1110
 #define EVENT_ID_KEY_F3 1111
 #define EVENT_ID_KEY_W (1024+('W'-'A'))
 #define EVENT_ID_KEY_A (1024+('A'-'A'))

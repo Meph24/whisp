@@ -17,7 +17,7 @@ Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg)
 	, pmLogic(1s, 8s)
 {}
 
-unique_ptr<Perspective> Simulation::getPerspective( User* user)
+unique_ptr<Perspective> Simulation::getPerspective( User* user )
 {
 	if( players.find(user) == players.end() ) return nullptr;
 

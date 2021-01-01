@@ -76,20 +76,26 @@ void EntityPlayer::selectWeapon(size_t selection)
 	current_gun = guns[selection%guns.size()].get();
 }
 
-void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw, Perspective& perspective)
+void EntityPlayer::draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw, Perspective& perspective)
 {
+	float tickOffset = (float) FloatSeconds(draw_time-last_ticked);
+	if(!viewFrustum->inside(bb,iw)) return;
+	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;
+	vec3 interPosMeters = iw.toMeters(interPos);
+
+	float character_height = eye.offsetFromEntity().y;
+
 	glPushMatrix();
 
-	const vec3& eye_pos = eye.offsetFromEntity();
-	//shift the model up for 1/2 the eye-height, which is the height of the model, bc the models center is in the middle of it
-	//shifting it up, so it is visible in full
-	glTranslatef( 0.0f, eye_pos.y/2, 0.0f );
-	// 180° turned on y axis for the model, so that an edge of the model is pointed forward
-	glRotatef( -user()->perspective->camera->eye->rotation.y + 180, 0.0f, 1.0f, 0.0f ); 
+	//apply position
+	glTranslatef(interPosMeters.x, interPosMeters.y + character_height/2, interPosMeters.z);
+
+	glRotatef( eye.rotation.x, 90.0f, 0.0f, 0.0f );
 	player_model.drawHere();	
+
 	glPopMatrix();
 
-	if(held_item) held_item->draw(t, viewFrustum, iw, perspective);
+	if(held_item) held_item->draw(draw_time, viewFrustum, iw, perspective);
 }
 
 void EntityPlayer::setUser(User* user){ user_ = user; }

@@ -12,7 +12,7 @@ class IWorld;
 class Eye
 {
     Entity& entity;
-    vec3 character_eye_offset = vec3(0.0f, 0.8f, 0.0f);
+    vec3 character_eye_offset = vec3(0.0f, 1.6f, 0.0f);
 
 public:
     vec3 rotation = vec3(0.0001f, 0.0001f, 0.0001f);

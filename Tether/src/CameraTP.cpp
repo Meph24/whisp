@@ -3,7 +3,7 @@
 
 CameraTP::CameraTP( Eye& eye )
 	: ICamera3D( eye )
-	, dist(4)
+	, dist(0)
 {}
 
 DivisionPlane CameraTP::getNearPlane()
