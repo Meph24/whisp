@@ -28,7 +28,7 @@ public:
 	Zombie_Tree(spacevec position);
 	Zombie_Tree(spacevec position, float diameter, float height, float diameterLeaves);
 	~Zombie_Tree();
-	virtual void draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw, Perspective&);
 	virtual void tick(const SimClock::time_point& t,TickServiceProvider * tsp);
 };
 

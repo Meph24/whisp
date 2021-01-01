@@ -34,7 +34,7 @@ public:
 
 	bool isMultichunk();
 
-	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw, Perspective& perspective);
 
 	void extend(AABB other);
 	void extend(AABB * other);

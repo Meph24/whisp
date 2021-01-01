@@ -348,8 +348,8 @@ void PerformanceMeter::StepData::shrinkTimeBuffer(int by)
 #include "Spacevec.h"
 #include "Frustum.h"
 #include "IWorld.h"
-#include "DrawServiceProvider.h"
-void PerformanceMeter::draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
+#include "Perspective.hpp"
+void PerformanceMeter::draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw, Perspective& perspective)
 {
 	spacevec interPos=-viewFrustum->observerPos;
 	vec3 interPosMeters=iw.toMeters(interPos);
@@ -358,7 +358,7 @@ void PerformanceMeter::draw(const SimClock::time_point& draw_time, Frustum * vie
 	glPushMatrix();
 	glTranslatef(interPosMeters.x-8, interPosMeters.y+offsetH, interPosMeters.z);
 	glColor3f(1,1,1);//white
-	roundtrip.draw(roundtrip.times,&dsp->graphics2d);
+	roundtrip.draw(roundtrip.times,&perspective.graphics2d);
 	int size=stepData.size();
 	for(int i=0;i<size;i++)
 	{
@@ -377,7 +377,7 @@ void PerformanceMeter::draw(const SimClock::time_point& draw_time, Frustum * vie
 		case 5: R = 1;        B = X; break; // [5, 6)
 		}
 		glColor3f(R,G,B);
-		stepData[i].draw(roundtrip.times,&dsp->graphics2d);
+		stepData[i].draw(roundtrip.times,&perspective.graphics2d);
 	}
 	glPopMatrix();
 }

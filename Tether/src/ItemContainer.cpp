@@ -7,11 +7,11 @@
  */
 
 #include "ItemContainer.h"
-#include "TickServiceProvider.h"
-#include "DrawServiceProvider.h"
 #include "EventMapper.hpp"
 #include "Graphics2D.h"
+#include "Perspective.hpp"
 #include "ShortNames.h"
+#include "TickServiceProvider.h"
 #include "WarnErrReporter.h"
 #include <iostream>
 
@@ -87,15 +87,17 @@ void ItemContainer::insertR(Item* it)
 	}
 }
 
-
-void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
+void ItemContainer::draw(	const SimClock::time_point& t,
+						 	Frustum* viewFrustum,
+							IWorld& iw,
+							Perspective& perspective		)
 {
 	std::cout<<"selected: "<<selected<<std::endl;
-	dsp->transformViewToGUI(0.75f);
-	subsection inventoryBounds=dsp->graphics2d.generateSubsection(0,0,1.8f,1.8f,SNAP_MID);
+	perspective.transformViewToGUI(0.75f);
+	subsection inventoryBounds = perspective.graphics2d.generateSubsection(0,0,1.8f,1.8f,SNAP_MID);
 	TRANSPARENT_SECTION_DO_LATER(0.75f)
 	{
-		dsp->graphics2d.setSubsection(&inventoryBounds);
+		perspective.graphics2d.setSubsection(&inventoryBounds);
 		glColor4f(0,0,0,0.75f);
 		glBegin(GL_TRIANGLE_FAN);
 		glVertex3f(-1, -1, 1);
@@ -104,14 +106,14 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 		glVertex3f(1, -1, 1);
 		glEnd();
 
-		dsp->graphics2d.resetLastSubsection();
-		dsp->revertView();
+		perspective.graphics2d.resetLastSubsection();
+		perspective.revertView();
 
-		dsp->transformViewToGUI(0.751f);
-		dsp->graphics2d.setSubsection(&inventoryBounds);
+		perspective.transformViewToGUI(0.751f);
+		perspective.graphics2d.setSubsection(&inventoryBounds);
 		int selectionOffset=selected-firstInList;
-		subsection selection=dsp->graphics2d.generateSubsection(0,-(selectionOffset+0.5f)*2.0f/maxListLen+1,2.0f,2.0f,SNAP_N);
-		dsp->graphics2d.setSubsection(&selection);
+		subsection selection=perspective.graphics2d.generateSubsection(0,-(selectionOffset+0.5f)*2.0f/maxListLen+1,2.0f,2.0f,SNAP_N);
+		perspective.graphics2d.setSubsection(&selection);
 
 		glColor4f(1,1,0.5f,0.2f);
 		glBegin(GL_TRIANGLE_FAN);
@@ -121,12 +123,12 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 		glVertex3f(1, -1.0f/maxListLen, 1);
 		glEnd();
 
-		dsp->graphics2d.resetAllSubsections();
-		dsp->revertView();
+		perspective.graphics2d.resetAllSubsections();
+		perspective.revertView();
 	}
 	OTHER_SECTION
 	{
-		dsp->transformViewToGUI(0.752f);
+		perspective.transformViewToGUI(0.752f);
 		u32 last=items.size();//actually last item index + 1
 		u32 maxListIndx=firstInList+maxListLen;//actually last item index + 1
 		maxListIndx=maxListIndx<last?maxListIndx:last;
@@ -134,7 +136,7 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 		float lineIncrement=-2.0f/maxListLen;
 		float curLine=firstLine;
 		glColor3f(1,1,1);
-		dsp->graphics2d.setSubsection(&inventoryBounds);
+		perspective.graphics2d.setSubsection(&inventoryBounds);
 		for(u32 i=firstInList;i<maxListIndx;i++)
 		{
 			Item * item=items[i];
@@ -142,13 +144,13 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 			else
 			{
 				curLine+=lineIncrement;
-				dsp->graphics2d.drawString(item->name,-0.95f,curLine,-lineIncrement);
+				perspective.graphics2d.drawString(item->name,-0.95f,curLine,-lineIncrement);
 			}
 		}
-		dsp->graphics2d.resetLastSubsection();
+		perspective.graphics2d.resetLastSubsection();
 	}
 
-	dsp->revertView();
+	perspective.revertView();
 }
 
 void ItemContainer::selectRelative( i64 select_add )

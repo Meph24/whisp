@@ -35,7 +35,7 @@ public:
 	void draw(	const SimClock::time_point& ts, 
 						Frustum* viewFrustum, 
 						IWorld& iw,
-						DrawServiceProvider* dsp
+						Perspective& perspective
 					 );
 
 	void tick(	const SimClock::time_point& t,
@@ -47,9 +47,7 @@ public:
 	vector<Model::ConvexPart> convexParts() const;
 
 	vector<Vertex> vertices (microseconds tick_time);
-
 	vector<EdgeRef> edges() const;
-
 	vector<FaceRef> faces() const;
 
 	void react(microseconds tick_time);

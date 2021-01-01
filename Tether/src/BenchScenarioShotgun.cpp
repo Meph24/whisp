@@ -94,7 +94,7 @@ void BenchScenarioShotgun::spawnEntities(IWorld* w)
 
 		AABB bb(w->fromMeters(positionVec1));
 		bb.extend(w->fromMeters(positionVec2));
-		BenchEntityMaster * e=new BenchEntityMaster(bb);
+		BenchEntityMaster * e = new BenchEntityMaster(bb);
 		//test.registerEntity(e);
 		w->requestEntitySpawn(e);
 	}

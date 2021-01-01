@@ -34,7 +34,7 @@ public:
 
 	EntityProjectileBulletLike(BulletLikeSource * origin,BulletLikeType t, const SimClock::time_point& spawn_time, spacevec position,spacevec velocity);//gives item ownership to the Projectile
 	~EntityProjectileBulletLike();
-	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw, Perspective& perspective);
 	virtual void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
 
 	bool collide(HittableBulletLike * hittable,ProjectileCollision collision,TickServiceProvider* tsp);//return if projectile continues to fly

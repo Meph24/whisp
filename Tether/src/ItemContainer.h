@@ -36,7 +36,7 @@ public:
 	void selectRelative( i64 select_add );
 
 	virtual Item * newClone();
-	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);//when held by player: must draw GUI and/or the physical item
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,Perspective& perspective);//when held by player: must draw GUI and/or the physical item
 	virtual void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
 
 	ItemContainer();

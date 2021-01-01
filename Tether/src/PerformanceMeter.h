@@ -99,7 +99,7 @@ public:
 	int getStepCount();
 
 	//draws graph of all time information
-	void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum, IWorld& iw, Perspective& perspective);
 
 	//reset the timer to 0
 	void resetTimer();

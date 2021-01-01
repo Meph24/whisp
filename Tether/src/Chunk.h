@@ -44,8 +44,8 @@ public:
 	AABB bb;
 	void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
 	spacelen getHeight(float x,float z);//coordinates inside chunk
-	void render(int lod,spacevec camOffset, DrawServiceProvider* dsp);//TODO replace
-	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void render(int lod,spacevec camOffset, Perspective& perspective);//TODO replace
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw, Perspective& perspective);
 	void clearEntities();
 
 	Chunk(spacevec basePos,int baseSize,ChunkManager * cm);//from xStart,yStart to xStart+size,yStart+size; this means chunks overlap by 1

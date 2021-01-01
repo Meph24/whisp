@@ -1,37 +1,28 @@
-/*
- * EntityPlayer.cpp
- *
- *  Created on:	Apr 16, 2018
- *      Author:	HL65536
- *     Version:	2.0
- */
-
-#include <GL/glew.h>
 #include "EntityPlayer.h"
 
+#include <GL/glew.h>
 #include "glmutils.hpp"
-using glm::vec3;
 
-#include "faction.h"
-#include "Frustum.h"
-#include "SpeedMod.h"
-#include "TopLevelInventory.h"
-#include "ItemDummy.h"
 #include "CameraTP.h"
-#include "HittableBulletLike.h"
-#include "TickServiceProvider.h"
 #include "ChunkManager.h"
-#include "EventMapper.hpp"
-#include "Frustum.h"
-#include "DrawServiceProvider.h"
-#include "Zombie_Gun.h"
-#include "Graphics2D.h"
-#include "ItemAmmo.h"
-#include "InteractFilterAlgoSym.h"
-#include "FloatSeconds.hpp"
 #include "drawUtils.hpp"
 #include "EventDefines.h"
+#include "EventMapper.hpp"
+#include "faction.h"
+#include "FloatSeconds.hpp"
+#include "Frustum.h"
+#include "Graphics2D.h"
+#include "HittableBulletLike.h"
+#include "ItemDummy.h"
+#include "ItemAmmo.h"
+#include "InteractFilterAlgoSym.h"
+#include "Perspective.hpp"
+#include "SpeedMod.h"
+#include "TickServiceProvider.h"
+#include "TopLevelInventory.h"
+#include "Zombie_Gun.h"
 
+using glm::vec3;
 
 EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 							spacevec startPos,
@@ -85,7 +76,7 @@ void EntityPlayer::selectWeapon(size_t selection)
 	current_gun = guns[selection%guns.size()].get();
 }
 
-void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw, DrawServiceProvider* dsp)
+void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw, Perspective& perspective)
 {
 	glPushMatrix();
 
@@ -98,7 +89,7 @@ void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWor
 	player_model.drawHere();	
 	glPopMatrix();
 
-	if(held_item) held_item->draw(t,viewFrustum,iw,dsp);
+	if(held_item) held_item->draw(t, viewFrustum, iw, perspective);
 }
 
 void EntityPlayer::setUser(User* user){ user_ = user; }

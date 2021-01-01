@@ -9,24 +9,20 @@
 #ifndef SRC_ENTITY_H_
 #define SRC_ENTITY_H_
 
-#include "Tickable.h"
-#include "Drawable.h"
-
-#include "AABB.h"
-#include "Spacevec.h"
-#include "SimClock.hpp"
-
-class TickServiceProvider;
-class Frustum;
-class ChunkManager;
-class DrawServiceProvider;
-class IWorld;
-class IgnoreCondition;
-
 #include <vector>
 
+#include "AABB.h"
+#include "Drawable.h"
+#include "Spacevec.h"
+#include "SimClock.hpp"
+#include "Tickable.h"
 
-//#include "EntityIdent.h"
+class ChunkManager;
+class DrawServiceProvider;
+class Frustum;
+class IgnoreCondition;
+class IWorld;
+class TickServiceProvider;
 
 class Entity: public Tickable, Drawable
 {
@@ -68,7 +64,7 @@ public:
 	virtual void move(float time,ChunkManager * cm);
 */
 
-	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)=0;
+	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,Perspective& perspective)=0;
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
 	virtual void tick(const SimClock::time_point& next_tick_begin,TickServiceProvider * tsp)=0;

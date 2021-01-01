@@ -18,13 +18,8 @@ BenchEntityS::BenchEntityS(spacevec Size, spacevec Pos)
 	v.set0();
 }
 
-BenchEntityS::~BenchEntityS()
-{
-}
-
-void BenchEntityS::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
-{
-}
+BenchEntityS::~BenchEntityS(){}
+void BenchEntityS::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw, Perspective& perspective){}
 
 void BenchEntityS::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {

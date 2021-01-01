@@ -96,8 +96,8 @@ public:
 	//magic, do not use yourself:
 
 	void requestEntityMove(Entity * e);//do not call yourself, managed by chunks
-	void render(Frustum * viewFrustum, DrawServiceProvider* dsp);
-	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum, IWorld& iw, DrawServiceProvider * dsp);//TODO
+	void render(Frustum * viewFrustum, Perspective& perspective);
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum, IWorld& iw, Perspective& perspective);//TODO
 	void generateMissing(int count);
 	void applyEntityChunkChanges(TickServiceProvider& tsp);//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
 	void setMid(spacevec abs,TickServiceProvider * tsp);//absolute x,z

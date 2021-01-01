@@ -10,19 +10,16 @@ struct WorldTerrainDisplayer : public WorldDefault
     WorldTerrainDisplayer( float chunk_size, ChunkManager& cm )
         : WorldDefault( chunk_size )
         , cm( cm )
-    {
-
-    }
+    {}
 
     void draw(  const SimClock::time_point& draw_time, 
                 Frustum* viewFrustum, 
                 IWorld& iw,
-                DrawServiceProvider* dsp)
+                Perspective& perspective)
     {
-        WorldDefault::draw(draw_time, viewFrustum, iw, dsp);
-        cm.draw(draw_time, viewFrustum, iw, dsp);
-
-	    cm.render( viewFrustum, dsp );
+        WorldDefault::draw(draw_time, viewFrustum, iw, perspective);
+        cm.draw(draw_time, viewFrustum, iw, perspective);
+	    cm.render( viewFrustum, perspective );
     }
 };
 

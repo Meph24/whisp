@@ -77,7 +77,7 @@ public:
 
 	void changeTPdist(float amount);
 
-	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum, IWorld& iw, Perspective& perspective);
 	virtual void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
 	virtual void push(spacevec amount, TickServiceProvider& tsp);
 	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);

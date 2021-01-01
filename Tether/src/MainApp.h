@@ -1,17 +1,16 @@
 #pragma once
 
-#include <string>
-#include <stdexcept>
-
-#include "User.hpp"
 #include <memory>
-#include "WallClock.hpp"
-#include "SFMLClock.hpp"
-
-using std::unique_ptr;
+#include <stdexcept>
+#include <string>
 
 #include "commandline.hpp"
 #include "GraphicsRessources.hpp"
+#include "SFMLClock.hpp"
+#include "User.hpp"
+#include "WallClock.hpp"
+
+using std::unique_ptr;
 
 struct App
 {

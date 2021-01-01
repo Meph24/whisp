@@ -11,7 +11,7 @@
 #include "Cfg.hpp"
 #include "ChunkManager.h"
 #include "Chunk.h"
-#include "DrawServiceProvider.h"
+#include "Perspective.hpp"
 #include "Entity.h"
 #include "Frustum.h"
 #include "InteractionManager.h"
@@ -69,7 +69,7 @@ spacelen ChunkManager::getHeight(spacevec abs)
 	else return fromMeters(defaultHeight*1.0f);
 }
 
-void ChunkManager::render(Frustum * viewFrustum, DrawServiceProvider* dsp)
+void ChunkManager::render(Frustum * viewFrustum, Perspective& perspective)
 {
 	spacevec camOffset=viewFrustum->observerPos;
 
@@ -87,7 +87,7 @@ void ChunkManager::render(Frustum * viewFrustum, DrawServiceProvider* dsp)
 	int midX=(startX+stopX)/2;
 	int midZ=(startZ+stopZ)/2;
 
-	dsp->graphics_ressources.grass->bind();
+	perspective.graphics_ressources.grass->bind();
 
 	for(int runz = startZ ; runz<stopZ ; runz++)
 	{
@@ -113,7 +113,7 @@ void ChunkManager::render(Frustum * viewFrustum, DrawServiceProvider* dsp)
 				{
 					if((lod*2)<=i) lod*=2;
 				}
-				chunks[indx]->render(lod, camOffset, dsp);
+				chunks[indx]->render(lod, camOffset, perspective);
 			}
 		}
 	}
@@ -545,7 +545,7 @@ chunkSearchResult ChunkManager::smartSearch(Entity* e, spacevec pos)
 	return chunkSearch(e,ret.chunkIndex);
 }
 
-void ChunkManager::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
+void ChunkManager::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum,IWorld& iw, Perspective& perspective)
 {
 	int startX=chunksPerAxis/2-renderDistanceChunks;
 	int startZ=chunksPerAxis/2-renderDistanceChunks;
@@ -563,7 +563,7 @@ void ChunkManager::draw(const SimClock::time_point& draw_time, Frustum* viewFrus
 			int indx=runz*chunksPerAxis+runx;
 			if(chunks[indx])
 			{
-				chunks[indx]->draw(draw_time,viewFrustum,iw,dsp);
+				chunks[indx]->draw(draw_time,viewFrustum,iw,perspective);
 			}
 		}
 	}

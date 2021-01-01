@@ -17,11 +17,11 @@ IGameMode::IGameMode(const WallClock& reference_clock, Cfg& cfg)
 	, pmLogic(1s, 8s)
 {}
 
-unique_ptr<DrawServiceProvider> IGameMode::getPerspective( User* user )
+unique_ptr<Perspective> IGameMode::getPerspective( User* user )
 {
 	if( players.find(user) == players.end() ) return nullptr;
 
-	return std::make_unique<DrawServiceProvider>( &user->window->getSFWindow(), players[user].get(), this );
+	return std::make_unique<Perspective>( &user->window->getSFWindow(), players[user].get(), this );
 }
 
 void IGameMode::onRegisterUser( User* ){}

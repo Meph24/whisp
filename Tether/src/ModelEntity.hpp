@@ -34,7 +34,7 @@ public:
 	virtual void draw(	const SimClock::time_point& draw_time,
 						Frustum* viewFrustum, 
 						IWorld& iw,
-						DrawServiceProvider* dsp
+						Perspective& perspective
 					 );
 
 	/**
@@ -58,11 +58,8 @@ public:
 	//ColliderInterface
 	
 	vector<Model::ConvexPart> convexParts() const;
-	
 	vector<Vertex> vertices (float tick_time) const;
-
 	vector<EdgeRef> edges(float tick_time) const;
-
 	vector<FaceRef> faces(float tick_time) const;
 };
 

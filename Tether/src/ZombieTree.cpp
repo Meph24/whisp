@@ -12,7 +12,7 @@
 #include "ITexture.h"
 #include "Frustum.h"
 #include "FloatSeconds.hpp"
-#include "DrawServiceProvider.h"
+#include "Perspective.hpp"
 
 #include <GL/glew.h>
 
@@ -86,7 +86,7 @@ void Zombie_Tree::drawLeaves()
 	glEnd();
 }
 
-void Zombie_Tree::draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
+void Zombie_Tree::draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw, Perspective& perspective)
 {
 	float tickOffset = (float) FloatSeconds ( draw_time - last_ticked );
 
@@ -98,7 +98,7 @@ void Zombie_Tree::draw(const SimClock::time_point& draw_time,Frustum * viewFrust
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
 	vec3 interPosMeters=iw.toMeters(interPos);
 
-	ITexture* tex1 = dsp->graphics_ressources.tree.get();
+	ITexture* tex1 = perspective.graphics_ressources.tree.get();
 	tex1->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
@@ -112,7 +112,7 @@ void Zombie_Tree::draw(const SimClock::time_point& draw_time,Frustum * viewFrust
 
 	glDisable(GL_TEXTURE_2D);
 
-	ITexture* tex2 = dsp->graphics_ressources.leaves.get();
+	ITexture* tex2 = perspective.graphics_ressources.leaves.get();
 	tex2->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);

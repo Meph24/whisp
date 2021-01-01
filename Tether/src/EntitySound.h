@@ -16,7 +16,7 @@ class EntitySound: public Entity
 	sf::Sound sound;
 	bool playSoon;
 public:
-	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw, Perspective& perspective);
 
 	virtual void tick(const SimClock::time_point& t,TickServiceProvider * tsp);
 

@@ -48,7 +48,7 @@ void EntitySound::notifyRemoval(Entity* e)
 	v=e->v;
 }
 
-void EntitySound::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum,IWorld& iw,DrawServiceProvider* dsp)
+void EntitySound::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum,IWorld& iw, Perspective& perspective)
 {
 	float tickOffset=(float) FloatSeconds(draw_time-last_ticked);
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;

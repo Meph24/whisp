@@ -62,7 +62,7 @@ public:
 	Zombie_Enemy(const SimClock::time_point& spawnTime,spacevec startPos,TickServiceProvider * tsp);
 	~Zombie_Enemy();
 
-	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw, Perspective& perspective);
 	virtual void tick(const SimClock::time_point& next_tick_time,TickServiceProvider * tsp);
 
 	void checkProjectile(EntityProjectileBulletLike * projectile,TickServiceProvider& tsp);

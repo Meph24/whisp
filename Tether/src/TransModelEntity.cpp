@@ -45,7 +45,7 @@ AABB TransModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)
 void TransModelEntity::draw(	const SimClock::time_point& ts, 
 						Frustum* viewFrustum, 
 						IWorld& iw,
-						DrawServiceProvider* dsp
+						Perspective& perspective
 					 )
 {
 	float tickOffset = (double)FloatSeconds(ts-last_ticked);

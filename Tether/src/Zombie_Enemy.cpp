@@ -5,7 +5,7 @@
 
 #include "Chunk.h"
 #include "ChunkManager.h"
-#include "DrawServiceProvider.h"
+#include "Perspective.hpp"
 #include "EntityProjectileBulletLike.h"
 #include "EntitySound.h"
 #include "FloatSeconds.hpp"
@@ -244,7 +244,7 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 	glPopMatrix();
 }
 #include <iostream>
-void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
+void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFrustum,IWorld& iw,Perspective& perspective)
 {
 	float tickOffset=(float) FloatSeconds(draw_time-last_ticked);
 	if(!viewFrustum->inside(bb,iw))
@@ -267,7 +267,7 @@ void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFru
 	glRotatef(facing, 0, 1, 0);
 	glRotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
 	glScalef(size, size, size);
-	dsp->graphics_ressources.zombieTex->bind();
+	perspective.graphics_ressources.zombieTex->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
 

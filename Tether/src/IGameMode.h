@@ -41,7 +41,7 @@ public:
 	virtual void init()=0;
 	virtual void step()=0;
 
-	unique_ptr<DrawServiceProvider> getPerspective( User* user );
+	unique_ptr<Perspective> getPerspective( User* user );
 
 	void registerUser(User* new_user);
 	virtual void onRegisterUser( User* );

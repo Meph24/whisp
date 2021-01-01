@@ -34,7 +34,7 @@ BenchEntitySlave::~BenchEntitySlave()
 {
 }
 
-void BenchEntitySlave::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+void BenchEntitySlave::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
 {
 }
 void BenchEntitySlave::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)

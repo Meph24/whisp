@@ -6,13 +6,14 @@
  *     Version:	2.0
  */
 
-#include "AABB.h"
-#include "Frustum.h"
-#include "ChunkManager.h"
-#include "ICamera3D.h"
-#include "DrawServiceProvider.h"
 #include <GL/glew.h>
+
+#include "AABB.h"
+#include "ChunkManager.h"
+#include "Frustum.h"
 #include "glmutils.hpp"
+#include "ICamera3D.h"
+#include "Perspective.hpp"
 
 u64 AABB::intersectionCounter=0;
 u64 AABB::checkCounter=0;
@@ -82,7 +83,7 @@ bool AABB::isMultichunk()
 	return (low.x.intpart!=high.x.intpart)||(low.y.intpart!=high.y.intpart)||(low.z.intpart!=high.z.intpart);
 }
 
-void AABB::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+void AABB::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
 {
 	if(!viewFrustum->inside(*(this),iw)) return;
 	float widthOnScreen=1.0f/1024;//apparent size on the screen
@@ -94,7 +95,7 @@ void AABB::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWo
 	spacevec interPos=mid-viewFrustum->observerPos;
 	vec3 interPosMeters=iw.toMeters(interPos);
 
-	float dist=glm::length(interPosMeters-dsp->getCamPos());
+	float dist=glm::length(interPosMeters - perspective.getCamPos());
 
 	float width=widthOnScreen*dist;
 	vec3 distMax=iw.toMeters(sizeHalf);

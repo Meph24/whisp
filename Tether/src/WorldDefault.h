@@ -22,7 +22,7 @@ public:
 
 	void requestEntitySpawn(Entity * e);
 	void clearEntities();
-	void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw, Perspective& perspective);
 	void tick(const SimClock::time_point& next_tick_begin,TickServiceProvider* tsp);
 	void postTick(TickServiceProvider& tsp);
 };

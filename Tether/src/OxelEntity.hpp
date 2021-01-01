@@ -78,7 +78,7 @@ public:
 	void draw(	const SimClock::time_point& ts, 
 						Frustum* viewFrustum, 
 						IWorld& iw,
-						DrawServiceProvider* dsp
+						Perspective& perspective
 					 )
     {            
         float tickOffset = (float)FloatSeconds(ts-last_ticked);

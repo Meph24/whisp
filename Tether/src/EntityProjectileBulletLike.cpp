@@ -8,6 +8,10 @@
 
 #include "EntityProjectileBulletLike.h"
 
+
+#include <iostream>
+#include "WarnErrReporter.h"
+
 #include "TickServiceProvider.h"
 #include "Zombie_Enemy.h"
 #include "TextureDummy.h"
@@ -39,7 +43,7 @@ EntityProjectileBulletLike::~EntityProjectileBulletLike()
 //	delete fromItem;
 }
 
-void EntityProjectileBulletLike::draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp)
+void EntityProjectileBulletLike::draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw, Perspective& perspective)
 {
 	float tickOffset=(float)FloatSeconds(draw_time - last_ticked);
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;//TODO frustum culling?
@@ -96,6 +100,7 @@ void EntityProjectileBulletLike::draw(const SimClock::time_point& draw_time,Frus
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 }
+
 void EntityProjectileBulletLike::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	IWorld * iw=&tsp->world();
@@ -126,8 +131,6 @@ void EntityProjectileBulletLike::tick(const SimClock::time_point& next_tick_begi
 	iw->projectileAlgo->doChecks((Projectile *)this, (Entity *)this,time,*tsp);
 
 }
-#include <iostream>
-#include "WarnErrReporter.h"
 bool EntityProjectileBulletLike::collide(HittableBulletLike* hittable,ProjectileCollision collision,TickServiceProvider* tsp)
 {
 

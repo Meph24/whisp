@@ -6,11 +6,18 @@
  *     Version:	2.0
  */
 
+#include <iostream>
+#include <cmath>
+
+#include "noise/noise.h"
+
 #include "Chunk.h"
-#include "DrawServiceProvider.h"
+#include "Perspective.hpp"
 #include "ChunkManager.h"
 #include "InteractionManager.h"
 #include "Entity.h"
+
+using namespace noise;
 
 spacelen Chunk::getHeight(float xh, float zh)
 {
@@ -31,9 +38,7 @@ spacelen Chunk::getHeight(float xh, float zh)
 
 	return parent->fromMeters((innerX*h10+(1-innerX)*h00)*(1-innerY)+(innerX*h11+(1-innerX)*h01)*innerY);
 }
-#include <iostream>
-#include <cmath>
-void Chunk::render(int lod, spacevec camOffset, DrawServiceProvider* dsp)//TODO draw entities
+void Chunk::render(int lod, spacevec camOffset, Perspective& perspective)//TODO draw entities
 {
 	//std::cout<<"rendering x="<<x<<" y="<<y<<std::endl;
 	vec3 relpos=parent->toMeters(base-camOffset);
@@ -124,8 +129,6 @@ void Chunk::render(int lod, spacevec camOffset, DrawServiceProvider* dsp)//TODO 
 		}
 	}
 }
-#include "noise/noise.h"
-using namespace noise;
 
 Chunk::Chunk(spacevec basePos,int baseSize,ChunkManager * cm):
 base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
@@ -220,15 +223,15 @@ void Chunk::tick(const SimClock::time_point& next_tick_end, TickServiceProvider*
 	}
 }
 
-void Chunk::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+void Chunk::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
 {
 	int size=managedEntities.size();
 	for(int i=0;i<size;i++)
 	{
 		if(managedEntities[i]->exists)
 		{
-			managedEntities[i]->draw(draw_time, viewFrustum, iw, dsp);
-			if(dsp->enable_aabbs) managedEntities[i]->bb.draw(draw_time, viewFrustum, iw, dsp);
+			managedEntities[i]->draw(draw_time, viewFrustum, iw, perspective);
+			if(perspective.enable_aabbs) managedEntities[i]->bb.draw(draw_time, viewFrustum, iw, perspective);
 		}
 	}
 }

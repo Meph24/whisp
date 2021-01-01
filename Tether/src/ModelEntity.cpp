@@ -49,7 +49,7 @@ void ModelEntity::draw(
 					const SimClock::time_point& draw_time,
 					Frustum* viewFrustum,
 					IWorld& iw,
-					DrawServiceProvider* dsp
+					Perspective& perspective
 				 )
 {
 	float tickOffset = (float) FloatSeconds(draw_time-last_ticked);

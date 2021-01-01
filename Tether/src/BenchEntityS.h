@@ -18,7 +18,7 @@ public:
 	BenchEntityS(spacevec Size, spacevec Pos);
 	virtual ~BenchEntityS();
 
-	void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
+	void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum,IWorld& iw,Perspective&);
 	void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
 };
 

@@ -9,12 +9,11 @@
 #include "WorldDefault.h"
 
 #include "Entity.h"
-#include "DrawServiceProvider.h"
+#include "Perspective.hpp"
 
-WorldDefault::WorldDefault(float GridSize):
-IWorld(GridSize)
-{
-}
+WorldDefault::WorldDefault(float GridSize)
+	: IWorld(GridSize)
+{}
 
 WorldDefault::~WorldDefault()
 {
@@ -82,15 +81,15 @@ void WorldDefault::postTick(TickServiceProvider& tsp)
 	}
 }
 
-void WorldDefault::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
+void WorldDefault::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
 {
 	for(Entity * e: managedEntities)
 	{
-		e->draw(draw_time, viewFrustum,iw,dsp);
-		if(dsp->enable_aabbs)
+		e->draw(draw_time, viewFrustum,iw,perspective);
+		if(perspective.enable_aabbs)
 		{
 			glColor3f(e->bbColor.r,e->bbColor.g,e->bbColor.b);
-			e->bb.draw(draw_time, viewFrustum,iw,dsp);
+			e->bb.draw(draw_time, viewFrustum,iw,perspective);
 		}
 	}
 }

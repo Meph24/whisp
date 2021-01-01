@@ -16,7 +16,7 @@
 #include "Window.hpp"
 #include "SFMLWindow.hpp"
 #include "InputDeviceConfigurator.hpp"
-#include "DrawServiceProvider.h"
+#include "Perspective.hpp"
 
 #include <utility>
 
@@ -34,7 +34,7 @@ public:
 	string name;
 	Window* window;
 	IGameMode* simulation;
-	unique_ptr<DrawServiceProvider> perspective;
+	unique_ptr<Perspective> perspective;
 
 	SimulationInputStatusSet input_status;
 

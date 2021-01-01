@@ -34,9 +34,7 @@ BenchEntityMaster::~BenchEntityMaster()
 {
 }
 
-void BenchEntityMaster::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw,DrawServiceProvider* dsp)
-{
-}
+void BenchEntityMaster::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw, Perspective& perspective){}
 
 void BenchEntityMaster::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
