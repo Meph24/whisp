@@ -11,6 +11,7 @@
 using std::unique_ptr;
 
 #include "commandline.hpp"
+#include "GraphicsRessources.hpp"
 
 struct App
 {
@@ -24,6 +25,7 @@ struct DefaultApp : public App
 
 	unique_ptr<IGameMode> sim;
 	LocalUser op;
+
 
 	DefaultApp( WallClock& wallclock, Cfg& cfg );
 	void run();

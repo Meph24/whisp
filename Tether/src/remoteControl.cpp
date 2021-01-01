@@ -7,16 +7,26 @@
 
 #include <iostream>
 
+using std::cout;
+
 void RemoteControlReceiverUser::operateSimulation(IGameMode* simulation) 
-{ 
-    managed_status = simulation->input_status.get();
+{
+	if(!simulation) return;
+
+	this->simulation = simulation;
+	simulation->registerUser(this);
 }
 
-void RemoteControlReceiverUser::disconnectSimulation(){ managed_status = nullptr; }
+void RemoteControlReceiverUser::disconnectSimulation()
+{
+	if(!this->simulation) return;
+
+	simulation->kickUser(this);
+	simulation = nullptr;
+}
 
 void RemoteControlReceiverUser::pollEvents() 
 { 
-    if(!managed_status) return;
     sf::IpAddress addr; Port port;
     size_t this_received = 1;
     char * data = (char*)&current_receive + received;
@@ -28,9 +38,9 @@ void RemoteControlReceiverUser::pollEvents()
         received += this_received;
         if(received == sizeof(SimulationInputStatusSet))
         {
-            if(managed_status->timestamp < current_receive.timestamp)
+            if(input_status.timestamp < current_receive.timestamp)
             {
-                *managed_status = current_receive;
+                input_status = current_receive;
             }
             received = 0;
         }
@@ -60,12 +70,12 @@ RemoteControlReceiverApp::RemoteControlReceiverApp(WallClock& wallclock, Cfg& cf
 	int zombie_mode = *cfg.getInt("test", "zombie_mode");
 	if(zombie_mode) 
 	{
-		sim = std::make_unique<Zombie_World>(wallclock, &op.window->getSFWindow());
-		sim->input_status->clip = true;
+		sim = std::make_unique<Zombie_World>(wallclock, cfg);
+		op.input_status.clip = true;
 	}
 	else 
 	{
-		sim = std::make_unique<Simulation_World>(wallclock, &op.window->getSFWindow());
+		sim = std::make_unique<Simulation_World>(wallclock, cfg);
 	}
 	op.operateSimulation( sim.get() );
 }
@@ -101,10 +111,9 @@ void RemoteControlReceiverApp::run()
 	while (op.window->isOpen())
 	{
 		//render
-		sim->loop();
+		sim->step();
 
-		op.render();
-		sim->doGraphics(sim->clock.now());
+		op.draw();
 		op.display();
 
 		//handle events
@@ -144,7 +153,6 @@ RemoteControlReceiverUser::RemoteControlReceiverUser(
 	 std::string name, int reswidth, int resheight, Port try_port
 	)
 	: User (name + string(" - remote controlled receiver"), reswidth, resheight)
-	, managed_status(nullptr)
 	, sfmlwindow( reswidth, resheight, name, sf::Style::None, contextSettings )
 	, received(0)
 {
@@ -157,9 +165,7 @@ RemoteControlReceiverUser::RemoteControlReceiverUser(
 
 vec2 RemoteControlSender::turnSensitivity() const
 {
-		float modifier = 1.0f;
-		if( event_mapper.managed_stati->zoom ) modifier = 1.0f / 8; 
-		return turn_sensitivity * modifier; 
+		return turn_sensitivity; 
 }
 
 
@@ -173,8 +179,6 @@ void RemoteControlSender::operateRemote()
 {
 	namespace Act = eventmapping::actions;
 	namespace Cond = eventmapping::conditions;
-
-	SimulationInputStatusSet& input_status = status_set;
 
 	event_mapper.registerMapping(
 		EVENT_ID_KEY_W, 
@@ -200,7 +204,6 @@ void RemoteControlSender::operateRemote()
 		EVENT_ID_KEY_CTRL,
 		Act::Combinate(&input_status.walk.y, -1.0)
 	);
-
 	event_mapper.registerMapping(
 		EVENT_ID_KEY_F3,
 		Act::Toggle(&input_status.debug_screen_active)
@@ -244,10 +247,7 @@ void RemoteControlSender::operateRemote()
 		EVENT_ID_KEY_P,
 		Act::Toggle(&input_status.pause)
 	);
-	event_mapper.registerMapping(
-		EVENT_ID_MOUSE_RMB,
-		Act::Toggle(&input_status.zoom)
-	);
+
 	event_mapper.registerMapping(
 		EVENT_ID_MOUSE_WHEEL,
 		Act::AccumulateValue<Index<8>>(&input_status.weapon_selection)
@@ -259,11 +259,6 @@ void RemoteControlSender::operateRemote()
 	event_mapper.registerMapping(
 		EVENT_ID_KEY_C,
 		Act::Toggle(&input_status.clip)
-	);
-	event_mapper.registerMapping(
-		EVENT_ID_KEY_V,
-		Act::Toggle(&input_status.verbose),
-		Cond::keyPressed
 	);
 
 	auto& container = mouse_mode_mappings[ InputDeviceConfigurator::MouseMode::diff ];
@@ -285,8 +280,8 @@ void RemoteControlSender::sync()
 { 
 	auto ts = clock.now();
 	if(ts - last_synced < 20ms) return;
-	status_set.timestamp = ts.time_since_epoch().count(); 
-	udpsocket.send( &status_set, sizeof(SimulationInputStatusSet), sf::IpAddress((uint32_t)receiver_addr), receiver_port );
+	input_status.timestamp = ts.time_since_epoch().count(); 
+	udpsocket.send( &input_status, sizeof(SimulationInputStatusSet), sf::IpAddress((uint32_t)receiver_addr), receiver_port );
 	last_synced = ts;
 }
 
@@ -338,7 +333,7 @@ RemoteControlSender::RemoteControlSender( WallClock& wallclock, Cfg& cfg )
 	: InputDeviceConfigurator(cfg)
 	, clock(wallclock)
 	, window( 200, 200, string("remote control device") , sf::Style::None, sf::ContextSettings())
-	, event_mapper( status_set )
+	, event_mapper( input_status )
 	, event_source( &window )
 	, mousemode(MouseMode::pointer)
 	, last_synced(clock.now())

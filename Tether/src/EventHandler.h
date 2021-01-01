@@ -1,13 +1,14 @@
-#pragma once
 
-
-#include "IGameMode.h"
+#ifndef EVENTHANDLER_H
+#define EVENTHANDLER_H
 
 /*
 //	Space for the lowerID parts
 */
 #define EVENTHANDLER_LOWID_BITS 10
 
+class IGameMode;
+class EventMapper;
 
 class EventHandler
 {
@@ -83,3 +84,4 @@ public:
 
 };
 
+#endif // EVENTHANDLER_H

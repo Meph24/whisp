@@ -39,10 +39,11 @@ class BenchmarkManager: public Tickable
 
 	SignalCounter prev_benchmark_signal = 0;
 
+
 	void nextPhase();
-	 void nextAlgo();
-	  void nextScenario();
-	   void nextParam();
+	void nextAlgo();
+	void nextScenario();
+	void nextParam();
 
 	void evaluateData(TickServiceProvider * tsp);
 
@@ -73,7 +74,12 @@ class BenchmarkManager: public Tickable
 	void addSymAlgo(InteractFilterAlgoSym<BenchSym>* algo, std::string name);
 
 	float lastTimeSeconds=0;
+
+	bool benchmark_request = false;
 public:
+
+	void requestBenchmark();
+
 	unsigned int repeats=5;//how often is the same experiment repeated
 
 	void tick(const SimClock::time_point& next_tick_begin,TickServiceProvider * tsp);//call before ticks, when it is safe to modify required values

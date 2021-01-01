@@ -6,16 +6,29 @@
  *     Version:	1.0
  */
 
+#include <iostream>
+
+#include "Cfg.hpp"
 #include "ChunkManager.h"
 #include "Chunk.h"
+#include "DrawServiceProvider.h"
 #include "Entity.h"
+#include "Frustum.h"
 #include "InteractionManager.h"
 #include "LockChunk.h"
-#include "Frustum.h"
+#include "WarnErrReporter.h"
 
-
-ChunkManager::ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks, int chunksPerLockchunk,int ChunkLoadRate):
-IWorld(ChunkSize),ITerrain((IWorld *) this),chunkLoadRate(ChunkLoadRate),chunksPerAxis(ChunksPerAxis),renderDistanceChunks(RenderDistanceChunks)
+ChunkManager::ChunkManager(	Cfg& cfg, 
+							int ChunkSize, int ChunksPerAxis,
+							int RenderDistanceChunks, 
+							int chunksPerLockchunk,
+							int ChunkLoadRate)
+	: IWorld(ChunkSize)
+	, ITerrain((IWorld *) this)
+	, chunkLoadRate(ChunkLoadRate)
+	, chunksPerAxis(ChunksPerAxis)
+	, renderDistanceChunks(RenderDistanceChunks)
+	, lodQuality(*cfg.getFlt("graphics", "terrainQuality"))
 {
 	std::cout<<"(IWorld *) this: "<<(IWorld *)this<<std::endl;
 	lockChunkSizeX=1;
@@ -56,8 +69,7 @@ spacelen ChunkManager::getHeight(spacevec abs)
 	else return fromMeters(defaultHeight*1.0f);
 }
 
-#include <iostream>
-void ChunkManager::render(float lodQ,Frustum * viewFrustum)
+void ChunkManager::render(Frustum * viewFrustum, DrawServiceProvider* dsp)
 {
 	spacevec camOffset=viewFrustum->observerPos;
 
@@ -74,6 +86,8 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum)
 	if(stopZ>chunksPerAxis) stopZ=chunksPerAxis;
 	int midX=(startX+stopX)/2;
 	int midZ=(startZ+stopZ)/2;
+
+	dsp->graphics_ressources.grass->bind();
 
 	for(int runz = startZ ; runz<stopZ ; runz++)
 	{
@@ -93,13 +107,13 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum)
 				if(distZ>distX) dist=distZ;
 				int lod=1;
 				if(dist==0) dist=0.5;
-				dist/=lodQ;
+				dist/=lodQuality;
 				if(dist>gridSize) dist=gridSize;
 				for(int i=1;i<=dist;i++)
 				{
 					if((lod*2)<=i) lod*=2;
 				}
-				chunks[indx]->render(lod, camOffset);
+				chunks[indx]->render(lod, camOffset, dsp);
 			}
 		}
 	}
@@ -107,7 +121,6 @@ void ChunkManager::render(float lodQ,Frustum * viewFrustum)
 	glPopMatrix();
 }
 
-#include "WarnErrReporter.h"
 void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 {
 	gridInt midChunkCoo=chunksPerAxis/2;
@@ -208,7 +221,6 @@ void ChunkManager::generateMissing(int count)
 		if(tryCreateChunk(xrun,zrun)) if(!(--count)) return;
 	}
 }
-
 
 void ChunkManager::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
@@ -378,7 +390,6 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 }
 
 
-#include "WarnErrReporter.h"
 void ChunkManager::applyEntityChunkChanges(TickServiceProvider& tsp)
 {
 	int size=addVec.size();

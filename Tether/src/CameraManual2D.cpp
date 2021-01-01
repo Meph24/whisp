@@ -7,17 +7,15 @@
  */
 
 #include "CameraManual2D.h"
+#include <glm/vec3.hpp>
 
-CameraManual2D::CameraManual2D(int resX,int resY)//:
-//width(resX),height(resY)
+using glm::vec3;
+
+CameraManual2D::CameraManual2D(int resX,int resY, Eye& eye)
+	: ICamera2D(eye)
 {
 	width=resX;
 	height=resY;
-}
-
-CameraManual2D::~CameraManual2D()
-{
-	// TODO Auto-generated destructor stub
 }
 
 void CameraManual2D::apply()
@@ -29,7 +27,7 @@ void CameraManual2D::apply()
 
 	/*
 	 * 0 genau in der Mitte eines Pixels
-	 * ->evtl verschiebung um einen halben Pixel nötig
+	 * ->evtl verschiebung um einen halben Pixel nï¿½tig
 	 *
 	 */
 	glTranslatef(pixelOffsetX/width,pixelOffsetY/height,0);//factor 2 eliminated from OpenGL (-1|1) and it being half a pixel
@@ -42,5 +40,6 @@ void CameraManual2D::apply()
 	{
 		glScalef(1/zoom,(width/height)/zoom,1);
 	}
-	glTranslatef(-posX, -posY, -posZ);
+	const vec3& pos = eye->offsetFromEntity();
+	glTranslatef(-pos.x, -pos.y, -pos.z);
 }

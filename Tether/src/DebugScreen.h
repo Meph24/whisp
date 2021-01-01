@@ -16,13 +16,12 @@ class PerformanceMeter;
 
 class DebugScreen
 {
-	Graphics2D ** g;
+	Graphics2D* g;
 	PerformanceMeter * pm;
 public:
 	float textSize;
-	DebugScreen(PerformanceMeter * p,Graphics2D ** gr);
+	DebugScreen(PerformanceMeter * p,Graphics2D* gr);
 	~DebugScreen();
-
 
 	int draw(float x,float y,float z,int lineOffset);
 };

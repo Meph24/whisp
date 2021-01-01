@@ -21,7 +21,6 @@ class ITerrain;
 
 #include <vector>
 #include <memory>
-#include "SimulationInputStatusSet.hpp"
 
 using std::unique_ptr;
 
@@ -32,16 +31,16 @@ class TickServiceProvider
 	std::vector<Retickable *> retickRequests;
 	SoundManager * sm;
 public:
-	volatile unsigned long long interactionCounter=0;//for benchmark purposes
-	volatile unsigned long long arbitraryNumber=0;//for benchmark purposes
+	volatile unsigned long long interactionCounter = 0;//for benchmark purposes
+	volatile unsigned long long arbitraryNumber = 0;//for benchmark purposes
 
-	unique_ptr<SimulationInputStatusSet> input_status;
+	int tickID = 0;
 
-	int tickID=0;
-	virtual ICamera3D * getHolderCamera()=0;//can return 0 if currently not held
-	virtual IWorld * getIWorld()=0;
-	virtual ITerrain * getITerrain()=0;
-	virtual Entity * getTarget(Entity * me)=0;
+	virtual IWorld& world() = 0;
+	virtual ITerrain* getITerrain() = 0;
+	
+	virtual Entity* getTarget( const Entity* ) = 0; //returns the target for an enemy
+
 	std::vector<InteractionManager *> * getInterManVector(unsigned int threadID=0);
 
 	//initializes the next tick, call once before ticking everyone
@@ -49,7 +48,6 @@ public:
 	void doReticks();
 	void requestRetick(Retickable * e);
 	SoundManager * getSoundManager();
-
 
 	TickServiceProvider();
 	virtual ~TickServiceProvider();

@@ -1,14 +1,13 @@
 #ifndef USER_HPP
 #     define USER_HPP
 
+#include <SFML/Window.hpp>
 #include "EventHandler.h"
 #include "EventMapper.hpp"
 #include "Buffer.h"
 #include "WallClock.hpp"
 
-#include <SFML/Window.hpp>
 
-#include "IGameMode.h"
 #include <memory>
 #include "Cfg.hpp"
 
@@ -17,6 +16,7 @@
 #include "Window.hpp"
 #include "SFMLWindow.hpp"
 #include "InputDeviceConfigurator.hpp"
+#include "DrawServiceProvider.h"
 
 #include <utility>
 
@@ -24,21 +24,26 @@ using glm::vec2;
 using std::pair;
 using std::unique_ptr;
 
+class IGameMode;
+
 class User
 {
 protected:
 	sf::ContextSettings contextSettings;
 public:
+	string name;
 	Window* window;
+	IGameMode* simulation;
+	unique_ptr<DrawServiceProvider> perspective;
 
-	User(	
-				std::string name, 
-				int reswidth, 
-				int resheight
-				);
+	SimulationInputStatusSet input_status;
 
+	User(	std::string name, 
+			int reswidth, 
+			int resheight
+			);
 
-	void render();
+	void draw();
 	void display();
 	void setContextToMyThread();
 	
@@ -75,6 +80,9 @@ public:
 				int reswidth, 
 				int resheight 
 	);
+
+	LocalUser(const LocalUser&) = delete;
+	LocalUser& operator=(const LocalUser&) = delete;
 };
 
 #endif /* USER_HPP */

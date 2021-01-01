@@ -17,7 +17,6 @@
 
 class ITerrain//: public Drawable
 {
-	//IWorld * w;
 	spacevec defaultGravity;
 public:
 	ITerrain(IWorld * world);

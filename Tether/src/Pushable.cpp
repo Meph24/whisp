@@ -19,7 +19,7 @@ using glm::vec3;
 
 void Pushable::interact(Entity * self,DualPointer<Pushable> other, float time, TickServiceProvider& tsp)
 {
-	IWorld * iw=tsp.getIWorld();
+	IWorld * iw=&tsp.world();
 	spacevec dif=self->pos-other.e->pos;
 	float difX = iw->toMeters(dif.x);
 	float difZ = iw->toMeters(dif.z);

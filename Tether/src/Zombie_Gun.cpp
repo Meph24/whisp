@@ -13,7 +13,6 @@
 
 using glm::vec3;
 
-
 Zombie_Gun::Zombie_Gun(
 		const SimClock::time_point& init_time,
 		std::string weaponName, 
@@ -54,9 +53,9 @@ Zombie_Gun::~Zombie_Gun()
 	delete pType;
 }
 
-#include <iostream>
-#define recoilDampeningTime 0.5f
-void Zombie_Gun::tryShoot(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, IWorld& iw)
+const float Zombie_Gun::recoilDampeningTime = 0.5f;
+
+void Zombie_Gun::tryShoot(const SimClock::time_point& call_time,EntityPlayer * player, IWorld& iw)
 {
 	trigger=true;
 	if (timer <= 0)
@@ -88,9 +87,9 @@ void Zombie_Gun::tryShoot(const SimClock::time_point& call_time,ICamera3D * cam,
 	ml.loadIdentity();
 
 	ml = ml 
-		* glm::rotateDeg((float)(-cam->beta), vec3(0, 1, 0))
-		* glm::rotateDeg((float)(-cam->alpha), vec3(1, 0, 0))
-		* glm::rotateDeg((float)(-cam->gamma), vec3(0, 0, 1));
+		* glm::rotateDeg((float)( - player->eye.rotation.y ), vec3(0, 1, 0))
+		* glm::rotateDeg((float)( - player->eye.rotation.x ), vec3(1, 0, 0))
+		* glm::rotateDeg((float)( - player->eye.rotation.z ), vec3(0, 0, 1));
 	for(int i=0;i<pType->bulletQuantity;i++)
 	{
 		float rand3=(rand()%1024)/512.0f-1.0f;//TODO remove
@@ -112,7 +111,14 @@ void Zombie_Gun::tryShoot(const SimClock::time_point& call_time,ICamera3D * cam,
 		vec3 velvec(velX, velY, velZ);
 		v = ml * velvec;	
 
-		EntityProjectileBulletLike * zp= new EntityProjectileBulletLike(player,pType->bulletData,call_time,player->getCamPos(),iw.fromMeters(v)+player->v);
+		EntityProjectileBulletLike * zp= new EntityProjectileBulletLike(
+				player,
+				pType->bulletData,
+				call_time, 
+				player->eye.absolutePosition(iw),
+				iw.fromMeters(v)+player->v
+				);
+
 		iw.requestEntitySpawn((Entity *)zp);
 
 		ml.pop();
@@ -124,12 +130,13 @@ void Zombie_Gun::tryShoot(const SimClock::time_point& call_time,ICamera3D * cam,
 	recoilM.registerRecoil(recoil,recoilRand,{0,0,0});
 }
 
-void Zombie_Gun::tick(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, IWorld& iw)
+void Zombie_Gun::tick(const SimClock::time_point& call_time, EntityPlayer* player, IWorld& iw)
 {
-	float sec = (float)FloatSeconds(call_time-last_time);
+	float sec = (float)FloatSeconds(call_time - last_time);
 	vec3 recoilMod=recoilM.getRecoilDiff(sec);
-	cam->alpha-=recoilMod.x;
-	cam->beta+=recoilMod.y;
+	player->eye.rotation.x -= recoilMod.x;
+	player->eye.rotation.y += recoilMod.y;
+
 	if(timer>0)
 	{
 		timer -= sec;
@@ -142,7 +149,7 @@ void Zombie_Gun::tick(const SimClock::time_point& call_time,ICamera3D * cam,Enti
 	{
 		if(trigger)
 		{
-			tryShoot(call_time,cam,player,iw);
+			tryShoot(call_time, player, iw);
 		}
 	}
 	last_time=call_time;

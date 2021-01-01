@@ -8,8 +8,9 @@
 
 #include "ICamera2D.h"
 
-ICamera2D::ICamera2D():
-gamma(0)
+ICamera2D::ICamera2D( Eye& eye )
+	: ICamera(eye)
+	, gamma(0)
 {
 	// TODO Auto-generated constructor stub
 

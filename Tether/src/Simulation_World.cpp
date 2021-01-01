@@ -5,15 +5,10 @@
 
 #include <iostream>
 
-//dirty
-#include "Zombie_MouseInput.h"
-
-
 #include "ZombieTree.h"
 #include "TextureStatic2D.h"
 #include "Zombie_Enemy.h"
 #include "PerformanceMeter.h"
-
 
 #include "Cfg.hpp"
 #include "CfgIO.hpp"
@@ -23,7 +18,6 @@
 #include "ModelEntity.hpp"
 #include "MeshIO.hpp"
 #include "TransModelEntity.hpp"
-
 
 #include "EntityPlayer.h"
 #include "Graphics2D.h"
@@ -46,137 +40,36 @@
 #include "GridEntity.hpp"
 #include "OxelEntity.hpp"
 
+#include "EventDefines.h"
 
-Simulation_World::Simulation_World(const WallClock& reference_clock, sf::Window * w)
-	: IGameMode(reference_clock)
+#include "InteractFilterAlgoAsym.h"
+#include "InteractFilterAlgoSym.h"
+
+#include <utility>
+
+Simulation_World::Simulation_World(const WallClock& reference_clock, Cfg& cfg)
+	: IGameMode(reference_clock, cfg)
+	, world_(16)
+	, bm_(&world_)
+	, terrain_(&world_, world_.fromMeters(0))
 {
-	test=0;
-	CfgIO cfgio( "./res/config.txt" );
-	Cfg cfg = cfgio.get();
-//	int physDist=*cfg.getInt("graphics", "physicsDistance");
-//	int renderDist=*cfg.getInt("graphics", "renderDistance");
-	lodQuality=*cfg.getFlt("graphics", "terrainQuality");
+	//	int physDist=*cfg.getInt("graphics", "physicsDistance");
+	//	int renderDist=*cfg.getInt("graphics", "renderDistance");
 	objects_count=*cfg.getInt("simulation", "objects_count");
 
-	wd=new WorldDefault(16);
-
-	bm=new BenchmarkManager(getIWorld());
-
-	//cm=new ChunkManager(16,physDist*2,renderDist,16,*cfg.getInt("graphics", "chunkLoadRate"));//TODO make chunksPerLockchunk configurable
-	td=new TerrainDummy(getIWorld(),getIWorld()->fromMeters(0));
-
-	SimClock::time_point timS = clock.tick();
-
-	
-	float characterSpeed=7.6f;
-
-	float sensX = *cfg.getFlt("input", "sensitivityX");
-	float sensY = *cfg.getFlt("input", "sensitivityY");
-
-	player=new EntityPlayer(timS,{{0,0},{0,0},{0,0}},w,sensX,sensY,characterSpeed);
-	adQ=new AdaptiveQuality(32,player->cam->maxView,0.001f*(*cfg.getFlt("graphics","maxRenderTime")));//TODO not hard code
-
-	pmLogic = new PerformanceMeter(8s,1s);
-	logicOutside=pmLogic->createTimestep		("            other");
-
+	logicOutside=pmLogic.createTimestep			("            other");
 	logicOutside.setAsRoundtripMarker			(" Total logic time");
-
-	logicGunTick=pmLogic->createTimestep		("        guns tick");
-	logicTick=pmLogic->createTimestep			("      entity tick");
-	logicIntersectEval=pmLogic->createTimestep	("   intersect eval");
-	logicRetick=pmLogic->createTimestep			("     re+post tick");
-	logicTerrain=pmLogic->createTimestep		("    terrain calcs");
-
-	dsLogic=new DebugScreen(pmLogic,&g);
-
-
-	pmGraphics = new PerformanceMeter(8s,1s);
-	graphicsOutside=pmGraphics->createTimestep	("            other");
-
-	graphicsOutside.setAsRoundtripMarker		("Total render time");
-
-	graphicsWorld=pmGraphics->createTimestep	("   world contents");
-	graphicsDebug=pmGraphics->createTimestep	("     debug screen");
-	graphicsFlush=pmGraphics->createTimestep	(" GPU work + syncs");
-
-	dsGraphics=new DebugScreen(pmGraphics,&g);
-
-	setCam(player->cam);
+	logicGunTick=pmLogic.createTimestep			("        guns tick");
+	logicTick=pmLogic.createTimestep			("      entity tick");
+	logicIntersectEval=pmLogic.createTimestep	("   intersect eval");
+	logicRetick=pmLogic.createTimestep			("     re+post tick");
+	logicTerrain=pmLogic.createTimestep			("    terrain calcs");
 }
 
-void Simulation_World::restart()
-{	
-	player->HP = player->maxHP;
-	player->score = 0;
-	getIWorld()->clearEntities();
-	//TODO clean chunks
-}
-
-
-Simulation_World::~Simulation_World()
-{
-	//missing deletes (one-time tier 1 ode, so who cares)
-//	delete cm;
-	delete bm;
-	delete wd;
-
-	delete dsLogic;
-	delete dsGraphics;
-	delete pmLogic;
-	delete pmGraphics;
-	delete g;
-
-	delete zombieTex;
-	delete grass;
-	delete shot;
-	delete tree;
-	delete leaves;
-	delete tps;
-	delete tps2;
-
-	delete adQ;
-	delete player;
-}
-
-void Simulation_World::render(const SimClock::time_point& render_time)
-{
-	
-}
+void Simulation_World::restart(){}
 
 void Simulation_World::init()
 {
-	IWorld * iw=getIWorld();
-
-	tps = new TexParamSet();
-	tps->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	tps->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	tps->addF(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);//GL_NEAREST);
-	tps->addF(GL_TEXTURE_MAG_FILTER, GL_LINEAR);//GL_NEAREST);
-	tps->addF(GL_TEXTURE_MAX_ANISOTROPY_EXT,16);//TODO compatibility check
-	tps->addF(GL_TEXTURE_LOD_BIAS,0);
-	tps->enableMipmap();
-	zombieTex = new TextureStatic2D(tps, "./res/zombie.png");
-	zombieTex->update();
-	grass = new TextureStatic2D(tps, "./res/grass_top.png");
-	grass->update();
-	tree = new TextureStatic2D(tps, "./res/log_oak.png");
-	tree->update();
-
-
-	tps2 = new TexParamSet();
-	tps2->addI(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	tps2->addI(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	tps2->addF(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	tps2->addF(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	shot = new TextureStatic2D(tps2, "./res/fireball.png");
-	shot->update();
-	EntityProjectileBulletLike::setTexture(shot);
-	leaves = new TextureStatic2D(tps2, "./res/leaves.png");
-	leaves->update();
-
-	g = new Graphics2D(64,getAspectRatio());
-
 	{
 		Mesh m (diamondMesh(7, 0.3f, 2.0f));
 		models.emplace_back(new Model (m) );
@@ -206,11 +99,11 @@ void Simulation_World::init()
 		
 	}
 */
+	IWorld* iw = &world_;
 	float fi = 0.0;
 	for(auto& m_uptr : models)
 	{
 		ModelEntity* me = new ModelEntity(*m_uptr);
-
 
 		spawn(me, iw->fromMeters(vec3(20.0f, 4.0f, fi*2.5f)));
 		fi += 1.0f;
@@ -225,12 +118,12 @@ void Simulation_World::init()
 							  );
 
 		spawn
-		(	me,
+		(	
+			me,
 			iw->fromMeters	(	vec3(	randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f),
 										randommodel::randomFloat(-30.0f, 30.0f))
 							)
-
 		);
 	}
 	
@@ -258,6 +151,7 @@ void Simulation_World::init()
 			iw->fromMeters	( vec3( 10.0f, 9.0f, 1.0f) )
 		);
 	}
+
 	//still diamond
 	{
 
@@ -310,6 +204,7 @@ void Simulation_World::init()
 
 		);
 	}
+
 	//orrery
 	{
 		vec3 pos(15.0f, 15.0f, 15.0f);
@@ -430,12 +325,15 @@ void Simulation_World::init()
 
 void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
 {
-	IWorld * iw=getIWorld();
+	IWorld * iw=&world();
 
-	bm->tick(next_tick_begin,this);
+	bm_.tick(next_tick_begin,this);
 	initNextTick();
 	iw->preTick(*this);
-	player->tick(next_tick_begin,this);//TODO insert into IWorld
+	for(auto& p : players)
+	{
+		p.second->tick(next_tick_begin,this);//TODO insert into IWorld
+	}
 	iw->tick(next_tick_begin,this);
 	logicTick.registerTime();
 
@@ -446,150 +344,90 @@ void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
 	iw->postTick(*this);
 	logicRetick.registerTime();
 
-	bm->notifyTickEnded();
+	bm_.notifyTickEnded();
 }
 
-#include "EventDefines.h"
-
-void Simulation_World::loop()
+void Simulation_World::step()
 {
-	if(input_status->pause)
-	{	
-		clock.setNextTargetRate(0.0);
-	}
-	else if(input_status->slomo)
-	{
-		clock.setNextTargetRate(0.1);
-	}
+	if(players.empty())
+		clock.setNextTargetRate(1.0);
 	else
 	{
-		clock.setNextTargetRate(1.0);
-	}
-	if( prev_restart_signal != input_status->restart )
-	{
-		prev_restart_signal = input_status->restart;
-		restart();
-	}
-	
-	SimClock::time_point new_tick_begin = clock.tick();
 
-	if (!(player->HP < 0))
+		if(std::all_of(players.begin(), players.end(), 
+			[](auto& p)->bool 
+			{ return p.first->input_status.pause; }))
+		{	
+			clock.setNextTargetRate(0.0);
+		}
+		else if(std::all_of(players.begin(), players.end(), 
+			[](auto& p)->bool 
+			{ return p.first->input_status.slomo; }))
+		{
+			clock.setNextTargetRate(0.1);
+		}
+		else
+		{
+			clock.setNextTargetRate(1.0);
+		}
+
+		vector<User*> changed_restart;
+		vector<User*> changed_benchmark;
+		for(auto& p : players)
+		{
+			if(p.first->input_status.restart != user_prev_input_status[p.first].restart)
+				changed_restart.push_back(p.first);
+			if(p.first->input_status.benchmark != user_prev_input_status[p.first].benchmark)
+				changed_benchmark.push_back(p.first);
+
+		}
+		if( !changed_restart.empty() && 
+			changed_restart.size() == players.size() )
+		{
+			for(User* user : changed_restart) 
+				user_prev_input_status[user].restart = user->input_status.restart;
+			restart();
+		}
+		if( !changed_benchmark.empty() &&
+			changed_benchmark.size() == players.size() )
+		{ 
+			for(User* user : changed_benchmark)
+				user_prev_input_status[user].benchmark = user->input_status.benchmark;
+			bm_.requestBenchmark();
+		}
+	}
+
+	if(std::none_of(players.begin(), players.end(), 
+		[](auto& p)->bool 
+		{ return p.second->HP < 0; }))
 	{
-		//test=(test+1)%4;
-		//if(!test)
-			doLogic(new_tick_begin);
+		doLogic(clock.tick());
 	}
 }
 
-Entity* Simulation_World::getTarget(Entity* me)
-{
-	return (Entity *)player;
-}
-
-void Simulation_World::drawGameOver()//TODO find new home
-{
-	transformViewToGUI();
-	glColor3f(1, 0, 0);
-	g->drawString("GAME OVER", -0.8f, -0.2f, 0.4f);
-	glColor3f(0, 1, 0);
-	g->drawString("R=restart", -0.8f, -0.6f, 0.3f);
-
-	char scoreString[8];
-
-	int scoreTemp = player->score;
-	for (int i = 0; i < 8; i++)
-	{
-		scoreString[7 - i] = (scoreTemp % 10) + '0';
-		scoreTemp /= 10;
-	}
-	g->drawString("score:", -0.8f, 0.8f, 0.1f);
-	g->drawString(scoreString, -0.8f, 0.62f, 0.1f, 8);
-	revertView();
-}
-
-#include "InteractFilterAlgoAsym.h"
-#include "InteractFilterAlgoSym.h"
 void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 {
-	IWorld * iw=getIWorld();
-	iw->verbose=input_status->verbose;
-	iw->projectileAlgo->verbose=iw->verbose;
-	iw->collideAlgo->verbose=iw->verbose;
-	iw->pushAlgo->verbose=iw->verbose;
+	IWorld * iw=&world();
+	if( *cfg.getInt("test","verbose") )
+	{ 	iw->verbose=true;	}
+	else iw->verbose = false;
+
+	iw->projectileAlgo->verbose = iw->verbose;
+	iw->collideAlgo->verbose = iw->verbose;
+	iw->pushAlgo->verbose = iw->verbose;
+
 	logicOutside.registerTime();
 
-	player->current_gun->tick(next_tick_begin, player->cam,player,*getIWorld());
+	for(auto& p : players)
+		p.second->current_gun->tick(next_tick_begin, p.second.get(), world());
+
 	logicGunTick.registerTime();
 
 	doPhysics(next_tick_begin);
 
-	getITerrain()->postTickTerrainCalcs(this,player->pos);
+	if(!players.empty())
+		getITerrain()->postTickTerrainCalcs(this,players.begin()->second->pos); //behavior is temporary the first player in the list, until terrain gets a better place
 	logicTerrain.registerTime();
-}
-
-void Simulation_World::doGraphics(const SimClock::time_point& t)
-{
-	IWorld * iw=getIWorld();
-
-	drawAABBs=input_status->draw_aabbs;
-	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
-	if (player->HP < 0)
-	{
-		drawGameOver();
-	}
-	else
-	{
-		//Timestamp t=tm.getSlaveTimestamp();
-
-		graphicsOutside.registerTime();
-
-		callbackList.clear();
-		float renderTime=graphicsWorld.getData().getLastTime()+graphicsFlush.getData().getLastTime();
-		float quality=adQ->getQuality(renderTime);
-		Frustum * viewFrustum=player->newFrustumApplyPerspective(t,true,this,quality);
-
-		grass->bind();
-		//cm->render(lodQuality,viewFrustum);//TODO integrate into draw()?!
-
-		iw->draw(t,viewFrustum,*iw,this);
-		player->draw(t,viewFrustum,*iw,this);//TODO  this is the job of an instance of IWorld
-		doTransparentCallbacks(t,viewFrustum,*iw);//TODO bugs here
-
-		delete viewFrustum;
-
-		graphicsWorld.registerTime();
-		if(input_status->debug_screen_active)
-		{
-			transformViewToGUI(1);
-			glColor3f(1, 0, 1);
-			glEnable(GL_TEXTURE_2D);
-			vec3 ppos=iw->toMeters(player->pos);
-			int offset=dsGraphics->draw(ppos.x,ppos.y,ppos.z,0);
-			dsLogic->draw(player->pos.x.intpart,player->pos.y.intpart,player->pos.z.intpart,offset);
-			glDisable(GL_TEXTURE_2D);
-			revertView();
-		}
-		graphicsDebug.registerTime();
-	}
-
-	sf::Time waitt = sf::microseconds(1000);//TODO enable/disable depending on framerate
-	sf::sleep(waitt);
-	glFlush();
-	graphicsFlush.registerTime();
-}
-
-ICamera3D* Simulation_World::getHolderCamera()
-{
-	return player->cam;
-}
-
-IWorld* Simulation_World::getIWorld()
-{
-	return (IWorld *)wd;//cm;
-}
-ITerrain* Simulation_World::getITerrain()
-{
-	return (ITerrain *)td;//(ITerrain *)cm;
 }
 
 void Simulation_World::spawn(Entity* e, spacevec pos)
@@ -598,10 +436,9 @@ void Simulation_World::spawn(Entity* e, spacevec pos)
 	e->last_ticked = clock.now();
 	e->bb = AABB(e->pos);
 	e->onSpawn( this );
-	getIWorld()->requestEntitySpawn(e);
+	world().requestEntitySpawn(e);
 }
 
-ITexture* Simulation_World::suggestFont()
-{
-	return g->font;
-}
+IWorld& Simulation_World::world() { return world_; }
+ITerrain* Simulation_World::getITerrain() { return &terrain_; }
+Entity* Simulation_World::getTarget(const Entity* enemy) { return nullptr; }

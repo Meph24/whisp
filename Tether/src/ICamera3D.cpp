@@ -4,10 +4,10 @@
 
 #include <iostream>
 
-ICamera3D::ICamera3D():
-ml(),alpha(0), beta(0), gamma(0)
-{
-}
+ICamera3D::ICamera3D( Eye& eye )
+	: ICamera(eye)
+	, ml()
+{}
 
 vec3 ICamera3D::getNormal(vec3 v)
 {
@@ -24,10 +24,6 @@ vec3 ICamera3D::getForwardVector()
 	return getNormal({0,0,-1});
 }
 
-ICamera3D::~ICamera3D()
-{
-}
-
 void ICamera3D::applyFrustum()
 {
 	glMatrixMode(GL_PROJECTION);
@@ -41,9 +37,9 @@ void ICamera3D::applyFrustum()
 
 	ml.loadIdentity();
 	ml = ml 
-		* glm::rotateDeg(-beta, vec3(0, 1, 0))
-		* glm::rotateDeg(-alpha, vec3(1, 0, 0))
-		* glm::rotateDeg(-gamma, vec3(0, 0, 1));
+		* glm::rotateDeg(-eye->rotation.y, vec3(0, 1, 0))
+		* glm::rotateDeg(-eye->rotation.x, vec3(1, 0, 0))
+		* glm::rotateDeg(-eye->rotation.z, vec3(0, 0, 1));
 }
 
 vec3 ICamera3D::getNearNormal()

@@ -87,7 +87,7 @@ void WorldDefault::draw(const SimClock::time_point& draw_time, Frustum* viewFrus
 	for(Entity * e: managedEntities)
 	{
 		e->draw(draw_time, viewFrustum,iw,dsp);
-		if(dsp->drawAABBs)
+		if(dsp->enable_aabbs)
 		{
 			glColor3f(e->bbColor.r,e->bbColor.g,e->bbColor.b);
 			e->bb.draw(draw_time, viewFrustum,iw,dsp);

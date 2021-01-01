@@ -33,7 +33,7 @@ spacelen Chunk::getHeight(float xh, float zh)
 }
 #include <iostream>
 #include <cmath>
-void Chunk::render(int lod,spacevec camOffset)//TODO draw entities
+void Chunk::render(int lod, spacevec camOffset, DrawServiceProvider* dsp)//TODO draw entities
 {
 	//std::cout<<"rendering x="<<x<<" y="<<y<<std::endl;
 	vec3 relpos=parent->toMeters(base-camOffset);
@@ -228,7 +228,7 @@ void Chunk::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IW
 		if(managedEntities[i]->exists)
 		{
 			managedEntities[i]->draw(draw_time, viewFrustum, iw, dsp);
-			if(dsp->drawAABBs) managedEntities[i]->bb.draw(draw_time, viewFrustum, iw, dsp);
+			if(dsp->enable_aabbs) managedEntities[i]->bb.draw(draw_time, viewFrustum, iw, dsp);
 		}
 	}
 }

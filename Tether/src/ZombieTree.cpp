@@ -12,13 +12,13 @@
 #include "ITexture.h"
 #include "Frustum.h"
 #include "FloatSeconds.hpp"
+#include "DrawServiceProvider.h"
 
 #include <GL/glew.h>
 
 #include <iostream>
 
-Zombie_Tree::Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves):
-tex1(textureLog),tex2(textureLeaves)
+Zombie_Tree::Zombie_Tree(spacevec position)
 {
 	surviveClearing=true;
 	allowHibernating=true;
@@ -29,8 +29,9 @@ tex1(textureLog),tex2(textureLeaves)
 	h = 18;
 }
 
-Zombie_Tree::Zombie_Tree(spacevec position, float diameter, float height, float diameterLeavse,  ITexture* textureLog, ITexture* textureLeaves):
-d(diameter),h(height+8),tex1(textureLog),tex2(textureLeaves)
+Zombie_Tree::Zombie_Tree(spacevec position, float diameter, float height, float diameterLeavse)
+	: d(diameter)
+	, h(height+8)
 {
 	surviveClearing=true;
 	bb=AABB(position);
@@ -97,6 +98,7 @@ void Zombie_Tree::draw(const SimClock::time_point& draw_time,Frustum * viewFrust
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
 	vec3 interPosMeters=iw.toMeters(interPos);
 
+	ITexture* tex1 = dsp->graphics_ressources.tree.get();
 	tex1->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
@@ -110,6 +112,7 @@ void Zombie_Tree::draw(const SimClock::time_point& draw_time,Frustum * viewFrust
 
 	glDisable(GL_TEXTURE_2D);
 
+	ITexture* tex2 = dsp->graphics_ressources.leaves.get();
 	tex2->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
@@ -138,7 +141,7 @@ void Zombie_Tree::tick(const SimClock::time_point& next_tick_begin, TickServiceP
 //	float seconds=t-lastTick;
 	last_ticked=next_tick_begin;
 
-	IWorld * iw=tsp->getIWorld();
+	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 
 	pos=it->clip(pos,true);

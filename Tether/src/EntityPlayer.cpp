@@ -26,7 +26,6 @@ using glm::vec3;
 #include "DrawServiceProvider.h"
 #include "Zombie_Gun.h"
 #include "Graphics2D.h"
-//#include "Zombie_MouseInput.h"
 #include "ItemAmmo.h"
 #include "InteractFilterAlgoSym.h"
 #include "FloatSeconds.hpp"
@@ -36,32 +35,19 @@ using glm::vec3;
 
 EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 							spacevec startPos,
-							sf::Window * w,
 							float sensX,
 							float sensY,
 							float characterSpeed)
-	: prev_input_status()
-	, player_mesh (diamondMesh(3, 0.6, 1.8))
+	: player_mesh (diamondMesh(3, 0.6, 1.8))
 	, player_model( player_mesh )
+	, eye(*this)
 	, speed(characterSpeed)
-	, heldItem(nullptr)
-	, inventory()
 {
 	surviveClearing=true;
 	last_ticked=spawn_time;
 	pos=startPos;
 	v.set0();
-	cam=new CameraTP();
-	cam->alpha=0.0001f;
-	cam->beta=0.0001f;
-	cam->gamma=0.0001f;
-	cam->height=w->getSize().y;
-	cam->width=w->getSize().x;
-	cam->maxView=1024*8;
-	setTP(true);
-	cam->zoom=defaultZoom;
-	//mouseInp = new Zombie_MouseInput(this, w,sensX,sensY);
-	//mouseInp->enable();
+	
 	HP=maxHP;
 
 	pushRadius=0.4f;
@@ -69,12 +55,12 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 
 	bb=AABB(pos);
 
-	inventory = std::make_unique<TopLevelInventory>(this);//comment this line to disable inventory
-	if(inventory)
+	unused_inventory_slot = std::make_unique<TopLevelInventory>(this);//comment this line to disable inventory
+	if(unused_inventory_slot)
 	{
 		for(int i=0;i<42;i++)
 		{
-			inventory->items.push_back(new ItemDummy("Duftkerze Nummer "+std::to_string(i)));
+			inventory()->items.push_back(new ItemDummy("Duftkerze Nummer "+std::to_string(i)));
 		}
 	}
 
@@ -90,11 +76,6 @@ EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 	current_gun = guns[0].get();
 }
 
-EntityPlayer::~EntityPlayer()
-{
-	delete cam;
-}
-
 void EntityPlayer::selectWeapon(size_t selection)
 {
 	Zombie_Gun* selected_gun =  guns[selection%guns.size()].get();
@@ -106,192 +87,77 @@ void EntityPlayer::selectWeapon(size_t selection)
 
 void EntityPlayer::draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw, DrawServiceProvider* dsp)
 {
-	bool drawSkin=false;
-	bool drawGUI=isPerspective;
-
-	if(isPerspective) isPerspective=false;//reset for next frame
-	else drawSkin=true;//perspective of other player means drawing skin of this player is required
-
-	if(cam->dist>minTPdist)	drawSkin=true;//if third person is active, draw skin of this player
-
-	//float tickOffset=t-lastTick;
-
-	if(drawSkin)
-	{
-		//TODO draw player skin
-		glPushMatrix();
-		glTranslatef(0.0f, characterEyeHeight/2, 0.0f);
-		glRotatef( -cam->beta + 180, 0.0f, 1.0f, 0.0f ); // 180° shifted, so that an edge of the model is pointed forward
-		player_model.drawHere();	
-		glPopMatrix();
-	}
-
-	if(!drawGUI) return;//only GUI draw calls follow
-
-	glEnable(GL_TEXTURE_2D);
-	dsp->transformViewToGUI();
-	glColor3f(0, 1, 0);
 	glPushMatrix();
-	char scoreString[8];
-	int scoreTemp = score;
-	for (int i = 0; i < 8; i++)
-	{
-		scoreString[7 - i] = (scoreTemp % 10)+'0';
-		scoreTemp /= 10;
-	}
-	dsp->g->drawString("score:", -0.8f, 0.8f, 0.1f);
-	dsp->g->drawString(scoreString, -0.8f, 0.62f, 0.1f, 8);
 
-	scoreTemp = HP;
-	for (int i = 0; i < 3; i++)
-	{
-		scoreString[7 - i] = (scoreTemp % 10) + '0';
-		scoreTemp /= 10;
-	}
-	dsp->g->drawString("health:", -0.2f, 0.8f, 0.1f);
-	dsp->g->drawString(scoreString+5, -0.2f, 0.62f, 0.1f, 3);
-
-	glColor3f(1, 1, 0);
-	dsp->g->drawString("Weapon:", 0.6f, -0.66f, 0.1f);
-	dsp->g->drawString(current_gun->name, 0.6f, -0.82f, 0.1f);
-	glColor3f(0, 1, 0);
+	const vec3& eye_pos = eye.offsetFromEntity();
+	//shift the model up for 1/2 the eye-height, which is the height of the model, bc the models center is in the middle of it
+	//shifting it up, so it is visible in full
+	glTranslatef( 0.0f, eye_pos.y/2, 0.0f );
+	// 180° turned on y axis for the model, so that an edge of the model is pointed forward
+	glRotatef( -user()->perspective->camera->eye->rotation.y + 180, 0.0f, 1.0f, 0.0f ); 
+	player_model.drawHere();	
 	glPopMatrix();
-	float crosshairSize = 0.005f;
-	int crosshairAmount = 4;
 
-	glDisable(GL_TEXTURE_2D);
-	glColor3f(1, hitmark, 0);
-
-	glPushMatrix();
-	for (int i = 0; i < crosshairAmount; i++)
-	{
-		glBegin(GL_TRIANGLES);
-		glVertex3f(0, crosshairSize, 1);
-		glVertex3f(-crosshairSize, crosshairSize * 6, 1);
-		glVertex3f(crosshairSize, crosshairSize * 6, 1);
-		glEnd();
-		glRotatef(360.0f / crosshairAmount, 0, 0, 1);
-	}
-	glPopMatrix();
-	dsp->revertView();
-
-	if(heldItem) heldItem->draw(t,viewFrustum,iw,dsp);
+	if(held_item) held_item->draw(t,viewFrustum,iw,dsp);
 }
 
-void EntityPlayer::setTP(bool on)
-{
-	if(on)
-	{
-		if(cam->dist<minTPdist)
-		{
-			cam->dist=minTPdist;
-		}
-		cam->minView=0.5f;
-	}
-	else
-	{
-		cam->dist=0;
-		cam->minView=0.125f;
-	}
-}
+void EntityPlayer::setUser(User* user){ user_ = user; }
+const User* EntityPlayer::user() const { return user_; }
 
-void EntityPlayer::changeTPdist(float amount)
+void setLookingDirection(const vec3& forward, const vec3& up);
+	
+TopLevelInventory* EntityPlayer::inventory()
 {
-	cam->dist+=amount;
-	setTP(cam->dist>=minTPdist);
-	if(cam->dist>maxTPdist) cam->dist=maxTPdist;
-}
-
-spacevec EntityPlayer::getCamPos()
-{
-	return pos+characterEyeOffset;
-}
-
-Frustum * EntityPlayer::newFrustumApplyPerspective(SimClock::time_point t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction)
-{
-	SimulationInputStatusSet& controlinputs = *(tsp->input_status);
-	float zoomMult=8;
-	bool zoomed=controlinputs.zoom;
-	float zoomFactor=zoomed?zoomMult:1;
-	//mouseInp->setSensitivityMultiplier(1.0f/zoomFactor);
-	cam->zoom=defaultZoom/zoomFactor;
-	IWorld * iw=tsp->getIWorld();
-	float time=(float)FloatSeconds(t-last_ticked);
-	spacevec curPos=pos+v*time;
-	cam->posX=iw->toMeters(characterEyeOffset.x);
-	cam->posY=iw->toMeters(characterEyeOffset.y);
-	cam->posZ=iw->toMeters(characterEyeOffset.z);
-	if(fresh) cam->applyFresh();
-	else cam->apply();
-	vec3 fwd=cam->getForwardVector();
-	sf::Listener::setDirection(fwd.x,fwd.y,fwd.z);
-	vec3 upv=cam->getUpVector();
-	sf::Listener::setUpVector(upv.x,upv.y,upv.z);
-	sf::Listener::setPosition(cam->posX,cam->posY,cam->posZ);
-	isPerspective=true;
-
-	Frustum * ret=new Frustum();
-	ret->observerPos=curPos;
-	bool lookingUp=cam->alpha<0;
-	if(lookingUp)
-	{
-		ret->planes[0]=cam->getUpperPlane();
-		ret->planes[3]=cam->getLowerPlane();
-	}
-	else
-	{
-		ret->planes[0]=cam->getLowerPlane();
-		ret->planes[3]=cam->getUpperPlane();
-	}
-	ret->planes[1]=cam->getLeftPlane();
-	ret->planes[2]=cam->getRightPlane();
-	ret->planes[4]=cam->getFarPlane(viewDistRestriction);
-	if(FRUSTUM_PLANE_COUNT==6)
-	{
-		ret->planes[5]=cam->getNearPlane();
-	}
-	return ret;
+	if(!unused_inventory_slot) return (TopLevelInventory*) held_item.get();
+	else return (TopLevelInventory*) unused_inventory_slot.get();
 }
 
 void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
-	IWorld * iw=tsp->getIWorld();
+	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 
-	SimulationInputStatusSet& controlinputs = *tsp->input_status;
-	selectWeapon(controlinputs.weapon_selection);
-
-	if(inventory.get() == heldItem)
+	if( user() )
 	{
-		i64 selectAdd = controlinputs.selection_down - prev_input_status.selection_down;
+		const SimulationInputStatusSet& controlinputs = user()->input_status;
+
+		int i = 0;
+
+		i64 selectAdd = controlinputs.selection_down - prev_input_status.selection_down -i;
 		selectAdd -= controlinputs.selection_up - prev_input_status.selection_up;
 		if( prev_input_status.selection_up != controlinputs.selection_up )
 			prev_input_status.selection_up = controlinputs.selection_up;
 		if( prev_input_status.selection_down != controlinputs.selection_down )
 			prev_input_status.selection_down = controlinputs.selection_down;
-		inventory->selectRelative(selectAdd);
-	}
+		inventory()->selectRelative(selectAdd);
 	
 
-	if(prev_input_status.inventory != controlinputs.inventory)
-	{
-		prev_input_status.inventory = controlinputs.inventory;
+		size_t weapon_selection = controlinputs.weapon_selection.value();
+		selectWeapon( weapon_selection );
 
-		if(heldItem) heldItem = nullptr;
-		else heldItem = inventory.get();
+		if(!inventory()) //=> inventory is currently held
+		{
+			i64 selectAdd = controlinputs.selection_down - prev_input_status.selection_down;
+			selectAdd -= controlinputs.selection_up - prev_input_status.selection_up;
+			prev_input_status.selection_up = controlinputs.selection_up;
+			prev_input_status.selection_down = controlinputs.selection_down;
+			inventory()->selectRelative(selectAdd);
+		}
+		
+		if(prev_input_status.inventory != controlinputs.inventory)
+		{
+			prev_input_status.inventory = controlinputs.inventory;
 
-		//this writes to controlinputs, which shall not be permitted in the future ( issue #36 )
-		//this line will need to go
-		controlinputs.toggleCondition(controlinputs.selection_active);//TODO find out which is inventory and set value ORed accordingly
+			unused_inventory_slot.swap(held_item);
+
+			//this writes to controlinputs, which shall not be permitted in the future ( issue #36 )
+			//this line will need to go
+			controlinputs.toggleCondition(controlinputs.selection_active);//TODO find out which is inventory and set value ORed accordingly
+		}
 	}
 
-	if(heldItem) heldItem->tick(next_tick_begin, tsp);
+	if(held_item) held_item->tick(next_tick_begin, tsp);
 
-	characterEyeOffset=iw->toUnitLength(it->getGravity(pos))*(-characterEyeHeight);
-	//std::cout<<"pos"<<pos<<std::endl;
-	//std::cout<<"gravity"<<it->getGravity(pos)<<std::endl;
-	//std::cout<<"characterEyeHeight"<<characterEyeHeight<<std::endl;
-	//std::cout<<"iw->toUnitLength(it->getGravity(pos))"<<iw->toUnitLength(it->getGravity(pos))<<std::endl;
 	float time=(float) FloatSeconds(next_tick_begin - last_ticked);
 	last_ticked = next_tick_begin;
 	hitmark -= time * 10;
@@ -299,56 +165,57 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	HP += maxHP*time / 200;
 	if (HP > maxHP) HP = maxHP;
 
-	spacevec oldPos=pos;
-
-	vec3 wantedV = controlinputs.walk;
-	wantedV.z*=-1; //invert because someone thought it would be nice forward meaning negative
-	if(wantedV != vec3(0.0f))
+	if( user() )
 	{
-		wantedV = cam->getNormal(wantedV);
-	}
-	pos+=iw->fromMeters(wantedV * speed )*time;
+		const SimulationInputStatusSet& controlinputs = user()->input_status;
+		const unique_ptr<CameraTP>& cam = user()->perspective->camera;
+		spacevec oldPos=pos;
 
-	if(controlinputs.turn != prev_input_status.turn)
-	{
-		cam->alpha = controlinputs.turn.x;
-		cam->beta = controlinputs.turn.y;
-		//cam->gamma = controlinputs.turn.z;
-		prev_input_status.turn = controlinputs.turn;
-	}
-
-	if(controlinputs.clip)
-	{
-		pos=it->clip(pos,true);
-		spacevec newPos=pos;
-		vec3 moved=iw->toMeters(newPos-oldPos);
-		if(glm::sqlen(moved) > 0.0000000001f)
+		vec3 wantedV = controlinputs.walk;
+		wantedV.z*=-1; //invert because someone thought it would be nice forward meaning negative
+		if(wantedV != vec3(0.0f))
 		{
-			vec3 norm=glm::normalize(moved);
-			float speedModA=(glm::length(vec3(norm.x,0,norm.z)));
-			vec3 flat=vec3(moved.x,0,moved.z);
-			float h=moved.y/glm::length(flat);
-			SpeedMod sm=SpeedMod();
-			float speedModB=sm.slowdownFromTerrain(h);
-			pos=it->clip(oldPos+iw->fromMeters(flat*speedModA*speedModB),true);
+			wantedV = cam->getNormal(wantedV);
 		}
-	}
+		pos+=iw->fromMeters(wantedV * speed )*time;
 
-	if (controlinputs.trigger)
-	{
-		current_gun->tryShoot(next_tick_begin,cam,this,*iw);
+		if(controlinputs.turn != prev_input_status.turn)
+		{
+			eye.rotation.x = controlinputs.turn.x;
+			eye.rotation.y = controlinputs.turn.y;
+			eye.rotation.z = controlinputs.turn.z;
+			prev_input_status.turn = controlinputs.turn;
+		}
+
+		if(controlinputs.clip)
+		{
+			pos=it->clip(pos,true);
+			spacevec newPos=pos;
+			vec3 moved=iw->toMeters(newPos-oldPos);
+			if(glm::sqlen(moved) > 0.0000000001f)
+			{
+				vec3 norm=glm::normalize(moved);
+				float speedModA=(glm::length(vec3(norm.x,0,norm.z)));
+				vec3 flat=vec3(moved.x,0,moved.z);
+				float h=moved.y/glm::length(flat);
+				SpeedMod sm=SpeedMod();
+				float speedModB=sm.slowdownFromTerrain(h);
+				pos=it->clip(oldPos+iw->fromMeters(flat*speedModA*speedModB),true);
+			}
+		}
+
+		if (controlinputs.trigger)
+			current_gun->tryShoot(next_tick_begin, this, *iw);
+		else
+			current_gun->stopShooting();
+
+		if(time>0.0000000001f)
+			v=(pos-oldPos)/time;
 	}
-	else
-	{
-		current_gun->stopShooting();
-	}
-	
-	if(time>0.0000000001f)
-		v=(pos-oldPos)/time;
 
 	spacevec size;
-	size.x=iw->fromMeters(characterEyeHeight*0.5f);
-	size.y=iw->fromMeters(characterEyeHeight*1.5f);
+	size.x=iw->fromMeters( eye.offsetFromEntity().y*0.5f );
+	size.y=iw->fromMeters( eye.offsetFromEntity().y*1.5f );
 	size.z=size.x;
 	bb=AABB(pos,size,v*time);
 	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,time,*tsp);
@@ -357,8 +224,6 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 void EntityPlayer::push(spacevec amount, TickServiceProvider& tsp)
 {
 	pos+=amount;
-	//std::cout<<"amount"<<amount<<" | "<<tsp.getIWorld()->toMeters(amount);
-//	HP -= 15625*glm::sqlen(tsp.getChunkManager()->toMeters(amount));
 }
 
 void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,HittableBulletLike* victim)

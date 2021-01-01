@@ -3,11 +3,14 @@
 #define SRC_ICAMERA3D_H_
 
 #include <glm/glm.hpp>
-using glm::vec3;
 
 #include "ICamera.h"
 #include "DivisionPlane.h"
 #include "CumulativeMat.hpp"
+
+using glm::vec3;
+
+class Eye;
 
 class ICamera3D: public ICamera
 {
@@ -20,8 +23,6 @@ protected:
 	void applyFrustum();
 public:
 	vec3 getNormal(vec3 v);
-
-	float alpha, beta, gamma;
 
 	virtual void apply()=0;
 
@@ -45,10 +46,8 @@ public:
 	virtual DivisionPlane getUpperPlane()=0;
 	virtual DivisionPlane getLowerPlane()=0;
 
-
-
-	ICamera3D();
-	virtual ~ICamera3D();
+	ICamera3D( Eye& eye );
+	virtual ~ICamera3D() = default;
 };
 
 #endif /*SRC_ICAMERA3D_H_*/

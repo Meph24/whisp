@@ -98,7 +98,7 @@ void EntityProjectileBulletLike::draw(const SimClock::time_point& draw_time,Frus
 }
 void EntityProjectileBulletLike::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
-	IWorld * iw=tsp->getIWorld();
+	IWorld * iw=&tsp->world();
 
 	float time = (float) FloatSeconds(next_tick_begin - last_ticked);
 	last_ticked = next_tick_begin;

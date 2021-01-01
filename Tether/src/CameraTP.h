@@ -1,9 +1,11 @@
 #pragma once
-#include "ICamera3D.h"
-class CameraTP: public ICamera3D
-{
-public:
 
+#include "ICamera3D.h"
+
+class Eye;
+
+struct CameraTP: public ICamera3D
+{
 	float dist;
 
 	void apply();
@@ -15,7 +17,7 @@ public:
 	virtual DivisionPlane getUpperPlane();
 	virtual DivisionPlane getLowerPlane();
 
-	CameraTP();
-	~CameraTP();
+	CameraTP( Eye& eye );
+	~CameraTP() = default;
 };
 

@@ -16,8 +16,8 @@ class CameraManual2D: public ICamera2D
 public:
 
 	void apply();
-	CameraManual2D(int resX,int resY);
-	~CameraManual2D();
+	CameraManual2D(int resX,int resY, Eye& eye);
+	~CameraManual2D() = default;
 };
 
 #endif /* SRC_CAMERAMANUAL2D_H_ */

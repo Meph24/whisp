@@ -32,6 +32,8 @@ class Zombie_Gun
 	RecoilReturning recoilM;
 
 	ITexture* bullet_texture;
+
+	static const float recoilDampeningTime;
 public:
 	sf::SoundBuffer sBuf;
 	std::string name;
@@ -48,8 +50,8 @@ public:
 
 	Zombie_Gun(const SimClock::time_point& init_time, std::string weaponName,float ReloadTime,const std::string& filename,float pitchModifier,ItemAmmo * pType,bool fullAutomatic,vec3 Recoil,vec3 RecoilSpread);
 	~Zombie_Gun();
-	void tryShoot(const SimClock::time_point& call_time, ICamera3D * cam,EntityPlayer * player, IWorld& iw);
-	void tick(const SimClock::time_point& call_time,ICamera3D * cam,EntityPlayer * player, IWorld& iw);//TODO tsp
+	void tryShoot(const SimClock::time_point& call_time,EntityPlayer * player, IWorld& iw);
+	void tick(const SimClock::time_point& call_time, EntityPlayer* player, IWorld& iw);//TODO tsp
 	void stopShooting();
 };
 

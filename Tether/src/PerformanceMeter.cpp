@@ -9,6 +9,7 @@
 #include "PerformanceMeter.h"
 #include <ctgmath>
 #include "myAssert.h"
+#include "Graphics2D.h"
 
 PerformanceMeter::PerformanceMeter(FloatSeconds historyLength,FloatSeconds WarmupTime,bool BenchmarkMode):
 benchmarkMode(BenchmarkMode)
@@ -357,7 +358,7 @@ void PerformanceMeter::draw(const SimClock::time_point& draw_time, Frustum * vie
 	glPushMatrix();
 	glTranslatef(interPosMeters.x-8, interPosMeters.y+offsetH, interPosMeters.z);
 	glColor3f(1,1,1);//white
-	roundtrip.draw(roundtrip.times,dsp->g);
+	roundtrip.draw(roundtrip.times,&dsp->graphics2d);
 	int size=stepData.size();
 	for(int i=0;i<size;i++)
 	{
@@ -376,13 +377,11 @@ void PerformanceMeter::draw(const SimClock::time_point& draw_time, Frustum * vie
 		case 5: R = 1;        B = X; break; // [5, 6)
 		}
 		glColor3f(R,G,B);
-		stepData[i].draw(roundtrip.times,dsp->g);
+		stepData[i].draw(roundtrip.times,&dsp->graphics2d);
 	}
-
-
 	glPopMatrix();
 }
-#include "Graphics2D.h"
+
 void PerformanceMeter::StepData::draw(std::deque<float>& roundtrip,Graphics2D * g)
 {
 	if(times.size()<2) return;

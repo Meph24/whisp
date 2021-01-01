@@ -92,10 +92,10 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 {
 	std::cout<<"selected: "<<selected<<std::endl;
 	dsp->transformViewToGUI(0.75f);
-	subsection inventoryBounds=dsp->g->generateSubsection(0,0,1.8f,1.8f,SNAP_MID);
+	subsection inventoryBounds=dsp->graphics2d.generateSubsection(0,0,1.8f,1.8f,SNAP_MID);
 	TRANSPARENT_SECTION_DO_LATER(0.75f)
 	{
-		dsp->g->setSubsection(&inventoryBounds);
+		dsp->graphics2d.setSubsection(&inventoryBounds);
 		glColor4f(0,0,0,0.75f);
 		glBegin(GL_TRIANGLE_FAN);
 		glVertex3f(-1, -1, 1);
@@ -104,15 +104,14 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 		glVertex3f(1, -1, 1);
 		glEnd();
 
-		dsp->g->resetLastSubsection();
+		dsp->graphics2d.resetLastSubsection();
 		dsp->revertView();
 
-
 		dsp->transformViewToGUI(0.751f);
-		dsp->g->setSubsection(&inventoryBounds);
+		dsp->graphics2d.setSubsection(&inventoryBounds);
 		int selectionOffset=selected-firstInList;
-		subsection selection=dsp->g->generateSubsection(0,-(selectionOffset+0.5f)*2.0f/maxListLen+1,2.0f,2.0f,SNAP_N);
-		dsp->g->setSubsection(&selection);
+		subsection selection=dsp->graphics2d.generateSubsection(0,-(selectionOffset+0.5f)*2.0f/maxListLen+1,2.0f,2.0f,SNAP_N);
+		dsp->graphics2d.setSubsection(&selection);
 
 		glColor4f(1,1,0.5f,0.2f);
 		glBegin(GL_TRIANGLE_FAN);
@@ -122,7 +121,7 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 		glVertex3f(1, -1.0f/maxListLen, 1);
 		glEnd();
 
-		dsp->g->resetAllSubsections();
+		dsp->graphics2d.resetAllSubsections();
 		dsp->revertView();
 	}
 	OTHER_SECTION
@@ -135,7 +134,7 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 		float lineIncrement=-2.0f/maxListLen;
 		float curLine=firstLine;
 		glColor3f(1,1,1);
-		dsp->g->setSubsection(&inventoryBounds);
+		dsp->graphics2d.setSubsection(&inventoryBounds);
 		for(u32 i=firstInList;i<maxListIndx;i++)
 		{
 			Item * item=items[i];
@@ -143,10 +142,10 @@ void ItemContainer::draw(const SimClock::time_point& t, Frustum* viewFrustum,IWo
 			else
 			{
 				curLine+=lineIncrement;
-				dsp->g->drawString(item->name,-0.95f,curLine,-lineIncrement);
+				dsp->graphics2d.drawString(item->name,-0.95f,curLine,-lineIncrement);
 			}
 		}
-		dsp->g->resetLastSubsection();
+		dsp->graphics2d.resetLastSubsection();
 	}
 
 	dsp->revertView();

@@ -17,7 +17,7 @@ struct Index
 	typedef IndexTypeBase IndexType;
 	typedef std::int32_t IndexCalcType;
 private:
-	IndexType v;
+	mutable IndexType v;
 public:
 	constexpr static IndexType mod( const IndexType& x, const IndexType& m)
 	{ 
@@ -43,9 +43,10 @@ public:
 	//since this index i supposed to be sent and may be overwritten without the context of the modulo
 	// the value could get into undefined space that way
 	// an additional modulus is applied on output, so the type gets robust in this way
-	IndexType value() { v = mod(v, max_indexable); return v; }
+	IndexType value() const { v = mod(v, max_indexable); return v; }
 	operator IndexType() { return value(); }
 };
+
 
 #include "WallClock.hpp"
 //this struct shall be kept sendable, that means no dynamic allocation and pointers allowed
@@ -64,9 +65,7 @@ struct SimulationInputStatusSet
 	bool pause = false;
 	bool menu = false;
 	Index<8> weapon_selection = 0;
-	bool zoom = false;
 	bool clip = false;
-	bool verbose = false;
 	vec3 walk = vec3(0.0f);
 	vec3 turn = vec3(0.0f, 0.1f, 0.0f);
 	bool trigger = false;
@@ -76,9 +75,9 @@ struct SimulationInputStatusSet
 
 	//these methods probably need to go, as they participate in writing to this status-set
 	// from the wrong side ( issue #36 )
-	static void toggleCondition(bool& b);
-	static void setConditionTrue(bool& b);
-	static void setConditionFalse(bool& b);
+	static void toggleCondition(bool b);
+	static void setConditionTrue(bool b);
+	static void setConditionFalse(bool b);
 
 	//static float getStatusAndReset(float& f, float resetTo = 0.0f );//not thread safe; reset value
 

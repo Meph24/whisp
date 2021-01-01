@@ -25,12 +25,8 @@ public:
 	float d;
 	float h;
 
-	ITexture * tex1;
-	ITexture * tex2;
-
-
-	Zombie_Tree(spacevec position, ITexture* textureLog, ITexture* textureLeaves);
-	Zombie_Tree(spacevec position, float diameter, float height, float diameterLeaves, ITexture* textureLog, ITexture* textureLeaves);
+	Zombie_Tree(spacevec position);
+	Zombie_Tree(spacevec position, float diameter, float height, float diameterLeaves);
 	~Zombie_Tree();
 	virtual void draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
 	virtual void tick(const SimClock::time_point& t,TickServiceProvider * tsp);

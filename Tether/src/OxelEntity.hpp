@@ -57,7 +57,7 @@ public:
         tick_begin_rot = rot;
         tick_begin_drot = drot;
 
-        IWorld* iw = tsp->getIWorld();
+        IWorld* iw = &tsp->world();
 
         float aabblength = t.oxelWidth(t.root_granularity) * 1.5; //approx sqrt of 2
         bb.low = iw->fromMeters(-vec3(aabblength, aabblength, aabblength)) + pos;

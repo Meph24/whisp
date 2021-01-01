@@ -90,6 +90,13 @@ inline mat4 	rotateDeg (mat4 const &m, float angle, vec3 const& v)
 	return glm::rotate(m, glm::radians(angle), v);
 }
 
+inline vec3		rotateVec( const vec3& v , const vec3& rotation)
+{
+	return v 	* glm::rotate(rotation.x, vec3(1.0f, 0.0f, 0.0f))
+				* glm::rotate(rotation.y, vec3(0.0f, 1.0f, 0.0f))
+				* glm::rotate(rotation.z, vec3(0.0f, 0.0f, 1.0f));
+}
+
 #define GLMUTILS_EQUALS_DEFAULT_EPSIOLON 0.00001
 
 template<typename mat_type, typename epsilon_prec>

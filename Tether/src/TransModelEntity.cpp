@@ -37,8 +37,8 @@ AABB TransModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)
 {
 	return AABB(	pos,
 					pos + v * tick_seconds,
-					tsp->getIWorld()->fromMeters(mo.extent().first),
-					tsp->getIWorld()->fromMeters(mo.extent().second)
+					tsp->world().fromMeters(mo.extent().first),
+					tsp->world().fromMeters(mo.extent().second)
 				);
 }
 
@@ -78,7 +78,7 @@ void TransModelEntity::tick(	const SimClock::time_point& next_tick_begin,
 	tick_begin_scale = scale;
 	tick_begin_dscale = dscale;
 
-	IWorld* iw = tsp->getIWorld();
+	IWorld* iw = &tsp->world();
 	
 	bb = aabb(tick_seconds, tsp);
 

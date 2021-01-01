@@ -2,6 +2,7 @@
 #include "EventHandler.h"
 #include "EntityPlayer.h"
 #include "EventMapper.hpp"
+#include "CameraTP.h"
 
 
 #include <iostream>
@@ -50,9 +51,6 @@ void EventHandler::Filter::update(event e)
 	prevValue[e.ID] = e.value;
 }
 
-#include "Zombie_MouseInput.h"
-
-#include "CameraTP.h"
 
 EventHandler::event EventHandler::createEvent(EventHandler::eventType type, int lowID, float value)
 {

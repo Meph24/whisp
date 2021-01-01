@@ -30,7 +30,7 @@ struct GridEntity : public Entity
         tick_begin_rot = rot;
         tick_begin_drot = drot;
 
-        IWorld* iw = tsp->getIWorld();
+        IWorld* iw = &tsp->world();
         
         bb.low = iw->fromMeters(-vec3(2.0f,2.0f,2.0f)) + pos;
         bb.high = iw->fromMeters(vec3(2.0f,2.0f,2.0f)) + pos;

@@ -73,7 +73,7 @@ void EntitySound::tick(const SimClock::time_point& next_tick_begin, TickServiceP
 	if((!playSoon)&&sound.getStatus()==sf::Sound::Status::Stopped)
 	{
 //		std::cout<<"sound request destroy"<<std::endl;
-		requestDestroy(tsp->getIWorld());
+		requestDestroy(&tsp->world());
 	}
 }
 

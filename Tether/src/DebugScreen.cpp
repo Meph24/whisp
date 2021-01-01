@@ -10,7 +10,7 @@
 #include "Graphics2D.h"
 #include "PerformanceMeter.h"
 
-DebugScreen::DebugScreen(PerformanceMeter * p,Graphics2D ** gr):
+DebugScreen::DebugScreen(PerformanceMeter * p,Graphics2D * gr):
 g(gr),pm(p),textSize(0.1f)
 {
 
@@ -29,13 +29,13 @@ int DebugScreen::draw(float x,float y,float z,int lineOffset)//TODO drawable + p
 	for(i=-1;i<num;i++)
 	{
 		std::string s=pm->getInfo(i,FLAG_RECENTAVG+FLAG_SPIKES+FLAG_NOW);
-		g[0]->drawString(s,-1.4f,0.8f-(lineOffset-1)*textSize,textSize);
+		g->drawString(s,-1.4f,0.8f-(lineOffset-1)*textSize,textSize);
 		lineOffset++;
 	}
 	std::ostringstream myString;
 	myString<<"x = "<<x<<" | y = "<<y<<" | z = "<<z;
 	std::string s=myString.str();
-	g[0]->drawString(s,-1.4f,0.8f-(lineOffset-1)*textSize,textSize);
+	g->drawString(s,-1.4f,0.8f-(lineOffset-1)*textSize,textSize);
 	lineOffset++;
 	return lineOffset;
 }

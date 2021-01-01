@@ -78,8 +78,8 @@ AABB ModelEntity::aabb(float tick_seconds, TickServiceProvider* tsp)
 
 	return AABB(pos , 
 				pos + v*tick_seconds, 
-				tsp->getIWorld()->fromMeters(ext.first),
-				tsp->getIWorld()->fromMeters(ext.second)
+				tsp->world().fromMeters(ext.first),
+				tsp->world().fromMeters(ext.second)
 				);
 }
 

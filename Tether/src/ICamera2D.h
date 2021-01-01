@@ -18,7 +18,7 @@ public:
 
 	virtual void apply()=0;
 
-	ICamera2D();
+	ICamera2D(Eye& eye);
 	virtual ~ICamera2D();
 };
 

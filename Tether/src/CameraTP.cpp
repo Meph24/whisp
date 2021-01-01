@@ -1,11 +1,10 @@
 #include "CameraTP.h"
 
 
-CameraTP::CameraTP(): dist(4)
-{
-
-}
-
+CameraTP::CameraTP( Eye& eye )
+	: ICamera3D( eye )
+	, dist(4)
+{}
 
 DivisionPlane CameraTP::getNearPlane()
 {
@@ -13,10 +12,7 @@ DivisionPlane CameraTP::getNearPlane()
 	DivisionPlane ret(
 						normal,
 						minView - dist + 
-						glm::dot(
-								normal,
-								vec3(posX,posY,posZ)
-								)
+						glm::dot( normal, eye->offsetFromEntity() )
 					 );
 	return ret;
 }
@@ -26,55 +22,46 @@ DivisionPlane CameraTP::getFarPlane(float overrideViewDist)
 	float dist=maxView;
 	if(overrideViewDist!=-1) dist=overrideViewDist;
 	vec3 normal=getFarNormal();
-	DivisionPlane ret(normal,dist+glm::dot(normal,vec3(posX,posY,posZ)));
+	DivisionPlane ret(normal,dist+glm::dot(normal, eye->offsetFromEntity()));
 	return ret;
 }
 
 DivisionPlane CameraTP::getRightPlane()
 {
 	vec3 normal=getRightNormal();
-	DivisionPlane ret(normal,minView-dist+glm::dot(normal,vec3(posX,posY,posZ)));//TODO
+	DivisionPlane ret(normal,minView-dist+glm::dot(normal, eye->offsetFromEntity()));
 	return ret;
 }
 
 DivisionPlane CameraTP::getLeftPlane()
 {
 	vec3 normal=getLeftNormal();
-	DivisionPlane ret(normal,minView-dist+glm::dot(normal,vec3(posX,posY,posZ)));//TODO
+	DivisionPlane ret(normal,minView-dist+glm::dot(normal, eye->offsetFromEntity()));
 	return ret;
 }
 
 DivisionPlane CameraTP::getUpperPlane()
 {
 	vec3 normal=getUpperNormal();
-	DivisionPlane ret(normal,minView-dist+glm::dot(normal,vec3(posX,posY,posZ)));//TODO
-	//std::cout<<"minView: "<<minView<<"; dist: "<<dist<<"; dot: "<<glm::dot(normal,vec3(posX,posY,posZ))<<std::endl;
-	//std::cout<<"normal: "<<normal<<std::endl;
-	//std::cout<<"pos: "<<vec3(posX,posY,posZ)<<std::endl;
+	DivisionPlane ret(normal,minView-dist+glm::dot(normal, eye->offsetFromEntity()));
 	return ret;
 }
 
 DivisionPlane CameraTP::getLowerPlane()
 {
 	vec3 normal=getLowerNormal();
-	DivisionPlane ret(normal,minView-dist+glm::dot(normal,vec3(posX,posY,posZ)));//TODO
+	DivisionPlane ret(normal,minView-dist+glm::dot(normal, eye->offsetFromEntity()));
 	return ret;
 }
-
-CameraTP::~CameraTP()
-{
-
-}
-
-
 
 void CameraTP::apply()
 {
 	applyFrustum();
 	glMatrixMode(GL_MODELVIEW);
 	glTranslatef(0, 0, -dist);
-	glRotatef(gamma, 0, 0, 1);
-	glRotatef(alpha, 1, 0, 0);
-	glRotatef(beta, 0, 1, 0);
-	glTranslatef(-posX, -posY, -posZ);
+	glRotatef(eye->rotation.z, 0, 0, 1);
+	glRotatef(eye->rotation.x, 1, 0, 0);
+	glRotatef(eye->rotation.y, 0, 1, 0);
+	const vec3& pos = eye->offsetFromEntity();
+	glTranslatef(-pos.x, -pos.y, -pos.z);
 }

@@ -1,76 +1,56 @@
 #pragma once
 
 #include <memory>
+#include "IGameMode.h"
+#include "PerformanceMeter.h"
+#include "SimulationInputStatusSet.hpp"
+#include "WorldDefault.h"
+#include "BenchmarkManager.h"
+#include "Model.hpp"
+#include "Mesh.hpp"
+#include "TerrainDummy.h"
 
 using std::unique_ptr;
 
-#include "TickServiceProvider.h"
-#include "DrawServiceProvider.h"
-#include "IGameMode.h"
-
-#include "ModelEntity.hpp"
-#include "Spacevec.h"
-#include "PerformanceMeter.h"
-
-
-class AdaptiveQuality;
-class DebugScreen;
+class BenchmarkManager;
 class EntityPlayer;
-class Mesh;
-class TexParamSet;
 class IWorld;
+class Mesh;
 class TerrainDummy;
 class WorldDefault;
-class BenchmarkManager;
 
-#include <SFML/Window.hpp>
-
-
-#include "SimulationInputStatusSet.hpp"
-
-class Simulation_World: public DrawServiceProvider, public IGameMode
+class Simulation_World: public IGameMode
 {
-	int objects_count;
-
-	BenchmarkManager * bm;
-
-	PerformanceMeter * pmLogic;
-	PerformanceMeter * pmGraphics;
-	DebugScreen * dsLogic;
-	DebugScreen * dsGraphics;
-
-	WorldDefault * wd;
-//	ChunkManager * cm;
-	TerrainDummy * td;
+	WorldDefault world_;
+	BenchmarkManager bm_;
+	TerrainDummy terrain_;
 
 	vector<unique_ptr<Mesh>> meshes;
 	vector<unique_ptr<Model>> models;
 
-	ITexture * zombieTex;
-	ITexture * grass;
-	ITexture * shot;
-	ITexture * tree;
-	ITexture * leaves;
-	TexParamSet * tps;
+	struct PrevInputStatus
+	{
+		SignalCounter benchmark = SimulationInputStatusSet().benchmark;
+		SignalCounter restart = SimulationInputStatusSet().restart;
+	};
+	map<User*, PrevInputStatus> user_prev_input_status;
 
-	TexParamSet * tps2;
-
-	float lodQuality;
-	int zombieDist;
-	AdaptiveQuality * adQ;
-
-	void render(const SimClock::time_point& t);
-	void doPhysics(const SimClock::time_point& t);
-
-	SignalCounter prev_restart_signal = 0;
 	void restart();
 
-	void drawGameOver();
+	void doPhysics(const SimClock::time_point& t);
 	void doLogic(const SimClock::time_point& t);
 
-	int test;//TODO remove
-
 public:
+	Simulation_World(const WallClock& reference_clock, Cfg& cfg);
+
+	void spawn(Entity *, spacevec);
+	void init();
+	void step();
+
+	virtual IWorld& world();
+	virtual ITerrain* getITerrain();
+	virtual Entity* getTarget(const Entity* enemy);
+	
 	PerformanceMeter::SingleTimer logicOutside;
 	PerformanceMeter::SingleTimer logicGunTick;
 	PerformanceMeter::SingleTimer logicTick;
@@ -78,31 +58,7 @@ public:
 	PerformanceMeter::SingleTimer logicRetick;
 	PerformanceMeter::SingleTimer logicTerrain;
 
-	PerformanceMeter::SingleTimer graphicsOutside;
-	PerformanceMeter::SingleTimer graphicsWorld;
-	PerformanceMeter::SingleTimer graphicsDebug;
-	PerformanceMeter::SingleTimer graphicsFlush;
-
-	Simulation_World(const WallClock& reference_clock, sf::Window * w);
-	~Simulation_World();
-
-	//TickServiceProvider
-	virtual ICamera3D * getHolderCamera();//can return 0 if currently not held
-
-	ITerrain * getITerrain();
-	IWorld * getIWorld();
-
-	virtual Entity * getTarget(Entity * me);
-
-	void spawn(Entity *, spacevec);
-
-	void init();
-
-	void loop();
-	void doGraphics(const SimClock::time_point& t);
-
-	//from DrawServiceProvider:
-	virtual ITexture * suggestFont();//returns 0 if no suggestion is made
-
+private:
+	int objects_count;
 };
 

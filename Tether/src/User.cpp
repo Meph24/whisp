@@ -10,6 +10,8 @@
 #include "SFMLWindow.hpp"
 #include "IPv4Address.hpp"
 
+#include "IGameMode.h"
+
 using std::string;
 
 User::User(		
@@ -18,6 +20,7 @@ User::User(
 						int			resheight
 					) 
 	: contextSettings(24, 8, 0, 3, 3)
+	, name(name)
 	, window(nullptr)
 {}
 
@@ -34,6 +37,23 @@ LocalUser::LocalUser(
 	, event_source( &sfmlwindow )
 {	
 	window = &sfmlwindow;
+	window->setActive(true);
+
+ 	GLenum err = glewInit();
+	if (err != GLEW_OK)
+	{
+		std::cerr << "GLEW failed to initialize !" << std::endl;
+	}
+
+	glClearDepth(1.0f);
+	glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glAlphaFunc(GL_GREATER, 0.02f);
+	glEnable(GL_ALPHA_TEST);
 }
 
 InputDeviceConfigurator::MouseMode LocalUser::mouseMode() const { return mousemode; }
@@ -79,13 +99,18 @@ void LocalUser::setMouseMode( MouseMode mode )
 vec2 LocalUser::turnSensitivity() const
 {
 		float modifier = 1.0f;
-		if( event_mapper && event_mapper->managed_stati->zoom ) modifier = 1.0f / 8; 
+		if( perspective && perspective->zoomed ) modifier = 1.0f / 8; 
 		return turn_sensitivity * modifier; 
 }
 
 void LocalUser::operateSimulation(IGameMode* simulation)
 {
-	SimulationInputStatusSet& input_status = *simulation->input_status;
+	if(!simulation) return;
+
+	this->simulation = simulation;
+	simulation->registerUser(this);
+	perspective = simulation->getPerspective(this);
+
 	event_mapper.reset(new EventMapper(input_status));
 
 	namespace Act = eventmapping::actions;
@@ -161,7 +186,7 @@ void LocalUser::operateSimulation(IGameMode* simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_MOUSE_RMB,
-		Act::Toggle(&input_status.zoom)
+		Act::Toggle(&perspective->zoomed)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_MOUSE_WHEEL,
@@ -174,11 +199,6 @@ void LocalUser::operateSimulation(IGameMode* simulation)
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_C,
 		Act::Toggle(&input_status.clip)
-	);
-	event_mapper->registerMapping(
-		EVENT_ID_KEY_V,
-		Act::Toggle(&input_status.verbose),
-		Cond::keyPressed
 	);
 
 	auto& container = mouse_mode_mappings[ InputDeviceConfigurator::MouseMode::diff ];
@@ -201,6 +221,10 @@ void LocalUser::operateSimulation(IGameMode* simulation)
 
 void LocalUser::disconnectSimulation()
 {
+	if(!perspective) return;
+
+	perspective->simulation->kickUser(this);
+	perspective.reset();
 	event_mapper.reset();
 }
 
@@ -257,8 +281,17 @@ void LocalUser::postHandleEvent(sf::Event& e)
 }
 
 void User::setContextToMyThread(){ window->setActive(true); }
-void User::display(){ window->display(); }
-void User::render()
+void User::draw()
 {
+	perspective->enableAABBDrawing(input_status.draw_aabbs);
+	perspective->enableDebugScreen(input_status.debug_screen_active);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	perspective->draw();
+}
+
+void User::display()
+{
+	window->display();
 }

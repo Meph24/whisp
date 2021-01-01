@@ -15,6 +15,7 @@
 #include "Spacevec.h"
 #include "LockFast.h"
 
+class Cfg;
 class LockChunk;
 class Chunk;
 class Frustum;
@@ -88,24 +89,30 @@ class ChunkManager: public IWorld, public ITerrain
 
 	//TODO void deleteChunk()
 
+	float lodQuality = 0.5;
+
 public:
 
 	//magic, do not use yourself:
 
 	void requestEntityMove(Entity * e);//do not call yourself, managed by chunks
-	void render(float lodQ,Frustum * viewFrustum);//TODO drawable
+	void render(Frustum * viewFrustum, DrawServiceProvider* dsp);
 	virtual void draw(const SimClock::time_point& draw_time, Frustum * viewFrustum, IWorld& iw, DrawServiceProvider * dsp);//TODO
 	void generateMissing(int count);
 	void applyEntityChunkChanges(TickServiceProvider& tsp);//only inside here entities are allowed to be added/removed from chunks, otherwise request it to be done via the request methods
 	void setMid(spacevec abs,TickServiceProvider * tsp);//absolute x,z
 
 	//chunksPerLockchunk must be power of 2, if its not, it will be assigned one
-	ChunkManager(int ChunkSize,int ChunksPerAxis,int RenderDistanceChunks,int chunksPerLockchunk,int ChunkLoadRate);//render distance should be lower than half of the total chunks per axis
+	ChunkManager(	Cfg& cfg, 
+					int ChunkSize,
+					int ChunksPerAxis,
+					int RenderDistanceChunks,
+					int chunksPerLockchunk,
+					int ChunkLoadRate
+				);//render distance should be lower than half of the total chunks per axis
 	~ChunkManager();
 
 	///the non-critical interface: you can always safely use these
-
-
 
 	//the partially critical interface: only call from main tick thread
 	//read-only:

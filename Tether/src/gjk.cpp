@@ -30,8 +30,8 @@ ostream& operator<< (ostream& os, const MinkowskiPoint& p)
 
 RelColliders::RelColliders(DualPointer<Collider> c0, DualPointer<Collider> c1, TickServiceProvider& tsp)
 		: c0(c0), c1(c1)
-		, m_pos1(tsp.getIWorld()->toMeters(c1.e->pos - c0.e->pos))
-		, m_v1(tsp.getIWorld()->toMeters(c1.e->v - c0.e->v))
+		, m_pos1(tsp.world().toMeters(c1.e->pos - c0.e->pos))
+		, m_v1(tsp.world().toMeters(c1.e->v - c0.e->v))
 	{}
 
 vec3 RelColliders::pos0(microseconds tick_time) const

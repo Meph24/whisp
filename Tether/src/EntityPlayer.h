@@ -1,19 +1,27 @@
-/*
- * EntityPlayer.h
- *
- *  Created on:	Apr 16, 2018
- *      Author:	HL65536
- *     Version:	2.0
- */
-
 #ifndef SRC_ENTITYPLAYER_H_
 #define SRC_ENTITYPLAYER_H_
 
-#include "BulletLikeSource.h"
-#include "Pushable.h"
-#include "Entity.h"
-#include "SimClock.hpp"
+#include <memory>
+#include <vector>
 
+#include <SFML/Window.hpp>
+#include <SFML/Audio.hpp>
+
+#include "BulletLikeSource.h"
+#include "diamondMesh.hpp"
+#include "Entity.h"
+#include "Eye.hpp"
+#include "Mesh.hpp"
+#include "Model.hpp"
+#include "Pushable.h"
+#include "SimClock.hpp"
+#include "SimulationInputStatusSet.hpp"
+#include "TopLevelInventory.h"
+#include "User.hpp"
+#include "Zombie_Gun.h"
+
+using std::unique_ptr;
+using std::vector;
 
 class Zombie_MouseInput;
 class Zombie_Gun;
@@ -23,48 +31,31 @@ class Item;
 class ItemContainer;
 class ITexture;
 
-
-#include <SFML/Window.hpp>
-#include <SFML/Audio.hpp>
-
-#include "SimulationInputStatusSet.hpp"
-#include <memory>
-#include <vector>
-
-using std::unique_ptr;
-using std::vector;
-
-#include "diamondMesh.hpp"
-#include "Mesh.hpp"
-#include "Model.hpp"
-
-#include "TopLevelInventory.h"
-
 class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 {
-	void setTP(bool on);
+	friend class Perspective;
 
-	bool isPerspective=false;
+	struct PrevInputStatus
+	{
+		SignalCounter inventory;
+		SignalCounter selection_up, selection_down;
+		vec3 turn;
+	}prev_input_status;
 
-	SimulationInputStatusSet prev_input_status;
+	User* user_ = nullptr;
 
 	Mesh player_mesh;
 	Model player_model;
+
 public:
-
-
-	float defaultZoom=1;
+	void setUser(User* user = nullptr);
+	const User* user() const; //return 0/false if Entity is not controlled
 
 	double score=0;
 
-	//Zombie_MouseInput * mouseInp;
+	Eye eye;	
 
-	CameraTP * cam;
-	float minTPdist=2;
-	float maxTPdist=20;
-
-	float characterEyeHeight=1.6f;
-	spacevec characterEyeOffset;
+public:
 
 	float HP=-1;
 	float maxHP=100;
@@ -74,26 +65,22 @@ public:
 	vector<unique_ptr<Zombie_Gun>> guns;
 	Zombie_Gun* current_gun = nullptr;
 
-	Item * heldItem;//to browse the inventory, "heldItem" is switched with "inventory"
-	unique_ptr<TopLevelInventory> inventory;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
+	unique_ptr<Item> held_item;
+	unique_ptr<Item> unused_inventory_slot;//contains other top-level inventories like backpack, jeans pockets, or directly attached items like sling
+	TopLevelInventory* inventory();
 
-	EntityPlayer(SimClock::time_point spawn_time,spacevec startPos,sf::Window * w,float sensX,float sensY,float characterSpeed);
-	~EntityPlayer();
+	EntityPlayer(	SimClock::time_point spawn_time,
+					spacevec startPos, 
+					float sensX, float sensY,	
+ 					float characterSpeed	);
+	virtual ~EntityPlayer() = default;
 
 	void changeTPdist(float amount);
 
-	spacevec getCamPos();
-	Frustum * newFrustumApplyPerspective(SimClock::time_point t,bool fresh,TickServiceProvider * tsp,float viewDistRestriction=-1);
-
 	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
-
 	virtual void tick(const SimClock::time_point& next_tick_begin, TickServiceProvider * tsp);
-
 	virtual void push(spacevec amount, TickServiceProvider& tsp);
-
 	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);
-
-
 	void selectWeapon(size_t selection);
 };
 

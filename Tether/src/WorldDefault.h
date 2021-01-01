@@ -9,9 +9,9 @@
 #ifndef SRC_WORLDDEFAULT_H_
 #define SRC_WORLDDEFAULT_H_
 
-#include "IWorld.h"
-
 #include <vector>
+
+#include "IWorld.h"
 
 class WorldDefault: public IWorld
 {

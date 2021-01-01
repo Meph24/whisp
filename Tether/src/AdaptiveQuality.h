@@ -9,9 +9,8 @@
 #ifndef SRC_ADAPTIVEQUALITY_H_
 #define SRC_ADAPTIVEQUALITY_H_
 
-class AdaptiveQuality
+struct AdaptiveQuality
 {
-public:
 	float target;
 	float max;
 	float min;
@@ -21,7 +20,6 @@ public:
 	float getQuality(float curTime);
 
 	AdaptiveQuality(float minQuality,float maxQuality,float targetTime);
-	~AdaptiveQuality();
 };
 
 #endif /* SRC_ADAPTIVEQUALITY_H_ */

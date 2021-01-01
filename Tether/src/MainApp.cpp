@@ -14,6 +14,8 @@
 #include "Zombie_World.h"
 #include "remoteControl.hpp"
 
+using std::cout;
+
 #define PHYSICS_MAX_TICKLENGTH 20000
 
 unordered_map<string, unsigned int> Main::command_line_argument_flags = 
@@ -30,6 +32,8 @@ Main::Main(int argc, char** argv)
 {
 	CfgIO cfgio ( "./res/config.txt" );
 	cfg = cfgio.get();
+
+	srand(time(0));
 
 	Port port = (*cfg.getInt("network", "default_port_remote_control"));
 	if(port < 0 || port > 65535)
@@ -75,16 +79,15 @@ DefaultApp::DefaultApp( WallClock& wallclock, Cfg& cfg )
 {
 	cout << "Initializing Default Application !\n";
 
-
 	int zombie_mode = *cfg.getInt("test", "zombie_mode");
 	if(zombie_mode) 
 	{
-		sim = std::make_unique<Zombie_World>(wallclock, &op.window->getSFWindow());
-		sim->input_status->clip = true;
+		sim = std::make_unique<Zombie_World>(wallclock, cfg);
+		op.input_status.clip = true;
 	}
 	else 
 	{
-		sim = std::make_unique<Simulation_World>(wallclock, &op.window->getSFWindow());
+		sim = std::make_unique<Simulation_World>(wallclock, cfg);
 	}
 
 	op.operateSimulation(sim.get());
@@ -98,32 +101,14 @@ void DefaultApp::run()
 		throw std::runtime_error( "App: Failure in application initialization < No Simulation to simulate >!" );
 	}
 
-	GLenum err = glewInit();
-	if (err != GLEW_OK)
-	{
-		std::cerr << "GLEW failed to initialize !" << std::endl;
-	}
-
-	glClearDepth(1.0f);
-	glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
-	glAlphaFunc(GL_GREATER, 0.02f);
-	glEnable(GL_ALPHA_TEST);
-
 	sim->init();
-	srand(time(0));
 
 	while (op.window->isOpen())
 	{
 		//render
-		sim->loop();
+		sim->step();
 
-		op.render();
-		sim->doGraphics(sim->clock.now());
+		op.draw();
 		op.display();
 
 		//handle events

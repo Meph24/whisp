@@ -30,10 +30,10 @@ struct intfloat
 	void correct();
 	void correctPos();
 
-	intfloat<I,F> operator+(intfloat<I,F> other) const;
-	intfloat<I,F> operator-(intfloat<I,F> other) const;
-	void operator+=(intfloat<I,F> other);
-	void operator-=(intfloat<I,F> other);
+	intfloat<I,F> operator+(const intfloat<I,F>& other) const;
+	intfloat<I,F> operator-(const intfloat<I,F>& other) const;
+	void operator+=(const intfloat<I,F>& other);
+	void operator-=(const intfloat<I,F>& other);
 
 	intfloat<I,F> operator*(double scalar) const;
 	void operator*=(double scalar);
@@ -46,12 +46,12 @@ struct intfloat
 	void operator/=(float scalar);
 
 
-	bool operator<(intfloat<I,F> other) const;
-	bool operator<=(intfloat<I,F> other) const;
-	bool operator>(intfloat<I,F> other) const;
-	bool operator>=(intfloat<I,F> other) const;
-	bool operator!=(intfloat<I,F> other) const;
-	bool operator==(intfloat<I,F> other) const;
+	bool operator<(const intfloat<I,F>& other) const;
+	bool operator<=(const intfloat<I,F>& other) const;
+	bool operator>(const intfloat<I,F>& other) const;
+	bool operator>=(const intfloat<I,F>& other) const;
+	bool operator!=(const intfloat<I,F>& other) const;
+	bool operator==(const intfloat<I,F>& other) const;
 
 	bool equalsZero() const;//tiny epsilon tolerance
 };
@@ -63,7 +63,7 @@ template<typename I, typename F>
 inline intfloat<I, F>::intfloat(const I& i, const F& f) : intpart(i), floatpart(f) {}
 
 template<typename I, typename F>
-inline intfloat<I, F> intfloat<I, F>::operator +(intfloat<I, F> other) const
+inline intfloat<I, F> intfloat<I, F>::operator +(const intfloat<I, F>& other) const
 {
 	intfloat<I,F> ret;
 	ret.floatpart=floatpart+other.floatpart;
@@ -73,7 +73,7 @@ inline intfloat<I, F> intfloat<I, F>::operator +(intfloat<I, F> other) const
 }
 
 template<typename I, typename F>
-inline intfloat<I, F> intfloat<I, F>::operator -(intfloat<I, F> other) const
+inline intfloat<I, F> intfloat<I, F>::operator -(const intfloat<I, F>& other) const
 {
 	intfloat<I,F> ret;
 	ret.floatpart=floatpart-other.floatpart;
@@ -83,7 +83,7 @@ inline intfloat<I, F> intfloat<I, F>::operator -(intfloat<I, F> other) const
 }
 
 template<typename I, typename F>
-inline void intfloat<I, F>::operator +=(intfloat<I, F> other)
+inline void intfloat<I, F>::operator +=(const intfloat<I, F>& other)
 {
 	intpart+=other.intpart;
 	floatpart+=other.floatpart;
@@ -91,7 +91,7 @@ inline void intfloat<I, F>::operator +=(intfloat<I, F> other)
 }
 
 template<typename I, typename F>
-inline void intfloat<I, F>::operator -=(intfloat<I, F> other)
+inline void intfloat<I, F>::operator -=(const intfloat<I, F>& other)
 {
 	intpart-=other.intpart;
 	floatpart-=other.floatpart;
@@ -99,31 +99,31 @@ inline void intfloat<I, F>::operator -=(intfloat<I, F> other)
 }
 
 template<typename I, typename F>
-inline bool intfloat<I, F>::operator <(intfloat<I, F> other) const
+inline bool intfloat<I, F>::operator <(const intfloat<I, F>& other) const
 {
 	return (intpart<other.intpart)|((intpart==other.intpart)&(floatpart<other.floatpart));
 }
 
 template<typename I, typename F>
-inline bool intfloat<I, F>::operator <=(intfloat<I, F> other) const
+inline bool intfloat<I, F>::operator <=(const intfloat<I, F>& other) const
 {
 	return (intpart<other.intpart)|((intpart==other.intpart)&(floatpart<=other.floatpart));
 }
 
 template<typename I, typename F>
-inline bool intfloat<I, F>::operator >(intfloat<I, F> other) const
+inline bool intfloat<I, F>::operator >(const intfloat<I, F>& other) const
 {
 	return (intpart>other.intpart)|((intpart==other.intpart)&(floatpart>other.floatpart));
 }
 
 template<typename I, typename F>
-inline bool intfloat<I, F>::operator >=(intfloat<I, F> other) const
+inline bool intfloat<I, F>::operator >=(const intfloat<I, F>& other) const
 {
 	return (intpart>other.intpart)|((intpart==other.intpart)&(floatpart>=other.floatpart));
 }
 
 template<typename I, typename F>
-inline bool intfloat<I, F>::operator !=(intfloat<I, F> other) const
+inline bool intfloat<I, F>::operator !=(const intfloat<I, F>& other) const
 {
 	return (intpart!=other.intpart)|(floatpart!=other.floatpart);
 }
@@ -205,7 +205,7 @@ inline void intfloat<I, F>::operator /=(double scalar)
 	*this*=(1/scalar);
 }
 template<typename I, typename F>
-inline bool intfloat<I, F>::operator ==(intfloat<I, F> other) const
+inline bool intfloat<I, F>::operator ==(const intfloat<I, F>& other) const
 {
 	return (intpart==other.intpart)&(floatpart==other.floatpart);
 }
@@ -254,11 +254,11 @@ struct vec3if
 	vec3if() = default;
 	vec3if(const intfloat<I, F>&, const intfloat<I, F>&, const intfloat<I, F>& );
 
-	vec3if<I,F> operator+(vec3if<I,F> other) const;
-	vec3if<I,F> operator-(vec3if<I,F> other) const;
+	vec3if<I,F> operator+(const vec3if<I,F>& other) const;
+	vec3if<I,F> operator-(const vec3if<I,F>& other) const;
 	vec3if<I,F> operator-() const;
-	void operator+=(vec3if<I,F> other);
-	void operator-=(vec3if<I,F> other);
+	void operator+=(const vec3if<I,F>& other);
+	void operator-=(const vec3if<I,F>& other);
 
 	vec3if<I,F> operator*(double scalar) const;
 	void operator*=(double scalar);
@@ -274,10 +274,10 @@ struct vec3if
 	vec3 operator/(vec3if<I,F> other) const;
 
 	//returns bit vector of comparison lsb=x
-	unsigned int operator<(vec3if<I,F> other) const;
-	unsigned int operator<=(vec3if<I,F> other) const;
-	unsigned int operator>(vec3if<I,F> other) const;
-	unsigned int operator>=(vec3if<I,F> other) const;
+	unsigned int operator<(const vec3if<I,F>& other) const;
+	unsigned int operator<=(const vec3if<I,F>& other) const;
+	unsigned int operator>(const vec3if<I,F>& other) const;
+	unsigned int operator>=(const vec3if<I,F>& other) const;
 
 	bool equalsZero() const;//tiny epsilon tolerance
 	intfloat<I,F> lengthHP() const;//gives the length using high precision (currently: double)
@@ -302,7 +302,7 @@ std::ostream& operator<<(std::ostream &out, const struct vec3if<I, F> v);
 
 
 template<typename I, typename F>
-inline vec3if<I, F> vec3if<I, F>::operator +(vec3if<I, F> other) const
+inline vec3if<I, F> vec3if<I, F>::operator +(const vec3if<I, F>& other) const
 {
 	vec3if<I, F> ret;
 	ret.x=x+other.x;
@@ -312,7 +312,7 @@ inline vec3if<I, F> vec3if<I, F>::operator +(vec3if<I, F> other) const
 }
 
 template<typename I, typename F>
-inline vec3if<I, F> vec3if<I, F>::operator -(vec3if<I, F> other) const
+inline vec3if<I, F> vec3if<I, F>::operator -(const vec3if<I, F>& other) const
 {
 	vec3if<I, F> ret;
 	ret.x=x-other.x;
@@ -322,7 +322,7 @@ inline vec3if<I, F> vec3if<I, F>::operator -(vec3if<I, F> other) const
 }
 
 template<typename I, typename F>
-inline void vec3if<I, F>::operator +=(vec3if<I, F> other)
+inline void vec3if<I, F>::operator +=(const vec3if<I, F>& other)
 {
 	x+=other.x;
 	y+=other.y;
@@ -330,7 +330,7 @@ inline void vec3if<I, F>::operator +=(vec3if<I, F> other)
 }
 
 template<typename I, typename F>
-inline void vec3if<I, F>::operator -=(vec3if<I, F> other)
+inline void vec3if<I, F>::operator -=(const vec3if<I, F>& other)
 {
 	x-=other.x;
 	y-=other.y;
@@ -437,25 +437,25 @@ inline void vec3if<I, F>::operator /=(float scalar)
 }
 
 template<typename I, typename F>
-inline unsigned int vec3if<I, F>::operator <(vec3if<I, F> other) const
+inline unsigned int vec3if<I, F>::operator <(const vec3if<I, F>& other) const
 {
 	return (x<other.x)*1+(y<other.y)*2+(z<other.z)*4;
 }
 
 template<typename I, typename F>
-inline unsigned int vec3if<I, F>::operator <=(vec3if<I, F> other) const
+inline unsigned int vec3if<I, F>::operator <=(const vec3if<I, F>& other) const
 {
 	return (x<=other.x)*1+(y<=other.y)*2+(z<=other.z)*4;
 }
 
 template<typename I, typename F>
-inline unsigned int vec3if<I, F>::operator >(vec3if<I, F> other) const
+inline unsigned int vec3if<I, F>::operator >(const vec3if<I, F>& other) const
 {
 	return (x>other.x)*1+(y>other.y)*2+(z>other.z)*4;
 }
 
 template<typename I, typename F>
-inline unsigned int vec3if<I, F>::operator >=(vec3if<I, F> other) const
+inline unsigned int vec3if<I, F>::operator >=(const vec3if<I, F>& other) const
 {
 	return (x>=other.x)*1+(y>=other.y)*2+(z>=other.z)*4;
 }

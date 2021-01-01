@@ -3,11 +3,13 @@
 #define SRC_ICAMERA_H_
 
 #include <GL/glew.h>
+
+#include "Eye.hpp"
 class ICamera
 {
 public:
+	Eye* eye;
 
-	float posX, posY, posZ;
 	float zoom;// = tan(fov/2); smaller value means things look bigger
 	float width;// width of screen in pixels
 	float height;// height of screen in pixels
@@ -19,8 +21,8 @@ public:
 	void applyFresh();//resets the matrices and calls apply() afterwards
 
 
-	ICamera();
-	virtual ~ICamera();
+	ICamera(Eye& eye);
+	virtual ~ICamera() = default;
 };
 
 #endif /*SRC_ICAMERA_H_*/

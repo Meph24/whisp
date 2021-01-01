@@ -29,7 +29,7 @@ void BenchEntityS::draw(const SimClock::time_point& draw_time, Frustum* viewFrus
 void BenchEntityS::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
 {
 	assert(tsp);
-	IWorld * iw=tsp->getIWorld();
+	IWorld* iw=&tsp->world();
 	assert(iw);
 	float seconds=(float)FloatSeconds(next_tick_begin-last_ticked);
 	last_ticked=next_tick_begin;

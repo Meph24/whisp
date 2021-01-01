@@ -10,8 +10,6 @@ using network::UdpSocket;
 
 struct RemoteControlReceiverUser : public User
 {
-	SimulationInputStatusSet* managed_status;
-
 	SFMLWindow sfmlwindow;
 
 	SimulationInputStatusSet current_receive;
@@ -33,7 +31,7 @@ struct RemoteControlSender : public InputDeviceConfigurator
 	EventMapper event_mapper;
 	EventSource* event_source;
 
-	SimulationInputStatusSet status_set;
+	SimulationInputStatusSet input_status;
 
 	IPv4Address receiver_addr;
 	Port receiver_port;

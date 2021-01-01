@@ -1,5 +1,6 @@
 #pragma once
 #include "ICamera3D.h"
+
 class CameraFP: public ICamera3D
 {
 public:
@@ -12,6 +13,6 @@ public:
 	virtual DivisionPlane getUpperPlane();
 	virtual DivisionPlane getLowerPlane();
 
-	CameraFP();
-	~CameraFP();
+	CameraFP( Eye& eye );
+	~CameraFP() = default;
 };

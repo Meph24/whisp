@@ -13,9 +13,6 @@ AdaptiveQuality::AdaptiveQuality(float minQuality,float maxQuality,float targetT
 target(targetTime),max(maxQuality),min(minQuality),lastQuality(maxQuality)
 {}
 
-AdaptiveQuality::~AdaptiveQuality()
-{}
-
 //#include <iostream>
 #define LIFT_RESTRICTION_VALUE 2.0f
 

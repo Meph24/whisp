@@ -1,31 +1,34 @@
 #include "Zombie_Enemy.h"
 
-#include "glmutils.hpp"
-#include <glm/glm.hpp>
-
-#include "EntitySound.h"
-#include "ChunkManager.h"
-#include "Projectile.h"
-#include "EntityProjectileBulletLike.h"
-#include "TickServiceProvider.h"
-#include "SoundManager.h"
-#include "Frustum.h"
-#include "ITexture.h"
-#include "SpeedMod.h"
-#include "Chunk.h"
-#include "InteractFilterAlgoSym.h"
-#include "InteractFilterAlgoAsym.h"
-#include "FloatSeconds.hpp"
-
 #include <cstdlib>
 #include <GL/glew.h>
 
+#include "Chunk.h"
+#include "ChunkManager.h"
+#include "DrawServiceProvider.h"
+#include "EntityProjectileBulletLike.h"
+#include "EntitySound.h"
+#include "FloatSeconds.hpp"
+#include "Frustum.h"
+#include "glmutils.hpp"
+#include "InteractFilterAlgoSym.h"
+#include "InteractFilterAlgoAsym.h"
+#include "ITexture.h"
+#include "Projectile.h"
+#include "SoundManager.h"
+#include "SpeedMod.h"
+#include "TickServiceProvider.h"
+
 int Zombie_Enemy::zombieCount=0;
 
-Zombie_Enemy::Zombie_Enemy(const SimClock::time_point& spawn_time,ITexture * texture,spacevec startPos,TickServiceProvider* tsp):
-tex(texture),ml(),legDmg(0),bodyAnim(1,0),fallAnim(0.25f,0,1),transitionAnim(0.5f,0,1)
+Zombie_Enemy::Zombie_Enemy(const SimClock::time_point& spawn_time,spacevec startPos,TickServiceProvider* tsp)
+	: ml()
+	, legDmg(0)
+	, bodyAnim(1,0)
+	, fallAnim(0.25f,0,1)
+	, transitionAnim(0.5f,0,1)
 {
-	IWorld * iw=tsp->getIWorld();
+	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 	fac=FACTION_ZOMBIES;
 	acceptedConversions=FLAG_HIT_TYPE_BULLET_LIKE;
@@ -69,8 +72,6 @@ void Zombie_Enemy::drawTexturedCube(texCooSet tc)
 	tc.sideWidth *= tc.unitSize;
 	tc.topX *= tc.unitSize;
 	tc.topY *= tc.unitSize;
-
-
 
 	glBegin(GL_QUADS);
 
@@ -266,7 +267,7 @@ void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFru
 	glRotatef(facing, 0, 1, 0);
 	glRotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
 	glScalef(size, size, size);
-	tex->bind();
+	dsp->graphics_ressources.zombieTex->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glEnable(GL_TEXTURE_2D);
 
@@ -303,7 +304,7 @@ void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFru
 
 void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceProvider * tsp)
 {
-	IWorld * iw=tsp->getIWorld();
+	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 
 	headshot=true;
@@ -316,7 +317,7 @@ void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceP
 	if(fallAnim.getCurStep(0)>=1)
 	{
 		exists=false;//TODO convert to new entity management
-		requestDestroy(tsp->getIWorld());
+		requestDestroy(&tsp->world());
 	}
 
 	spacelen characterHeightConv=iw->fromMeters(size*2);
@@ -355,20 +356,28 @@ void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceP
 
 	}
 
-	vec3 relPos=iw->toMeters(pos-tsp->getTarget(this)->pos);
-
-	vec3 mySpeed=iw->toMeters(v);
-	vec3 xprod=glm::cross(mySpeed,relPos);
-//	float mySpdSq=mySpeed.lengthSq();
-//	if(mySpdSq==0) mySpdSq=1;
-//	facing-=seconds*xprod.y/mySpdSq*20;
-	if(xprod.y>0)
+	Entity* target = tsp->getTarget(this);
+	if(!target)
 	{
-		facing-=seconds*60;
+		v.set0();
 	}
 	else
-	{
-		facing+=seconds*60;
+	{	
+		vec3 relPos=iw->toMeters(pos - target->pos);
+
+		vec3 mySpeed=iw->toMeters(v);
+		vec3 xprod=glm::cross(mySpeed,relPos);
+	//	float mySpdSq=mySpeed.lengthSq();
+	//	if(mySpdSq==0) mySpdSq=1;
+	//	facing-=seconds*xprod.y/mySpdSq*20;
+		if(xprod.y>0)
+		{
+			facing-=seconds*60;
+		}
+		else
+		{
+			facing+=seconds*60;
+		}
 	}
 
 //	float wishAngle=atan2(relPos.x, relPos.z);
@@ -404,7 +413,7 @@ void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceP
 #include "WarnErrReporter.h"
 void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickServiceProvider& tsp)
 {
-	IWorld * iw=tsp.getIWorld();
+	IWorld * iw = &tsp.world();
 //	std::cout<<"inside checkProjectile"<<std::endl;
 	float before=this->remainingHP;
 	DualPointer<Projectile> projConv=DualPointer<Projectile>((Entity *)projectile,(Projectile *)projectile);
@@ -555,7 +564,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 
 float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,CumulativeMat* ml, float xFrom, float xTo, float yFrom,float yTo, float zFrom, float zTo,TickServiceProvider& tsp)
 {
-	IWorld * iw=tsp.getIWorld();
+	IWorld * iw=&tsp.world();
 	float ret=-1;
 	ml->push();
 	*ml = *ml 

@@ -26,8 +26,6 @@ class Zombie_Enemy: public Entity,public Pushable,public Hittable, public Hittab
 		float bottomX, bottomY;
 	};
 
-	ITexture * tex;
-
 	CumulativeMat ml;
 
 	float tilted=10;
@@ -61,7 +59,7 @@ public:
 
 
 	//spawns a random zombie at the given location
-	Zombie_Enemy(const SimClock::time_point& spawnTime,ITexture * texture,spacevec startPos,TickServiceProvider * tsp);
+	Zombie_Enemy(const SimClock::time_point& spawnTime,spacevec startPos,TickServiceProvider * tsp);
 	~Zombie_Enemy();
 
 	virtual void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw,DrawServiceProvider * dsp);
