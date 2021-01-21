@@ -74,6 +74,8 @@ struct CommandLineArgumentInterpreter
 		Default,
 		RemoteControlSender,
 		RemoteControlReceiver,
+		Server,
+		Client,
 
 		NUM_EXECUTIONMODE
 	} execution_mode = ExecutionMode::Default;
@@ -83,7 +85,11 @@ struct CommandLineArgumentInterpreter
     CommandLineArgumentInterpreter( unordered_map<string, vector<string>> args )
 	: args(args)
     {   
-        if( args.find( "remote-control-sender" ) != args.end() )
+        if( args.find( "server" ) != args.end() )
+            execution_mode = ExecutionMode::Server;
+        else if( args.find( "client" ) != args.end() )
+            execution_mode = ExecutionMode::Client;
+        else if( args.find( "remote-control-sender" ) != args.end() )
             execution_mode = ExecutionMode::RemoteControlSender;
 		else if(args.find( "remote-control-receiver" ) != args.end() )
 			execution_mode = ExecutionMode::RemoteControlReceiver;

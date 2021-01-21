@@ -38,4 +38,6 @@ IPv4Address::operator uint32_t () const { return v; }
 IPv4Address::operator string () const { return to_string(v >> 24 & 0xFF) + string(".") + to_string(v >> 16 & 0xFF) + string(".") + to_string(v >> 8 & 0xFF) + string(".") + to_string(v & 0xFF); }
 const IPv4Address IPv4Address::any = IPv4Address(0,0,0,0);
 
+ostream& operator<<(ostream& os, const IPv4Address& addr) { os << (string) addr; return os; }
+
 } /* namespace network */

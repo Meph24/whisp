@@ -22,5 +22,11 @@ sensitivityY=0.0431654676
 objects_count=0
 
 [network]
-default_ip_remote_control_sender="127.0.0.1"
-default_port_remote_control=55555
+default_connect_ip="127.0.0.1"
+default_connect_port=55555
+
+[server]
+name="Standard Dwengine Server"
+
+[client]
+name="Meph"

@@ -1,13 +1,15 @@
 #ifndef IPV4ADDRESS_HPP
 #define IPV4ADDRESS_HPP
 
-#include <regex>
 #include <cstdint>
+#include <iostream>
+#include <regex>
 #include <string>
 #include "error.hpp"
 
 using std::string;
 using std::regex;
+using std::ostream;
 
 namespace network {
 
@@ -38,7 +40,11 @@ public:
     explicit operator string () const;
 
     static const IPv4Address any;
+
+    friend ostream& operator<<(ostream& os, const IPv4Address& addr);
 };
+
+ostream& operator<<(ostream& os, const IPv4Address& addr);
 
 using Port = uint16_t;
 

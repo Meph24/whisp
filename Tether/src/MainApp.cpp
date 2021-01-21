@@ -13,6 +13,7 @@
 #include "Simulation_World.h"
 #include "Zombie_World.h"
 #include "remoteControl.hpp"
+#include "synchronized.hpp"
 
 using std::cout;
 
@@ -22,6 +23,8 @@ unordered_map<string, unsigned int> Main::command_line_argument_flags =
 {  
 	{"remote-control-sender", 0},
 	{"remote-control-receiver", 0},
+	{"server", 0},
+	{"client", 0},
 	{"addr", 1},
 	{"port", 1}
 };
@@ -35,7 +38,7 @@ Main::Main(int argc, char** argv)
 
 	srand(time(0));
 
-	Port port = (*cfg.getInt("network", "default_port_remote_control"));
+	Port port = (*cfg.getInt("network", "default_connect_port"));
 	if(port < 0 || port > 65535)
 		throw std::runtime_error( " Port loaded from cfg " + std::to_string(port) + "is not a port!\n" );
 	if(commandline_argument_interpreter.args.find("port") != commandline_argument_interpreter.args.end() )
@@ -51,9 +54,21 @@ Main::Main(int argc, char** argv)
 		case CommandLineArgumentInterpreter::ExecutionMode::Default:
 			app = std::make_unique<DefaultApp>(clock, cfg);
 		break;
+		case CommandLineArgumentInterpreter::ExecutionMode::Server:
+			app = std::make_unique<ServerApp>(clock, cfg, port);
+		break;
+		case CommandLineArgumentInterpreter::ExecutionMode::Client:
+		{
+			IPv4Address addr ( *cfg.getStr( "network", "default_connect_ip" ) );
+			if( commandline_argument_interpreter.args.find("addr") != commandline_argument_interpreter.args.end() )
+				addr = IPv4Address(commandline_argument_interpreter.args["addr"][0]);
+
+			app = std::make_unique<ClientApp>(clock, cfg, addr, port);
+		}
+		break;
 		case CommandLineArgumentInterpreter::ExecutionMode::RemoteControlSender:
 		{
-			IPv4Address addr ( *cfg.getStr( "network", "default_ip_remote_control_sender" ) );
+			IPv4Address addr ( *cfg.getStr( "network", "default_connect_ip" ) );
 			if( commandline_argument_interpreter.args.find("addr") != commandline_argument_interpreter.args.end() )
 				addr = IPv4Address(commandline_argument_interpreter.args["addr"][0]);
 
