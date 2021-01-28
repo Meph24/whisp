@@ -25,5 +25,4 @@ struct SFMLClock
 	}
 };
 
-
 #endif /* SFMLCLOCK_HPP */
