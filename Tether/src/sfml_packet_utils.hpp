@@ -1,6 +1,14 @@
 #ifndef SFML_PACKET_UTILS_HPP
 #define SFML_PACKET_UTILS_HPP
 
+/*
+ * This File contains utilities for streaming to sf::Packets.
+ * Here, only the overloads and utilities go, whih try to stream classes from other libraries
+ * like from the std namepace.
+ * If a class that is to be streamed is custom, the overloads are not to be included here,
+ * but in the respective class' files instead!
+*/
+
 #include <SFML/Network/Packet.hpp>
 
 #include <chrono>
