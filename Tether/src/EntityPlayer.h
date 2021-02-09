@@ -71,7 +71,7 @@ public:
 
 	EntityPlayer(	SimClock::time_point spawn_time,
 					spacevec startPos, 
-					float sensX, float sensY,	
+					float sensX, float sensY,
  					float characterSpeed	);
 	virtual ~EntityPlayer() = default;
 

@@ -48,6 +48,29 @@ ostream& operator<<(ostream& os, const IPv4Address& addr);
 
 using Port = uint16_t;
 
+struct FullIPv4
+{
+    IPv4Address addr;
+    Port port;
+
+    FullIPv4() = default;
+    FullIPv4(const IPv4Address&, const Port&);
+    //TODO with regex : FullIPv4(const string&);
+
+    FullIPv4(const FullIPv4&) = default;
+    FullIPv4& operator=(const FullIPv4&) = default;
+
+    bool operator<(const FullIPv4& other) const;
+    bool operator>(const FullIPv4& other) const;
+    bool operator<=(const FullIPv4& other) const;
+    bool operator>=(const FullIPv4& other) const;
+    bool operator==(const FullIPv4& other) const;
+    bool operator!=(const FullIPv4& other) const;
+
+    friend ostream& operator<<(ostream& os, const FullIPv4&);
+};
+ostream& operator<<(ostream& os, const FullIPv4& ipv4);
+
 } /* namespace network */
 
 #endif // IPV4ADDRESS_HPP
