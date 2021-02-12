@@ -19,7 +19,7 @@ void Entity::requestDestroy(IWorld * w)
 {
 	if(requestedDelete) return;
 	requestedDelete=true;
-	exists=false;
+//	exists=false;
 	int size=follower.size();
 	for(int i=0;i<size;i++)
 	{

@@ -52,6 +52,13 @@ public:
 	PerformanceMeter::SingleTimer logicRetick;
 	PerformanceMeter::SingleTimer logicTerrain;
 
+
+
+	void serialize(sf::Packet& p,bool complete);
+	void deserialize(sf::Packet& p,SyncableManager & sm);
+	void getOwnedSyncables(std::vector<Syncable *> collectHere);
+	void getReferencedSyncables(std::vector<Syncable *> collectHere);
+
 private:
 	bool spawnZombies;
 	int zCount;//max number of zombies

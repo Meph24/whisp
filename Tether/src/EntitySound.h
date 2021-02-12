@@ -23,6 +23,13 @@ public:
 	virtual void notifyRemoval(Entity * e);
 	EntitySound(Entity * attachedTo,const sf::SoundBuffer& soundTemplate,float pitch=1.0f,bool enable3D=true);
 	~EntitySound();
+
+
+	void serialize(sf::Packet& p,bool complete);
+	void deserialize(sf::Packet& p,SyncableManager & sm);
+	EntitySound(sf::Packet p,TickServiceProvider * tsp, SyncableManager& sm);//deserialize constructor
+	void getOwnedSyncables(std::vector<Syncable *> collectHere);
+	void getReferencedSyncables(std::vector<Syncable *> collectHere);
 };
 
 #endif /* SRC_ENTITYSOUND_H_ */

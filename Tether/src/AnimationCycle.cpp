@@ -3,76 +3,103 @@
  *
  *  Created on:	Apr 12, 2018
  *      Author:	HL65536
- *     Version:	2.0
+ *     Version:	2.1
  */
 
 #include "AnimationCycle.h"
 
-void AnimationCycle::updateInternals(float timePassed)
+float AnimationCycle::modFloat(float x, float by)
 {
-	progress+=timePassed*cycleLenInv;
-	progress=cap(progress);
+	int a=(int)(x/by);
+	if(x<0) a--;
+	return x-a*by;
 }
 
-float AnimationCycle::cap(float x)
+float AnimationCycle::cap01(float x)
 {
-	int rounds=(int)x;
-	if(remaining<0)//no limit
+	if(maxCycles==0)//no limit
 	{
-		x-=rounds;
-		if(x<0) x+=1;
-		return x;
+		return modFloat(x,1);
 	}
-	else if(remaining>rounds)//inside limit
+	else if(maxCycles>x && x>=0)//inside limit
 	{
-		remaining-=rounds;
-		x-=rounds;
-		if(x<0) x+=1;
+		return modFloat(x,1);
+	}
+	//else: //outside limit
+	if(x>=maxCycles) return 1;
+	return 0;//x<0
+}
+
+float AnimationCycle::cap0max(float x)
+{
+	if(maxCycles==0)//no limit
+	{
+		return modFloat(x,1);
+	}
+	else if(maxCycles>x && x>=0)//inside limit
+	{
 		return x;
 	}
 	//else: //outside limit
-	if(rounds==0)
-	{
-		if(x<0) x+=1;
-		return x;
-	}
-	else if(rounds>0)
-	{
-		return 1;
-	}
-	else return 0;
+	if(x>=maxCycles) return maxCycles;
+	return 0;//x<0
 }
 
 void AnimationCycle::update(float timePassed)
 {
-	updateInternals(timePassed-hiddenProgress);
-	hiddenProgress=0;
+	confirmedProgress+=timePassed*cycleLenInv;
+	confirmedProgress=cap0max(confirmedProgress);
 }
 
 void AnimationCycle::updateTemp(float timeOffset)
 {
-	updateInternals(timeOffset-hiddenProgress);
-	hiddenProgress=timeOffset;
+	tempProgress=timeOffset*cycleLenInv;
 }
 
-float AnimationCycle::getCurStep(float phaseOffset)
+float AnimationCycle::getCurStep(float phaseOffset,bool withTempProgress)
 {
-	float myProgress=progress+phaseOffset;
-	return cap(myProgress);
+	float myProgress=confirmedProgress+phaseOffset;
+	if(withTempProgress) myProgress+=tempProgress;
+	return cap01(myProgress);
 }
 #include "MathStuff.h"
-float AnimationCycle::getCurStepTau(float phaseOffset)
+float AnimationCycle::getCurStepTau(float phaseOffset,bool withTempProgress)
 {
-	return getCurStep(phaseOffset)*TAU;
+	return getCurStep(phaseOffset,withTempProgress)*TAU;
 }
 
 
-AnimationCycle::AnimationCycle(float cycleLength, float startPhase,int maxCycles):
-		hiddenProgress(0),remaining(maxCycles),cycleLenInv(1.0f/cycleLength),progress(startPhase)
+AnimationCycle::AnimationCycle(float cycleLength, float startPhase,u8 maxCyc)
+: tempProgress(0)
+, maxCycles(maxCyc)
+, cycleLenInv(1.0f/cycleLength)
+, confirmedProgress(startPhase)
 {
-	if(remaining>0) remaining--;
 }
 
 AnimationCycle::~AnimationCycle()
-{}
+{
+}
+
+void AnimationCycle::serialize(sf::Packet& p, bool complete)
+{
+	p<<confirmedProgress;
+	if(complete)
+	{
+		p<<maxCycles;
+		p<<cycleLenInv;
+	}
+}
+
+void AnimationCycle::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	p>>confirmedProgress;
+}
+
+AnimationCycle::AnimationCycle(sf::Packet p, SyncableManager& sm)
+{
+	deserialize(p,sm);
+	p>>maxCycles;
+	p>>cycleLenInv;
+}
 

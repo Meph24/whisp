@@ -38,6 +38,8 @@ class Zombie_Enemy: public Entity,public Pushable,public Hittable, public Hittab
 
 	bool gotHit(float time, int part, EntityProjectileBulletLike * projectile);
 
+	spacevec sizeBB(IWorld * iw);
+
 public:
 
 	static int zombieCount;
@@ -46,10 +48,9 @@ public:
 	float speed;
 	float size;
 
-	float totalHP;
+	float maxHP;
 	float remainingHP;
 	float legDmg;
-	float maxHP;
 
 	AnimationCycle bodyAnim;
 	AnimationCycle fallAnim;
@@ -74,6 +75,14 @@ public:
 	virtual void push(spacevec amount, TickServiceProvider& tsp);
 
 	virtual HittableBulletLike * asHittableBulletLike();
+
+
+	void serialize(sf::Packet& p,bool complete);
+	void deserialize(sf::Packet& p,SyncableManager & sm);
+	void deserializeNonNested(sf::Packet& p, SyncableManager& sm);
+	Zombie_Enemy(sf::Packet p,TickServiceProvider * tsp, SyncableManager& sm);//deserialize constructor
+	void getOwnedSyncables(std::vector<Syncable *> collectHere);
+	void getReferencedSyncables(std::vector<Syncable *> collectHere);
 
 };
 

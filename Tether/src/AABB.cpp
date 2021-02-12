@@ -205,3 +205,17 @@ AABB::AABB(spacevec posT0, spacevec posT1, spacevec lowBorderOffset,spacevec hig
 	high+=highBorderOffset;
 	assert(!(low>high));
 }
+
+sf::Packet& operator <<(sf::Packet& p, AABB& bb)
+{
+	p<<bb.low;
+	p<<bb.high;
+	return p;
+}
+
+sf::Packet& operator >>(sf::Packet& p, AABB& bb)
+{
+	p>>bb.low;
+	p>>bb.high;
+	return p;
+}

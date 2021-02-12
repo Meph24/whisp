@@ -17,6 +17,7 @@
 EntitySound::EntitySound(Entity* attachedTo,const sf::SoundBuffer& soundTemplate,float pitch,bool enable3D):
 attached(attachedTo)
 {
+	classID=CLASS_ID_EntitySound;
 	if(attached)
 	{
 		attached->follow(this);
@@ -88,3 +89,32 @@ EntitySound::~EntitySound()
 //		std::cout<<"sound destroyed normally"<<std::endl;
 }
 
+void EntitySound::serialize(sf::Packet& p, bool complete)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+void EntitySound::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+EntitySound::EntitySound(sf::Packet p, TickServiceProvider* tsp,SyncableManager& sm)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+void EntitySound::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+void EntitySound::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}

@@ -228,11 +228,11 @@ void Chunk::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IW
 	int size=managedEntities.size();
 	for(int i=0;i<size;i++)
 	{
-		if(managedEntities[i]->exists)
-		{
+		//TODO check if removal broke anything:if(managedEntities[i]->exists)
+		//{
 			managedEntities[i]->draw(draw_time, viewFrustum, iw, perspective);
 			if(perspective.enable_aabbs) managedEntities[i]->bb.draw(draw_time, viewFrustum, iw, perspective);
-		}
+		//}
 	}
 }
 

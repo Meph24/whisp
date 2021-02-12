@@ -45,8 +45,13 @@ public:
 	AABB(spacevec posT1,spacevec sizeFromMid,spacevec movement);
 	AABB(spacevec posT0,spacevec posT1,spacevec lowBorderOffset,spacevec highBorderOffset);
 	~AABB();
+
+
 };
 
 std::ostream& operator<< (std::ostream& os, const AABB& bb);
+
+sf::Packet& operator<<(sf::Packet& p, AABB& bb);
+sf::Packet& operator>>(sf::Packet& p, AABB& bb);
 
 #endif /* SRC_AABB_H_ */

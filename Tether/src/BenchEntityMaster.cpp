@@ -43,3 +43,27 @@ void BenchEntityMaster::tick(const SimClock::time_point& next_tick_begin, TickSe
 	last_ticked = next_tick_begin;
 	iw->benchAlgoAsym->doChecks((BenchAsymMaster *) this,(Entity *) this,seconds,*tsp);
 }
+
+void BenchEntityMaster::serialize(sf::Packet& p, bool complete)
+{
+	bool thisIsCalled=true;
+	assert(!thisIsCalled);
+}
+
+void BenchEntityMaster::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	bool thisIsCalled=true;
+	assert(!thisIsCalled);
+}
+
+void BenchEntityMaster::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsCalled=true;
+	assert(!thisIsCalled);
+}
+
+void BenchEntityMaster::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsCalled=true;
+	assert(!thisIsCalled);
+}

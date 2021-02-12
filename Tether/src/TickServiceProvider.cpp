@@ -26,7 +26,6 @@ TickServiceProvider::~TickServiceProvider()
 
 void TickServiceProvider::initNextTick()
 {
-	tickID++;
 	AABB::intersectionCounter=0;
 	AABB::checkCounter=0;
 }

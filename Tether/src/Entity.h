@@ -16,6 +16,7 @@
 #include "Spacevec.h"
 #include "SimClock.hpp"
 #include "Tickable.h"
+#include "Syncable.h"
 
 class ChunkManager;
 class DrawServiceProvider;
@@ -24,7 +25,7 @@ class IgnoreCondition;
 class IWorld;
 class TickServiceProvider;
 
-class Entity: public Tickable, Drawable
+class Entity: public Tickable, public Drawable, public Syncable
 {
 	std::vector<Entity *> follower;
 	bool requestedDelete=false;
@@ -32,10 +33,10 @@ public:
 	bool surviveClearing=false;
 	bool allowHibernating=false;//if true, survives being outside the world, being transferrred to a hibernation state
 
-	int refCounter=0;//DO NOT TOUCH
+	int refCounter=0;//DO NOT TOUCH (unless you rewrite the old chunk system...)
 
 
-	AABB bb;
+	AABB bb;//physics AABB
 	vec3 bbColor;
 
 //	EntityIdent ID;
@@ -45,12 +46,12 @@ public:
 	spacevec v;
 
 	SimClock::time_point last_ticked;
-	int lastTickID=0;//used for resets
+	//TODO check if removal broke anything: int lastTickID=0;//used for resets
 
 	std::vector<void *> alreadyChecked;//TODO remove/replace
 
 
-	bool exists=true;//if exists is false, memory will be freed soon
+	//TODO check if removal broke anything:	bool exists=true;//if exists is false, memory will be freed soon
 
 	//TODO evaluate if it makes more sense to save value or recalculate each time:
 //	bool multichunk=false;//can be used by spatial partitioning algorithms (in conjunction with "alreadyChecked")

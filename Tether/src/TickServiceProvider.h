@@ -34,8 +34,6 @@ public:
 	volatile unsigned long long interactionCounter = 0;//for benchmark purposes
 	volatile unsigned long long arbitraryNumber = 0;//for benchmark purposes
 
-	int tickID = 0;
-
 	virtual IWorld& world() = 0;
 	virtual ITerrain* getITerrain() = 0;
 	

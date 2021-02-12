@@ -44,3 +44,27 @@ void BenchEntitySlave::tick(const SimClock::time_point& next_tick_begin, TickSer
 	last_ticked = next_tick_begin;
 	iw->benchAlgoAsym->doChecks((BenchAsymSlave *) this,(Entity *) this,seconds,*tsp);
 }
+
+void BenchEntitySlave::serialize(sf::Packet& p, bool complete)
+{
+	bool thisIsCalled=true;
+	assert(!thisIsCalled);
+}
+
+void BenchEntitySlave::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	bool thisIsCalled=true;
+	assert(!thisIsCalled);
+}
+
+void BenchEntitySlave::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsCalled=true;
+	assert(!thisIsCalled);
+}
+
+void BenchEntitySlave::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsCalled=true;
+	assert(!thisIsCalled);
+}

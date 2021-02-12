@@ -12,8 +12,10 @@
 #include <iostream>
 #include <string>
 #include "MathStuff.h"
+#include "ShortNames.h"
 #include "glmutils.hpp"
 #include <glm/glm.hpp>
+#include <SFML/Network.hpp>
 using glm::vec3;
 
 //I must be a signed integer type
@@ -186,6 +188,10 @@ inline intfloat<I, F> operator*(double scalar, const intfloat<I, F>& v)
 
 template<typename I,typename F>
 std::ostream& operator<<(std::ostream &out, const struct intfloat<I, F> v);
+template<typename I,typename F>
+sf::Packet& operator<<(sf::Packet& p, const struct intfloat<I, F> v);
+template<typename I,typename F>
+sf::Packet& operator>>(sf::Packet& p, struct intfloat<I, F> v);
 
 template<typename I, typename F>
 inline void intfloat<I, F>::operator *=(double scalar)
@@ -300,6 +306,10 @@ vec3if<I, F>::vec3if(const intfloat<I, F>& x, const intfloat<I, F>& y, const int
 template<typename I,typename F>
 std::ostream& operator<<(std::ostream &out, const struct vec3if<I, F> v);
 
+template<typename I,typename F>
+sf::Packet& operator<<(sf::Packet& p, const struct vec3if<I, F> v);
+template<typename I,typename F>
+sf::Packet& operator>>(sf::Packet& p, struct vec3if<I, F> v);
 
 template<typename I, typename F>
 inline vec3if<I, F> vec3if<I, F>::operator +(const vec3if<I, F>& other) const
@@ -570,9 +580,43 @@ inline bool chunkCoordinate<I, F>::operator !=(chunkCoordinate<I, F> other) cons
 
 // 32 bit integer leads to ~7 light-seconds world radius (@gridSize=1m)
 // 64 bit integer leads to ~970 light-years world radius (@gridSize=1m)
-typedef int gridInt;
+typedef i32 gridInt;
 typedef intfloat<gridInt,float> spacelen;
 typedef vec3if<gridInt, float> spacevec;
 typedef chunkCoordinate<gridInt, float> chunkCoo;
+
+template<typename I, typename F>
+inline sf::Packet& operator <<(sf::Packet& p, const struct intfloat<I, F> v)
+{
+	p<<v.floatpart;
+	p<<v.intpart;
+	return p;
+}
+
+template<typename I, typename F>
+inline sf::Packet& operator >>(sf::Packet& p, struct intfloat<I, F> v)
+{
+	p>>v.floatpart;
+	p>>v.intpart;
+	return p;
+}
+
+template<typename I, typename F>
+inline sf::Packet& operator <<(sf::Packet& p, const struct vec3if<I, F> v)
+{
+	p<<v.x;
+	p<<v.y;
+	p<<v.z;
+	return p;
+}
+
+template<typename I, typename F>
+inline sf::Packet& operator >>(sf::Packet& p, struct vec3if<I, F> v)
+{
+	p>>v.x;
+	p>>v.y;
+	p>>v.z;
+	return p;
+}
 
 #endif /* SRC_SPACEVEC_H_ */

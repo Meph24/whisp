@@ -31,6 +31,7 @@ EntityProjectileBulletLike::EntityProjectileBulletLike(BulletLikeSource * origin
 typeB(t),source(origin)
 //,fromItem(item)
 {
+	classID=CLASS_ID_EntityProjectileBulletLike;
 	typeH=FLAG_HIT_TYPE_BULLET_LIKE;
 	posOld=position;
 	last_ticked = spawn_time;
@@ -170,4 +171,35 @@ void EntityProjectileBulletLike::setTexture(ITexture* texture)
 {
 	if(tex) delete tex;
 	tex=texture;
+}
+
+void EntityProjectileBulletLike::serialize(sf::Packet& p, bool complete)
+{
+	p<<pos;
+	p<<v;
+	p<<last_ticked;
+}
+
+void EntityProjectileBulletLike::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	p>>pos;
+	p>>v;
+	p>>last_ticked;
+	bb=AABB(pos);
+}
+
+EntityProjectileBulletLike::EntityProjectileBulletLike(sf::Packet p,SyncableManager& sm)
+: source(0)//source not needed for draw
+{
+	classID=CLASS_ID_EntityProjectileBulletLike;
+	typeH=FLAG_HIT_TYPE_BULLET_LIKE;
+	deserialize(p,sm);
+}
+
+void EntityProjectileBulletLike::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{}
+
+void EntityProjectileBulletLike::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+	//source is not needed in draw(), so it is not included here
 }

@@ -15,8 +15,8 @@
 
 class WorldDefault: public IWorld
 {
-	std::vector<Entity *> managedEntities;
 public:
+	std::vector<Entity *> managedEntities;
 	WorldDefault(float GridSize);
 	virtual ~WorldDefault();
 

@@ -44,6 +44,7 @@ Zombie_World::Zombie_World(const WallClock& reference_clock, Cfg& cfg)
 	, zCount( *cfg.getInt("test", "zombies") )
 	, zombieDist( *cfg.getInt("test", "zombieDist") )
 {
+	classID=CLASS_ID_Zombie_World;
 	logicOutside 		= pmLogic.createTimestep	("            other");
 	logicOutside.setAsRoundtripMarker				(" Total logic time");
 	logicGunTick	 	= pmLogic.createTimestep	("        guns tick");
@@ -216,4 +217,24 @@ Entity* Zombie_World::getTarget(const Entity* me)
 {
 	if(players.empty()) return nullptr;
 	return players.begin()->second.get();
+}
+
+void Zombie_World::serialize(sf::Packet& p, bool complete)
+{
+}
+
+void Zombie_World::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+}
+
+void Zombie_World::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+	for(auto& p : players)
+		collectHere.push_back(p.second.get());
+	for(auto e : world_.managedEntities)
+		collectHere.push_back(e);
+}
+
+void Zombie_World::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
 }

@@ -19,12 +19,13 @@
 #include "SimClock.hpp"
 #include "TickServiceProvider.h"
 #include "User.hpp"
+#include "Syncable.h"
 
 using std::map;
 using std::string;
 using std::unique_ptr;
 
-class Simulation: public TickServiceProvider
+class Simulation: public TickServiceProvider, public Syncable
 {
 public:
 	map<User*, unique_ptr<EntityPlayer> > players;

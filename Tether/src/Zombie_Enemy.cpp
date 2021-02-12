@@ -18,16 +18,17 @@
 #include "SoundManager.h"
 #include "SpeedMod.h"
 #include "TickServiceProvider.h"
+#include "SyncableManager.h"
 
 int Zombie_Enemy::zombieCount=0;
 
 Zombie_Enemy::Zombie_Enemy(const SimClock::time_point& spawn_time,spacevec startPos,TickServiceProvider* tsp)
-	: ml()
-	, legDmg(0)
+	: legDmg(0)
 	, bodyAnim(1,0)
 	, fallAnim(0.25f,0,1)
 	, transitionAnim(0.5f,0,1)
 {
+	classID=CLASS_ID_Zombie_Enemy;
 	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 	fac=FACTION_ZOMBIES;
@@ -46,7 +47,7 @@ Zombie_Enemy::Zombie_Enemy(const SimClock::time_point& spawn_time,spacevec start
 		size *= 5;
 		remainingHP *= 40;
 	}
-	totalHP=remainingHP;
+	maxHP=remainingHP;
 
 	bodyAnim=AnimationCycle(3*size/speed,0);
 	pushRadius=0.3f*size;
@@ -214,7 +215,7 @@ void Zombie_Enemy::drawArm(int loc)
 
 	glPushMatrix();
 	glTranslatef(0, 1.1f, loc *0.3f);
-	glRotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
+	glRotatef(sin(bodyAnim.getCurStepTau(0.25+0.25*loc,true))*16+90, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 16 + 90
 	glTranslatef(0, -0.6f, 0);
 	glScalef(1, 3, 1);
 	drawTexturedCube(tc);
@@ -237,7 +238,7 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 
 	glPushMatrix();
 	glTranslatef(0, 0.6f, loc * 0.1f);
-	glRotatef(sin(bodyAnim.getCurStepTau(0.25*loc))*30*strength, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 30*strength
+	glRotatef(sin(bodyAnim.getCurStepTau(0.25*loc,true))*30*strength, 0, 0, 1);//sin(loc*animStep * 2 *speed/size) * 30*strength
 	glTranslatef(0, -0.6f, 0);
 	glScalef(1, 3, 1);
 	drawTexturedCube(tc);
@@ -247,14 +248,16 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFrustum,IWorld& iw,Perspective& perspective)
 {
 	float tickOffset=(float) FloatSeconds(draw_time-last_ticked);
-	if(!viewFrustum->inside(bb,iw))
+	AABB graphicsBB(pos+v*tickOffset,sizeBB(&iw));
+
+	if(!viewFrustum->inside(graphicsBB,iw))
 	{
 //		std::cout<<"zombie outside view"<<std::endl;//use this to test Frustum Culling
 		return;
 	}
 
 	bodyAnim.updateTemp(tickOffset);
-	if(legDmg>0.25f*totalHP)
+	if(legDmg>0.25f*maxHP)
 		transitionAnim.updateTemp(tickOffset);
 	if(remainingHP<=0) fallAnim.updateTemp(tickOffset);
 
@@ -265,7 +268,7 @@ void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFru
 	glPushMatrix();
 	glTranslatef(interPosMeters.x, interPosMeters.y, interPosMeters.z);
 	glRotatef(facing, 0, 1, 0);
-	glRotatef(fallAnim.getCurStep(0)*90, 1, 0, 0);
+	glRotatef(fallAnim.getCurStep(0,true)*90, 1, 0, 0);
 	glScalef(size, size, size);
 	perspective.graphics_ressources.zombieTex->bind();
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -274,21 +277,21 @@ void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFru
 
 	glPushMatrix();
 	float animStrength=1;
-	if(legDmg>0.25f*totalHP)
+	if(legDmg>0.25f*maxHP)
 	{
-		glTranslatef(-0.25f*transitionAnim.getCurStep(0)*maxTransition,0.1f*transitionAnim.getCurStep(0)*maxTransition,0);
-		glRotatef(-90*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
-		animStrength=0.15f*transitionAnim.getCurStep(0)*maxTransition;
+		glTranslatef(-0.25f*transitionAnim.getCurStep(0,true)*maxTransition,0.1f*transitionAnim.getCurStep(0,true)*maxTransition,0);
+		glRotatef(-90*transitionAnim.getCurStep(0,true)*maxTransition, 0, 0, 1);
+		animStrength=0.15f*transitionAnim.getCurStep(0,true)*maxTransition;
 	}
 	drawLeg(1,animStrength);
 	drawLeg(-1,animStrength);
 
 	glPopMatrix();
 
-	if(legDmg>0.25f*totalHP)
+	if(legDmg>0.25f*maxHP)
 	{
-		glTranslatef(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0);
-		glRotatef(-35*transitionAnim.getCurStep(0)*maxTransition, 0, 0, 1);
+		glTranslatef(0,-0.4f*transitionAnim.getCurStep(0,true)*maxTransition,0);
+		glRotatef(-35*transitionAnim.getCurStep(0,true)*maxTransition, 0, 0, 1);
 	}
 	drawBody();
 
@@ -311,16 +314,15 @@ void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceP
 	float seconds=(float) FloatSeconds(next_tick_time-last_ticked);
 	last_ticked = next_tick_time;
 	bodyAnim.update(seconds);
-	if(legDmg>0.25f*totalHP)
+	if(legDmg>0.25f*maxHP)
 		transitionAnim.update(seconds);
 	if(remainingHP<=0) fallAnim.update(seconds);
-	if(fallAnim.getCurStep(0)>=1)
+	if(fallAnim.getCurStep(0,false)>=1)
 	{
-		exists=false;//TODO convert to new entity management
+//TODO check if removal broke anything		exists=false;//TODO convert to new entity management
 		requestDestroy(&tsp->world());
 	}
 
-	spacelen characterHeightConv=iw->fromMeters(size*2);
 
 	spacevec old=pos;
 	spacevec prev=pos;
@@ -390,22 +392,11 @@ void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceP
 //	else if (difminus<dif) facing -= 360;
 //	facing = facing *(1 - seconds) + seconds*wishAngle;
 
-	spacevec sizeBB;
 
-	if(legDmg>0.25f*totalHP)
-	{
-		sizeBB.x=characterHeightConv*0.8f;
-	}
-	else
-	{
-		sizeBB.x=characterHeightConv*0.4f;
-	}
-	sizeBB.y=characterHeightConv*0.9f;
-	sizeBB.z=sizeBB.x;
 	if(seconds)
 		v=(pos-prev)/seconds;
 	//std::cout<<pos<<"|"<<prev<<"|"<<seconds<<"|"<<v<<std::endl;
-	bb=AABB(pos,sizeBB);
+	bb=AABB(pos,sizeBB(iw));
 	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,seconds,*tsp);
 	if(remainingHP>=0) iw->projectileAlgo->doChecks((Hittable *) this,(Entity *)this,seconds,*tsp);
 }
@@ -421,7 +412,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 	ml.loadIdentity();
 	ml = ml * glm::rotateDeg(facing, vec3(0.0f, 1.0f, 0.0f))
 		    * glm::rotateDeg(	
-							fallAnim.getCurStep(0)*90, 
+							fallAnim.getCurStep(0,false)*90,
 							glm::vec3(1.0f, 0.0f, 0.0f)
 						 )		 
 			* glm::scale(vec3(size, size, size));
@@ -429,16 +420,16 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 
 	ml.push();
 	float animStrength=1;
-	if(legDmg>0.25f*totalHP)
+	if(legDmg>0.25f*maxHP)
 	{
 		ml = glm::translate(ml, 
 							vec3( 
-								-0.25f*transitionAnim.getCurStep(0)*maxTransition,
-								0.1f*transitionAnim.getCurStep(0)*maxTransition,
+								-0.25f*transitionAnim.getCurStep(0,false)*maxTransition,
+								0.1f*transitionAnim.getCurStep(0,false)*maxTransition,
 								0.0f
 								));
-		ml = glm::rotateDeg(ml, -90*transitionAnim.getCurStep(0)*maxTransition, vec3(0, 0, 1));
-		animStrength=0.15f*transitionAnim.getCurStep(0)*maxTransition;
+		ml = glm::rotateDeg(ml, -90*transitionAnim.getCurStep(0,false)*maxTransition, vec3(0, 0, 1));
+		animStrength=0.15f*transitionAnim.getCurStep(0,false)*maxTransition;
 	}
 
 	ml.push();//leg
@@ -446,7 +437,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 	float hitTime;
 	loc = 1;
 	ml = glm::translate(ml, vec3(0, 0.6f, loc * 0.1f));
-	ml = glm::rotateDeg(ml, (float)sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, vec3(0, 0, 1));//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
+	ml = glm::rotateDeg(ml, (float)sin(bodyAnim.getCurStepTau(0.25*loc,false))*30*animStrength, vec3(0, 0, 1));//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
 	ml = glm::translate(ml, vec3(0, -0.6f, 0));
 	ml = glm::scale(ml, vec3(1, 3, 1));
 
@@ -464,7 +455,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 	loc = -1;
 	ml = ml
 		* glm::translate(vec3(0, 0.6f, loc * 0.1f))
-		* glm::rotateDeg((float) sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength, vec3(0, 0, 1))
+		* glm::rotateDeg((float) sin(bodyAnim.getCurStepTau(0.25*loc,false))*30*animStrength, vec3(0, 0, 1))
 		* glm::translate(vec3(0, -0.6f, 0))
 		* glm::scale(vec3(1, 3, 1));
 
@@ -481,11 +472,11 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 
 	ml.push();
 
-	if(legDmg>0.25f*totalHP)
+	if(legDmg>0.25f*maxHP)
 	{
 		ml = ml
-			* glm::translate(vec3(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0))
-			* glm::rotateDeg((float)-35*transitionAnim.getCurStep(0)*maxTransition, vec3(0, 0, 1));
+			* glm::translate(vec3(0,-0.4f*transitionAnim.getCurStep(0,false)*maxTransition,0))
+			* glm::rotateDeg((float)-35*transitionAnim.getCurStep(0,false)*maxTransition, vec3(0, 0, 1));
 	}
 
 	ml.push();	//head
@@ -526,7 +517,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 
 	ml = ml 
 		* glm::translate(vec3(0, 1.1f, loc * 0.3f))
-		* glm::rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, vec3(0, 0, 1))//sin(loc*animStep * 2 *speed/size) * 16 + 90
+		* glm::rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc,false))*16+90, vec3(0, 0, 1))//sin(loc*animStep * 2 *speed/size) * 16 + 90
 
 		* glm::translate(vec3(0, -0.6f, 0))
 		* glm::scale(vec3(1, 3, 1));
@@ -541,7 +532,7 @@ void Zombie_Enemy::checkProjectile(EntityProjectileBulletLike * projectile,TickS
 
 	ml = ml 
 		* glm::translate(vec3(0, 1.1f, loc * 0.3f))
-		* glm::rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, vec3(0, 0, 1))
+		* glm::rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc,false))*16+90, vec3(0, 0, 1))
 		* glm::translate(vec3(0, -0.6f, 0))
 		* glm::scale(vec3(1, 3, 1));
 
@@ -616,7 +607,7 @@ float Zombie_Enemy::checkBox(DualPointer<Projectile> projectile,CumulativeMat* m
 
 bool Zombie_Enemy::gotHit(float time, int part, EntityProjectileBulletLike * projectile)
 {
-	bool before=legDmg>0.25f*totalHP;
+	bool before=legDmg>0.25f*maxHP;
 	if(time==-1) return false;//no hit
 	float dmgMult = 0;
 	//float armDmgMult = 0;
@@ -652,7 +643,7 @@ bool Zombie_Enemy::gotHit(float time, int part, EntityProjectileBulletLike * pro
 
 	projectile->pos.y.intpart -= 1000;
 	projectile->posOld.y.intpart -= 1000;
-	if((!before)&&(legDmg>0.25f*totalHP))
+	if((!before)&&(legDmg>0.25f*maxHP))
 	{
 		speed/=2.5f;
 		return true;
@@ -665,18 +656,18 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	ml.loadIdentity();
 	ml = ml 
 		* rotateDeg(facing,vec3( 0, 1, 0))
-		* rotateDeg(fallAnim.getCurStep(0)*90,vec3( 1, 0, 0))
+		* rotateDeg(fallAnim.getCurStep(0,false)*90,vec3( 1, 0, 0))
 		* scale(vec3(size, size, size));
 
 
 	ml.push();
 	float animStrength=1;
-	if(legDmg>0.25f*totalHP)
+	if(legDmg>0.25f*maxHP)
 	{
 		ml = ml 
-			* translate(vec3(-0.25f*transitionAnim.getCurStep(0)*maxTransition,0.1f*transitionAnim.getCurStep(0)*maxTransition,0))
-			* rotateDeg(-90*transitionAnim.getCurStep(0)*maxTransition, vec3(0, 0, 1));
-		animStrength=0.15f*transitionAnim.getCurStep(0)*maxTransition;
+			* translate(vec3(-0.25f*transitionAnim.getCurStep(0,false)*maxTransition,0.1f*transitionAnim.getCurStep(0,false)*maxTransition,0))
+			* rotateDeg(-90*transitionAnim.getCurStep(0,false)*maxTransition, vec3(0, 0, 1));
+		animStrength=0.15f*transitionAnim.getCurStep(0,false)*maxTransition;
 	}
 
 	ml.push();//leg
@@ -685,7 +676,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	loc = 1;
 	ml = ml 
 		* translate(vec3(0, 0.6f, loc * 0.1f))
-		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength,vec3( 0, 0, 1))//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
+		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25*loc,false))*30*animStrength,vec3( 0, 0, 1))//sin(loc*animStep * 2 *speed/size) * 30*animStrength, 0, 0, 1);
 		* translate(vec3(0, -0.6f, 0))
 		* scale(vec3(1, 3, 1));
 
@@ -702,7 +693,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 	loc = -1;
 	ml = ml 
 		* translate(vec3(0, 0.6f, loc * 0.1f))
-		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25*loc))*30*animStrength,vec3( 0, 0, 1))
+		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25*loc,false))*30*animStrength,vec3( 0, 0, 1))
 		* translate(vec3(0, -0.6f, 0))
 		* scale(vec3(1, 3, 1));
 
@@ -718,11 +709,11 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 
 	ml.push();
 
-	if(legDmg>0.25f*totalHP)
+	if(legDmg>0.25f*maxHP)
 	{
 		ml = ml 
-			* translate(vec3(0,-0.4f*transitionAnim.getCurStep(0)*maxTransition,0))
-			* rotateDeg((float)-35*transitionAnim.getCurStep(0)*maxTransition,vec3( 0, 0, 1));
+			* translate(vec3(0,-0.4f*transitionAnim.getCurStep(0,false)*maxTransition,0))
+			* rotateDeg((float)-35*transitionAnim.getCurStep(0,false)*maxTransition,vec3( 0, 0, 1));
 	}
 
 	ml.push();	//head
@@ -760,7 +751,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 
 	ml = ml 
 		* translate(vec3(0, 1.1f, loc * 0.3f))
-		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, vec3(0, 0, 1))//sin(loc*animStep * 2 *speed/size) * 16 + 90
+		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc,false))*16+90, vec3(0, 0, 1))//sin(loc*animStep * 2 *speed/size) * 16 + 90
 		* translate(vec3(0, -0.6f, 0))
 		* scale(vec3(1, 3, 1));
 
@@ -777,7 +768,7 @@ void Zombie_Enemy::testHit(std::vector<ProjectileCollision> * collisions,hitType
 
 	ml = ml 
 		* translate(vec3(0, 1.1f, loc * 0.3f))
-		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc))*16+90, vec3(0, 0, 1))
+		* rotateDeg((float)sin(bodyAnim.getCurStepTau(0.25+0.25*loc,false))*16+90, vec3(0, 0, 1))
 		* translate(vec3(0, -0.6f, 0))
 		* scale(vec3(1, 3, 1));
 
@@ -801,4 +792,97 @@ void Zombie_Enemy::push(spacevec amount, TickServiceProvider& tsp)
 HittableBulletLike* Zombie_Enemy::asHittableBulletLike()
 {
 	return this;
+}
+
+void Zombie_Enemy::serialize(sf::Packet& p, bool complete)
+{
+	bodyAnim.serialize(p,complete);
+	fallAnim.serialize(p,complete);
+	transitionAnim.serialize(p,complete);
+	p<<facing;
+	p<<remainingHP;
+	p<<legDmg;
+	p<<maxTransition;
+	//TODO AABBs (bb, bbColor)
+	p<<pos;
+	p<<v;
+	p<<last_ticked;
+
+	if(complete)
+	{
+		p<<tilted;
+		p<<size;
+		p<<maxHP;
+		//TODO AABBs (bb, bbColor)
+	}
+}
+
+
+void Zombie_Enemy::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	bodyAnim.deserialize(p,sm);
+	fallAnim.deserialize(p,sm);
+	transitionAnim.deserialize(p,sm);
+	deserializeNonNested(p,sm);
+}
+
+void Zombie_Enemy::deserializeNonNested(sf::Packet& p, SyncableManager& sm)
+{
+	p>>facing;
+	p>>remainingHP;
+	p>>legDmg;
+	p>>maxTransition;
+	//TODO AABBs (bb, bbColor)
+	p>>pos;
+	p>>v;
+	p>>last_ticked;
+
+	bb=AABB(pos,sizeBB(sm.getIWorld()));
+}
+
+Zombie_Enemy::Zombie_Enemy(sf::Packet p, TickServiceProvider* tsp, SyncableManager& sm)
+: bodyAnim(p,sm)
+, fallAnim(p,sm)
+, transitionAnim(p,sm)
+{
+	classID=CLASS_ID_Zombie_Enemy;
+
+	deserializeNonNested(p,sm);
+	p>>tilted;
+	p>>size;
+	p>>maxHP;
+	//TODO AABBs (bb, bbColor)
+
+
+
+	fac=FACTION_ZOMBIES;
+	acceptedConversions=FLAG_HIT_TYPE_BULLET_LIKE;
+	zombieCount++;
+}
+
+void Zombie_Enemy::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+	//none
+}
+
+spacevec Zombie_Enemy::sizeBB(IWorld * iw)
+{
+	spacelen characterHeightConv=iw->fromMeters(size*2);
+	spacevec ret;
+	if(legDmg>0.25f*maxHP)
+	{
+		ret.x=characterHeightConv*0.8f;
+	}
+	else
+	{
+		ret.x=characterHeightConv*0.4f;
+	}
+	ret.y=characterHeightConv*0.9f;
+	ret.z=ret.x;
+	return ret;
+}
+
+void Zombie_Enemy::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+	//none
 }
