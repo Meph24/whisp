@@ -44,7 +44,6 @@ Zombie_World::Zombie_World(const WallClock& reference_clock, Cfg& cfg)
 	, zCount( *cfg.getInt("test", "zombies") )
 	, zombieDist( *cfg.getInt("test", "zombieDist") )
 {
-	classID=CLASS_ID_Zombie_World;
 	logicOutside 		= pmLogic.createTimestep	("            other");
 	logicOutside.setAsRoundtripMarker				(" Total logic time");
 	logicGunTick	 	= pmLogic.createTimestep	("        guns tick");
@@ -237,4 +236,9 @@ void Zombie_World::getOwnedSyncables(std::vector<Syncable*> collectHere)
 
 void Zombie_World::getReferencedSyncables(std::vector<Syncable*> collectHere)
 {
+}
+
+u32 Zombie_World::getClassID()
+{
+	return CLASS_ID_Zombie_World;
 }

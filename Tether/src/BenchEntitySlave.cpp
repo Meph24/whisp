@@ -68,3 +68,8 @@ void BenchEntitySlave::getReferencedSyncables(std::vector<Syncable*> collectHere
 	bool thisIsCalled=true;
 	assert(!thisIsCalled);
 }
+
+u32 BenchEntitySlave::getClassID()
+{
+	return CLASS_ID_BenchEntitySlave;
+}

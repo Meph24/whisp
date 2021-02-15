@@ -111,3 +111,33 @@ vector<FaceRef> ModelEntity::faces(float tick_time) const
 {
 	return m_model.faces();
 }
+
+void ModelEntity::serialize(sf::Packet& p, bool complete)
+{
+	//TODO
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+void ModelEntity::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+void ModelEntity::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+void ModelEntity::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+u32 ModelEntity::getClassID()
+{
+	return CLASS_ID_ModelEntity;
+}

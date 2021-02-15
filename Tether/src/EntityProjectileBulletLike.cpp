@@ -23,6 +23,7 @@
 #include "FloatSeconds.hpp"
 
 #include "glmutils.hpp"
+#include "sfml_packet_utils.hpp"
 
 ITexture * EntityProjectileBulletLike::tex=new TextureDummy();
 
@@ -31,7 +32,6 @@ EntityProjectileBulletLike::EntityProjectileBulletLike(BulletLikeSource * origin
 typeB(t),source(origin)
 //,fromItem(item)
 {
-	classID=CLASS_ID_EntityProjectileBulletLike;
 	typeH=FLAG_HIT_TYPE_BULLET_LIKE;
 	posOld=position;
 	last_ticked = spawn_time;
@@ -189,9 +189,9 @@ void EntityProjectileBulletLike::deserialize(sf::Packet& p, SyncableManager& sm)
 }
 
 EntityProjectileBulletLike::EntityProjectileBulletLike(sf::Packet p,SyncableManager& sm)
-: source(0)//source not needed for draw
+: typeB(0,0,0,0)//dummy
+, source(0)//source not needed for draw
 {
-	classID=CLASS_ID_EntityProjectileBulletLike;
 	typeH=FLAG_HIT_TYPE_BULLET_LIKE;
 	deserialize(p,sm);
 }
@@ -202,4 +202,9 @@ void EntityProjectileBulletLike::getOwnedSyncables(std::vector<Syncable*> collec
 void EntityProjectileBulletLike::getReferencedSyncables(std::vector<Syncable*> collectHere)
 {
 	//source is not needed in draw(), so it is not included here
+}
+
+u32 EntityProjectileBulletLike::getClassID()
+{
+	return CLASS_ID_EntityProjectileBulletLike;
 }

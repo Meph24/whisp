@@ -30,6 +30,14 @@ public:
 	~Zombie_Tree();
 	virtual void draw(const SimClock::time_point& t,Frustum * viewFrustum,IWorld& iw, Perspective&);
 	virtual void tick(const SimClock::time_point& t,TickServiceProvider * tsp);
+
+
+	void serialize(sf::Packet& p,bool complete);
+	void deserialize(sf::Packet& p,SyncableManager & sm);
+	Zombie_Tree(sf::Packet p,TickServiceProvider * tsp, SyncableManager& sm);//deserialize constructor
+	void getOwnedSyncables(std::vector<Syncable *> collectHere);
+	void getReferencedSyncables(std::vector<Syncable *> collectHere);
+	u32 getClassID();
 };
 
 #endif /* SRC_ZOMBIETREE_H_ */

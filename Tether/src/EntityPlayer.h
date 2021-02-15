@@ -53,9 +53,7 @@ public:
 
 	double score=0;
 
-	Eye eye;	
-
-public:
+	Eye eye;
 
 	float HP=-1;
 	float maxHP=100;
@@ -82,6 +80,14 @@ public:
 	virtual void push(spacevec amount, TickServiceProvider& tsp);
 	virtual void hitCallback(float dmg,bool kill,bool projDestroyed,HittableBulletLike * victim);
 	void selectWeapon(size_t selection);
+
+
+	void serialize(sf::Packet& p,bool complete);
+	void deserialize(sf::Packet& p,SyncableManager & sm);
+	EntityPlayer(sf::Packet p,TickServiceProvider * tsp, SyncableManager& sm);//deserialize constructor
+	void getOwnedSyncables(std::vector<Syncable *> collectHere);
+	void getReferencedSyncables(std::vector<Syncable *> collectHere);
+	u32 getClassID();
 };
 
 #endif /* SRC_ENTITYPLAYER_H_ */

@@ -21,6 +21,7 @@
 #include "TickServiceProvider.h"
 #include "TopLevelInventory.h"
 #include "Zombie_Gun.h"
+#include "sfml_packet_utils.hpp"
 
 using glm::vec3;
 
@@ -92,7 +93,7 @@ void EntityPlayer::draw(const SimClock::time_point& draw_time,Frustum * viewFrus
 	glRotatef( -eye.rotation.y, 0.0f, 1.0f, 0.0f );
 	glRotatef( -eye.rotation.x + 90, 1.0f, 0.0f, 0.0f );
 
-	player_model.drawHere();	
+	player_model.drawHere();
 
 	glPopMatrix();
 
@@ -232,4 +233,89 @@ void EntityPlayer::hitCallback(float dmg, bool kill, bool projDestroyed,Hittable
 		hitmark=1;
 		score+=dmg+kill*100;
 	}
+}
+
+void EntityPlayer::serialize(sf::Packet& p, bool complete)
+{
+	p<<score;
+	//TODO eye properly: start
+	p<<eye.rotation;
+	//TODO eye properly: end
+	p<<HP;
+	p<<hitmark;
+	//TODO held stuff properly: start
+	bool inventoryOpen=(bool)held_item;
+	p<<inventoryOpen;
+	i8 gunHeld=-1;
+	size_t size=guns.size();
+	for(size_t i=0;i<size;i++)
+	{
+		if(guns[i].get()==current_gun)
+		{
+			gunHeld=(i8) i;
+			break;
+		}
+	}
+	p<<gunHeld;
+	//TODO held stuff properly: end
+	p<<pos;
+	p<<v;
+	p<<last_ticked;
+
+	if(complete)
+	{
+
+	}
+}
+
+void EntityPlayer::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	p>>score;
+	//TODO eye properly: start
+	p>>eye.rotation;
+	//TODO eye properly: end
+	p>>HP;
+	p>>hitmark;
+	//TODO held stuff properly: start
+	bool inventoryShouldBeOpen;
+	bool inventoryIsOpen=(bool)held_item;
+	p>>inventoryShouldBeOpen;
+	if(inventoryIsOpen!=inventoryShouldBeOpen)
+	{
+		unused_inventory_slot.swap(held_item);
+	}
+	i8 gunHeld;
+	p>>gunHeld;
+	if(gunHeld<0 || ((size_t)gunHeld)>=guns.size())
+	{
+		current_gun=0;
+	}
+	else
+	{
+		current_gun=guns[gunHeld].get();
+	}
+	//TODO held stuff properly: end
+	p>>pos;
+	p>>v;
+	p>>last_ticked;
+}
+
+EntityPlayer::EntityPlayer(sf::Packet p, TickServiceProvider* tsp,SyncableManager& sm)
+: player_mesh (diamondMesh(3, 0.2, 0.5))
+, player_model( player_mesh )
+, eye(*this)
+{
+}
+
+void EntityPlayer::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+}
+
+void EntityPlayer::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+}
+
+u32 EntityPlayer::getClassID()
+{
+	return CLASS_ID_EntityPlayer;
 }

@@ -38,7 +38,7 @@ class Zombie_Enemy: public Entity,public Pushable,public Hittable, public Hittab
 
 	bool gotHit(float time, int part, EntityProjectileBulletLike * projectile);
 
-	spacevec sizeBB(IWorld * iw);
+	spacevec sizeBB(IWorld & iw);
 
 public:
 
@@ -83,6 +83,7 @@ public:
 	Zombie_Enemy(sf::Packet p,TickServiceProvider * tsp, SyncableManager& sm);//deserialize constructor
 	void getOwnedSyncables(std::vector<Syncable *> collectHere);
 	void getReferencedSyncables(std::vector<Syncable *> collectHere);
+	u32 getClassID();
 
 };
 

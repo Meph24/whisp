@@ -193,6 +193,9 @@ sf::Packet& operator<<(sf::Packet& p, const struct intfloat<I, F> v);
 template<typename I,typename F>
 sf::Packet& operator>>(sf::Packet& p, struct intfloat<I, F> v);
 
+sf::Packet& operator<<(sf::Packet& p, const vec3 v);
+sf::Packet& operator>>(sf::Packet& p, vec3 v);
+
 template<typename I, typename F>
 inline void intfloat<I, F>::operator *=(double scalar)
 {
@@ -612,6 +615,22 @@ inline sf::Packet& operator <<(sf::Packet& p, const struct vec3if<I, F> v)
 
 template<typename I, typename F>
 inline sf::Packet& operator >>(sf::Packet& p, struct vec3if<I, F> v)
+{
+	p>>v.x;
+	p>>v.y;
+	p>>v.z;
+	return p;
+}
+
+inline sf::Packet& operator <<(sf::Packet& p, const vec3 v)
+{
+	p<<v.x;
+	p<<v.y;
+	p<<v.z;
+	return p;
+}
+
+inline sf::Packet& operator >>(sf::Packet& p, vec3 v)
 {
 	p>>v.x;
 	p>>v.y;

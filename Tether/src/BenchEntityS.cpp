@@ -55,3 +55,8 @@ void BenchEntityS::getReferencedSyncables(std::vector<Syncable*> collectHere)
 	bool thisIsCalled=true;
 	assert(!thisIsCalled);
 }
+
+u32 BenchEntityS::getClassID()
+{
+	return CLASS_ID_BenchEntityS;
+}

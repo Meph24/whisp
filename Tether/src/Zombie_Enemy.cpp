@@ -19,6 +19,7 @@
 #include "SpeedMod.h"
 #include "TickServiceProvider.h"
 #include "SyncableManager.h"
+#include "sfml_packet_utils.hpp"
 
 int Zombie_Enemy::zombieCount=0;
 
@@ -28,7 +29,6 @@ Zombie_Enemy::Zombie_Enemy(const SimClock::time_point& spawn_time,spacevec start
 	, fallAnim(0.25f,0,1)
 	, transitionAnim(0.5f,0,1)
 {
-	classID=CLASS_ID_Zombie_Enemy;
 	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 	fac=FACTION_ZOMBIES;
@@ -248,7 +248,7 @@ void Zombie_Enemy::drawLeg(int loc,float strength)
 void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFrustum,IWorld& iw,Perspective& perspective)
 {
 	float tickOffset=(float) FloatSeconds(draw_time-last_ticked);
-	AABB graphicsBB(pos+v*tickOffset,sizeBB(&iw));
+	AABB graphicsBB(pos+v*tickOffset,sizeBB(iw));
 
 	if(!viewFrustum->inside(graphicsBB,iw))
 	{
@@ -396,7 +396,7 @@ void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceP
 	if(seconds)
 		v=(pos-prev)/seconds;
 	//std::cout<<pos<<"|"<<prev<<"|"<<seconds<<"|"<<v<<std::endl;
-	bb=AABB(pos,sizeBB(iw));
+	bb=AABB(pos,sizeBB(*iw));
 	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,seconds,*tsp);
 	if(remainingHP>=0) iw->projectileAlgo->doChecks((Hittable *) this,(Entity *)this,seconds,*tsp);
 }
@@ -845,8 +845,6 @@ Zombie_Enemy::Zombie_Enemy(sf::Packet p, TickServiceProvider* tsp, SyncableManag
 , fallAnim(p,sm)
 , transitionAnim(p,sm)
 {
-	classID=CLASS_ID_Zombie_Enemy;
-
 	deserializeNonNested(p,sm);
 	p>>tilted;
 	p>>size;
@@ -865,9 +863,9 @@ void Zombie_Enemy::getOwnedSyncables(std::vector<Syncable*> collectHere)
 	//none
 }
 
-spacevec Zombie_Enemy::sizeBB(IWorld * iw)
+spacevec Zombie_Enemy::sizeBB(IWorld & iw)
 {
-	spacelen characterHeightConv=iw->fromMeters(size*2);
+	spacelen characterHeightConv=iw.fromMeters(size*2);
 	spacevec ret;
 	if(legDmg>0.25f*maxHP)
 	{
@@ -885,4 +883,9 @@ spacevec Zombie_Enemy::sizeBB(IWorld * iw)
 void Zombie_Enemy::getReferencedSyncables(std::vector<Syncable*> collectHere)
 {
 	//none
+}
+
+u32 Zombie_Enemy::getClassID()
+{
+	return CLASS_ID_Zombie_Enemy;
 }

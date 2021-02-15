@@ -20,6 +20,7 @@ class NestedSyncable: public Syncable
 public:
 	void getOwnedSyncables(std::vector<Syncable *> collectHere);
 	void getReferencedSyncables(std::vector<Syncable *> collectHere);
+	u32 getClassID();
 };
 
 #endif /* SRC_NESTEDSYNCABLE_H_ */

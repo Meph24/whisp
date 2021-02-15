@@ -53,7 +53,6 @@ Simulation_World::Simulation_World(const WallClock& reference_clock, Cfg& cfg)
 	, bm_(&world_)
 	, terrain_(&world_, world_.fromMeters(0))
 {
-	classID=CLASS_ID_Simulation_World;
 	//	int physDist=*cfg.getInt("graphics", "physicsDistance");
 	//	int renderDist=*cfg.getInt("graphics", "renderDistance");
 	objects_count=*cfg.getInt("simulation", "objects_count");
@@ -465,4 +464,9 @@ void Simulation_World::getOwnedSyncables(std::vector<Syncable*> collectHere)
 
 void Simulation_World::getReferencedSyncables(std::vector<Syncable*> collectHere)
 {
+}
+
+u32 Simulation_World::getClassID()
+{
+	return CLASS_ID_Simulation_World;
 }

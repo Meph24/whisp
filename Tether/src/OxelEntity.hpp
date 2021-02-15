@@ -102,6 +102,42 @@ public:
         glPopMatrix();
     }
 
+
+	void serialize(sf::Packet& p,bool complete);
+	void deserialize(sf::Packet& p,SyncableManager & sm);
+	void getOwnedSyncables(std::vector<Syncable *> collectHere);
+	void getReferencedSyncables(std::vector<Syncable *> collectHere);
+	u32 getClassID();
+
 };
+
+inline void OxelEntity::serialize(sf::Packet& p, bool complete)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+inline void OxelEntity::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+inline void OxelEntity::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+inline void OxelEntity::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+inline u32 OxelEntity::getClassID()
+{
+	return CLASS_ID_OxelEntity;
+}
 
 #endif // OXELENTITY_HPP

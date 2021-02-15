@@ -28,9 +28,7 @@ public:
 	NetGameEventListener();
 	virtual ~NetGameEventListener();
 
-	virtual void notifyNetGameEvent(sf::Packet p);
-
-	void safetyList();
+	virtual void notifyNetGameEvent(sf::Packet p)=0;
 
 
 	//move and copy protection

@@ -20,7 +20,10 @@ class Syncable
 {
 public:
 	syncID sID=0;//0 means nested Syncable (or someone forgot to request an ID)
-	u32 classID=0;//0 means nested Syncable (or someone forgot to override)
+
+//	u32 classID=0;//0 means nested Syncable (or someone forgot to override)
+	virtual u32 getClassID()=0;
+
 	Syncable();
 	virtual ~Syncable();
 

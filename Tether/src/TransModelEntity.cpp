@@ -169,3 +169,32 @@ void TransModelEntity::react(microseconds tick_time)
 
 	physics = false;
 }
+
+void TransModelEntity::serialize(sf::Packet& p, bool complete)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+void TransModelEntity::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+void TransModelEntity::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+void TransModelEntity::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+	bool thisIsImplemented=false;
+	assert(thisIsImplemented);
+}
+
+u32 TransModelEntity::getClassID()
+{
+	return CLASS_ID_TransModelEntity;
+}

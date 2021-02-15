@@ -150,3 +150,39 @@ void Zombie_Tree::tick(const SimClock::time_point& next_tick_begin, TickServiceP
 	if(temp<rootSize) temp=rootSize;
 	bb=AABB(pos, iw->fromMeters(vec3(d*dLeaves,temp,d*dLeaves)));
 }
+
+void Zombie_Tree::serialize(sf::Packet& p, bool complete)
+{
+	if(complete)
+	{
+		p<<pos;
+	}
+}
+
+void Zombie_Tree::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+}
+
+Zombie_Tree::Zombie_Tree(sf::Packet p, TickServiceProvider* tsp,SyncableManager& sm)
+{
+	p>>pos;
+	surviveClearing=true;
+	allowHibernating=true;
+	bb=AABB(pos);
+	v.set0();
+	d = 0.8f;//TODO
+	h = 18;
+}
+
+void Zombie_Tree::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+}
+
+void Zombie_Tree::getReferencedSyncables(std::vector<Syncable*> collectHere)
+{
+}
+
+u32 Zombie_Tree::getClassID()
+{
+	return CLASS_ID_Zombie_Tree;
+}

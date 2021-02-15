@@ -149,10 +149,21 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 
 void SyncableManager::createSpawnEvent(Syncable* s)
 {
+	//TODO remove this hack (begin)
+	u32 classID=s->getClassID();
+	if(classID==CLASS_ID_EntitySound) return;//do not sync sound events for now
+	if(classID==CLASS_ID_ModelEntity) return;//do not sync sound events for now
+	if(classID==CLASS_ID_TransModelEntity) return;//do not sync sound events for now
+	if(classID==CLASS_ID_GridEntity) return;//do not sync sound events for now
+	if(classID==CLASS_ID_OxelEntity) return;//do not sync sound events for now
+	if(classID==CLASS_ID_BenchEntitySlave) return;//do not sync sound events for now
+	if(classID==CLASS_ID_BenchEntityMaster) return;//do not sync sound events for now
+	if(classID==CLASS_ID_BenchEntityS) return;//do not sync sound events for now
+	//TODO remove this hack (end)
 	sf::Packet& p=createGenericEvent(NET_GAME_EVENT_SPAWN);
 	p<<s->sID;
-	assert(s->classID!=0);
-	p<<s->classID;
+	assert(classID!=0);
+	p<<classID;
 	s->serialize(p,true);
 }
 
@@ -267,5 +278,5 @@ IWorld& SyncableManager::getIWorld()
 
 TickServiceProvider& SyncableManager::getTSP()
 {
-	return *sim;
+	return sim;
 }

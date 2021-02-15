@@ -17,7 +17,6 @@
 EntitySound::EntitySound(Entity* attachedTo,const sf::SoundBuffer& soundTemplate,float pitch,bool enable3D):
 attached(attachedTo)
 {
-	classID=CLASS_ID_EntitySound;
 	if(attached)
 	{
 		attached->follow(this);
@@ -117,4 +116,9 @@ void EntitySound::getReferencedSyncables(std::vector<Syncable*> collectHere)
 {
 	bool thisIsImplemented=false;
 	assert(thisIsImplemented);
+}
+
+u32 EntitySound::getClassID()
+{
+	return CLASS_ID_EntitySound;
 }

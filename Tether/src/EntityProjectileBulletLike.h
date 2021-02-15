@@ -50,6 +50,7 @@ public:
 	EntityProjectileBulletLike(sf::Packet p, SyncableManager& sm);//deserialize constructor
 	void getOwnedSyncables(std::vector<Syncable *> collectHere);
 	void getReferencedSyncables(std::vector<Syncable *> collectHere);
+	u32 getClassID();
 };
 
 #endif /* SRC_ENTITYPROJECTILEBULLETLIKE_H_ */
