@@ -285,10 +285,11 @@ void LocalUser::postHandleEvent(sf::Event& e)
 void User::setContextToMyThread(){ window->setActive(true); }
 void User::draw()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if (! perspective) return;
 	perspective->enableAABBDrawing(input_status.draw_aabbs);
 	perspective->enableDebugScreen(input_status.debug_screen_active);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	perspective->draw();
 }

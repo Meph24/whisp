@@ -31,7 +31,7 @@ class Item;
 class ItemContainer;
 class ITexture;
 
-class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
+class EntityPlayer: public Entity, public Pushable, public BulletLikeSource
 {
 	struct PrevInputStatus
 	{
@@ -67,7 +67,7 @@ public:
 
 	EntityPlayer(	SimClock::time_point spawn_time,
 					spacevec startPos, 
-					float sensX, float sensY,	
+					float sensX, float sensY,
  					float characterSpeed	);
 	virtual ~EntityPlayer() = default;
 

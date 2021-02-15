@@ -6,12 +6,14 @@
 #include "glmutils.hpp"
 #include "Octree.hpp"
 
+#include "Material.hpp"
+
 using std::function;
 
 struct Oxel
 {
-    enum Material { Air, Rock, NUM_MATERIALS } 
-    material = Air;
+    Material *material = &Material::list.air;
+    void draw() const;
 };
 
 struct OxelTree
@@ -84,6 +86,8 @@ public:
         Creator( const Creator& ) = default;
         Creator& operator=( const Creator& other ) = default;
         Creator( const OxelTree::Viewer&, OxelInitializer );
+
+        void setOxelInitializer(OxelInitializer);
 
         Creator child ( uint8_t node_index ) const;
         Creator parent() const;

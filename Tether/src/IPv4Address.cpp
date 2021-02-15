@@ -38,6 +38,27 @@ IPv4Address::operator uint32_t () const { return v; }
 IPv4Address::operator string () const { return to_string(v >> 24 & 0xFF) + string(".") + to_string(v >> 16 & 0xFF) + string(".") + to_string(v >> 8 & 0xFF) + string(".") + to_string(v & 0xFF); }
 const IPv4Address IPv4Address::any = IPv4Address(0,0,0,0);
 
-ostream& operator<<(ostream& os, const IPv4Address& addr) { os << (string) addr; return os; }
+ostream& operator<<(ostream& os, const IPv4Address& addr) { return os << (string) addr; }
+
+FullIPv4::FullIPv4(const IPv4Address& addr, const Port& port) : addr(addr), port(port) {}
+
+bool FullIPv4::operator<(const FullIPv4& other) const 
+{ 
+    return ( addr < other.addr ) || (addr == other.addr && port < other.port);
+}
+bool FullIPv4::operator>(const FullIPv4& other) const 
+{ 
+    return ( addr > other.addr ) || (addr == other.addr && port > other.port);
+}
+bool FullIPv4::operator<=(const FullIPv4& other) const { return ! (*this > other); }
+bool FullIPv4::operator>=(const FullIPv4& other) const { return ! (*this < other); }
+bool FullIPv4::operator==(const FullIPv4& other) const { return addr == other.addr && port == other.port; }
+bool FullIPv4::operator!=(const FullIPv4& other) const { return ! (*this == other); }
+
+ostream& operator<<(ostream& os, const FullIPv4& fa)
+{
+    return os << fa.addr << ':' << fa.port;
+}
+
 
 } /* namespace network */
