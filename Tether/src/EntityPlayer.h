@@ -31,7 +31,7 @@ class Item;
 class ItemContainer;
 class ITexture;
 
-class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
+class EntityPlayer: public Entity, public Pushable, public BulletLikeSource
 {
 	friend class Perspective;
 
