@@ -33,8 +33,6 @@ class ITexture;
 
 class EntityPlayer: public Entity,public Pushable, public BulletLikeSource
 {
-	friend class Perspective;
-
 	struct PrevInputStatus
 	{
 		SignalCounter inventory;

@@ -305,6 +305,34 @@ EntityPlayer::EntityPlayer(sf::Packet p, TickServiceProvider* tsp,SyncableManage
 , player_model( player_mesh )
 , eye(*this)
 {
+	deserialize(p,sm);
+	surviveClearing=true;
+	HP=maxHP;
+
+	pushRadius=0.4f;
+	pushForce=speed/30;
+
+	bb=AABB(pos);
+
+	unused_inventory_slot = std::make_unique<TopLevelInventory>(this);//comment this line to disable inventory
+	if(unused_inventory_slot)
+	{
+		for(int i=0;i<42;i++)
+		{
+			inventory()->items.push_back(new ItemDummy("Duftkerze Nummer "+std::to_string(i)));
+		}
+	}
+
+	guns.emplace_back(new Zombie_Gun(last_ticked,"Glock 17 9mm",0.2f,"res/gunshot.wav",0.9f,new ItemAmmo(358, 79.5f,0.001628170585565067f,1),false,{2,0.15f,0},{1,0.5f,0}));//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns.emplace_back(new Zombie_Gun(last_ticked,"Flamethrower",0.04f,"res/mortar_shoot.wav",1,new ItemAmmo(20, 75,0.005f,1),true,{0.2f,0,0},{0.05f,0.01f,0}));//new Zombie_Gun(30000, 800,5.0f);
+	guns.emplace_back(new Zombie_Gun(last_ticked,"American 180 .22",0.05f,"res/gunshot.wav",1.2f,new ItemAmmo(440,31.8f,0.0022272754325748604f,1),true,{0.5f,0,0},{0.5f,0.5f,0}));//new Zombie_Gun(300000, 40,0.18f);//new Zombie_Gun(120000, 40,0.2f);//TODO change
+	guns.emplace_back(new Zombie_Gun(last_ticked,"Barret M95 .50BMG",1.5f,"res/gunshot.wav",0.6f,new ItemAmmo(900, 3166,0.0004f,1),false,{5,0,0},{2,2,0}));
+	guns.emplace_back(new Zombie_Gun(last_ticked,"G3A3 .308",0.12f,"res/gunshot.wav",0.75f,new ItemAmmo(800, 200,0.0008f,1),true,{3,0,0},{1.5f,1.5f,0}));
+	guns.emplace_back(new Zombie_Gun(last_ticked,"Shotgun",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,45.0f,0.0022272754325748604f,9),true,{2.5f,0,0},{1.5f,1.5f,0}));
+	guns.emplace_back(new Zombie_Gun(last_ticked,"Shotgun with Birdshot",0.2f,"res/gunshot.wav",0.5f,new ItemAmmo(400,0.30f,0.0038f,900),true,{2.5f,0,0},{1.5f,1.5f,0}));
+	guns.emplace_back(new Zombie_Gun(last_ticked,"Cheat Blaster 180",0.08f,"res/gunshot.wav",0.5f,new ItemAmmo(600,200.30f,0.0018f,180),true,{0.5f,0,0},{0.5f,0.5f,0}));
+
+	current_gun = guns[0].get();
 }
 
 void EntityPlayer::getOwnedSyncables(std::vector<Syncable*> collectHere)
