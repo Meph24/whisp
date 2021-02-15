@@ -39,7 +39,7 @@ class OxelEntity : public Entity
         }
         else
         {
-            if( viewer.value().material == Oxel::Material::Rock ) drawCube();
+            viewer.value().draw();
         }
     }
 

@@ -312,9 +312,9 @@ void Simulation_World::init()
 		OxelTree::Creator c ( t );
 		for (size_t i = 0; i < 5; i++)
 		{
-			c.child(3).value().material = Oxel::Material::Rock;
-			c.child(5).value().material = Oxel::Material::Rock;
-			c.child(6).value().material = Oxel::Material::Rock;
+			c.child(3).value().material = &Material::list.dirt;
+			c.child(5).value().material = &Material::list.rock;
+			c.child(6).value().material = &Material::list.rock;
 
 			c = c.child(0);
 		}
