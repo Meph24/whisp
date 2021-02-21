@@ -32,7 +32,7 @@ void SyncableManager::addSyncable(Syncable* s)
 	syncMap[s->sID]=s;
 }
 
-bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool continueLastCall=false)
+bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool continueLastCall)
 {
 	bool iDidSomething=false;
 	if(!continueLastCall)
@@ -44,7 +44,7 @@ bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool contin
 	while(curBytes<byteBudget)
 	{
 		sf::Packet temp;
-		Syncable * s=getNextToUpdate(continueLastCall);
+		Syncable * s=getNextToUpdate();
 		if(s==nullptr) break;
 		s->serialize(temp,false);
 		size_t afterAppend=curBytes+sizeof(syncID)+sizeof(u32)+temp.getDataSize();
