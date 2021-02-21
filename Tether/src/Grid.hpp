@@ -7,6 +7,10 @@
 #include <memory>
 #include <vector>
 
+#include <GL/glew.h>
+
+#include "glmutils.hpp"
+
 #include "drawUtils.hpp"
 
 using std::array;
@@ -14,6 +18,8 @@ using std::exp;
 using std::fill;
 using std::shared_ptr;
 using std::vector;
+
+using glm::mat4;
 
 template<size_t extent, typename T>
 struct narray : public array< T, 2*extent + 1>

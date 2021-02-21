@@ -12,7 +12,7 @@ void rotateDraw( float x, float y, float z )
 void drawCube() 
 {
     glBegin(GL_POLYGON);
-    glColor3f(   0.01,  0.01, 0.01 );
+    //glColor3f(   0.01,  0.01, 0.01 );
     glVertex3f(  0.5, -0.5, -0.5 );
     glVertex3f(  0.5,  0.5, -0.5 );
     glVertex3f( -0.5,  0.5, -0.5 );
@@ -21,7 +21,7 @@ void drawCube()
 
     // White side - BACK
     glBegin(GL_POLYGON);
-    glColor3f(   1.0,  1.0, 1.0 );
+    //glColor3f(   1.0,  1.0, 1.0 );
     glVertex3f(  0.5, -0.5, 0.5 );
     glVertex3f(  0.5,  0.5, 0.5 );
     glVertex3f( -0.5,  0.5, 0.5 );
@@ -30,7 +30,7 @@ void drawCube()
     
     // Purple side - RIGHT
     glBegin(GL_POLYGON);
-    glColor3f(  1.0,  0.0,  1.0 );
+    //glColor3f(  1.0,  0.0,  1.0 );
     glVertex3f( 0.5, -0.5, -0.5 );
     glVertex3f( 0.5,  0.5, -0.5 );
     glVertex3f( 0.5,  0.5,  0.5 );
@@ -39,7 +39,7 @@ void drawCube()
     
     // Green side - LEFT
     glBegin(GL_POLYGON);
-    glColor3f(   0.0,  1.0,  0.0 );
+    //glColor3f(   0.0,  1.0,  0.0 );
     glVertex3f( -0.5, -0.5,  0.5 );
     glVertex3f( -0.5,  0.5,  0.5 );
     glVertex3f( -0.5,  0.5, -0.5 );
@@ -48,7 +48,7 @@ void drawCube()
     
     // Blue side - TOP
     glBegin(GL_POLYGON);
-    glColor3f(   0.0,  0.0,  1.0 );
+    //glColor3f(   0.0,  0.0,  1.0 );
     glVertex3f(  0.5,  0.5,  0.5 );
     glVertex3f(  0.5,  0.5, -0.5 );
     glVertex3f( -0.5,  0.5, -0.5 );
@@ -57,7 +57,7 @@ void drawCube()
     
     // Red side - BOTTOM
     glBegin(GL_POLYGON);
-    glColor3f(   1.0,  0.0,  0.0 );
+    //glColor3f(   1.0,  0.0,  0.0 );
     glVertex3f(  0.5, -0.5, -0.5 );
     glVertex3f(  0.5, -0.5,  0.5 );
     glVertex3f( -0.5, -0.5,  0.5 );

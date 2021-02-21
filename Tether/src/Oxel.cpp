@@ -5,6 +5,12 @@
 #include <cmath>
 #include <utility>
 
+void Oxel::draw() const
+{
+    material->applyManualDrawParametersToOpenGl();
+    drawCube();
+}
+
 OxelTree::LenType OxelTree::oxelWidth(int8_t granularity) { return baselen * std::pow(2.0f, granularity); }
 
 OxelTree::VecType OxelTree::calculateParentCenter(int8_t this_granularity, const VecType& this_center, uint8_t this_index)
@@ -137,6 +143,11 @@ OxelTree::Creator::Creator( const OxelTree::Viewer& other, OxelTree::Creator::Ox
     : Crawler_Base( (const Crawler_Base&) other )
     , initializer(initializer)
 {}
+
+void OxelTree::Creator::setOxelInitializer(OxelInitializer initializer)
+{
+    this->initializer = initializer;
+}
 
 OxelTree::Creator OxelTree::Creator::child( uint8_t node_index ) const
 {
