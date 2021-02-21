@@ -840,7 +840,7 @@ void Zombie_Enemy::deserializeNonNested(sf::Packet& p, SyncableManager& sm)
 	bb=AABB(pos,sizeBB(sm.getIWorld()));
 }
 
-Zombie_Enemy::Zombie_Enemy(sf::Packet p, TickServiceProvider* tsp, SyncableManager& sm)
+Zombie_Enemy::Zombie_Enemy(sf::Packet p,SyncableManager& sm)
 : bodyAnim(p,sm)
 , fallAnim(p,sm)
 , transitionAnim(p,sm)

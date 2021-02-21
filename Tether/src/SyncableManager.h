@@ -40,7 +40,13 @@ class SyncableManager
 	syncID nextID=1;
 
 	syncID updateQueryIndex=0;
+	syncID prevIndex=0;
+	syncID updateQueryIndexLimit=0;
+	bool oneTimeExceptionGranted=true;
 	Syncable * getNextToUpdate();
+	Syncable * getNext(syncID minID) const;
+	void justUpdated(Syncable * s);
+	void newRound();
 
 
 	std::vector<sf::Packet> events;//TODO no doubles
@@ -79,10 +85,13 @@ public:
 
 	bool exists(syncID sID);
 
-	void fillUpdatePacket(sf::Packet& p,u32 byteBudget);
 
-	void fillCompletePacket(sf::Packet& p);
-	void fetchEventPackets(sf::Packet& p);
+
+	//the following methods return true if they did something with the packet, false otherwise:
+	bool fillUpdatePacket(sf::Packet& p,u32 byteBudget,bool continueLastCall=false);
+
+	bool fillCompletePacket(sf::Packet& p);
+	bool fetchEventPackets(sf::Packet& p);
 
 	void applyUpdatePacket(sf::Packet& p);
 	void applyEventPacket(sf::Packet& p);

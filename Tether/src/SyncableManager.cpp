@@ -32,14 +32,19 @@ void SyncableManager::addSyncable(Syncable* s)
 	syncMap[s->sID]=s;
 }
 
-void SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget)
+bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool continueLastCall=false)
 {
+	bool iDidSomething=false;
+	if(!continueLastCall)
+	{
+		newRound();
+	}
 	u32 curBytes=0;
 	u32 sizeBefore=(u32)p.getDataSize();
 	while(curBytes<byteBudget)
 	{
 		sf::Packet temp;
-		Syncable * s=getNextToUpdate();
+		Syncable * s=getNextToUpdate(continueLastCall);
 		if(s==nullptr) break;
 		s->serialize(temp,false);
 		size_t afterAppend=curBytes+sizeof(syncID)+sizeof(u32)+temp.getDataSize();
@@ -52,8 +57,11 @@ void SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget)
 
 			curBytes=afterAppend;
 			assert(curBytes==p.getDataSize()-sizeBefore);
+			iDidSomething=true;
+			justUpdated(s);
 		}
 	}
+	return iDidSomething;
 }
 
 void SyncableManager::removeSyncable(syncID ID)
@@ -66,7 +74,7 @@ void SyncableManager::removeSyncable(Syncable* s)
 	removeSyncable(s->sID);
 }
 
-void SyncableManager::fillCompletePacket(sf::Packet& p)
+bool SyncableManager::fillCompletePacket(sf::Packet& p)
 {
 	assert(events.empty());//events must be extracted  with fetchEventPackets() before calling fillCompletePacket()
 	for(auto tup: syncMap)
@@ -74,7 +82,7 @@ void SyncableManager::fillCompletePacket(sf::Packet& p)
 		Syncable * s=tup.second;
 		createSpawnEvent(s);
 	}
-	fetchEventPackets(p);
+	return fetchEventPackets(p);
 }
 
 void SyncableManager::applyUpdatePacket(sf::Packet& p)
@@ -103,16 +111,19 @@ bool SyncableManager::exists(syncID sID)
 	return true;
 }
 
-void SyncableManager::fetchEventPackets(sf::Packet& p)
+bool SyncableManager::fetchEventPackets(sf::Packet& p)
 {
+	bool iDidSomething=false;
 	for(auto eventPacket: events)
 	{
 		u32 len=(u32)eventPacket.getDataSize();
 		assert(((size_t)len)==eventPacket.getDataSize());
 		p<<len;
 		p.append(eventPacket.getData(),eventPacket.getDataSize());
+		iDidSomething=true;
 	}
 	events.clear();
+	return iDidSomething;
 }
 
 void SyncableManager::applyEventPacket(sf::Packet& p)
@@ -249,14 +260,14 @@ void SyncableManager::internalDelete(Syncable* s)
 
 Syncable* SyncableManager::getNextToUpdate()
 {
-	auto result=syncMap.lower_bound(updateQueryIndex);
-	if(result==syncMap.end())
+	if(syncMap.empty()) return nullptr;
+	Syncable * next=getNext(updateQueryIndex);
+	Syncable * limit=getNext(updateQueryIndexLimit);
+	if(next==limit && !oneTimeExceptionGranted)
 	{
-		updateQueryIndex=0;
-		if(syncMap.empty()) return nullptr;
-		result=syncMap.lower_bound(updateQueryIndex);
+		return nullptr;
 	}
-	return result->second;
+	return next;
 }
 
 SyncableManager::~SyncableManager()
@@ -274,6 +285,29 @@ SyncableManager::~SyncableManager()
 IWorld& SyncableManager::getIWorld()
 {
 	return sim.world();
+}
+
+Syncable* SyncableManager::getNext(syncID minID) const
+{
+	if(syncMap.empty()) return nullptr;
+	auto result=syncMap.lower_bound(updateQueryIndex);
+	if(result==syncMap.end())
+	{
+		result=syncMap.lower_bound(0);
+	}
+	return result->second;
+}
+
+void SyncableManager::justUpdated(Syncable* s)
+{
+	updateQueryIndex=s->sID+1;
+	oneTimeExceptionGranted=false;
+}
+
+void SyncableManager::newRound()
+{
+	updateQueryIndexLimit=updateQueryIndex;
+	oneTimeExceptionGranted=true;
 }
 
 TickServiceProvider& SyncableManager::getTSP()

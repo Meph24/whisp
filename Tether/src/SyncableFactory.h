@@ -14,6 +14,7 @@
 #include <SFML/Network.hpp>
 
 class Syncable;
+class SyncableManager;
 
 class SyncableFactory
 {
@@ -21,7 +22,7 @@ public:
 	SyncableFactory();
 	virtual ~SyncableFactory();
 
-	virtual Syncable * createFromPacket(sf::Packet& p,syncID sID);
+	virtual Syncable * createFromPacket(sf::Packet& p,syncID sID, SyncableManager & sm);
 };
 
 #endif /* SRC_SYNCABLEFACTORY_H_ */

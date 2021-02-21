@@ -300,7 +300,7 @@ void EntityPlayer::deserialize(sf::Packet& p, SyncableManager& sm)
 	p>>last_ticked;
 }
 
-EntityPlayer::EntityPlayer(sf::Packet p, TickServiceProvider* tsp,SyncableManager& sm)
+EntityPlayer::EntityPlayer(sf::Packet p,SyncableManager& sm)
 : player_mesh (diamondMesh(3, 0.2, 0.5))
 , player_model( player_mesh )
 , eye(*this)

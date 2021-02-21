@@ -163,7 +163,7 @@ void Zombie_Tree::deserialize(sf::Packet& p, SyncableManager& sm)
 {
 }
 
-Zombie_Tree::Zombie_Tree(sf::Packet p, TickServiceProvider* tsp,SyncableManager& sm)
+Zombie_Tree::Zombie_Tree(sf::Packet p,SyncableManager& sm)
 {
 	p>>pos;
 	surviveClearing=true;
