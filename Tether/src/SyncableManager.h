@@ -11,6 +11,8 @@
 
 #include "ShortNames.h"
 
+#include "CreationDestructionNotificationHandler.h"
+
 #include <map>
 #include <SFML/Network.hpp>
 
@@ -25,6 +27,8 @@ class SyncableFactory;
 class Simulation;
 class IWorld;
 class TickServiceProvider;
+class Entity;
+class EntityPlayer;
 
 class SyncableManager
 {
@@ -36,6 +40,7 @@ class SyncableManager
 	 */
 	bool sender=false;
 	bool receiver=false;
+
 
 	syncID nextID=1;
 
@@ -82,6 +87,9 @@ public:
 	void properSpawn(sf::Packet& p,syncID sID);//call this to spawn from network
 
 	std::map<syncID,Syncable *> syncMap;
+
+	CreationDestructionNotificationHandler<Entity> entityNotif;
+	CreationDestructionNotificationHandler<EntityPlayer> playerNotif;
 
 	bool exists(syncID sID);
 

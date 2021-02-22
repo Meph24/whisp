@@ -72,7 +72,7 @@ Syncable* SyncableFactory::createFromPacket(sf::Packet& p,syncID sID, SyncableMa
 	}
 	else if(asEntity)//delete "else" as soon as plaer is kept as normal entity
 	{
-		//TODO spawn Entity
+		sm.entityNotif.notifyCreation(asEntity);
 	}
 	if(asSim)
 	{
