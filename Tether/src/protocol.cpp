@@ -1,5 +1,7 @@
 #include "protocol.hpp"
 
+#include "sfml_packet_utils.hpp"
+
 namespace syncprotocol
 {
     bool receiveInTime(WallClock& wc, sf::TcpSocket& socket, char* buffer, size_t size, WallClock::duration timeout_duration)
@@ -58,5 +60,17 @@ namespace syncprotocol
                     << "Name: " << server_info.name << '\n'
                     << "UdpPort: " << server_info.udpport << '\n';
     }
+
+    namespace udp {
+
+        sf::Packet& operator<<(sf::Packet& p, const Header& h){ return p << h.server_time << h.client_time; }
+        sf::Packet& operator>>(sf::Packet& p, Header& h){ return p >> h.server_time >> h.client_time; }
+        void Packet::setHeader(const Header& h)
+        {
+            Header* headerptr = (Header*) const_cast<void*> (getData());
+            *headerptr = h;
+        }
+
+    } // namespace udp
 
 } // namespace syncprotocol

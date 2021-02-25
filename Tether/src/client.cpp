@@ -7,7 +7,7 @@
 using std::cout; //TODO replace with logging #56
 
 ServerConnection::ServerConnection(SimulationClient& client, Cfg& cfg)
-    : client(client) 
+    : client(client)
 {
     udpsocket.bind( *cfg.getInt("client", "default_udp_port") );
     cout << "Port bound to " << *cfg.getInt("client", "default_udp_port") << '\n';
@@ -61,16 +61,11 @@ void ServerConnection::disconnect()
     is_connected = false;
 }
 
+const WallClock::duration& ServerConnection::latency() const { return latency_; }
+
 unique_ptr<sf::Packet> ServerConnection::receiveUdp()
 {
     unique_ptr<sf::Packet> newp;
-    if(!udp_backlog.empty())
-    {
-        newp = std::move(udp_backlog.front());
-        udp_backlog.pop();
-        return newp;
-    }
-
     newp = std::make_unique<sf::Packet>();
     sf::IpAddress sender_addr; Port sender_port;
     do
@@ -78,15 +73,23 @@ unique_ptr<sf::Packet> ServerConnection::receiveUdp()
         if(udpsocket.receive(*newp, sender_addr, sender_port) != sf::Socket::Status::Done )
         {
             newp.reset();
-            return newp;
+            break;
         }
     } while (sender_addr != tcpsocket.getRemoteAddress() || sender_port != server_info.udpport );
-    
+
+    syncprotocol::udp::Header header; *newp >> header;
+    latency_ = (header.client_time - client.wc.now()) / 2;
+    if(latest_server_time < header.server_time) latest_server_time = header.server_time;
+
     return newp;
 }
 
-bool ServerConnection::sendUdp( sf::Packet& p ) 
-{ return sf::Socket::Status::Done == udpsocket.send(p, tcpsocket.getRemoteAddress(), server_info.udpport); }
+bool ServerConnection::sendUdp( syncprotocol::udp::Packet& p ) 
+{ 
+    syncprotocol::udp::Header header {latest_server_time, client.wc.now()};
+    p.setHeader(header);
+    return sf::Socket::Status::Done == udpsocket.send(p, tcpsocket.getRemoteAddress(), server_info.udpport); 
+}
 
 SimulationClient::SimulationClient(WallClock& wc, Cfg& cfg)
     : wc(wc)

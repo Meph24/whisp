@@ -25,13 +25,23 @@ struct ClientConnection
     syncprotocol::ClientToken token;
     Port udpport;
 
+    void sendUdp(unique_ptr<syncprotocol::udp::Packet>);
+    unique_ptr<sf::Packet> receiveUdp();
+
+    FullIPv4 remoteUdpFullip() const;
+
+    const WallClock::duration& latency() const;
+
+private:
+    WallClock::duration latency_;
+    WallClock::time_point last_client_time;
 
     mutex udp_inbox_lock;
     mutex udp_outbox_lock;
-    deque<unique_ptr<sf::Packet> > udp_inbox; 
-    deque<unique_ptr<sf::Packet> > udp_outbox;
+    deque<unique_ptr<sf::Packet>  > udp_inbox; 
+    deque<unique_ptr<syncprotocol::udp::Packet> > udp_outbox;
 
-    FullIPv4 remoteUdpFullip() const;
+    friend struct UdpServerProcessor;
 };
 
 struct ConnectionListener
@@ -119,7 +129,9 @@ struct UdpServerProcessor
     map<ClientConnection*, uint8_t> lock_fail_counters;
     uint8_t lock_fail_tolerance = 3;
 
-    UdpServerProcessor( ClientConnectionListing& clients, Cfg& cfg );
+    const WallClock& wc;
+
+    UdpServerProcessor( ClientConnectionListing& clients, Cfg& cfg, const WallClock& wc);
 
     bool running = true;
     void stopThreads();

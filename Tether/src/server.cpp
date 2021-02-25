@@ -6,6 +6,13 @@
 
 using std::cout; //TODO replace with logging #56
 
+
+
+FullIPv4 ClientConnection::remoteUdpFullip() const
+{
+    return FullIPv4( tcpsocket.getRemoteAddress().toInteger(), udpport );
+}
+
 bool ConnectionListener::hasNewConnections() const { return !connections.empty(); }
 unique_ptr<ClientConnection> ConnectionListener::nextConnection()
 {
@@ -169,11 +176,9 @@ unique_ptr<ClientConnection> ConnectionInitialProcessor::nextConnection()
     return next_connection;
 }
 
-
-
-
-UdpServerProcessor::UdpServerProcessor( ClientConnectionListing& clients, Cfg& cfg )
+UdpServerProcessor::UdpServerProcessor( ClientConnectionListing& clients, Cfg& cfg, const WallClock& wc )
     : clients(clients)
+    , wc(wc)
 {
     socket.bind( *cfg.getInt("server", "default_udp_port") );
     socket.setBlocking(true);
@@ -206,6 +211,9 @@ void UdpServerProcessor::sendProcess()
                 else connection.udp_outbox_lock.lock();
             }
 
+            syncprotocol::udp::Header header { wc.now(), c->last_client_time };
+            connection.udp_outbox.front()->setHeader(header);
+
             socket.send( *connection.udp_outbox.front(), connection.tcpsocket.getRemoteAddress(), connection.udpport);
             connection.udp_outbox.pop_front();
             lock_fail_counters[c.get()] = 0;
@@ -235,19 +243,15 @@ void UdpServerProcessor::receiveProcess()
             continue;
         }
         ClientConnection& connection = *clients.atUdp(sender_addr, sender_port);
+        syncprotocol::udp::Header header; *newpacket >> header;
+        connection.latency_ = (header.server_time - wc.now()) / 2;
+        if(connection.last_client_time < header.client_time) 
+            connection.last_client_time = header.client_time;
 
         std::lock_guard<std::mutex>(clients.atUdp(sender_addr, sender_port)->udp_inbox_lock);
         connection.udp_inbox.emplace_back(std::move(newpacket));
     }
 }
-
-
-FullIPv4 ClientConnection::remoteUdpFullip() const
-{
-    return FullIPv4( tcpsocket.getRemoteAddress().toInteger(), udpport );
-}
-
-
 
 void ClientConnectionListing::addClient( unique_ptr<ClientConnection>&& new_connection )
 {
@@ -297,13 +301,11 @@ bool ClientConnectionListing::containsUdp(const sf::IpAddress& addr, Port port)
 { return atUdp(addr, port); }
 
 
-
-
 SimulationServer::SimulationServer(WallClock& wc, Cfg& cfg, Port port)
     : cfg(cfg)
     , listener(port)
     , initial_processor(*this, listener, wc, info)
-    , udp(clients, cfg)
+    , udp(clients, cfg, wc)
 {
     info.setName(*cfg.getStr("server", "name"));
     info.udpport = udp.socket.getLocalPort();
