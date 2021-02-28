@@ -20,6 +20,8 @@
 #include "BenchAsymMaster.h"
 #include "BenchAsymSlave.h"
 #include "BenchSym.h"
+#include "CreationDestructionListener.h"
+#include "Syncable.h"
 
 template<typename PhysicsIF>
 class InteractFilterAlgoSym;
@@ -29,7 +31,7 @@ class InteractFilterAlgoAsym;
 
 #include <vector>
 
-class IWorld: public Tickable, public Drawable
+class IWorld: public Tickable, public Drawable, public CreationDestructionListener<Entity>
 {
 private:
 
@@ -44,6 +46,8 @@ protected:
 
 	void resetAlgos(TickServiceProvider& tsp);
 public:
+
+	CreationDestructionNotificationHandler<Entity> entityNotif;
 
 	bool verbose;
 
@@ -90,6 +94,8 @@ public:
 	virtual void requestEntityDelete(Entity * e);//do not call this yourself, call Entiy.requestDestroy instead
 
 	virtual void clearEntities()=0;
+
+	virtual void getOwnedSyncables(std::vector<Syncable *> collectHere)=0;
 };
 
 

@@ -49,9 +49,8 @@
 
 Simulation_World::Simulation_World(const WallClock& reference_clock, Cfg& cfg)
 	: Simulation(reference_clock, cfg)
-	, world_(16)
-	, bm_(&world_)
-	, terrain_(&world_, world_.fromMeters(0))
+	, bm_(iw.get())
+	, terrain_(iw.get(), iw->fromMeters(0))
 {
 	//	int physDist=*cfg.getInt("graphics", "physicsDistance");
 	//	int renderDist=*cfg.getInt("graphics", "renderDistance");
@@ -99,7 +98,6 @@ void Simulation_World::init()
 		
 	}
 */
-	IWorld* iw = &world_;
 	float fi = 0.0;
 	for(auto& m_uptr : models)
 	{
@@ -325,8 +323,6 @@ void Simulation_World::init()
 
 void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
 {
-	IWorld * iw=&world();
-
 	bm_.tick(next_tick_begin,this);
 	initNextTick();
 	iw->preTick(*this);
@@ -407,7 +403,6 @@ void Simulation_World::step()
 
 void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 {
-	IWorld * iw=&world();
 	if( *cfg.getInt("test","verbose") )
 	{ 	iw->verbose=true;	}
 	else iw->verbose = false;
@@ -436,10 +431,9 @@ void Simulation_World::spawn(Entity* e, spacevec pos)
 	e->last_ticked = clock.now();
 	e->bb = AABB(e->pos);
 	e->onSpawn( this );
-	world().requestEntitySpawn(e);
+	iw->requestEntitySpawn(e);
 }
 
-IWorld& Simulation_World::world() { return world_; }
 ITerrain* Simulation_World::getITerrain() { return &terrain_; }
 Entity* Simulation_World::getTarget(const Entity* enemy)
 {
@@ -447,24 +441,13 @@ Entity* Simulation_World::getTarget(const Entity* enemy)
 }
 
 void Simulation_World::serialize(sf::Packet& p, bool complete)
-{
-}
+{}
 
 void Simulation_World::deserialize(sf::Packet& p, SyncableManager& sm)
-{
-}
-
-void Simulation_World::getOwnedSyncables(std::vector<Syncable*> collectHere)
-{
-	for(auto& p : players)
-		collectHere.push_back(p.second.get());
-	for(auto e : world_.managedEntities)
-		collectHere.push_back(e);
-}
+{}
 
 void Simulation_World::getReferencedSyncables(std::vector<Syncable*> collectHere)
-{
-}
+{}
 
 u32 Simulation_World::getClassID()
 {

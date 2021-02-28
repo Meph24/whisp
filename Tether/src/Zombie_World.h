@@ -9,7 +9,6 @@
 #include "SimulationInputStatusSet.hpp"
 #include "Spacevec.h"
 #include "TickServiceProvider.h"
-#include "WorldTerrainDisplayer.hpp"
 
 class DebugScreen;
 class EntityPlayer;
@@ -20,7 +19,6 @@ class WorldDefault;
 class Zombie_World: public Simulation
 {
 	ChunkManager cm_;
-	WorldTerrainDisplayer world_;
 
 	struct PrevInputStatus
 	{
@@ -40,7 +38,6 @@ public:
 	void init();
 	void step();
 
-	virtual IWorld& world();
 	virtual ITerrain * getITerrain();
 	virtual Entity * getTarget( const Entity * me);
 
@@ -56,9 +53,13 @@ public:
 
 	void serialize(sf::Packet& p,bool complete);
 	void deserialize(sf::Packet& p,SyncableManager & sm);
-	void getOwnedSyncables(std::vector<Syncable *> collectHere);
 	void getReferencedSyncables(std::vector<Syncable *> collectHere);
 	u32 getClassID();
+
+	void drawOtherStuff(  const SimClock::time_point& draw_time,
+            Frustum* viewFrustum,
+            IWorld& iw,
+            Perspective& perspective);
 
 private:
 	bool spawnZombies;

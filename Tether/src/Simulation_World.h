@@ -22,7 +22,6 @@ class WorldDefault;
 
 class Simulation_World: public Simulation
 {
-	WorldDefault world_;
 	BenchmarkManager bm_;
 	TerrainDummy terrain_;
 
@@ -48,7 +47,6 @@ public:
 	void init();
 	void step();
 
-	virtual IWorld& world();
 	virtual ITerrain* getITerrain();
 	virtual Entity* getTarget(const Entity* enemy);
 	
@@ -62,7 +60,6 @@ public:
 
 	void serialize(sf::Packet& p,bool complete);
 	void deserialize(sf::Packet& p,SyncableManager & sm);
-	void getOwnedSyncables(std::vector<Syncable *> collectHere);
 	void getReferencedSyncables(std::vector<Syncable *> collectHere);
 	u32 getClassID();
 

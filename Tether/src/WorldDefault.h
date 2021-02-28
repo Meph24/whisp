@@ -15,8 +15,8 @@
 
 class WorldDefault: public IWorld
 {
-public:
 	std::vector<Entity *> managedEntities;
+public:
 	WorldDefault(float GridSize);
 	virtual ~WorldDefault();
 
@@ -25,6 +25,12 @@ public:
 	void draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw, Perspective& perspective);
 	void tick(const SimClock::time_point& next_tick_begin,TickServiceProvider* tsp);
 	void postTick(TickServiceProvider& tsp);
+
+
+	void notifyCreation(Entity * obj);
+	void notifyDestruction(Entity * obj);
+
+	void getOwnedSyncables(std::vector<Syncable *> collectHere);
 };
 
 #endif /* SRC_WORLDDEFAULT_H_ */

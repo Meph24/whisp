@@ -17,35 +17,36 @@ WorldDefault::WorldDefault(float GridSize)
 
 WorldDefault::~WorldDefault()
 {
+	assert(entityNotif.registered.empty());
 	for(auto ptr: managedEntities) delete ptr;
 }
 
 void WorldDefault::requestEntitySpawn(Entity* e)
 {
 	managedEntities.push_back(e);
+	entityNotif.notifyCreation(e);
 }
 
 void WorldDefault::clearEntities()
 {
 	std::vector<Entity *> remain;
-	int size=managedEntities.size();
-	for(int i=0;i<size;i++)
+	for(Entity * e: managedEntities)
 	{
-		if(managedEntities[i]->surviveClearing)
+		if(e->surviveClearing)
 		{
-			remain.push_back(managedEntities[i]);
+			remain.push_back(e);
 		}
 		else
 		{
-			delete managedEntities[i];
+			entityNotif.notifyDestruction(e);
+			delete e;
 		}
 	}
 	managedEntities.clear();
 
-	size=remain.size();
-	for(int i=0;i<size;i++)
+	for(Entity * e: remain)
 	{
-		managedEntities.push_back(remain[i]);
+		managedEntities.push_back(e);
 	}
 	remain.clear();
 }
@@ -58,21 +59,22 @@ void WorldDefault::tick(const SimClock::time_point& next_tick_begin, TickService
 	}
 }
 
+#include "vectorTools.hpp"
 void WorldDefault::postTick(TickServiceProvider& tsp)
 {
 	auto size=managedEntities.size();
-	for(auto i=size*0;i<size;i++)
+	for(auto i=size*0;i<size;i++)//TODO implement this algorithm into vectorTools
 	{
 		auto size2=deleteVec.size();
 		for(auto j=size2*0;j<size2;j++)
 		{
 			if(deleteVec[j]==managedEntities[i])
 			{
-				delete managedEntities[i];
-				managedEntities[i]=managedEntities[size-1];
-				managedEntities.pop_back();
-				deleteVec[j]=deleteVec[size2-1];
-				deleteVec.pop_back();
+				Entity * toDelete=managedEntities[i];
+				removeIndexUnordered(managedEntities,i);
+				removeIndexUnordered(deleteVec,j);
+				entityNotif.notifyDestruction(managedEntities[i]);
+				delete toDelete;
 				i--;
 				break;
 			}
@@ -94,3 +96,19 @@ void WorldDefault::draw(const SimClock::time_point& draw_time, Frustum* viewFrus
 	}
 }
 
+void WorldDefault::notifyCreation(Entity* obj)
+{
+	managedEntities.push_back(obj);
+}
+
+void WorldDefault::notifyDestruction(Entity* obj)
+{
+	removeElementUnordered(managedEntities,obj);
+	obj->destroyCleanup();
+}
+
+void WorldDefault::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{
+	for(auto e : managedEntities)
+		collectHere.push_back(e);
+}

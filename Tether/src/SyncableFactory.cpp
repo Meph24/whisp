@@ -40,8 +40,10 @@ Syncable* SyncableFactory::createFromPacket(sf::Packet& p,syncID sID, SyncableMa
 	switch(classID)
 	{
 	case CLASS_ID_Zombie_World:
-//		asSim=new Zombie_World(p);//TODO
-//		ret=asSim;
+		assert(sm.refClock);
+		assert(sm.config);
+		asSim=new Zombie_World(*sm.refClock, *sm.config);
+		ret=asSim;
 		break;
 	case CLASS_ID_Zombie_Enemy:
 		asEntity=new Zombie_Enemy(p,sm);
@@ -66,17 +68,63 @@ Syncable* SyncableFactory::createFromPacket(sf::Packet& p,syncID sID, SyncableMa
 	}
 	assert(ret);
 	ret->sID=sID;
-	if(asPlayer)
-	{
-		//TODO register player to simulation
-	}
-	else if(asEntity)//delete "else" as soon as plaer is kept as normal entity
+	//if(asPlayer) {} else
+	if(asEntity)
 	{
 		sm.entityNotif.notifyCreation(asEntity);
 	}
 	if(asSim)
 	{
-		//TODO set Simulation
+		Simulation * prev=sm.setSim(asSim);
+		assert(prev==nullptr);
 	}
 	return ret;
+}
+
+void SyncableFactory::destroyFromPacket(Syncable * s, SyncableManager& sm)
+{
+	Entity * asEntity=nullptr;
+	Simulation * asSim=nullptr;
+	//EntityPlayer * asPlayer=nullptr;
+	u32 classID=s->getClassID();
+	switch(classID)
+	{
+	case CLASS_ID_Zombie_World:
+	case CLASS_ID_Simulation_World:
+		asSim=(Simulation *) s;
+		break;
+	case CLASS_ID_EntityPlayer:
+		//asPlayer=(EntityPlayer *)s;
+	case CLASS_ID_Zombie_Enemy:
+	case CLASS_ID_EntityProjectileBulletLike:
+	case CLASS_ID_Zombie_Tree:
+	case CLASS_ID_EntitySound:
+	case CLASS_ID_ModelEntity:
+	case CLASS_ID_TransModelEntity:
+	case CLASS_ID_GridEntity:
+	case CLASS_ID_OxelEntity:
+	case CLASS_ID_BenchEntitySlave:
+	case CLASS_ID_BenchEntityMaster:
+	case CLASS_ID_BenchEntityS:
+		asEntity=(Entity *)s;
+		break;
+	default:
+		bool classIDUndefined=true;
+		assert(!classIDUndefined);//TODO proper error handling
+	}
+	//if(asPlayer) {} else
+	if(asEntity)
+	{
+		sm.entityNotif.notifyDestruction(asEntity);
+	}
+	if(asSim)
+	{
+		Simulation * prev=sm.setSim(nullptr);
+		assert(prev!=nullptr);
+		assert(prev==asSim);
+	}
+	std::vector<Syncable * > testVec;
+	s->getOwnedSyncables(testVec);
+	assert(testVec.empty());
+	delete s;
 }

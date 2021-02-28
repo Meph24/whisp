@@ -73,6 +73,7 @@ public:
 
 	void requestDestroy(IWorld * w);//call this to request delete, do NOT delete any other way
 
+	void destroyCleanup();//do not call yourself
 
 	//methods used by spatial partitioning algorithms
 //	void prepareForPartitionAlgo(void * filterAlgo,bool multichunkInitValue=false);//must be called upon entry in spatial partitioning algorithm (the algorithms is responsible for doing it as the first step)-

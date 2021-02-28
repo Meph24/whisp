@@ -13,11 +13,11 @@
 #include "NetGameEventListener.h"
 #include "vectorTools.hpp"
 #include "Simulation.hpp"
+#include "SyncableFactory.h"
 
-SyncableManager::SyncableManager(Simulation & s):
-sim(s)
+SyncableManager::SyncableManager(Simulation & s)
 {
-	internalSpawn(&s);
+	addSim(&s);
 }
 
 syncID SyncableManager::getNextID()
@@ -25,11 +25,6 @@ syncID SyncableManager::getNextID()
 	syncID ret=nextID;
 	nextID++;
 	return ret;
-}
-
-void SyncableManager::addSyncable(Syncable* s)
-{
-	syncMap[s->sID]=s;
 }
 
 bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool continueLastCall)
@@ -62,16 +57,6 @@ bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool contin
 		}
 	}
 	return iDidSomething;
-}
-
-void SyncableManager::removeSyncable(syncID ID)
-{
-	syncMap.erase(ID);
-}
-
-void SyncableManager::removeSyncable(Syncable* s)
-{
-	removeSyncable(s->sID);
 }
 
 bool SyncableManager::fillCompletePacket(sf::Packet& p)
@@ -143,12 +128,21 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 		case NET_GAME_EVENT_SPAWN:
 			p>>sID;
 			assert(!exists(sID));//TODO proper error handling
-			properSpawn(p,sID);
+			{
+				Syncable * s=factory->createFromPacket(p,sID,*this);
+				if(sender) createSpawnEvent(s);
+				internalSpawn(s);
+			}
 			break;
 		case NET_GAME_EVENT_DELETE:
 			p>>sID;
 			assert(exists(sID));//TODO proper error handling
-			properDelete(sID);
+			{
+				if(sender) createDeleteEvent(sID);
+				Syncable * s=syncMap[sID];
+				internalRemove(s);
+				factory->destroyFromPacket(s,*this);
+			}
 			break;
 		default:
 			assert(hasEntry(eventID));
@@ -201,19 +195,6 @@ void SyncableManager::skipBytes(sf::Packet p,u32 bytes)
 	}
 }
 
-void SyncableManager::properDelete(syncID sID)
-{
-}
-
-void SyncableManager::properSpawn(sf::Packet& p,syncID sID)
-{
-
-}
-
-void SyncableManager::properSpawn(Syncable* s)
-{
-}
-
 void SyncableManager::registerNetGameEventListener(NetGameEventListener* l)
 {
 	u32 eventID=l->netGameEventID;
@@ -252,7 +233,7 @@ void SyncableManager::internalSpawn(Syncable* s)
 	syncMap[s->sID]=s;
 }
 
-void SyncableManager::internalDelete(Syncable* s)
+void SyncableManager::internalRemove(Syncable* s)
 {
 	assert(exists(s->sID));
 	syncMap.erase(s->sID);
@@ -284,7 +265,8 @@ SyncableManager::~SyncableManager()
 
 IWorld& SyncableManager::getIWorld()
 {
-	return sim.world();
+	assert(sim);
+	return sim->world();
 }
 
 Syncable* SyncableManager::getNext(syncID minID) const
@@ -312,5 +294,64 @@ void SyncableManager::newRound()
 
 TickServiceProvider& SyncableManager::getTSP()
 {
+	assert(sim);
+	return *sim;
+}
+
+Simulation* SyncableManager::getSim()
+{
 	return sim;
+}
+
+SyncableManager::SyncableManager(const WallClock& reference_clock, Cfg& cfg)
+: refClock(&reference_clock)
+, config(&cfg)
+{
+}
+
+
+void SyncableManager::notifyCreation(Entity* obj)
+{
+	assert(!receiver);
+	internalSpawn(obj);
+	if(sender)
+	{
+		createSpawnEvent(obj);
+	}
+}
+void SyncableManager::notifyDestruction(Entity* obj)
+{
+	assert(!receiver);
+	internalRemove(obj);
+	if(sender)
+	{
+		createDeleteEvent(obj->sID);
+	}
+}
+
+
+void SyncableManager::addSim(Simulation* s)
+{
+	sim=s;
+	if(s==nullptr) return;
+	internalSpawn(sim);
+	entityNotif.registerCreationDestructionListener(sim->iw.get());
+	sim->iw->entityNotif.registerCreationDestructionListener(this);
+}
+
+Simulation* SyncableManager::setSim(Simulation* s)
+{
+	Simulation * old=removeSim();
+	addSim(s);
+	return old;
+}
+
+Simulation* SyncableManager::removeSim()
+{
+	internalSpawn(sim);
+	entityNotif.removeCreationDestructionListener(sim->iw.get());
+	sim->iw->entityNotif.removeCreationDestructionListener(this);
+	Simulation * ret=sim;
+	sim=nullptr;
+	return ret;
 }

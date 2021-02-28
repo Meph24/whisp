@@ -39,6 +39,13 @@ public:
 
 	//only valid at this instant; NON-RECURSIVE: only provide those directly owned
 	virtual void getOwnedSyncables(std::vector<Syncable *> collectHere)=0;//kill these if this Syncable dies
+	//on client, ownership may apply differently on client,
+	//but this method should provide information about what needs to be deleted
+	//before this Syncable, so no wrong deletes are called
+	//TODO find better Solution for dynamic ownership
+
+
+
 	//only valid at this instant; NON-RECURSIVE: only provide those directly referenced
 	virtual void getReferencedSyncables(std::vector<Syncable *> collectHere)=0;//excludes owned
 };

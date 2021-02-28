@@ -81,15 +81,19 @@ inline void CreationDestructionNotificationHandler<T>::registerCreationDestructi
 template<typename T>
 inline void CreationDestructionNotificationHandler<T>::notifyCreation(T* obj)
 {
-	//TODO
-	assert(false);
+	for(CreationDestructionListener<T> * e: registered)
+	{
+		e->notifyCreation(obj);
+	}
 }
 
 template<typename T>
 inline void CreationDestructionNotificationHandler<T>::notifyDestruction(T* obj)
 {
-	//TODO
-	assert(false);
+	for(CreationDestructionListener<T> * e: registered)
+	{
+		e->notifyDestruction(obj);
+	}
 }
 
 #endif /* SRC_CREATIONDESTRUCTIONNOTIFICATIONHANDLER_H_ */

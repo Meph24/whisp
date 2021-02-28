@@ -155,12 +155,13 @@ void Perspective::drawAvatarPerspective()
 	unique_ptr<Frustum> viewFrustum =
 		newFrustumApplyPerspective(t, true); //TODO dangerouse allocations and ownership transferation
 
-	simulation->world().draw(t, viewFrustum.get(), simulation->world(), *this);
+	simulation->iw->draw(t, viewFrustum.get(), simulation->world(), *this);
+	simulation->drawOtherStuff(t,viewFrustum.get(),simulation->world(),*this);
 
 	timer_graphics_world.registerTime();
 
 	if(isThirdPerson())
-		avatar->draw( t, viewFrustum.get(), simulation->world() , *this );
+		avatar->draw( t, viewFrustum.get(), simulation->world(), *this );
 
 	if(enable_debug)
 	{
@@ -169,7 +170,7 @@ void Perspective::drawAvatarPerspective()
 		transformViewToGUI(1.0f);
 		glColor3f(1, 0, 1);
 		glEnable(GL_TEXTURE_2D);
-		vec3 ppos = simulation->world().toMeters(avatar->pos);
+		vec3 ppos = simulation->iw->toMeters(avatar->pos);
 		int offset=dsGraphics.draw(ppos.x, ppos.y, ppos.z, 0);
 		dsLogic.draw(avatar->pos.x.intpart,avatar->pos.y.intpart,avatar->pos.z.intpart,offset);
 		glDisable(GL_TEXTURE_2D);

@@ -660,3 +660,12 @@ void ChunkManager::postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playe
 	generateMissing(chunkLoadRate);//TODO load rate refactor
 	setMid(playerPos,tsp);
 }
+
+void ChunkManager::notifyCreation(Entity* obj)
+{}
+
+void ChunkManager::notifyDestruction(Entity* obj)
+{}
+
+void ChunkManager::getOwnedSyncables(std::vector<Syncable*> collectHere)
+{}
