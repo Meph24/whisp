@@ -60,6 +60,21 @@ namespace syncprotocol {
     };
     ostream& operator<< (ostream&, const ClientToken&);
 
+    namespace udp {
+         struct Header
+        {
+            WallClock::time_point server_time, client_time;
+        };
+        struct Packet : public sf::Packet
+        {
+            using sf::Packet::operator<<;
+            using sf::Packet::operator>>;
+            void setHeader(const Header&);
+        };
+
+        sf::Packet& operator<<(sf::Packet& p, const Header& h);
+        sf::Packet& operator>>(sf::Packet& p, Header& h);
+    } // namespace udp
 } // namespace syncprotocol
 
 #endif // PROTOCOL_HPP

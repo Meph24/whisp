@@ -33,13 +33,16 @@ struct ServerConnection
     bool tryConnect(Cfg& cfg, const IPv4Address& addr, Port port);
     void disconnect();
 
-    bool sendUdp(sf::Packet&);
+    const WallClock::duration& latency() const;
+
+    bool sendUdp(syncprotocol::udp::Packet&);
     unique_ptr<sf::Packet> receiveUdp();
 
     ServerConnection(SimulationClient& client, Cfg& cfg);
 private:
     bool is_connected = false;
-    std::queue<unique_ptr<sf::Packet>> udp_backlog;
+    WallClock::duration latency_;
+    WallClock::time_point latest_server_time;
 };
 
 struct SimulationClient
