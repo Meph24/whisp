@@ -18,6 +18,7 @@
 SyncableManager::SyncableManager(Simulation & s)
 {
 	addSim(&s);
+	sender=true;
 }
 
 syncID SyncableManager::getNextID()
@@ -307,6 +308,7 @@ SyncableManager::SyncableManager(const WallClock& reference_clock, Cfg& cfg)
 : refClock(&reference_clock)
 , config(&cfg)
 {
+	receiver=true;
 }
 
 

@@ -34,16 +34,6 @@ class EntityPlayer;
 
 class SyncableManager: public CreationDestructionListener<Entity>
 {
-	/* send | recv	| use case
-	 * 	0	|	0	| singleplayer	(currently unused)
-	 * 	1	|	0	| server
-	 * 	0	|	1	| client
-	 * 	1	|	1	| relay			(currently unused)
-	 */
-	bool sender=false;
-	bool receiver=false;//if receiver==true, then this SM is slave
-
-
 
 	syncID nextID=1;
 
@@ -83,6 +73,15 @@ class SyncableManager: public CreationDestructionListener<Entity>
 	Simulation * removeSim();
 
 public:
+	/* send | recv	| use case
+	 * 	0	|	0	| singleplayer	(currently unused)
+	 * 	1	|	0	| server
+	 * 	0	|	1	| client
+	 * 	1	|	1	| relay			(currently unused)
+	 */
+	bool sender=false;
+	bool receiver=false;//if receiver==true, then this SM is slave
+
 	const WallClock * refClock=0;
 	Cfg * config=0;
 
