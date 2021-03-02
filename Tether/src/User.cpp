@@ -87,7 +87,8 @@ void LocalUser::operateSimulation(Simulation& simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_R,
-		Act::SendSignal(&input_status.restart)
+		Act::SendSignal(&input_status.restart),
+		Cond::keyPressed
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_T,
@@ -175,14 +176,10 @@ void LocalUser::disconnectSimulation()
 void LocalUser::pollEvents()
 {
 	InputEvent e;
-	// are problems with the mousemode interpretation, which requires different components to work in tandem
-	// sf::Events are paired in coordinates regarding mouse movement (x,y) is a tuple and not
-	// what I actually want to do :
 	while (event_source->pollEvent(e))
 	{
 		if(event_mapper)event_mapper->mapEvent(e);
 	}
-	//what I must do currently instead:
 }
 
 InputDeviceConfigurator::MouseMode LocalUser::mouseMode() const { return mousemode; }

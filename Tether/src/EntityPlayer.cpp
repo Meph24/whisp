@@ -135,7 +135,7 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 		size_t weapon_selection = controlinputs.weapon_selection.value();
 		selectWeapon( weapon_selection );
 
-		if(!inventory()) //=> inventory is currently held
+		if(!unused_inventory_slot) //=> inventory is currently held
 		{
 			i64 selectAdd = controlinputs.selection_down - prev_input_status.selection_down;
 			selectAdd -= controlinputs.selection_up - prev_input_status.selection_up;
