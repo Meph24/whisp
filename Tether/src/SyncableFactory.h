@@ -23,6 +23,7 @@ public:
 	virtual ~SyncableFactory();
 
 	virtual Syncable * createFromPacket(sf::Packet& p,syncID sID, SyncableManager & sm);
+	virtual void destroyFromPacket(Syncable * s, SyncableManager & sm);
 };
 
 #endif /* SRC_SYNCABLEFACTORY_H_ */

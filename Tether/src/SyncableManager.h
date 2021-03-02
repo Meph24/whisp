@@ -12,6 +12,8 @@
 #include "ShortNames.h"
 
 #include "CreationDestructionNotificationHandler.h"
+#include "WallClock.hpp"
+#include "Cfg.hpp"
 
 #include <map>
 #include <SFML/Network.hpp>
@@ -30,17 +32,8 @@ class TickServiceProvider;
 class Entity;
 class EntityPlayer;
 
-class SyncableManager
+class SyncableManager: public CreationDestructionListener<Entity>
 {
-	/* send | recv	| use case
-	 * 	0	|	0	| singleplayer	(currently unused)
-	 * 	1	|	0	| server
-	 * 	0	|	1	| client
-	 * 	1	|	1	| relay			(currently unused)
-	 */
-	bool sender=false;
-	bool receiver=false;
-
 
 	syncID nextID=1;
 
@@ -60,12 +53,7 @@ class SyncableManager
 
 	SyncableFactory * factory;
 
-	Simulation & sim;
-
-	void addSyncable(Syncable * s);
-
-	void removeSyncable(syncID ID);
-	void removeSyncable(Syncable * s);
+	Simulation * sim=nullptr;
 
 	void skipBytes(sf::Packet p,u32 bytes);
 
@@ -74,24 +62,44 @@ class SyncableManager
 
 
 	void internalSpawn(Syncable * s);//performs required internal actions for spawn
-	void internalDelete(Syncable * s);//performs required internal actions for delete
+	void internalRemove(Syncable * s);//performs required internal actions for delete
 
 	bool hasEntry(u32 netGameEventID);
 
 
 	syncID getNextID();//never call on client side!!!
 
+	void addSim(Simulation * s);
+	Simulation * removeSim();
+
 public:
-	void properDelete(syncID sID);//call this to delete
-	void properSpawn(Syncable * s);//call this to spawn locally
-	void properSpawn(sf::Packet& p,syncID sID);//call this to spawn from network
+	/* send | recv	| use case
+	 * 	0	|	0	| singleplayer	(currently unused)
+	 * 	1	|	0	| server
+	 * 	0	|	1	| client
+	 * 	1	|	1	| relay			(currently unused)
+	 */
+	bool sender=false;
+	bool receiver=false;//if receiver==true, then this SM is slave
+
+	const WallClock * refClock=0;
+	Cfg * config=0;
+
+	//void properDelete(syncID sID);//call this to delete
+	//void properSpawn(Syncable * s);//call this to spawn locally
+	//void properSpawn(sf::Packet& p,syncID sID);//call this to spawn from network
+
+
+
+	bool exists(syncID sID);
 
 	std::map<syncID,Syncable *> syncMap;
 
-	CreationDestructionNotificationHandler<Entity> entityNotif;
-	CreationDestructionNotificationHandler<EntityPlayer> playerNotif;
 
-	bool exists(syncID sID);
+	CreationDestructionNotificationHandler<Entity> entityNotif;
+
+	void notifyCreation(Entity * obj);
+	void notifyDestruction(Entity * obj);
 
 
 
@@ -114,11 +122,14 @@ public:
 
 	sf::Packet& createGenericEvent(u32 eventID);//returned Packet can be fed with custom event data
 
-	SyncableManager(Simulation & s);
+	SyncableManager(const WallClock& reference_clock, Cfg& cfg);//client
+	SyncableManager(Simulation & s);//server
 	virtual ~SyncableManager();
 
 	IWorld & getIWorld();
 	TickServiceProvider & getTSP();
+	Simulation * getSim();
+	Simulation * setSim(Simulation * s);//returns old simulation or 0 if there was none before; (s==0 means remove Simulation)
 
 
 	//move and copy protection

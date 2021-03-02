@@ -23,6 +23,7 @@
 #include "Zombie_Enemy.h"
 #include "Zombie_Gun.h"
 #include "ZombieTree.h"
+#include "IWorld.h"
 
 #include <iostream>
 using std::cout;
@@ -38,8 +39,6 @@ Zombie_World::Zombie_World(const WallClock& reference_clock, Cfg& cfg)
 			16,
 			*cfg.getInt("graphics", "chunkLoadRate")
 			)
-	, world_(chunk_size, cm_)
-			
 	, spawnZombies(true)
 	, zCount( *cfg.getInt("test", "zombies") )
 	, zombieDist( *cfg.getInt("test", "zombieDist") )
@@ -62,19 +61,17 @@ void Zombie_World::restart()
 		p.second->HP = p.second->maxHP;
 		p.second->score = 0;
 	}
-	world_.clearEntities();
+	iw->clearEntities();
 }
 
 void Zombie_World::init()
 {
-	Zombie_Tree * tr = new Zombie_Tree(world_.fromMeters(vec3(5,0,5)));
-	world_.requestEntitySpawn(tr);
+	Zombie_Tree * tr = new Zombie_Tree(iw->fromMeters(vec3(5,0,5)));
+	iw->requestEntitySpawn(tr);
 }
 
 void Zombie_World::doPhysics(const SimClock::time_point& next_tick_begin)
 {
-	IWorld * iw = &world();
-
 	initNextTick();
 	iw->preTick(*this);
 	for(auto& p : players)
@@ -142,8 +139,6 @@ void Zombie_World::step()
 
 void Zombie_World::spawnZombie(const SimClock::time_point& t)
 {
-	IWorld * iw=&world();
-
 	if(!spawnZombies) return;
 	if (Zombie_Enemy::zombieCount>=zCount) return;
 	if(players.empty()) return;
@@ -182,7 +177,6 @@ void Zombie_World::spawnZombie(const SimClock::time_point& t)
 
 void Zombie_World::doLogic(const SimClock::time_point& next_tick_begin)
 {
-	IWorld * iw=&world();
 	if( *cfg.getInt("test","verbose") )
 	{ 	iw->verbose=true;	}
 	else iw->verbose = false;
@@ -210,7 +204,6 @@ void Zombie_World::doLogic(const SimClock::time_point& next_tick_begin)
 	logicTerrain.registerTime();
 }
 
-IWorld& Zombie_World::world() { return world_; }
 ITerrain* Zombie_World::getITerrain() { return &cm_; }
 Entity* Zombie_World::getTarget(const Entity* me)
 {
@@ -219,26 +212,21 @@ Entity* Zombie_World::getTarget(const Entity* me)
 }
 
 void Zombie_World::serialize(sf::Packet& p, bool complete)
-{
-}
+{}
 
 void Zombie_World::deserialize(sf::Packet& p, SyncableManager& sm)
-{
-}
-
-void Zombie_World::getOwnedSyncables(std::vector<Syncable*> collectHere)
-{
-	for(auto& p : players)
-		collectHere.push_back(p.second.get());
-	for(auto e : world_.managedEntities)
-		collectHere.push_back(e);
-}
+{}
 
 void Zombie_World::getReferencedSyncables(std::vector<Syncable*> collectHere)
-{
-}
+{}
 
 u32 Zombie_World::getClassID()
 {
 	return CLASS_ID_Zombie_World;
+}
+
+void Zombie_World::drawOtherStuff(const SimClock::time_point& draw_time,Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
+{
+    cm_.draw(draw_time, viewFrustum, iw, perspective);
+    cm_.render( viewFrustum, perspective );
 }

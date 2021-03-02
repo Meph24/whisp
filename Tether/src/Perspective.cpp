@@ -154,7 +154,8 @@ void Perspective::drawAvatarPerspective()
 	unique_ptr<Frustum> viewFrustum =
 		newFrustumApplyPerspective(t, true); //TODO dangerouse allocations and ownership transferation
 
-	simulation->world().draw(t, viewFrustum.get(), simulation->world(), *this);
+	simulation->iw->draw(t, viewFrustum.get(), simulation->world(), *this);
+	simulation->drawOtherStuff(t,viewFrustum.get(),simulation->world(),*this);
 
 	timer_graphics_world.registerTime();
 

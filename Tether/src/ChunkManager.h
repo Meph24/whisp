@@ -128,6 +128,12 @@ public:
 	void tick(const SimClock::time_point& next_tick_time ,TickServiceProvider * tsp);
 	void postTick(TickServiceProvider& tsp);
 	void requestEntitySpawn(Entity * e);//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks.
+
+
+	//dummy, not used because ChunkManager is not handling Entities anymore:
+	void notifyCreation(Entity * obj);
+	void notifyDestruction(Entity * obj);
+	void getOwnedSyncables(std::vector<Syncable *> collectHere);
 };
 
 #endif /* SRC_CHUNKMANAGER_H_ */

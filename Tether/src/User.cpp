@@ -21,8 +21,8 @@ LocalUser::LocalUser(
 	: InputDeviceConfigurator(cfg)
 	, context_settings(24, 8, 0, 3, 3)
 	, window( reswidth, resheight, window_name, sf::Style::None, context_settings )
-	, mousemode(MouseMode::pointer)
 	, event_source( &window )
+	, mousemode(MouseMode::pointer)
 {	
 	window.setActive(true);
 
@@ -220,6 +220,8 @@ void LocalUser::setMouseMode( InputDeviceConfigurator::MouseMode mode )
 			window.lockMouse(false);
 		break;
 	}
+
+	mousemode = mode;
 }
 
 vec2 LocalUser::turnSensitivity() const

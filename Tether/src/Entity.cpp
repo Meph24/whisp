@@ -20,12 +20,7 @@ void Entity::requestDestroy(IWorld * w)
 	if(requestedDelete) return;
 	requestedDelete=true;
 //	exists=false;
-	int size=follower.size();
-	for(int i=0;i<size;i++)
-	{
-		follower[i]->notifyRemoval(this);
-	}
-	follower.clear();
+	destroyCleanup();
 	w->requestEntityDelete(this);
 }
 
@@ -105,4 +100,15 @@ Entity::~Entity()
 	}
 }
 
-void Entity::onSpawn(TickServiceProvider* tsp) {}
+void Entity::onSpawn(TickServiceProvider* tsp)
+{
+}
+
+void Entity::destroyCleanup()
+{
+	for(Entity * e: follower)
+	{
+		if(e) e->notifyRemoval(this);
+	}
+	follower.clear();
+}
