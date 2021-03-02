@@ -17,16 +17,16 @@ Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg)
 	, pmLogic(1s, 8s)
 {}
 
-unique_ptr<Perspective> Simulation::getPerspective( User* user )
+unique_ptr<Perspective> Simulation::getPerspective( LocalUser* user )
 {
 	if( players.find(user) == players.end() ) return nullptr;
 
-	return std::make_unique<Perspective>( &user->window->getSFWindow(), players[user].get(), this );
+	return std::make_unique<Perspective>( user->window, players[user].get(), this );
 }
 
-void Simulation::onRegisterUser( User* ){}
+void Simulation::onRegisterUser( SimulationUser* ){}
 
-void Simulation::registerUser(User* user)
+void Simulation::registerUser(SimulationUser* user)
 { 
 	if( players.find(user) != players.end() ) return;
 	//TODO evaluate : should I throw in this case ... probably later when some form of GUI can catch the exception
@@ -44,4 +44,4 @@ void Simulation::registerUser(User* user)
 	onRegisterUser(user);
 }
 
-void Simulation::kickUser( User* to_kick_user ){ players.erase(to_kick_user);}
+void Simulation::kickUser( SimulationUser* to_kick_user ){ players.erase(to_kick_user);}

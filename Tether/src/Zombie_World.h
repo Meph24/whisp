@@ -26,7 +26,7 @@ class Zombie_World: public Simulation
 	{
 		SignalCounter restart =  SimulationInputStatusSet().restart;
 	};
-	map<User*, PrevInputStatus> user_prev_input_status;
+	map<SimulationUser*, PrevInputStatus> user_prev_input_status;
 
 	void restart();
 	void doPhysics(const SimClock::time_point& t);

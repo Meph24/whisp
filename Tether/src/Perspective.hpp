@@ -15,6 +15,7 @@
 #include "ITexture.h"
 #include "PerformanceMeter.h"
 #include "SimClock.hpp"
+#include "Window.hpp"
 
 using glm::vec3;
 using std::unique_ptr;
@@ -69,7 +70,7 @@ struct Perspective
 
 //----------------------
 
-	Perspective(sf::Window* window, EntityPlayer* observing_entity, Simulation* simulation);
+	Perspective(Window& window, EntityPlayer* observing_entity, Simulation* simulation);
 
 	void enableAABBDrawing(bool b = false);
 	void enableDebugScreen(bool b = false);

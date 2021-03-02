@@ -8,7 +8,6 @@
 #include "Graphics2D.h"
 #include "ICamera3D.h"
 #include "IWorld.h"
-#include "MainApp.h"
 #include "Simulation.hpp"
 #include "TextureStatic2D.h"
 #include "WarnErrReporter.h"
@@ -16,18 +15,18 @@
 
 const float Perspective::default_zoom = 1.0f;
 
-Perspective::Perspective(sf::Window* window, EntityPlayer* observing_entity, Simulation* simulation)
+Perspective::Perspective(Window& window, EntityPlayer* observing_entity, Simulation* simulation)
 	: avatar(observing_entity)
 	, simulation(simulation)
-	, graphics2d(64, window->getSize().x / window->getSize().y)
+	, graphics2d(64, window.width() / window.height())
 	, camera(std::make_unique<CameraTP>( observing_entity->eye ))
 	, pmGraphics(8s, 1s)
 	, dsGraphics(&pmGraphics, &graphics2d)
 	, dsLogic(&simulation->pmLogic, &graphics2d)
 {
 	enableThirdPerson(enable_third_person);
-	camera->height=window->getSize().y;
-	camera->width=window->getSize().x;
+	camera->height=window.height();
+	camera->width=window.width();
 	camera->maxView=1024*8;
 	camera->zoom=Perspective::default_zoom;
 

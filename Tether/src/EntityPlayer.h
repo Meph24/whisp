@@ -17,7 +17,6 @@
 #include "SimClock.hpp"
 #include "SimulationInputStatusSet.hpp"
 #include "TopLevelInventory.h"
-#include "User.hpp"
 #include "Zombie_Gun.h"
 
 using std::unique_ptr;
@@ -30,6 +29,7 @@ class Frustum;
 class Item;
 class ItemContainer;
 class ITexture;
+struct SimulationUser;
 
 class EntityPlayer: public Entity, public Pushable, public BulletLikeSource
 {
@@ -40,14 +40,14 @@ class EntityPlayer: public Entity, public Pushable, public BulletLikeSource
 		vec3 turn;
 	}prev_input_status;
 
-	User* user_ = nullptr;
+	SimulationUser* user_ = nullptr;
 
 	Mesh player_mesh;
 	Model player_model;
 
 public:
-	void setUser(User* user = nullptr);
-	const User* user() const; //return 0/false if Entity is not controlled
+	void setUser(SimulationUser* user = nullptr);
+	const SimulationUser* user() const; //return 0/false if Entity is not controlled
 
 	double score=0;
 

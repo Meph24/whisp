@@ -116,7 +116,7 @@ void Zombie_World::step()
 			clock.setNextTargetRate(1.0);
 		}
 
-		vector<User*> changed_restart;
+		vector<SimulationUser*> changed_restart;
 		for(auto& p : players)
 		{
 			if(p.first->input_status.restart != user_prev_input_status[p.first].restart)
@@ -126,7 +126,7 @@ void Zombie_World::step()
 		if( !changed_restart.empty() && 
 			changed_restart.size() == players.size() )
 		{
-			for(User* user : changed_restart) 
+			for(SimulationUser* user : changed_restart) 
 				user_prev_input_status[user].restart = user->input_status.restart;
 			restart();
 		}

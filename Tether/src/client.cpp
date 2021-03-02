@@ -118,10 +118,10 @@ ClientApp::ClientApp(WallClock& wc, Cfg& cfg, IPv4Address& addr, Port port)
 
 void ClientApp::run()
 {
-    while(user.window->isOpen())
+    while(user.window.isOpen())
     {
         user.draw();
-        user.display();
+        user.window.display();
 
         user.pollEvents();
     }

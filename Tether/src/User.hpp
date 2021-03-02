@@ -2,18 +2,14 @@
 #     define USER_HPP
 
 #include <SFML/Window.hpp>
-#include "EventHandler.h"
 #include "EventMapper.hpp"
-#include "Buffer.h"
 #include "WallClock.hpp"
-
 
 #include <memory>
 #include "Cfg.hpp"
 
 #include <glm/vec2.hpp>
 
-#include "Window.hpp"
 #include "SFMLWindow.hpp"
 #include "InputDeviceConfigurator.hpp"
 #include "Perspective.hpp"
@@ -26,63 +22,50 @@ using std::unique_ptr;
 
 class Simulation;
 
-class User
+class SimulationUser
 {
 protected:
-	sf::ContextSettings contextSettings;
 public:
-	string name;
-	Window* window;
 	Simulation* simulation;
-	unique_ptr<Perspective> perspective;
-
 	SimulationInputStatusSet input_status;
-
-	User(	std::string name, 
-			int reswidth, 
-			int resheight
-			);
-
-	void draw();
-	void display();
-	void setContextToMyThread();
 	
-	virtual void pollEvents() = 0;
-	virtual void operateSimulation(Simulation* simulation) = 0;
+	virtual void operateSimulation(Simulation& simulation) = 0;
 	virtual void disconnectSimulation() = 0;
 };
 
-
-class LocalUser : public User, public InputDeviceConfigurator
+struct LocalUser : public SimulationUser , public InputDeviceConfigurator
 {
-	MouseMode mousemode;
-public:
-	virtual vec2 turnSensitivity() const;
-	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
-	void setMouseMode( MouseMode mode );
-	MouseMode mouseMode() const;
+	sf::ContextSettings context_settings;
+	SFMLWindow window;
 
-	SFMLWindow sfmlwindow;
-	EventHandler event_handler;
+	//impl User
+	unique_ptr<Perspective> perspective;
+	void operateSimulation(Simulation& simulation);
+	void disconnectSimulation();
+
 	unique_ptr<EventMapper> event_mapper;
 	EventSource* event_source;
-
-	void operateSimulation(Simulation* simulation);
-	void disconnectSimulation();
 	void pollEvents();
 
-	void preHandleEvent(sf::Event& e);
-	void postHandleEvent(sf::Event& e);
+	map<InputDeviceConfigurator::MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
+	MouseMode mousemode;
+	virtual void setMouseMode( MouseMode mode );
+	virtual MouseMode mouseMode() const;
+	vec2 turnSensitivity() const;
 
 	LocalUser(	
 				const Cfg& cfg, 
-				std::string name, 
+				string window_name,
 				int reswidth, 
 				int resheight 
 	);
 
 	LocalUser(const LocalUser&) = delete;
 	LocalUser& operator=(const LocalUser&) = delete;
+	LocalUser(LocalUser&&) = delete;
+	LocalUser& operator=(LocalUser&&) = delete;
+
+	void draw();
 };
 
 #endif /* USER_HPP */

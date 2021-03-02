@@ -1,8 +1,4 @@
-
-#include "MainApp.h"
-
-#include <iostream>
-#include <exception>
+#include "MainApp.hpp"
 
 int main(int argc, char** argv)
 {

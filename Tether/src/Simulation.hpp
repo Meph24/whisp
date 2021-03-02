@@ -1,11 +1,3 @@
-/*
- * IGameMode.h
- *
- *  Created on:	Dec 11, 2019
- *      Author:	HL65536
- *     Version:	1.0
- */
-
 #ifndef SRC_IGAMEMODE_H_
 #define SRC_IGAMEMODE_H_
 
@@ -28,7 +20,7 @@ using std::unique_ptr;
 class Simulation: public TickServiceProvider, public Syncable
 {
 public:
-	map<User*, unique_ptr<EntityPlayer> > players;
+	map<SimulationUser*, unique_ptr<EntityPlayer> > players;
 
 	SimClock clock;
 	Cfg& cfg;
@@ -41,11 +33,11 @@ public:
 	virtual void init()=0;
 	virtual void step()=0;
 
-	unique_ptr<Perspective> getPerspective( User* user );
+	unique_ptr<Perspective> getPerspective( LocalUser* user );
 
-	void registerUser(User* new_user);
-	virtual void onRegisterUser( User* );
-	void kickUser(User* to_kick_user);
+	void registerUser(SimulationUser* new_user);
+	virtual void onRegisterUser( SimulationUser* );
+	void kickUser(SimulationUser* to_kick_user);
 };
 
 #endif /* SRC_IGAMEMODE_H_ */

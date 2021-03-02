@@ -20,6 +20,7 @@
 #include "SpeedMod.h"
 #include "TickServiceProvider.h"
 #include "TopLevelInventory.h"
+#include "User.hpp"
 #include "Zombie_Gun.h"
 #include "sfml_packet_utils.hpp"
 
@@ -100,8 +101,8 @@ void EntityPlayer::draw(const SimClock::time_point& draw_time,Frustum * viewFrus
 	if(held_item) held_item->draw(draw_time, viewFrustum, iw, perspective);
 }
 
-void EntityPlayer::setUser(User* user){ user_ = user; }
-const User* EntityPlayer::user() const { return user_; }
+void EntityPlayer::setUser(SimulationUser* user){ user_ = user; }
+const SimulationUser* EntityPlayer::user() const { return user_; }
 
 void setLookingDirection(const vec3& forward, const vec3& up);
 	
@@ -167,14 +168,16 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	if( user() )
 	{
 		const SimulationInputStatusSet& controlinputs = user()->input_status;
-		const unique_ptr<CameraTP>& cam = user()->perspective->camera;
 		spacevec oldPos=pos;
 
 		vec3 wantedV = controlinputs.walk;
 		wantedV.z*=-1; //invert because someone thought it would be nice forward meaning negative
 		if(wantedV != vec3(0.0f))
 		{
-			wantedV = cam->getNormal(wantedV);
+			mat4 turnmatrix = 		glm::rotateDeg(-eye.rotation.y, vec3(0, 1, 0))
+								* 	glm::rotateDeg(-eye.rotation.x, vec3(1, 0, 0))
+								* 	glm::rotateDeg(-eye.rotation.z, vec3(0, 0, 1));
+			wantedV = glm::normalize(turnmatrix * wantedV);
 		}
 		pos+=iw->fromMeters(wantedV * speed )*time;
 
