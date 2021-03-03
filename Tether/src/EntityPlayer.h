@@ -67,9 +67,12 @@ public:
 
 	EntityPlayer(	SimClock::time_point spawn_time,
 					spacevec startPos, 
-					float sensX, float sensY,
  					float characterSpeed	);
-	virtual ~EntityPlayer() = default;
+
+	EntityPlayer(const EntityPlayer&) = delete;
+	EntityPlayer& operator=(const EntityPlayer&) = delete;
+	EntityPlayer(EntityPlayer&&) = delete;
+	EntityPlayer& operator=(EntityPlayer&&) = delete;
 
 	void changeTPdist(float amount);
 

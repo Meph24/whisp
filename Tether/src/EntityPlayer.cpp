@@ -28,8 +28,6 @@ using glm::vec3;
 
 EntityPlayer::EntityPlayer(	SimClock::time_point spawn_time,
 							spacevec startPos,
-							float sensX,
-							float sensY,
 							float characterSpeed)
 	: player_mesh (diamondMesh(3, 0.2, 0.5))
 	, player_model( player_mesh )
