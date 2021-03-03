@@ -367,8 +367,8 @@ void Simulation_World::step()
 			clock.setNextTargetRate(1.0);
 		}
 
-		vector<User*> changed_restart;
-		vector<User*> changed_benchmark;
+		vector<SimulationUser*> changed_restart;
+		vector<SimulationUser*> changed_benchmark;
 		for(auto& p : players)
 		{
 			if(p.first->input_status.restart != user_prev_input_status[p.first].restart)
@@ -380,14 +380,14 @@ void Simulation_World::step()
 		if( !changed_restart.empty() && 
 			changed_restart.size() == players.size() )
 		{
-			for(User* user : changed_restart) 
+			for(SimulationUser* user : changed_restart) 
 				user_prev_input_status[user].restart = user->input_status.restart;
 			restart();
 		}
 		if( !changed_benchmark.empty() &&
 			changed_benchmark.size() == players.size() )
 		{ 
-			for(User* user : changed_benchmark)
+			for(SimulationUser* user : changed_benchmark)
 				user_prev_input_status[user].benchmark = user->input_status.benchmark;
 			bm_.requestBenchmark();
 		}
@@ -414,7 +414,7 @@ void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 	logicOutside.registerTime();
 
 	for(auto& p : players)
-		p.second->current_gun->tick(next_tick_begin, p.second.get(), world());
+		p.second->current_gun->tick(next_tick_begin, p.second, world());
 
 	logicGunTick.registerTime();
 

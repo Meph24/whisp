@@ -7,7 +7,6 @@
 #include "User.hpp"
 #include "EntityPlayer.h"
 #include "CameraTP.h"
-#include "IWorld.h"
 
 using std::unique_ptr;
 using std::pair;
@@ -25,44 +24,49 @@ Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg,unique_ptr<IWo
 }
 
 Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg)
-: Simulation(reference_clock,cfg,unique_ptr<IWorld>() )
+	: Simulation(reference_clock,cfg,unique_ptr<IWorld>() )
 {}
 
-unique_ptr<Perspective> Simulation::getPerspective( User* user )
+unique_ptr<Perspective> Simulation::getPerspective( LocalUser* user )
 {
+	if(!user) return nullptr;
+	if(!user->simulation) return nullptr;
 	if( players.find(user) == players.end() ) return nullptr;
 
-	return std::make_unique<Perspective>( &user->window->getSFWindow(), players[user].get(), this );
+	return std::make_unique<Perspective>( user->window, *user);
 }
 
-void Simulation::onRegisterUser( User* ){}
+void Simulation::onRegisterUser( SimulationUser* ){}
 
-void Simulation::registerUser(User* user)
+EntityPlayer* Simulation::registerUser(SimulationUser* user)
 { 
-	if( players.find(user) != players.end() ) return;
-	//TODO evaluate : should I throw in this case ... probably later when some form of GUI can catch the exception
+	if( players.find(user) != players.end() ) return nullptr;
 
-	float sensx = *cfg.getFlt("input", "sensitivityX");
-	float sensy = *cfg.getFlt("input", "sensitivityY");
-
-	players[user] = std::make_unique<EntityPlayer>( 
+	unique_ptr<EntityPlayer> newentityplayer = std::make_unique<EntityPlayer>( 
 		/* spawn time */		clock.now(),
 		/* spawn position */	spacevec(),
-								sensx,
-								sensy,
 		/* character speed */ 	(! *cfg.getInt("test","debug_movement") ) ? 7.6f : 30.6f );
+
+	iw->requestEntitySpawn(newentityplayer.get());
+	players[user] = newentityplayer.get();
 	players[user]->setUser(user);
+	newentityplayer.release();
 	onRegisterUser(user);
+	return players[user];
 }
 
-void Simulation::kickUser(User* to_kick_user)
-{
-	players.erase(to_kick_user);
+EntityPlayer* Simulation::userAvatar(SimulationUser* user) 
+{ 
+	auto f = players.find(user); 
+	return (f == players.end())? nullptr : f->second;
 }
+
+void Simulation::kickUser( SimulationUser* to_kick_user ){ players.erase(to_kick_user);}
+
 void Simulation::getOwnedSyncables(std::vector<Syncable*> collectHere)
 {
 	for(auto& p : players)
-		collectHere.push_back(p.second.get());
+		collectHere.push_back(p.second);
 	iw->getOwnedSyncables(collectHere);
 }
 void Simulation::drawOtherStuff(const SimClock::time_point& draw_time,Frustum* viewFrustum, IWorld& iw, Perspective& perspective)

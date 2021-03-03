@@ -1,52 +1,44 @@
 #ifndef SFMLWINDOW_HPP
 #     define SFMLWINDOW_HPP
 
-#include "Window.hpp"
+#include <deque>
 #include <SFML/Window.hpp>
 #include <string>
 
-#include "EventHandler.h"
-#include "Buffer.h"
+#include "InputDeviceConfigurator.hpp"
+#include "InputEvent.hpp"
+#include "Window.hpp"
 
+using std::deque;
 using std::string;
 
-struct SFMLWindow : public Window, public EventSource
+struct SFMLWindow : public Window
 {
-	sf::Window w;
-	
-	bool isOpen() const;
-	void close();
-	void display(); 
-
+	//impl RenderTarget
 	float width() const;
 	float height() const;
-	sf::Vector2i pos(){ return w.getPosition(); }
-	virtual void setPos( sf::Vector2i pos ) { w.setPosition(pos); }
-	sf::Vector2u size(){ return w.getSize(); };
-	void activate();
+	void display(); 
+	void setActive(bool b = true);
 
-	vector<InputEvent> backlog;
+	//impl EventSource
+	void mapSFEventToEventHandlerEvents( const sf::Event& sfe, deque<InputEvent>& event_backlog);
+	deque<InputEvent> event_backlog;
+	InputEvent::Filter event_filter;
+	bool pollEvent(InputEvent& e);
 
-	unsigned long long event_poll_counter;
+	//impl Window
+	sf::Window w;
+	bool isOpen() const;
+	void close();
+	sf::Vector2i pos();
+	virtual void setPos( sf::Vector2i pos );
+	sf::Vector2u size();
+	void setMouseCursorVisible( bool b = true );
+	bool mouse_locked = false;
+	void lockMouse(bool b);
 
-	SFMLWindow(unsigned int width, unsigned int height, string title, uint32_t style, sf::ContextSettings contextsettings );
-
-	//static vector<InputEvent> mapSFEventToInputEvents( const sf::Event& sfe );
-
-	void mapSFEventToEventHandlerEvents( const sf::Event& sfe, Buffer<EventHandler::event, 4>& eventBuffer);
-
-	bool pollEvent(sf::Event& e)
-	{
-		return w.pollEvent(e);
-	}
-
-	unsigned long long polled() const;
-
-	sf::Window& getSFWindow() { return w; } // TODO Hack remove in future, when Gamemodes do not require a window anymore
-
-	void setMouseCursorVisible( bool b = true ) { w.setMouseCursorVisible(b); }
-
-	void setActive(bool b = true) { w.setActive(b); };
+	SFMLWindow(unsigned int width, unsigned int height, 
+		string title, uint32_t style, sf::ContextSettings contextsettings);
 };
 
 #endif /* WINDOW_HPP */

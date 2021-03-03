@@ -1,25 +1,26 @@
 #ifndef REMOTECONTROL_HPP
 #define REMOTECONTROL_HPP
 
-#include "MainApp.h"
 #include "IPv4Address.hpp"
+#include "MainApp.hpp"
 #include "NetworkConnection.hpp"
+#include "SFMLWindow.hpp"
+
 using network::IPv4Address;
 using network::Port;
 using network::UdpSocket;
 
-struct RemoteControlReceiverUser : public User
+struct RemoteControlReceiverUser : public LocalUser
 {
-	SFMLWindow sfmlwindow;
-
-	SimulationInputStatusSet current_receive;
 	size_t received;
 	UdpSocket udpsocket;
+	SimulationInputStatusSet current_receive;
 
-	RemoteControlReceiverUser( std::string name, int reswidth, int resheight, Port try_port );
+	RemoteControlReceiverUser( Cfg& cfg, string window_name, int reswidth, int resheight, Port try_port );
 	void operateSimulation(Simulation* simulation);
 	void disconnectSimulation();
-	void pollEvents();
+
+	void processNetworkInput();
 };
 
 struct RemoteControlSender : public InputDeviceConfigurator
@@ -27,7 +28,6 @@ struct RemoteControlSender : public InputDeviceConfigurator
 	WallClock& clock;
 	SFMLWindow window;
 
-	EventHandler event_handler;
 	EventMapper event_mapper;
 	EventSource* event_source;
 
@@ -43,7 +43,6 @@ struct RemoteControlSender : public InputDeviceConfigurator
 
 	RemoteControlSender( WallClock& wallclock, Cfg& cfg);
 
-	vec2 turnSensitivity() const;
 	map<MouseMode, vector<pair<int, EventMapping>>> mouse_mode_mappings;
 
 	void setMouseMode( MouseMode mode );
@@ -61,7 +60,7 @@ struct RemoteControlReceiverApp : public App
 	Cfg& cfg;
 
 	unique_ptr<Simulation> sim;
-	RemoteControlReceiverUser op;
+	RemoteControlReceiverUser user;
 
 	RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg, Port port);
 	void run();

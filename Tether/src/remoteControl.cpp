@@ -15,17 +15,20 @@ void RemoteControlReceiverUser::operateSimulation(Simulation* simulation)
 
 	this->simulation = simulation;
 	simulation->registerUser(this);
+	if(!avatar()) { std::cerr << "User could not be registered in Simulation!" << std::endl; }
+	perspective = simulation->getPerspective(this);
 }
 
 void RemoteControlReceiverUser::disconnectSimulation()
 {
 	if(!this->simulation) return;
 
+	perspective.reset();
 	simulation->kickUser(this);
 	simulation = nullptr;
 }
 
-void RemoteControlReceiverUser::pollEvents() 
+void RemoteControlReceiverUser::processNetworkInput() 
 { 
     sf::IpAddress addr; Port port;
     size_t this_received = 1;
@@ -45,44 +48,41 @@ void RemoteControlReceiverUser::pollEvents()
             received = 0;
         }
     }
+}
 
-    sf::Event e;
-    while(sfmlwindow.pollEvent(e))
-    {
-        switch (e.type)
-        {
-            case sf::Event::EventType::Closed:
-                disconnectSimulation();
-                window->close();
-            break;
-
-            default: break;//warning suppression
-        }
-    }
+RemoteControlReceiverUser::RemoteControlReceiverUser( Cfg& cfg,
+	std::string window_name, int reswidth, int resheight, Port try_port )
+	: LocalUser(cfg, window_name, reswidth, resheight)
+	, received(0)
+{
+	udpsocket.setBlocking(false);
+	
+	udpsocket.bind(try_port);
+	std::cout << "RemoteControlReceiverUser : Bound at port <" << udpsocket.getLocalPort() << ">\n";
 }
 
 RemoteControlReceiverApp::RemoteControlReceiverApp(WallClock& wallclock, Cfg& cfg, Port port)
 	: wallclock(wallclock)
 	, cfg(cfg)
-	, op( "Dwengine - remote controlled",  *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"), port )
+	, user( cfg, *cfg.getStr("general","application_name") + " - remote controlled",  *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"), port )
 {
 
 	int zombie_mode = *cfg.getInt("test", "zombie_mode");
 	if(zombie_mode) 
 	{
 		sim = std::make_unique<Zombie_World>(wallclock, cfg);
-		op.input_status.clip = true;
+		user.input_status.clip = true;
 	}
 	else 
 	{
 		sim = std::make_unique<Simulation_World>(wallclock, cfg);
 	}
-	op.operateSimulation( sim.get() );
+	user.operateSimulation( sim.get() );
 }
 
 void RemoteControlReceiverApp::run()
 {
-	cout << "Initializing RemoteControlReceiver Application !\n";
+	cout << "Running RemoteControlReceiver Application !\n";
 
 	if(!sim) 
 	{
@@ -108,17 +108,26 @@ void RemoteControlReceiverApp::run()
 	sim->init();
 	srand(time(0));
 
-	while (op.window->isOpen())
+	while (user.window.isOpen())
 	{
 		//render
 		sim->step();
 
-		op.draw();
-		op.display();
+
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		user.draw();
+		user.window.display();
 
 		//handle events
-		op.pollEvents();
+		user.processNetworkInput();
+
+		InputEvent e;
+		while(user.window.pollEvent(e))	// is currently not used here, but must be polled to keep the window open
+									// the window will handle essential events concerning it by itself
+		{}; 		
 	}
+	user.disconnectSimulation();
 }
 
 RemoteControlSenderApp::RemoteControlSenderApp(WallClock& wallclock, Cfg& cfg, IPv4Address& addr, Port port)
@@ -149,24 +158,6 @@ void RemoteControlSenderApp::run()
 	}
 }
 
-RemoteControlReceiverUser::RemoteControlReceiverUser(
-	 std::string name, int reswidth, int resheight, Port try_port
-	)
-	: User (name + string(" - remote controlled receiver"), reswidth, resheight)
-	, sfmlwindow( reswidth, resheight, name, sf::Style::None, contextSettings )
-	, received(0)
-{
-	window = &sfmlwindow;
-	udpsocket.setBlocking(false);
-	
-	udpsocket.bind(try_port);
-	std::cout << "RemoteControlReceiverUser : Bound at port <" << udpsocket.getLocalPort() << ">\n";
-}
-
-vec2 RemoteControlSender::turnSensitivity() const
-{
-		return turn_sensitivity; 
-}
 
 
 void RemoteControlSender::tunein(IPv4Address& addr, Port port)
@@ -287,46 +278,12 @@ void RemoteControlSender::sync()
 
 void RemoteControlSender::processEvents()
 {
-	sf::Event e;
-	Buffer < EventHandler::event, 4 >  eventBuffer;
-	//handle events
-
-	EventHandler::event retEvent;
-	while (event_source->pollEvent(e))
+	InputEvent e;
+	while(window.pollEvent(e))	// is currently not used here, but must be polled to keep the window open
+								// the window will handle essential events concerning it by itself
 	{
-		event_source->mapSFEventToEventHandlerEvents(e, eventBuffer);
-		//handle mapped events
-		while (!eventBuffer.nodata())
-		{
-			if (eventBuffer.read(retEvent))
-			{
-				if(event_handler.Filter.filter(retEvent))
-				{
-					event_handler.Filter.update(retEvent);
-				 	event_mapper.event(retEvent);
-				}
-			}
-		}
-		eventBuffer.clear();
-
-		switch (e.type)
-		{
-			case sf::Event::EventType::Closed:
-				window.close();
-			break;
-
-			case sf::Event::MouseMoved:
-				if(mouseMode() == MouseMode::diff) 
-				{
-					sf::Vector2i to_set ( (window.pos()) + ((sf::Vector2i)window.size())/2 );
-					if( sf::Mouse::getPosition() == to_set ) break;
-					sf::Mouse::setPosition( to_set );
-				}
-			break;
-
-			default: break;//warning suppression
-		}
-	}
+		event_mapper.mapEvent(e);
+	}; 		
 }
 
 RemoteControlSender::RemoteControlSender( WallClock& wallclock, Cfg& cfg )
@@ -366,10 +323,12 @@ void RemoteControlSender::setMouseMode( MouseMode mode )
 	{ 
 		case MouseMode::diff:
 			window.setMouseCursorVisible(false); 
+			window.lockMouse(true);
 		break;
 		default:
 		case MouseMode::pointer:
 			window.setMouseCursorVisible(true);
+			window.lockMouse(false);
 		break;
 	}
 

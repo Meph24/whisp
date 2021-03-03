@@ -113,7 +113,7 @@ void Zombie_World::step()
 			clock.setNextTargetRate(1.0);
 		}
 
-		vector<User*> changed_restart;
+		vector<SimulationUser*> changed_restart;
 		for(auto& p : players)
 		{
 			if(p.first->input_status.restart != user_prev_input_status[p.first].restart)
@@ -123,7 +123,7 @@ void Zombie_World::step()
 		if( !changed_restart.empty() && 
 			changed_restart.size() == players.size() )
 		{
-			for(User* user : changed_restart) 
+			for(SimulationUser* user : changed_restart) 
 				user_prev_input_status[user].restart = user->input_status.restart;
 			restart();
 		}
@@ -188,7 +188,7 @@ void Zombie_World::doLogic(const SimClock::time_point& next_tick_begin)
 	logicOutside.registerTime();
 
 	for(auto& p : players)
-		p.second->current_gun->tick(next_tick_begin, p.second.get(), world());
+		p.second->current_gun->tick(next_tick_begin, p.second, world());
 
 	logicGunTick.registerTime();
 
@@ -208,7 +208,7 @@ ITerrain* Zombie_World::getITerrain() { return &cm_; }
 Entity* Zombie_World::getTarget(const Entity* me)
 {
 	if(players.empty()) return nullptr;
-	return players.begin()->second.get();
+	return players.begin()->second;
 }
 
 void Zombie_World::serialize(sf::Packet& p, bool complete)

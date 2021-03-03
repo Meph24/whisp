@@ -1,11 +1,3 @@
-/*
- * IGameMode.h
- *
- *  Created on:	Dec 11, 2019
- *      Author:	HL65536
- *     Version:	1.0
- */
-
 #ifndef SRC_IGAMEMODE_H_
 #define SRC_IGAMEMODE_H_
 
@@ -29,7 +21,7 @@ using std::unique_ptr;
 class Simulation: public TickServiceProvider, public Syncable
 {
 public:
-	map<User*, unique_ptr<EntityPlayer> > players;
+	map<SimulationUser*, EntityPlayer* > players;
 
 	SimClock clock;
 	Cfg& cfg;
@@ -37,10 +29,8 @@ public:
 
 	PerformanceMeter pmLogic;
 
-
 	Simulation(const WallClock& reference_clock, Cfg& cfg,unique_ptr<IWorld> iW);
-
-	Simulation(const WallClock& reference_clock, Cfg& cfg);//create your own IWorld
+	Simulation(const WallClock& reference_clock, Cfg& cfg);
 
 	virtual ~Simulation() = default;
 
@@ -51,11 +41,12 @@ public:
             IWorld& iw,
             Perspective& perspective);
 
-	unique_ptr<Perspective> getPerspective( User* user );
+	unique_ptr<Perspective> getPerspective( LocalUser* user );
 
-	void registerUser(User* new_user);
-	virtual void onRegisterUser( User* );
-	void kickUser(User* to_kick_user);
+	EntityPlayer* registerUser(SimulationUser* new_user);
+	EntityPlayer* userAvatar(SimulationUser* user);
+	virtual void onRegisterUser( SimulationUser* );
+	void kickUser(SimulationUser* to_kick_user);
 
 	virtual void getOwnedSyncables(std::vector<Syncable *> collectHere);
 

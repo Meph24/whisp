@@ -111,9 +111,9 @@ EventMapper::EventMapper(SimulationInputStatusSet& input_status)
 	, pm(8s,0s)
 {}
 
-void EventMapper::event(EventHandler::event& e)
+void EventMapper::mapEvent(InputEvent& e)
 {
-	for(EventMapping& m : event_id_mappings[e.ID])
+	for(EventMapping& m : event_id_mappings[e.id])
 	{
 		m.map(e, *managed_stati);
 	}
@@ -135,4 +135,3 @@ void EventMapper::clearMappings( int eventid )
 }
 
 void EventMapper::clearAllMappings(){ event_id_mappings.clear(); }
-

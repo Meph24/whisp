@@ -8,7 +8,6 @@
 #include "Graphics2D.h"
 #include "ICamera3D.h"
 #include "IWorld.h"
-#include "MainApp.h"
 #include "Simulation.hpp"
 #include "TextureStatic2D.h"
 #include "WarnErrReporter.h"
@@ -16,18 +15,17 @@
 
 const float Perspective::default_zoom = 1.0f;
 
-Perspective::Perspective(sf::Window* window, EntityPlayer* observing_entity, Simulation* simulation)
-	: avatar(observing_entity)
-	, simulation(simulation)
-	, graphics2d(64, window->getSize().x / window->getSize().y)
-	, camera(std::make_unique<CameraTP>( observing_entity->eye ))
+Perspective::Perspective(Window& window, SimulationUser& user_)
+	: user(&user_)
+	, graphics2d(64, window.width() / window.height())
+	, camera(std::make_unique<CameraTP>( user->avatar()->eye ))
 	, pmGraphics(8s, 1s)
 	, dsGraphics(&pmGraphics, &graphics2d)
-	, dsLogic(&simulation->pmLogic, &graphics2d)
+	, dsLogic(&user->simulation->pmLogic, &graphics2d)
 {
 	enableThirdPerson(enable_third_person);
-	camera->height=window->getSize().y;
-	camera->width=window->getSize().x;
+	camera->height=window.height();
+	camera->width=window.width();
 	camera->maxView=1024*8;
 	camera->zoom=Perspective::default_zoom;
 
@@ -78,7 +76,7 @@ void Perspective::drawGameOver()
 
 	char scoreString[8];
 
-	int scoreTemp = avatar->score;
+	int scoreTemp = user->avatar()->score;
 	for (int i = 0; i < 8; i++)
 	{
 		scoreString[7 - i] = (scoreTemp % 10) + '0';
@@ -95,8 +93,8 @@ unique_ptr<Frustum> Perspective::newFrustumApplyPerspective(	SimClock::time_poin
 {
 	float zoom_factor=zoomed?zoom_mult:1;
 	camera->zoom=default_zoom/zoom_factor;
-	float time=(float)FloatSeconds(t-avatar->last_ticked);
-	spacevec curPos= avatar->pos + avatar->v*time;
+	float time=(float)FloatSeconds(t-user->avatar()->last_ticked);
+	spacevec curPos= user->avatar()->pos + user->avatar()->v*time;
 
 
 	if(fresh) camera->applyFresh();
@@ -134,7 +132,7 @@ unique_ptr<Frustum> Perspective::newFrustumApplyPerspective(	SimClock::time_poin
 void Perspective::draw()
 {
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
-	if( avatar->HP < 0 ) drawGameOver();
+	if( user->avatar()->HP < 0 ) drawGameOver();
 	else
 	{
 		drawAvatarPerspective();
@@ -144,7 +142,10 @@ void Perspective::draw()
 
 void Perspective::drawAvatarPerspective()
 {
-	const SimClock::time_point t = simulation->clock.now();
+	EntityPlayer* avatar = user->avatar();
+	Simulation* simulation = user->simulation;
+
+	const SimClock::time_point t = user->simulation->clock.now();
 
 	enableThirdPerson(enable_third_person);
 
@@ -155,13 +156,13 @@ void Perspective::drawAvatarPerspective()
 	unique_ptr<Frustum> viewFrustum =
 		newFrustumApplyPerspective(t, true); //TODO dangerouse allocations and ownership transferation
 
-	simulation->iw->draw(t, viewFrustum.get(), simulation->world(), *this);
+	user->simulation->iw->draw(t, viewFrustum.get(), simulation->world(), *this);
 	simulation->drawOtherStuff(t,viewFrustum.get(),simulation->world(),*this);
 
 	timer_graphics_world.registerTime();
 
 	if(isThirdPerson())
-		avatar->draw( t, viewFrustum.get(), simulation->world(), *this );
+		avatar->draw( t, viewFrustum.get(), simulation->world() , *this );
 
 	if(enable_debug)
 	{
@@ -170,7 +171,7 @@ void Perspective::drawAvatarPerspective()
 		transformViewToGUI(1.0f);
 		glColor3f(1, 0, 1);
 		glEnable(GL_TEXTURE_2D);
-		vec3 ppos = simulation->iw->toMeters(avatar->pos);
+		vec3 ppos = simulation->world().toMeters(user->avatar()->pos);
 		int offset=dsGraphics.draw(ppos.x, ppos.y, ppos.z, 0);
 		dsLogic.draw(avatar->pos.x.intpart,avatar->pos.y.intpart,avatar->pos.z.intpart,offset);
 		glDisable(GL_TEXTURE_2D);
@@ -185,6 +186,8 @@ void Perspective::drawAvatarPerspective()
 
 void Perspective::drawHUD()
 {
+	EntityPlayer* avatar = user->avatar();
+
 	glEnable(GL_TEXTURE_2D);
 	transformViewToGUI();
 	glColor3f(0, 1, 0);

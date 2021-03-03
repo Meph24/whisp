@@ -2,8 +2,9 @@
 #define INPUTDEVICECONFIGURATOR_HPP
 
 #include <glm/vec2.hpp>
-using glm::vec2;
 #include "Cfg.hpp"
+
+using glm::vec2;
 
 struct InputDeviceConfigurator
 {
@@ -15,10 +16,7 @@ struct InputDeviceConfigurator
 	virtual MouseMode mouseMode() const = 0;
 
     vec2 turn_sensitivity;
-	virtual vec2 turnSensitivity() const 
-    { 
-        return turn_sensitivity; 
-    };
+	virtual vec2 turnSensitivity() const{ return turn_sensitivity; };
 
     InputDeviceConfigurator( const Cfg& cfg )
 	: turn_sensitivity( 0.0431654676, 0.0431654676 )

@@ -8,7 +8,7 @@
 
 #include "Cfg.hpp"
 #include "IPv4Address.hpp"
-#include "MainApp.h"
+#include "MainApp.hpp"
 #include "protocol.hpp"
 #include "WallClock.hpp"
 

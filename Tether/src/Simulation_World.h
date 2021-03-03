@@ -33,7 +33,7 @@ class Simulation_World: public Simulation
 		SignalCounter benchmark = SimulationInputStatusSet().benchmark;
 		SignalCounter restart = SimulationInputStatusSet().restart;
 	};
-	map<User*, PrevInputStatus> user_prev_input_status;
+	map<SimulationUser*, PrevInputStatus> user_prev_input_status;
 
 	void restart();
 

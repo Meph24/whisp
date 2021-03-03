@@ -1,4 +1,4 @@
-#include "MainApp.h"
+#include "MainApp.hpp"
 
 #include <iostream>
 #include <vector>
@@ -7,8 +7,6 @@
 
 #include "Cfg.hpp"
 #include "CfgIO.hpp"
-
-#include "EventHandler.h"
 
 #include "Simulation_World.h"
 #include "Zombie_World.h"
@@ -90,7 +88,7 @@ void Main::run()
 DefaultApp::DefaultApp( WallClock& wallclock, Cfg& cfg )
 	: wallclock(wallclock)
 	, cfg(cfg)
-	, op(cfg, "Dwengine", *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"))
+	, local_user(cfg, *cfg.getStr("general", "application_name"),*cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"))
 {
 	cout << "Initializing Default Application !\n";
 
@@ -98,19 +96,19 @@ DefaultApp::DefaultApp( WallClock& wallclock, Cfg& cfg )
 	if(zombie_mode) 
 	{
 		sim = std::make_unique<Zombie_World>(wallclock, cfg);
-		op.input_status.clip = true;
+		local_user.input_status.clip = true;
 	}
 	else 
 	{
 		sim = std::make_unique<Simulation_World>(wallclock, cfg);
 	}
 
-	op.operateSimulation(sim.get());
+	local_user.operateSimulation(*sim);
 }
 
 void DefaultApp::run()
 {
-	cout << "Initializing Default Application!\n";
+	cout << "Running Default Application!\n";
 	if(!sim) 
 	{
 		throw std::runtime_error( "App: Failure in application initialization < No Simulation to simulate >!" );
@@ -118,15 +116,16 @@ void DefaultApp::run()
 
 	sim->init();
 
-	while (op.window->isOpen())
+	while (local_user.window.isOpen())
 	{
 		//render
 		sim->step();
 
-		op.draw();
-		op.display();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		local_user.draw();
+		local_user.window.display();
 
 		//handle events
-		op.pollEvents();
+		local_user.pollEvents();
 	}
 }

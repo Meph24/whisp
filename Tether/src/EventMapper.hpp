@@ -8,13 +8,12 @@
 #ifndef SRC_EVENTMAPPER_H_
 #define SRC_EVENTMAPPER_H_
 
+#include <functional>
 #include <unordered_map>
 #include <vector>
 
-#include "EventHandler.h"
+#include "InputEvent.hpp"
 #include "PerformanceMeter.h"
-
-#include <functional>
 
 using std::function;
 using std::unordered_map;
@@ -26,7 +25,7 @@ class User;
 #include "InputDeviceConfigurator.hpp"
 #include "Window.hpp"
 
-#define EVENTMAPPING_FUNCTION_PARAMETERS EventHandler::event& e, SimulationInputStatusSet& stati
+#define EVENTMAPPING_FUNCTION_PARAMETERS InputEvent& e, SimulationInputStatusSet& stati
 
 struct EventMapping
 {
@@ -176,7 +175,7 @@ public:
 	EventMapper(SimulationInputStatusSet& input_status_);
 	void changeManaged(SimulationInputStatusSet& input_status);
 
-	void event(EventHandler::event& e);
+	void mapEvent(InputEvent& e);
 
 	void registerMapping(int eventid, EventMapping mapping);
 
@@ -186,7 +185,6 @@ public:
 	void registerMapping(int eventid, EventMapping::Action action, EventMapping::Condition condition = eventmapping::conditions::alwaysTrue);
 
 	void clearMappings( int eventid );
-
 	void clearAllMappings();
 };
 #endif /* SRC_EVENTMAPPER_H_ */

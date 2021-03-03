@@ -8,7 +8,7 @@
 #include <thread>
 #include <vector>
 
-#include "MainApp.h"
+#include "MainApp.hpp"
 #include "protocol.hpp"
 
 using std::deque;
