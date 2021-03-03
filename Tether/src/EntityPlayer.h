@@ -35,7 +35,7 @@ class EntityPlayer: public Entity, public Pushable, public BulletLikeSource
 {
 	struct PrevInputStatus
 	{
-		SignalCounter inventory;
+		SignalCounter inventory = 0;
 		SignalCounter selection_up, selection_down;
 		vec3 turn;
 	}prev_input_status;
