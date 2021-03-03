@@ -92,7 +92,8 @@ void ItemContainer::draw(	const SimClock::time_point& t,
 							IWorld& iw,
 							Perspective& perspective		)
 {
-	std::cout<<"selected: "<<selected<<std::endl;
+	glPushMatrix();
+	//std::cout<<"selected: "<<selected<<std::endl;
 	perspective.transformViewToGUI(0.75f);
 	subsection inventoryBounds = perspective.graphics2d.generateSubsection(0,0,1.8f,1.8f,SNAP_MID);
 	TRANSPARENT_SECTION_DO_LATER(0.75f)
@@ -151,6 +152,7 @@ void ItemContainer::draw(	const SimClock::time_point& t,
 	}
 
 	perspective.revertView();
+	glPopMatrix();
 }
 
 void ItemContainer::selectRelative( i64 select_add )
