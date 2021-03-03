@@ -1,3 +1,6 @@
+[general]
+application_name="whisp"
+
 [graphics]
 resolutionX=1920
 resolutionY=1080
@@ -27,6 +30,9 @@ default_connect_port=55555
 
 [server]
 name="Standard Dwengine Server"
+default_udp_port=55555
+udp_tester_socket_port=55554
 
 [client]
-name="Meph"
+name="None"
+default_udp_port=55556
