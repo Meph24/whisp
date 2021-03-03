@@ -48,8 +48,7 @@ struct Perspective
 	float third_person_distance_min = 2;
 	float third_person_distance_max = 20;
 
-	EntityPlayer* avatar = nullptr;
-	Simulation* simulation = nullptr;
+	SimulationUser* user;
 
 	Graphics2D graphics2d;
 	unique_ptr<CameraTP> camera;
@@ -70,7 +69,7 @@ struct Perspective
 
 //----------------------
 
-	Perspective(Window& window, EntityPlayer* observing_entity, Simulation* simulation);
+	Perspective(Window& window, SimulationUser& user);
 
 	void enableAABBDrawing(bool b = false);
 	void enableDebugScreen(bool b = false);

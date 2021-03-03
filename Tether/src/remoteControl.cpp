@@ -15,7 +15,7 @@ void RemoteControlReceiverUser::operateSimulation(Simulation* simulation)
 
 	this->simulation = simulation;
 	simulation->registerUser(this);
-
+	if(!avatar()) { std::cerr << "User could not be registered in Simulation!" << std::endl; }
 	perspective = simulation->getPerspective(this);
 }
 
@@ -23,6 +23,7 @@ void RemoteControlReceiverUser::disconnectSimulation()
 {
 	if(!this->simulation) return;
 
+	perspective.reset();
 	simulation->kickUser(this);
 	simulation = nullptr;
 }
@@ -111,6 +112,8 @@ void RemoteControlReceiverApp::run()
 	{
 		//render
 		sim->step();
+
+
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		user.draw();
@@ -275,7 +278,6 @@ void RemoteControlSender::sync()
 
 void RemoteControlSender::processEvents()
 {
-
 	InputEvent e;
 	while(window.pollEvent(e))	// is currently not used here, but must be polled to keep the window open
 								// the window will handle essential events concerning it by itself

@@ -188,7 +188,7 @@ void Zombie_World::doLogic(const SimClock::time_point& next_tick_begin)
 	logicOutside.registerTime();
 
 	for(auto& p : players)
-		p.second->current_gun->tick(next_tick_begin, p.second.get(), world());
+		p.second->current_gun->tick(next_tick_begin, p.second, world());
 
 	logicGunTick.registerTime();
 
@@ -208,7 +208,7 @@ ITerrain* Zombie_World::getITerrain() { return &cm_; }
 Entity* Zombie_World::getTarget(const Entity* me)
 {
 	if(players.empty()) return nullptr;
-	return players.begin()->second.get();
+	return players.begin()->second;
 }
 
 void Zombie_World::serialize(sf::Packet& p, bool complete)

@@ -414,7 +414,7 @@ void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 	logicOutside.registerTime();
 
 	for(auto& p : players)
-		p.second->current_gun->tick(next_tick_begin, p.second.get(), world());
+		p.second->current_gun->tick(next_tick_begin, p.second, world());
 
 	logicGunTick.registerTime();
 

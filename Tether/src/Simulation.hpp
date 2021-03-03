@@ -21,7 +21,7 @@ using std::unique_ptr;
 class Simulation: public TickServiceProvider, public Syncable
 {
 public:
-	map<SimulationUser*, unique_ptr<EntityPlayer> > players;
+	map<SimulationUser*, EntityPlayer* > players;
 
 	SimClock clock;
 	Cfg& cfg;
@@ -43,7 +43,8 @@ public:
 
 	unique_ptr<Perspective> getPerspective( LocalUser* user );
 
-	void registerUser(SimulationUser* new_user);
+	EntityPlayer* registerUser(SimulationUser* new_user);
+	EntityPlayer* userAvatar(SimulationUser* user);
 	virtual void onRegisterUser( SimulationUser* );
 	void kickUser(SimulationUser* to_kick_user);
 

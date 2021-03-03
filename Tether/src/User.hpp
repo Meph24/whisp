@@ -24,12 +24,12 @@ class Simulation;
 
 class SimulationUser
 {
-protected:
 public:
 	Simulation* simulation;
 	SimulationInputStatusSet input_status;
 	
 	virtual void operateSimulation(Simulation& simulation) = 0;
+	EntityPlayer* avatar();
 	virtual void disconnectSimulation() = 0;
 };
 

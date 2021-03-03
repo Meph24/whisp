@@ -12,6 +12,11 @@
 
 using std::string;
 
+EntityPlayer* SimulationUser::avatar()
+{
+	return (simulation)? simulation->userAvatar(this) : nullptr;
+}
+
 LocalUser::LocalUser(
 						const Cfg& cfg,
 						string window_name,
@@ -49,6 +54,7 @@ void LocalUser::operateSimulation(Simulation& simulation)
 
 	this->simulation = &simulation;
 	simulation.registerUser(this);
+	if(!avatar()) { std::cerr << "User could not be registered in Simulation!" << std::endl; }
 	perspective = simulation.getPerspective(this);
 
 	event_mapper.reset(new EventMapper(input_status));
@@ -168,7 +174,7 @@ void LocalUser::disconnectSimulation()
 {
 	if(!perspective) return;
 
-	perspective->simulation->kickUser(this);
+	simulation->kickUser(this);
 	perspective.reset();
 	event_mapper.reset();
 }
