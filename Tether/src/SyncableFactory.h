@@ -10,10 +10,10 @@
 #define SRC_SYNCABLEFACTORY_H_
 
 #include "ShortNames.h"
+#include "Syncable.h"
 
 #include <SFML/Network.hpp>
 
-class Syncable;
 class SyncableManager;
 
 class SyncableFactory

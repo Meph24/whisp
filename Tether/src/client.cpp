@@ -6,6 +6,7 @@
 
 using std::cout; //TODO replace with logging #56
 
+
 ServerConnection::ServerConnection(SimulationClient& client, Cfg& cfg)
     : client(client)
 {
@@ -61,6 +62,8 @@ void ServerConnection::disconnect()
     is_connected = false;
 }
 
+bool ServerConnection::connected() const { return tcpsocket.getRemoteAddress() != sf::IpAddress::None; }
+
 const WallClock::duration& ServerConnection::latency() const { return latency_; }
 
 unique_ptr<sf::Packet> ServerConnection::receiveUdp()
@@ -95,11 +98,46 @@ SimulationClient::SimulationClient(WallClock& wc, Cfg& cfg)
     : wc(wc)
     , name(*cfg.getStr("client", "name"))
     , connection(*this, cfg)
-{}
+    , syncman(wc, cfg)
+{
+    connection.tcpsocket.setBlocking(false);
+}
 
 SimulationClient::~SimulationClient()
 {
     connection.disconnect();
+}
+
+bool SimulationClient::connected() const { return connection.connected(); }
+bool SimulationClient::initialized() const { return syncman.getSim(); }
+
+void SimulationClient::processMainSync()
+{
+    if(!connected() || !initialized()) return;
+
+    sf::Packet incoming_tcp;
+
+    if(connection.tcpsocket.receive(incoming_tcp) == sf::Socket::Done)
+        syncman.applyEventPacket(incoming_tcp);
+
+}
+
+void SimulationClient::processRealtimeSync()
+{
+    if(!connected() || !initialized()) return;
+    unique_ptr<sf::Packet> incoming_udp;
+    incoming_udp = connection.receiveUdp();
+    if(incoming_udp)
+        syncman.applyUpdatePacket(*incoming_udp);
+}
+
+EntityPlayer* SimulationClient::avatar() const
+{
+    //TODO implement
+    //the avatar must be sampled from the syncable manager
+    //the syncable manager must however be updated, so that
+    // the entity player can be probed
+    return nullptr;
 }
 
 ClientApp::ClientApp(WallClock& wc, Cfg& cfg, IPv4Address& addr, Port port)
@@ -118,8 +156,37 @@ ClientApp::ClientApp(WallClock& wc, Cfg& cfg, IPv4Address& addr, Port port)
 
 void ClientApp::run()
 {
+    cout << "Waiting on Simulation to be transmitted from server ...\n";
+    {
+        //for visual feedback of processing on terminal
+        char wheel[4] = {'-', '\\', '|', '/' };
+        int wheelindex = 0;
+        while(!client.initialized())
+        {
+            client.processMainSync();
+
+            wheelindex = (wheelindex + 1) % sizeof(wheel);
+            cout << '\r' << wheel[wheelindex];
+        }
+        cout << "\rSimulation received!\n";
+    }
+
     while(user.window.isOpen())
     {
+        client.processMainSync();
+        if(!client.avatar())
+        {
+            //Switch the color to give visual feedback of no avatar
+            glClearColor(0.5f, 0.0f, 0.0f, 0.0f);
+            continue;
+        }
+        else
+        {
+            glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
+        }
+        client.processRealtimeSync();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         user.draw();
         user.window.display();
 

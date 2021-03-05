@@ -6,12 +6,28 @@
 
 using std::cout; //TODO replace with logging #56
 
+void ClientConnection::sendUdp(shared_ptr<syncprotocol::udp::Packet>& p)
+{
+    std::lock_guard<std::mutex> lockguard (udp_outbox_lock);
+    udp_outbox.emplace_back(p);
+}
 
+unique_ptr<sf::Packet> ClientConnection::receiveUdp()
+{
+    if(udp_inbox.empty()) return nullptr;
+    
+    std::lock_guard<std::mutex> lockguard (udp_inbox_lock);
+    unique_ptr<sf::Packet> newp = std::move(udp_inbox.front());
+    udp_inbox.pop_front();
+    return newp;
+}
 
 FullIPv4 ClientConnection::remoteUdpFullip() const
 {
     return FullIPv4( tcpsocket.getRemoteAddress().toInteger(), udpport );
 }
+
+const WallClock::duration& ClientConnection::latency() const { return latency_; }
 
 bool ConnectionListener::hasNewConnections() const { return !connections.empty(); }
 unique_ptr<ClientConnection> ConnectionListener::nextConnection()
@@ -148,6 +164,13 @@ void ConnectionInitialProcessor::processIncomingConnections()
             cout << " --- creating client token\n";
             syncprotocol::ClientToken client_token = newClientToken();
             client_token.server_known_fullip = FullIPv4(IPv4Address(connection->tcpsocket.getRemoteAddress().toInteger()), connection->tcpsocket.getRemotePort());
+
+            //TODO 
+            //spawn entityplayer
+            //WAIT FOR ENTITYPLAYER to be spawned
+            //get the pointer
+            //wait for syncablemanager to have an id
+            //add id to clienttoken
 
             cout << " --- sending client token\n";
             connection->tcpsocket.send( &client_token, sizeof(syncprotocol::ClientToken) );
@@ -315,20 +338,108 @@ void SimulationServer::processIncomingConnections()
 {
     if(! initial_processor.hasProcessedConnections()) return;
 
-    unique_ptr<ClientConnection> newconnection = initial_processor.nextConnection();
-    clients.addClient(std::move(newconnection));
+    vector<unique_ptr<ClientConnection> >new_connections;
+    while(initial_processor.hasProcessedConnections())
+    {
+        new_connections.emplace_back(initial_processor.nextConnection());
+    }
 
+    sf::Packet packet;
+    syncman->fillCompletePacket(packet);
+    for(auto& c : new_connections)
+    {
+        c->tcpsocket.send(packet);
+        clients.addClient(std::move(c));
+    }
 }
 void SimulationServer::process()
 {
-    processIncomingConnections();
+   if(!clients.connections.empty() && syncman)
+    {
+        sf::Packet packet;
+        while(syncman->fetchEventPackets(packet))
+            broadcastTcp(packet);
+
+        processIncomingConnections();
+
+        unique_ptr<syncprotocol::udp::Packet> udp_packet = std::make_unique<syncprotocol::udp::Packet>();
+        if(syncman->fillUpdatePacket(*udp_packet, sf::UdpSocket::MaxDatagramSize - udp_packet->getDataSize() ))
+            broadcastUdp(std::move(udp_packet));
+    }
 }
 
-ServerApp::ServerApp(WallClock& wc, Cfg& cfg, Port port)
-    : server(wc, cfg, port)
-{}
+void SimulationServer::setup(
+    SyncableManager& syncable_manager
+    )
+{ 
+    syncman = &syncable_manager; 
+}
 
-void ServerApp::run()
+#include "Simulation_World.h"
+#include "Zombie_World.h"
+
+HostApp::HostApp(WallClock& wc, Cfg& cfg, Port port)
+    : server(wc, cfg, port)
+	, local_user(cfg, *cfg.getStr("general", "application_name") + string(" - Host"),
+        *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"))
 {
-    while(1){}
+    cout << "Initializing Host Application !\n";
+
+	int zombie_mode = *cfg.getInt("test", "zombie_mode");
+	if(zombie_mode) 
+	{
+		simulation = std::make_unique<Zombie_World>(wc, cfg);
+	}
+	else 
+	{
+		simulation = std::make_unique<Simulation_World>(wc, cfg);
+	}
+    if(!simulation) throw std::runtime_error("Simulation could not be initialized!");
+
+    syncman = std::make_unique<SyncableManager>(*simulation);
+    local_user.operateSimulation(*simulation);
+    server.setup(*syncman);
+}
+
+void HostApp::run()
+{
+    if(!simulation || !syncman) 
+		throw std::runtime_error( "Application cannot be run! Initialization Failure!" );
+
+    simulation->init();
+
+    while(local_user.window.isOpen())
+    {
+        simulation->step();
+
+        server.process(); 
+
+        if(local_user.window.isOpen())
+        {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            local_user.draw();
+            local_user.window.display();
+
+            local_user.pollEvents();
+        }
+    }
+}
+
+void SimulationServer::broadcastTcp(sf::Packet& p)
+{
+    for(auto& c : clients.connections)
+    {
+        c->tcpsocket.send(p);
+    }
+}
+
+void SimulationServer::broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&& packet)
+{
+    syncprotocol::udp::Packet* packet_ptr = packet.get();
+    packet.release();
+    shared_ptr<syncprotocol::udp::Packet> shared_packet (packet_ptr);
+    for(auto& c : clients.connections)
+    {
+        c->sendUdp(shared_packet);
+    }
 }

@@ -21,7 +21,7 @@ unordered_map<string, unsigned int> Main::command_line_argument_flags =
 {  
 	{"remote-control-sender", 0},
 	{"remote-control-receiver", 0},
-	{"server", 0},
+	{"host", 0},
 	{"client", 0},
 	{"addr", 1},
 	{"port", 1}
@@ -52,8 +52,8 @@ Main::Main(int argc, char** argv)
 		case CommandLineArgumentInterpreter::ExecutionMode::Default:
 			app = std::make_unique<DefaultApp>(clock, cfg);
 		break;
-		case CommandLineArgumentInterpreter::ExecutionMode::Server:
-			app = std::make_unique<ServerApp>(clock, cfg, port);
+		case CommandLineArgumentInterpreter::ExecutionMode::Host:
+			app = std::make_unique<HostApp>(clock, cfg, port);
 		break;
 		case CommandLineArgumentInterpreter::ExecutionMode::Client:
 		{

@@ -299,7 +299,7 @@ TickServiceProvider& SyncableManager::getTSP()
 	return *sim;
 }
 
-Simulation* SyncableManager::getSim()
+Simulation* SyncableManager::getSim() const
 {
 	return sim;
 }

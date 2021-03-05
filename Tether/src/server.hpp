@@ -2,6 +2,7 @@
 #define SERVER_HPP
 
 #include <deque>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <string>
@@ -10,10 +11,12 @@
 
 #include "MainApp.hpp"
 #include "protocol.hpp"
+#include "SyncableManager.h"
 
 using std::deque;
 using std::mutex;
 using std::queue;
+using std::shared_ptr;
 using std::string;
 using std::thread;
 using std::vector;
@@ -25,7 +28,7 @@ struct ClientConnection
     syncprotocol::ClientToken token;
     Port udpport;
 
-    void sendUdp(unique_ptr<syncprotocol::udp::Packet>);
+    void sendUdp(shared_ptr<syncprotocol::udp::Packet>&);
     unique_ptr<sf::Packet> receiveUdp();
 
     FullIPv4 remoteUdpFullip() const;
@@ -39,7 +42,7 @@ private:
     mutex udp_inbox_lock;
     mutex udp_outbox_lock;
     deque<unique_ptr<sf::Packet>  > udp_inbox; 
-    deque<unique_ptr<syncprotocol::udp::Packet> > udp_outbox;
+    deque<shared_ptr<syncprotocol::udp::Packet> > udp_outbox;
 
     friend struct UdpServerProcessor;
 };
@@ -147,24 +150,37 @@ struct SimulationServer
     Cfg& cfg;
     ConnectionListener listener;
     ConnectionInitialProcessor initial_processor;
-
     UdpServerProcessor udp;
 
     syncprotocol::ServerInfo info;
 
     ClientConnectionListing clients;
 
+    SyncableManager* syncman;
+
     void processIncomingConnections();
     void process();
 
+    void setup(SyncableManager& syncable_manager);
+
     SimulationServer(WallClock& wc, Cfg& cfg, Port port);
     ~SimulationServer() = default;
+
+private:
+    void broadcastTcp(sf::Packet&);
+    void broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&&);
 };
 
-struct ServerApp : public App
+struct HostApp : public App
 {
+    unique_ptr<Simulation> simulation;
+
     SimulationServer server;
-    ServerApp(WallClock& wc, Cfg& cfg, Port port);
+    unique_ptr<SyncableManager> syncman;
+
+    LocalUser local_user;
+
+    HostApp(WallClock& wc, Cfg& cfg, Port port);
     void run();
 };
 

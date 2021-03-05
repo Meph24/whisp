@@ -1,16 +1,17 @@
 #ifndef COMMANDLINE_HPP
 #define COMMANDLINE_HPP
 
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
 #include <numeric>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+using std::string;
 using std::unordered_map;
 using std::unordered_set;
 using std::vector;
-using std::string;
 
 struct CommandLineArgumentParser
 {
@@ -74,7 +75,7 @@ struct CommandLineArgumentInterpreter
 		Default,
 		RemoteControlSender,
 		RemoteControlReceiver,
-		Server,
+		Host,
 		Client,
 
 		NUM_EXECUTIONMODE
@@ -86,7 +87,7 @@ struct CommandLineArgumentInterpreter
 	: args(args)
     {   
         if( args.find( "server" ) != args.end() )
-            execution_mode = ExecutionMode::Server;
+            execution_mode = ExecutionMode::Host;
         else if( args.find( "client" ) != args.end() )
             execution_mode = ExecutionMode::Client;
         else if( args.find( "remote-control-sender" ) != args.end() )

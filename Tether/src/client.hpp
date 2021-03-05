@@ -11,6 +11,7 @@
 #include "MainApp.hpp"
 #include "protocol.hpp"
 #include "WallClock.hpp"
+#include "SyncableManager.h"
 
 using std::queue;
 using std::unique_ptr;
@@ -32,6 +33,7 @@ struct ServerConnection
 
     bool tryConnect(Cfg& cfg, const IPv4Address& addr, Port port);
     void disconnect();
+    bool connected() const;
 
     const WallClock::duration& latency() const;
 
@@ -51,6 +53,14 @@ struct SimulationClient
     string name;
     ServerConnection connection;
 
+    SyncableManager syncman;
+
+    bool connected() const;
+    bool initialized() const;
+    void processMainSync();
+    void processRealtimeSync();
+    EntityPlayer* avatar() const;
+
     SimulationClient(WallClock& wc, Cfg& cfg);
     ~SimulationClient();
 };
@@ -58,7 +68,6 @@ struct SimulationClient
 struct ClientApp : public App
 {
     SimulationClient client;
-
     LocalUser user;
 
     ClientApp(WallClock& wc, Cfg& cfg, IPv4Address& addr, Port port);
