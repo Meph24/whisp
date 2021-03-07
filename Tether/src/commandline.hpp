@@ -86,7 +86,7 @@ struct CommandLineArgumentInterpreter
     CommandLineArgumentInterpreter( unordered_map<string, vector<string>> args )
 	: args(args)
     {   
-        if( args.find( "server" ) != args.end() )
+        if( args.find( "host" ) != args.end() )
             execution_mode = ExecutionMode::Host;
         else if( args.find( "client" ) != args.end() )
             execution_mode = ExecutionMode::Client;
