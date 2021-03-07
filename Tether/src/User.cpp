@@ -50,7 +50,7 @@ LocalUser::LocalUser(
 
 void LocalUser::operateSimulation(Simulation& simulation)
 {
-	if(!this->simulation) return;
+	if(this->simulation) return;
 
 	this->simulation = &simulation;
 	simulation.registerUser(this);
@@ -172,8 +172,6 @@ void LocalUser::operateSimulation(Simulation& simulation)
 
 void LocalUser::disconnectSimulation()
 {
-	if(!perspective) return;
-
 	simulation->kickUser(this);
 	perspective.reset();
 	event_mapper.reset();
