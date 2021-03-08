@@ -16,11 +16,18 @@ ServerConnection::ServerConnection(SimulationClient& client, Cfg& cfg)
 
 bool ServerConnection::tryConnect( Cfg& cfg, const IPv4Address& addr, Port port )
 {
-    cout << "Connecting to " << addr << ':' << port << '\n';
-    if(is_connected) return false;
 
-    is_connected = tcpsocket.connect(sf::IpAddress( (uint32_t)addr ), port) == sf::Socket::Done;
-    if(!is_connected) return false;
+    if(is_connected) return false;
+    cout << "Connecting to " << addr << ':' << port << '\n';
+
+    tcpsocket.setBlocking(true);
+    is_connected = sf::Socket::Status::Done == tcpsocket.connect(
+            sf::IpAddress( (uint32_t)addr ), port, sf::seconds(5) );
+    if(!is_connected)
+    {
+        cout << "tryConnect: connection attempt failed!\n";
+        return false;
+    }
 
     cout << "Socket connection established\nIntroduction with ";
 
@@ -51,7 +58,7 @@ bool ServerConnection::tryConnect( Cfg& cfg, const IPv4Address& addr, Port port 
 
     cout << "Client Token:" << client_token << '\n';
 
-    udpsocket.bind( *cfg.getInt("client", "default_udp_port") );
+    udpsocket.bind( server_info.udpport );
 
     return is_connected;
 }
@@ -111,24 +118,35 @@ SimulationClient::~SimulationClient()
 bool SimulationClient::connected() const { return connection.connected(); }
 bool SimulationClient::initialized() const { return syncman.getSim(); }
 
-void SimulationClient::processMainSync()
+bool SimulationClient::processInitialSync()
 {
-    if(!connected() || !initialized()) return;
+    if(initialized()) return true;
+    if(!connected()) return false;
 
     sf::Packet incoming_tcp;
 
-    if(connection.tcpsocket.receive(incoming_tcp) == sf::Socket::Done)
-        syncman.applyEventPacket(incoming_tcp);
-
+    if(connection.tcpsocket.receive(incoming_tcp) != sf::Socket::Done)
+        return false;
+    syncman.applyEventPacket(incoming_tcp);
+    return initialized();
 }
 
-void SimulationClient::processRealtimeSync()
+void SimulationClient::processCyclicSync()
 {
     if(!connected() || !initialized()) return;
-    unique_ptr<sf::Packet> incoming_udp;
-    incoming_udp = connection.receiveUdp();
-    if(incoming_udp)
-        syncman.applyUpdatePacket(*incoming_udp);
+
+    //tcp ; game events
+    unique_ptr<sf::Packet> incoming;
+    if(connection.tcpsocket.receive(*incoming) == sf::Socket::Done && incoming->getDataSize())
+    {
+        syncman.applyEventPacket(*incoming);
+    }
+
+    //udp ; update packets
+    incoming->clear();
+    incoming = connection.receiveUdp();
+    if(incoming)
+        syncman.applyUpdatePacket(*incoming);
 }
 
 EntityPlayer* SimulationClient::avatar() const
@@ -161,19 +179,21 @@ void ClientApp::run()
         //for visual feedback of processing on terminal
         char wheel[4] = {'-', '\\', '|', '/' };
         int wheelindex = 0;
-        while(!client.initialized())
+        
+        glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+        while(user.window.isOpen() && !client.processInitialSync())
         {
-            client.processMainSync();
-
             wheelindex = (wheelindex + 1) % sizeof(wheel);
             cout << '\r' << wheel[wheelindex];
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            user.window.display();
+            InputEvent e; while(user.window.pollEvent(e)); //keep window open
         }
         cout << "\rSimulation received!\n";
     }
 
     while(user.window.isOpen())
     {
-        client.processMainSync();
         if(!client.avatar())
         {
             //Switch the color to give visual feedback of no avatar
@@ -184,7 +204,7 @@ void ClientApp::run()
         {
             glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
         }
-        client.processRealtimeSync();
+        client.processCyclicSync();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         user.draw();

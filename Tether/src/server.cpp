@@ -42,8 +42,8 @@ unique_ptr<ClientConnection> ConnectionListener::nextConnection()
 void ConnectionListener::startListening( Port port )
 { 
     tcplistener.listen(port);
-    t = thread(&ConnectionListener::listenProcess, this); 
     is_listening = true;
+    t = thread(&ConnectionListener::listenProcess, this); 
 }
 void ConnectionListener::stopListening()
 { 
@@ -80,121 +80,145 @@ void ConnectionListener::listenProcess()
 ConnectionInitialProcessor::ConnectionInitialProcessor(
     SimulationServer& server,
     ConnectionListener& listener,
-    WallClock& wc, 
-    syncprotocol::ServerInfo& server_info
+    WallClock& wc
     )
     : server(server)
     , listener(listener)
     , wc(wc)
-    , server_info(server_info)
+    , main_process(&ConnectionInitialProcessor::mainProcess, this)
+{}
+
+void ConnectionInitialProcessor::stopMainProcess()
 {
-    initial_connection_processing_thread = thread(&ConnectionInitialProcessor::processIncomingConnections, this);
+    running = false;
+}
+
+void ConnectionInitialProcessor::mainProcess()
+{
+    cout << "Initial Processing is up!\n";
+    while(running)
+    {
+        while(listener.hasNewConnections())
+        {
+            asyncProcessNewConnection();
+        }
+        std::this_thread::sleep_for(200ms);
+    }
 }
 
 ConnectionInitialProcessor::~ConnectionInitialProcessor()
 {
-    connections.clear();
-    stopThread();
+    stopMainProcess();
+    main_process.detach();
 }
 
-void ConnectionInitialProcessor::stopThread()
+ConnectionInitialProcessor::SingleConnectionProcessor::SingleConnectionProcessor(
+    unique_ptr<ClientConnection>&& connection,
+    ConnectionInitialProcessor& cip
+    )
+    : connection(std::move(connection))
+    , cip(&cip)
+    , t(&SingleConnectionProcessor::process, this)
 {
-    initial_processing_on = false;
-    initial_connection_processing_thread.join();
+    t.detach();
 }
 
-syncprotocol::ClientToken ConnectionInitialProcessor::newClientToken() const
+void ConnectionInitialProcessor::asyncProcessNewConnection()
 {
-    syncprotocol::ClientToken token;
+    if(!listener.hasNewConnections()) return;
+
+    std::lock_guard<std::mutex> lg_ (process_lock);
+
+    cout << " --- processing new incoming connection\n";
+    processes.emplace_back( listener.nextConnection(), *this );
+}
+
+void ConnectionInitialProcessor::SingleConnectionProcessor::process()
+{
+    cout << "Asynchronous thread started!\n";
+
+    //receive greeting in 3s
+    syncprotocol::ClientIntroduction introduction;
+    if( ! syncprotocol::receiveInTime(cip->wc, connection->tcpsocket, (char*) &introduction, sizeof(syncprotocol::ClientIntroduction), 3s) )
+    {
+        cout << "timeout\n";
+        return;
+    }
+
+    if( !std::strcmp(introduction.greeting, syncprotocol::client_introduction_greeting) ) 
+    {
+        cout << "wrong greeting\n";
+        return;
+    }
+    connection->name = introduction.clientname;
+    connection->udpport = introduction.client_udp_port;
     
-    if(connections.size() + server.clients.size() >= 255) return token;
+    //send introduction success
+    connection->tcpsocket.setBlocking(true);
 
-    set<uint8_t> existing_ids;
-    for(auto& c : connections){ existing_ids.emplace(c->token.client_id); }
-    for(auto& c : server.clients.connections){ existing_ids.emplace(c->token.client_id); }
-    for (uint16_t i = 1; i < 256; i++)
-    {
-        if(existing_ids.find(i) != existing_ids.end()) continue;
-        else
-        {
-            token.client_id = i;
-            break;
-        }
-    }
-    return token;
+    connection->tcpsocket.send( 
+        &syncprotocol::introduction_success, 
+        sizeof( syncprotocol::introduction_success ) 
+    );
+
+    //send back server Information
+    connection->tcpsocket.send( &cip->server.info, sizeof(syncprotocol::ServerInfo) );
+
+    //send individual info for this client
+    syncprotocol::ClientToken client_token;
+    client_token.server_known_fullip = FullIPv4(IPv4Address(connection->tcpsocket.getRemoteAddress().toInteger()), connection->tcpsocket.getRemotePort());
+
+    //TODO 
+    //spawn entityplayer
+    //WAIT FOR ENTITYPLAYER to be spawned
+    //get the pointer
+    //wait for syncablemanager to have an id
+    //add id to clienttoken
+
+    connection->tcpsocket.send( &client_token, sizeof(syncprotocol::ClientToken) );
+    connection->token = client_token;
+
+    cout << " --- new connection accepted\n";
+    std::lock_guard<mutex> lg_ ( cip->process_lock );
+    cip->connections.emplace_back(std::move(connection));
 }
 
-void ConnectionInitialProcessor::processIncomingConnections()
+
+ConnectionInitialProcessor::SingleConnectionProcessor::SingleConnectionProcessor(
+    SingleConnectionProcessor&& other
+    )
+    : connection(std::move(other.connection))
+    , cip(other.cip)
+    , t(std::move(other.t))
+{}
+
+bool ConnectionInitialProcessor::SingleConnectionProcessor::finished() const
+{ return (bool)connection; }
+
+ConnectionInitialProcessor::SingleConnectionProcessor& 
+ConnectionInitialProcessor::SingleConnectionProcessor::operator=(
+    SingleConnectionProcessor&& other
+    )
 {
-    cout << "Start Processing incoming connections.\n";
-    while( initial_processing_on )
-    {
-        if(listener.hasNewConnections())
-        {
-            cout << " --- new incoming connection\n";
-            unique_ptr<ClientConnection> connection = listener.nextConnection();
-            cout << " --- local port : " << connection->tcpsocket.getLocalPort() << '\n';
-
-            //receive greeting in 3s
-            syncprotocol::ClientIntroduction introduction;
-            if( ! syncprotocol::receiveInTime(wc, connection->tcpsocket, (char*) &introduction, sizeof(syncprotocol::ClientIntroduction), 3s) ) continue;
-
-            if( !std::strcmp(introduction.greeting, syncprotocol::client_introduction_greeting) ) continue;
-            connection->name = introduction.clientname;
-            connection->udpport = introduction.client_udp_port;
-            
-            //send introduction success
-            connection->tcpsocket.setBlocking(true);
-
-            cout    << " --- introduction success !" 
-                    << "\n ------ Name: " << connection->name
-                    << "\n ------ TCP: " << connection->tcpsocket.getRemoteAddress() << ':' << connection->tcpsocket.getRemotePort()
-                    << "\n ------ UDP: " << connection->tcpsocket.getRemoteAddress() << ':' << connection->udpport 
-                    << '\n';
-            connection->tcpsocket.send( 
-                &syncprotocol::introduction_success, 
-                sizeof( syncprotocol::introduction_success ) 
-            );
-
-            //send back server Information
-            cout << " --- sending server info\n";
-            connection->tcpsocket.send( &server_info, sizeof(syncprotocol::ServerInfo) );
-
-            //send individual info for this client
-            cout << " --- creating client token\n";
-            syncprotocol::ClientToken client_token = newClientToken();
-            client_token.server_known_fullip = FullIPv4(IPv4Address(connection->tcpsocket.getRemoteAddress().toInteger()), connection->tcpsocket.getRemotePort());
-
-            //TODO 
-            //spawn entityplayer
-            //WAIT FOR ENTITYPLAYER to be spawned
-            //get the pointer
-            //wait for syncablemanager to have an id
-            //add id to clienttoken
-
-            cout << " --- sending client token\n";
-            connection->tcpsocket.send( &client_token, sizeof(syncprotocol::ClientToken) );
-            connection->token = client_token;
-
-            std::lock_guard<mutex> lock_guard( connections_lock );
-            connections.emplace_back(std::move(connection));
-            
-            cout 
-                << connections.back()->name << " connected with " 
-                << connections.back()->tcpsocket.getRemoteAddress().toString() 
-                << ':' << connections.back()->tcpsocket.getRemotePort() << '\n';
-        }
-        else
-            std::this_thread::sleep_for(200ms);
-    }
+    connection = std::move(other.connection);
+    cip = other.cip;
+    t = std::move(other.t);
+    return *this;
 }
 
 bool ConnectionInitialProcessor::hasProcessedConnections(){ return !connections.empty(); }
 unique_ptr<ClientConnection> ConnectionInitialProcessor::nextConnection()
 { 
     if(!hasProcessedConnections()) return nullptr;
+    std::lock_guard<mutex> lock_guard( process_lock );
 
-    std::lock_guard<mutex> lock_guard( connections_lock );
+    //cleanup finished threads
+    auto prev_size = processes.size();
+    if(prev_size)
+    {
+        processes.remove_if([&](const SingleConnectionProcessor& p)->bool{return p.finished();});
+        cout << "Cleaning up " << prev_size - processes.size() << " threads!\n";
+    }
     unique_ptr<ClientConnection> next_connection = std::move(connections.front()); connections.pop_front();
     return next_connection;
 }
@@ -281,17 +305,6 @@ void ClientConnectionListing::addClient( unique_ptr<ClientConnection>&& new_conn
     connections.emplace_back(std::move( new_connection ));
 }
 
-void ClientConnectionListing::removeClient(uint8_t id)
-{
-    auto f = std::find_if( connections.begin(), connections.end(),
-                        [&](const unique_ptr<ClientConnection>& p)->bool
-                            { return p->token.client_id == id; }
-                      );
-    if(f == connections.end()) return;
-
-    connections.erase(f);
-}
-
 size_t ClientConnectionListing::size() const { return connections.size(); }
 ClientConnection* ClientConnectionListing::atTcp(const sf::IpAddress& addr, Port port)
 { 
@@ -305,6 +318,7 @@ ClientConnection* ClientConnectionListing::atTcp(const sf::IpAddress& addr, Port
     if( f == connections.end() ) return nullptr;
     return f->get();
 }
+
 ClientConnection* ClientConnectionListing::atUdp(const sf::IpAddress& addr, Port port)
 {
     auto f = std::find_if(   connections.begin(), connections.end(),
@@ -327,7 +341,7 @@ bool ClientConnectionListing::containsUdp(const sf::IpAddress& addr, Port port)
 SimulationServer::SimulationServer(WallClock& wc, Cfg& cfg, Port port)
     : cfg(cfg)
     , listener(port)
-    , initial_processor(*this, listener, wc, info)
+    , initial_processor(*this, listener, wc)
     , udp(clients, cfg, wc)
 {
     info.setName(*cfg.getStr("server", "name"));
@@ -352,9 +366,13 @@ void SimulationServer::processIncomingConnections()
         clients.addClient(std::move(c));
     }
 }
+
 void SimulationServer::process()
 {
-   if(!clients.connections.empty() && syncman)
+    if(!syncman) return;
+    if(clients.connections.empty())
+        processIncomingConnections();
+    else
     {
         sf::Packet packet;
         while(syncman->fetchEventPackets(packet))
@@ -396,8 +414,8 @@ HostApp::HostApp(WallClock& wc, Cfg& cfg, Port port)
 	}
     if(!simulation) throw std::runtime_error("Simulation could not be initialized!");
 
-    syncman = std::make_unique<SyncableManager>(*simulation);
     local_user.operateSimulation(*simulation);
+    syncman = std::make_unique<SyncableManager>(*simulation);
     server.setup(*syncman);
 }
 
@@ -414,14 +432,11 @@ void HostApp::run()
 
         server.process(); 
 
-        if(local_user.window.isOpen())
-        {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            local_user.draw();
-            local_user.window.display();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        local_user.draw();
+        local_user.window.display();
 
-            local_user.pollEvents();
-        }
+        local_user.pollEvents();
     }
 }
 

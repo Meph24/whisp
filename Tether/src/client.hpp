@@ -57,8 +57,8 @@ struct SimulationClient
 
     bool connected() const;
     bool initialized() const;
-    void processMainSync();
-    void processRealtimeSync();
+    bool processInitialSync();
+    void processCyclicSync();
     EntityPlayer* avatar() const;
 
     SimulationClient(WallClock& wc, Cfg& cfg);
