@@ -205,7 +205,9 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 		}
 
 		if (controlinputs.trigger)
-			current_gun->tryShoot(next_tick_begin, this, *iw);
+		{
+			if(!(current_gun->trigger)) current_gun->tryShoot(next_tick_begin, this, *iw);
+		}
 		else
 			current_gun->stopShooting();
 
