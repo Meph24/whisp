@@ -8,8 +8,9 @@
 ServerConnection::ServerConnection(SimulationClient& client, Cfg& cfg)
     : client(client)
 {
-    udpsocket.bind( *cfg.getInt("client", "default_udp_port") );
-    std::cout << "Port bound to " << *cfg.getInt("client", "default_udp_port") << '\n';
+    Port this_udp_port = *cfg.getInt("client", "default_udp_port");
+    udpsocket.bind( this_udp_port );
+    std::cout << "Udp port bound to " << udpsocket.getLocalPort() << '\n';
 }
 
 bool ServerConnection::tryConnect( Cfg& cfg, const IPv4Address& addr, Port port )
@@ -55,8 +56,6 @@ bool ServerConnection::tryConnect( Cfg& cfg, const IPv4Address& addr, Port port 
     if( !syncprotocol::receiveInTime( client.wc, tcpsocket, (char*) &client_token, sizeof(client_token), 10s ) ) return false;
 
     std::cout << "Client Token:" << client_token << '\n';
-
-    udpsocket.bind( server_info.udpport );
 
     return is_connected;
 }
