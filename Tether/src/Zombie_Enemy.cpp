@@ -34,7 +34,7 @@ Zombie_Enemy::Zombie_Enemy(const SimClock::time_point& spawn_time,spacevec start
 	fac=FACTION_ZOMBIES;
 	acceptedConversions=FLAG_HIT_TYPE_BULLET_LIKE;
 	last_ticked = spawn_time;
-	pos=it->clip(startPos,true);
+	pos=it->clip(startPos,true,tsp->world());
 	v=iw->fromMeters({0,0,0});
 	facing = std::rand() % 360;
 	speed = 2 +(std::rand() % 5000)/1000;
@@ -329,7 +329,7 @@ void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceP
 
 	pos.x += iw->fromMeters((speed)*cos(facing *TAU/360)*seconds);//Zombie walk "AI"
 	pos.z += iw->fromMeters(-(speed)*sin(facing*TAU/360)*seconds);
-	pos=it->clip(pos,true);
+	pos=it->clip(pos,true,*iw);
 
 	spacevec newVec=pos;
 	spacevec moved=(newVec-old);
@@ -351,7 +351,7 @@ void Zombie_Enemy::tick(const SimClock::time_point& next_tick_time, TickServiceP
 		old+=iw->fromMeters(flat*speedModA*speedModB);
 		pos.x=old.x;
 		pos.z=old.z;
-		pos=it->clip(pos,true);
+		pos=it->clip(pos,true,*iw);
 		maxTransition=1-(h/1.5f);
 		if(maxTransition>1.7f) maxTransition=1.7f;
 		if(maxTransition<0) maxTransition=0;

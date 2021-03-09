@@ -28,21 +28,18 @@
 #include <iostream>
 using std::cout;
 
-const float Zombie_World::chunk_size = 16;
-
 Zombie_World::Zombie_World(const WallClock& reference_clock, Cfg& cfg)
 	: Simulation(reference_clock, cfg)
-	, cm_(	cfg,
-			chunk_size,
-			*cfg.getInt("graphics", "physicsDistance") * 2,
+	, cm_(	*cfg.getFlt("graphics", "terrainQuality"),
 			*cfg.getInt("graphics", "renderDistance"),
-			16,
-			*cfg.getInt("graphics", "chunkLoadRate")
+			*cfg.getInt("graphics", "chunkLoadRate"),
+			world()
 			)
 	, spawnZombies(true)
 	, zCount( *cfg.getInt("test", "zombies") )
 	, zombieDist( *cfg.getInt("test", "zombieDist") )
 {
+	std::cout<<"test"<<std::endl;
 	logicOutside 		= pmLogic.createTimestep	("            other");
 	logicOutside.setAsRoundtripMarker				(" Total logic time");
 	logicGunTick	 	= pmLogic.createTimestep	("        guns tick");
@@ -228,5 +225,4 @@ u32 Zombie_World::getClassID()
 void Zombie_World::drawOtherStuff(const SimClock::time_point& draw_time,Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
 {
     cm_.draw(draw_time, viewFrustum, iw, perspective);
-    cm_.render( viewFrustum, perspective );
 }

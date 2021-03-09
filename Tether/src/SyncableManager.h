@@ -106,6 +106,7 @@ public:
 	//the following methods return true if they did something with the packet, false otherwise:
 	bool fillUpdatePacket(sf::Packet& p,u32 byteBudget,bool continueLastCall=false);
 
+	//events must be extracted  with fetchEventPackets() before calling fillCompletePacket()
 	bool fillCompletePacket(sf::Packet& p);
 	bool fetchEventPackets(sf::Packet& p);
 

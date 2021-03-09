@@ -18,35 +18,16 @@
 #include "LockChunk.h"
 #include "WarnErrReporter.h"
 
-ChunkManager::ChunkManager(	Cfg& cfg, 
-							int ChunkSize, int ChunksPerAxis,
+ChunkManager::ChunkManager(	float terrainQuality,
 							int RenderDistanceChunks, 
-							int chunksPerLockchunk,
-							int ChunkLoadRate)
-	: IWorld(ChunkSize)
-	, ITerrain((IWorld *) this)
+							int ChunkLoadRate,
+							IWorld& iw)
+	: ITerrain(&iw)
 	, chunkLoadRate(ChunkLoadRate)
-	, chunksPerAxis(ChunksPerAxis)
+	, chunksPerAxis(RenderDistanceChunks)
 	, renderDistanceChunks(RenderDistanceChunks)
-	, lodQuality(*cfg.getFlt("graphics", "terrainQuality"))
+	, lodQuality(terrainQuality)
 {
-	std::cout<<"(IWorld *) this: "<<(IWorld *)this<<std::endl;
-	lockChunkSizeX=1;
-	lockChunkSizeZ=1;
-	while(chunksPerLockchunk>3)
-	{
-		lockChunkSizeX*=2;
-		lockChunkSizeZ*=2;
-		chunksPerLockchunk/=4;
-	}
-	if(chunksPerLockchunk>1)
-	{
-		lockChunkSizeX*=2;
-	}
-	lockChunkStartX=0;
-	lockChunkStartZ=0;
-	lockChunksPerAxisX=(chunksPerAxis+lockChunkSizeX*2-2)/lockChunkSizeX;
-	lockChunksPerAxisZ=(chunksPerAxis+lockChunkSizeZ*2-2)/lockChunkSizeZ;
 	chunksBuf1=new Chunk * [chunksPerAxis*chunksPerAxis];
 	chunksBuf2=new Chunk * [chunksPerAxis*chunksPerAxis];
 	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
@@ -55,21 +36,21 @@ ChunkManager::ChunkManager(	Cfg& cfg,
 		chunksBuf2[i]=0;
 	}
 	chunks=chunksBuf1;
-	setMid({{0,0.5f},{0,0.5f},{0,0.5f}},0);
-	defaultH=fromMeters(defaultHeight*1.0f);
+	setMid({{0,0.5f},{0,0.5f},{0,0.5f}},iw);
+	defaultH=iw.fromMeters(defaultHeight*1.0f);
 }
 
-spacelen ChunkManager::getHeight(spacevec abs)
+spacelen ChunkManager::getHeight(spacevec abs,IWorld& iw)
 {
 	gridInt cx=abs.x.intpart;
 	gridInt cz=abs.z.intpart;
 	if(!isValid(cx,cz)) return defaultH;
 	if(chunks[getIndx(cx,cz)])
-		return chunks[getIndx(cx,cz)]->getHeight(abs.x.floatpart,abs.z.floatpart);
-	else return fromMeters(defaultHeight*1.0f);
+		return chunks[getIndx(cx,cz)]->getHeight(abs.x.floatpart,abs.z.floatpart,iw);
+	else return iw.fromMeters(defaultHeight*1.0f);
 }
 
-void ChunkManager::render(Frustum * viewFrustum, Perspective& perspective)
+void ChunkManager::render(Frustum * viewFrustum, Perspective& perspective,IWorld& iw)
 {
 	spacevec camOffset=viewFrustum->observerPos;
 
@@ -94,7 +75,7 @@ void ChunkManager::render(Frustum * viewFrustum, Perspective& perspective)
 		for(int runx = startX ; runx<stopX ; runx++)
 		{
 			int indx=runz*chunksPerAxis+runx;
-			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb,*this))
+			if(chunks[indx]&&viewFrustum->inside(chunks[indx]->bb,iw))
 			{
 				//std::cout<<"rendering chunk "<<runz<<"|"<<runx<<std::endl;
 				//std::cout<<"chunk bb: \n"<<chunks[indx]->bb.low<<"\n"<<chunks[indx]->bb.high<<std::endl;
@@ -108,12 +89,12 @@ void ChunkManager::render(Frustum * viewFrustum, Perspective& perspective)
 				int lod=1;
 				if(dist==0) dist=0.5;
 				dist/=lodQuality;
-				if(dist>gridSize) dist=gridSize;
+				if(dist>iw.toMeters({1,0})) dist=iw.toMeters({1,0});
 				for(int i=1;i<=dist;i++)
 				{
 					if((lod*2)<=i) lod*=2;
 				}
-				chunks[indx]->render(lod, camOffset, perspective);
+				chunks[indx]->render(lod, camOffset, perspective,iw);
 			}
 		}
 	}
@@ -121,7 +102,7 @@ void ChunkManager::render(Frustum * viewFrustum, Perspective& perspective)
 	glPopMatrix();
 }
 
-void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
+void ChunkManager::setMid(spacevec abs,IWorld& iw)
 {
 	gridInt midChunkCoo=chunksPerAxis/2;
 	gridInt cx=abs.x.intpart;
@@ -153,18 +134,7 @@ void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 				if(xnew>=chunksPerAxis) result++;
 				if(result)//if chunk will be outside the loaded region
 				{
-					int size=curChunk->managedEntities.size();
-					for(int i=0;i<size;i++)
-					{
-						curChunk->managedEntities[i]->refCounter--;
-						if(curChunk->managedEntities[i]->refCounter)
-						{
-							WarnErrReporter::doubleErr("entity found in multiple chunks while one of them is destroyed, ignoring it");
-							continue;
-						}
-						leaveWorld(curChunk->managedEntities[i],tsp);
-					}
-					delete curChunk;//TODO managed entities
+					delete curChunk;
 				}
 				else
 				{
@@ -177,8 +147,7 @@ void ChunkManager::setMid(spacevec abs,TickServiceProvider * tsp)
 		lowX=newLowX;
 		lowZ=newLowZ;
 	}
-	//correctLockChunks();
-	tryCreateChunk(cx,cz);//make sure middle chunk exists so player is always in a loaded chunk
+	tryCreateChunk(cx,cz,iw);//make sure middle chunk exists so player is always in a loaded chunk
 }
 
 int ChunkManager::getIndx(gridInt cx,gridInt cz)
@@ -195,7 +164,7 @@ int ChunkManager::getIndx(gridInt cx,gridInt cz,gridInt newLowX,gridInt newLowZ)
 	return cz*chunksPerAxis+cx;
 }
 
-void ChunkManager::generateMissing(int count)
+void ChunkManager::generateMissing(int count,IWorld& iw)
 {
 	int dir=1;
 	gridInt xrun=chunksPerAxis/2+lowX;
@@ -206,122 +175,29 @@ void ChunkManager::generateMissing(int count)
 		for(int i=0;i<j;i++)
 		{
 			xrun+=dir;
-			if(tryCreateChunk(xrun,zrun)) if(!(--count)) return;
+			if(tryCreateChunk(xrun,zrun,iw)) if(!(--count)) return;
 		}
 		for(int i=0;i<j;i++)
 		{
 			zrun+=dir;
-			if(tryCreateChunk(xrun,zrun)) if(!(--count)) return;
+			if(tryCreateChunk(xrun,zrun,iw)) if(!(--count)) return;
 		}
 	}
 	dir=-dir;
 	for(int i=0;i<chunksPerAxis-1;i++)
 	{
 		xrun+=dir;
-		if(tryCreateChunk(xrun,zrun)) if(!(--count)) return;
+		if(tryCreateChunk(xrun,zrun,iw)) if(!(--count)) return;
 	}
 }
 
-void ChunkManager::tick(const SimClock::time_point& next_tick_begin, TickServiceProvider* tsp)
-{
-	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
-	{
-		if(chunks[i]) chunks[i]->tick(next_tick_begin, tsp);
-	}
-}
 
 int ChunkManager::getIndx(spacevec abs)
 {
 	return getIndx(abs.x.intpart,abs.z.intpart);
 }
 
-void ChunkManager::correctLockChunks()
-{
-	gridInt highX=lowX+chunksPerAxis;
-	gridInt highZ=lowZ+chunksPerAxis;
-	gridInt lockChunkStopX=lockChunkStartX+lockChunksPerAxisX*lockChunkSizeX;
-	gridInt lockChunkStopZ=lockChunkStartZ+lockChunksPerAxisZ*lockChunkSizeZ;
-	if ((lowX-lockChunkStartX>=0)&&
-		(lowZ-lockChunkStartZ>=0)&&
-		(lockChunkStopX-highX>=0)&&
-		(lockChunkStopZ-highZ>=0))
-	{
-		return;//no need to change anything
-	}
-
-	int size=lockChunks.size();
-	std::vector<std::shared_ptr<LockChunk>> tempBuf(size);//TODO correct way to preallocate?
-	for(int i=0;i<size;i++)
-	{
-		tempBuf.push_back(lockChunks[i]);
-	}
-
-	gridInt newX=lockChunkStartX;
-	gridInt newZ=lockChunkStartZ;
-	if(lockChunkStartX-lowX>0)
-	{
-		gridInt correctionSize=(lockChunkStartX-lowX+lockChunkSizeX-1)/lockChunkSizeX;
-		newX-=correctionSize*lockChunkSizeX;
-	}
-	else if(highX-lockChunkStopX>0)
-	{
-		gridInt correctionSize=(lockChunkStartX-lowX+lockChunkSizeX-1)/lockChunkSizeX;
-		newX+=correctionSize*lockChunkSizeX;
-	}
-	if(lockChunkStartZ-lowZ>0)
-	{
-		gridInt correctionSize=(lockChunkStartZ-lowZ+lockChunkSizeZ-1)/lockChunkSizeZ;
-		newZ-=correctionSize*lockChunkSizeZ;
-	}
-	else if(highZ-lockChunkStopZ>0)
-	{
-		gridInt correctionSize=(lockChunkStartZ-lowZ+lockChunkSizeZ-1)/lockChunkSizeZ;
-		newZ+=correctionSize*lockChunkSizeZ;
-	}
-
-	for(int zrun=0;zrun<lockChunksPerAxisZ;zrun++)
-	{
-		for(int xrun=0;xrun<lockChunksPerAxisX;xrun++)
-		{
-			int newInd=zrun*lockChunksPerAxisX+xrun;
-			gridInt realX=newX+xrun*lockChunkSizeX;
-			gridInt realZ=newZ+zrun*lockChunkSizeZ;
-			int oldX=realX/lockChunkSizeX-lockChunkStartX;
-			int oldZ=realZ/lockChunkSizeZ-lockChunkStartZ;
-			int oldInd=oldZ*lockChunksPerAxisX+oldX;
-
-			if(insideLimits(oldX,oldZ,lockChunksPerAxisX,lockChunksPerAxisZ))
-			{
-				tempBuf[newInd]=lockChunks[oldInd];//TODO check if correct
-				lockChunks[oldInd]=std::shared_ptr<LockChunk>(0);//TODO check if correct
-			}
-			else
-			{
-				tempBuf[newInd]=std::shared_ptr<LockChunk>(new LockChunk(lockChunkSizeX,lockChunkSizeZ));//TODO more?
-			}
-		}
-	}
-	/*
-	int size=lockChunksPerAxisX*lockChunksPerAxisZ;
-	for(int i=0;i<size;i++)
-	{
-		if(lockChunks[i])//non-null in old structure
-		{
-			lockChunks[i]->lock();
-
-			//make sure every contained chunk is null
-
-			lockChunks[i]->unlock();
-			//free the own shared ptr//TODO make sure shared pointer free properly deletes lockchunk
-		}
-	}
-*/
-	//TODO
-
-	lockChunks=tempBuf;//TODO replace by non-dummy
-}
-
-bool ChunkManager::tryCreateChunk(gridInt cx, gridInt cz)
+bool ChunkManager::tryCreateChunk(gridInt cx, gridInt cz,IWorld& iw)
 {
 	if(cx<lowX) return false;
 	if(cz<lowZ) return false;
@@ -332,16 +208,15 @@ bool ChunkManager::tryCreateChunk(gridInt cx, gridInt cz)
 	if(chunks[myInd]==0)
 	{
 		spacevec chunkBase;
-		chunkBase.y=fromMeters(0);
+		chunkBase.y.floatpart=0;
+		chunkBase.y.intpart=0;
 		chunkBase.x.floatpart=0;
 		chunkBase.z.floatpart=0;
 		chunkBase.x.intpart=cx;
 		chunkBase.z.intpart=cz;
-		chunks[myInd]=new Chunk(chunkBase,gridSize,this);
-		wakeHibernating();//TODO optimize
+		chunks[myInd]=new Chunk(chunkBase,iw);
 	}
 	else return false;
-	//TODO lockchunks
 	return true;
 }
 
@@ -354,10 +229,10 @@ bool ChunkManager::insideLimits(int x, int z, int maxX, int maxZ)
 	return true;
 }
 
-spacevec ChunkManager::clip(spacevec pos, bool forceGround)
+spacevec ChunkManager::clip(spacevec pos, bool forceGround,IWorld& iw)
 {
 	spacevec ret=pos;
-	spacelen height=getHeight(pos);
+	spacelen height=getHeight(pos,iw);
 	if(ret.y<height || forceGround)
 	{
 		ret.y=height;
@@ -365,7 +240,7 @@ spacevec ChunkManager::clip(spacevec pos, bool forceGround)
 	return ret;
 }
 #define MAX_GROUNDHIT_TRIES 50
-bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
+bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint,IWorld& iw)
 {
 	//TODO make better
 	spacevec dif=endpoint-startpoint;
@@ -384,129 +259,9 @@ bool ChunkManager::hitsGround(spacevec startpoint, spacevec endpoint)
 	for(unsigned int i = 0 ; i<tries+1; i++)
 	{
 		spacevec testPos=startpoint+dif*triesInv;
-		if(testPos.y<getHeight(testPos)) return true;
+		if(testPos.y<getHeight(testPos,iw)) return true;
 	}
 	return false;
-}
-
-
-void ChunkManager::applyEntityChunkChanges(TickServiceProvider& tsp)
-{
-	int size=addVec.size();
-	for(int i=0;i<size;i++)
-	{
-		chunkChange c=addVec[i];
-		int indx=getIndxOrNeg1(c.loc);
-		if(indx==-1)
-		{
-			if(c.e->refCounter==0)//freshly spawned outside
-			{
-				leaveWorld(c.e,&tsp);
-			}
-			continue;
-		}
-		if(!chunks[indx])
-		{
-			//TODO generate chunks smarter
-			while(!chunks[indx]) generateMissing(10);
-		}
-		chunks[indx]->managedEntities.push_back(c.e);
-		c.e->residentPos=c.loc;
-		c.e->refCounter++;
-	}
-	addVec.clear();
-	size=removeVec.size();
-	for(int i=0;i<size;i++)
-	{
-		chunkChange c=removeVec[i];
-		chunkSearchResult res=trySmartSearch(c.e,c.loc,true);
-		if(res.chunkIndex==-1)
-		{
-			WarnErrReporter::notFoundErr("entity to remove could not be found, doing nothing...");
-			if(c.e->refCounter>1) WarnErrReporter::doubleErr("entity now has 2 chunks");
-		}
-		else
-		{
-			Chunk * myChunk=chunks[res.chunkIndex];
-			if(c.e!=myChunk->managedEntities[res.vectorIndex])
-			{
-				WarnErrReporter::notFoundErr("entity was not where search results indicate, doing nothing...");
-				if(c.e->refCounter>1) WarnErrReporter::doubleErr("entity now has 2 chunks");
-				continue;
-			}
-			int size=myChunk->managedEntities.size();
-			if(size-1==res.vectorIndex)
-			{
-				myChunk->managedEntities.pop_back();
-			}
-			else
-			{
-				myChunk->managedEntities[res.vectorIndex]=myChunk->managedEntities[size-1];
-				myChunk->managedEntities.pop_back();
-			}
-			c.e->refCounter--;
-			if(c.e->refCounter==0)//moved outside
-			{
-				leaveWorld(c.e,&tsp);
-			}
-		}
-	}
-	removeVec.clear();
-	size=deleteVec.size();
-	for(int i=0;i<size;i++)
-	{
-		Entity * e=deleteVec[i];
-		if(e->refCounter<=0)
-		{
-			delete e;
-			continue;
-		}
-		else if(e->refCounter>1)
-		{
-			WarnErrReporter::doubleErr("entity is in more than one chunk, deleting it anyway...");
-			//TODO cleanup of remaining refs
-		}
-		chunkSearchResult res=trySmartSearch(e,e->residentPos,true);
-		if(res.chunkIndex==-1)
-		{
-			WarnErrReporter::notFoundErr("entity was not found despite refCounter>0, deleting it anyway...");
-			delete e;
-		}
-		else
-		{
-			Chunk * myChunk=chunks[res.chunkIndex];
-			if(e!=myChunk->managedEntities[res.vectorIndex])
-			{
-				WarnErrReporter::notFoundErr("entity was not where search results indicate, deleting it anyway...");
-				delete e;
-				continue;
-			}
-			int size=myChunk->managedEntities.size();
-			if(size-1==res.vectorIndex)
-			{
-				myChunk->managedEntities.pop_back();
-				delete e;
-			}
-			else
-			{
-				myChunk->managedEntities[res.vectorIndex]=myChunk->managedEntities[size-1];
-				myChunk->managedEntities.pop_back();
-				delete e;
-			}
-		}
-	}
-	deleteVec.clear();
-}
-
-void ChunkManager::requestEntitySpawn(Entity* e)
-{
-	addVec.push_back({e,e->pos});//capture the position in this exact moment as the insert location
-}
-
-void ChunkManager::requestEntityMove(Entity* e)
-{
-	addVec.push_back({e,e->pos});//capture the position in this exact moment as the new chunk location
-	removeVec.push_back({e,e->residentPos});
 }
 
 int ChunkManager::getIndxOrNeg1(spacevec abs)
@@ -517,103 +272,12 @@ int ChunkManager::getIndxOrNeg1(spacevec abs)
 	else return -1;
 }
 
-chunkSearchResult ChunkManager::dumbSearch(Entity* e)
-{
-	chunkSearchResult result;
-	result.chunkIndex=-1;
-	result.vectorIndex=-1;
-	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
-	{
-		result=chunkSearch(e,i);
-		if(result.chunkIndex!=-1)
-		{
-			return result;
-		}
-	}
-	return result;
-}
-
-chunkSearchResult ChunkManager::smartSearch(Entity* e, spacevec pos)
-{
-	chunkSearchResult ret;
-	ret.chunkIndex=getIndxOrNeg1(pos);
-	if(ret.chunkIndex==-1)
-	{
-		ret.vectorIndex=-1;
-		return ret;
-	}
-	return chunkSearch(e,ret.chunkIndex);
-}
 
 void ChunkManager::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum,IWorld& iw, Perspective& perspective)
 {
-	int startX=chunksPerAxis/2-renderDistanceChunks;
-	int startZ=chunksPerAxis/2-renderDistanceChunks;
-	int stopX=startX+renderDistanceChunks*2;
-	int stopZ=startZ+renderDistanceChunks*2;
-	if(startX<0) startX=0;
-	if(startZ<0) startZ=0;
-	if(stopX>chunksPerAxis) stopX=chunksPerAxis;
-	if(stopZ>chunksPerAxis) stopZ=chunksPerAxis;
-
-	for(int runz = startZ ; runz<stopZ ; runz++)
-	{
-		for(int runx = startX ; runx<stopX ; runx++)
-		{
-			int indx=runz*chunksPerAxis+runx;
-			if(chunks[indx])
-			{
-				chunks[indx]->draw(draw_time,viewFrustum,iw,perspective);
-			}
-		}
-	}
+	render(viewFrustum,perspective,iw);
 }
 
-void ChunkManager::clearEntities()
-{
-	for(int i=0;i<chunksPerAxis*chunksPerAxis;i++)
-	{
-		if(chunks[i]) chunks[i]->clearEntities();
-	}
-}
-
-chunkSearchResult ChunkManager::trySmartSearch(Entity* e, spacevec pos,bool reportWarn)
-{
-	chunkSearchResult result=smartSearch(e,pos);
-	if(result.chunkIndex!=-1) return result;
-	result=dumbSearch(e);
-	if(reportWarn)
-	{
-		if(result.chunkIndex==-1) WarnErrReporter::notFoundErr("Entity not found");
-		else WarnErrReporter::notFoundWhereBelongsErr("Entity not found at stated location");
-	}
-	return result;
-}
-
-chunkSearchResult ChunkManager::chunkSearch(Entity* e, int chunkIndx)
-{
-	chunkSearchResult ret;
-	if(!chunks[chunkIndx])
-	{
-		ret.chunkIndex=-1;
-		ret.vectorIndex=-1;
-		return ret;
-	}
-	std::vector<Entity *> * myVec=&(chunks[chunkIndx]->managedEntities);
-	int size=myVec->size();
-	for(int i=0;i<size;i++)
-	{
-		if((*myVec)[i]==e)
-		{
-			ret.chunkIndex=chunkIndx;
-			ret.vectorIndex=i;
-			return ret;
-		}
-	}
-	ret.chunkIndex=-1;
-	ret.vectorIndex=-1;
-	return ret;
-}
 
 ChunkManager::~ChunkManager()
 {
@@ -649,23 +313,9 @@ bool ChunkManager::isValid(gridInt cx, gridInt cz)
 	return true;
 }
 
-void ChunkManager::postTick(TickServiceProvider& tsp)
-{
-	//TODO find out how to exactly do this stuff, previously: "//TODO retick, applyEntityChunkChanges"
-	applyEntityChunkChanges(tsp);
-}
 
 void ChunkManager::postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos)
 {
-	generateMissing(chunkLoadRate);//TODO load rate refactor
-	setMid(playerPos,tsp);
+	generateMissing(chunkLoadRate,tsp->world());//TODO load rate refactor
+	setMid(playerPos,tsp->world());
 }
-
-void ChunkManager::notifyCreation(Entity* obj)
-{}
-
-void ChunkManager::notifyDestruction(Entity* obj)
-{}
-
-void ChunkManager::getOwnedSyncables(std::vector<Syncable*> collectHere)
-{}

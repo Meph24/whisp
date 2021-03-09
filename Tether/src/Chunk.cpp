@@ -13,13 +13,11 @@
 
 #include "Chunk.h"
 #include "Perspective.hpp"
-#include "ChunkManager.h"
-#include "InteractionManager.h"
-#include "Entity.h"
+#include "IWorld.h"
 
 using namespace noise;
 
-spacelen Chunk::getHeight(float xh, float zh)
+spacelen Chunk::getHeight(float xh, float zh,IWorld& iw)
 {
 	if(xh<0) return defaultH*2.0f;
 	if(zh<0) return defaultH*2.0f;
@@ -36,12 +34,12 @@ spacelen Chunk::getHeight(float xh, float zh)
 	float h11=getH((int)(xh)+1,(int)(zh)+1);
 	float h01=getH((int)(xh),(int)(zh)+1);
 
-	return parent->fromMeters((innerX*h10+(1-innerX)*h00)*(1-innerY)+(innerX*h11+(1-innerX)*h01)*innerY);
+	return iw.fromMeters((innerX*h10+(1-innerX)*h00)*(1-innerY)+(innerX*h11+(1-innerX)*h01)*innerY);
 }
-void Chunk::render(int lod, spacevec camOffset, Perspective& perspective)//TODO draw entities
+void Chunk::render(int lod, spacevec camOffset, Perspective& perspective,IWorld& iw)
 {
 	//std::cout<<"rendering x="<<x<<" y="<<y<<std::endl;
-	vec3 relpos=parent->toMeters(base-camOffset);
+	vec3 relpos=iw.toMeters(base-camOffset);
 	//if(relpos.y!=0)
 	//	std::cout<<"rendering relpos.x="<<relpos.x<<" relpos.y="<<relpos.y<<std::endl;
 
@@ -130,13 +128,14 @@ void Chunk::render(int lod, spacevec camOffset, Perspective& perspective)//TODO 
 	}
 }
 
-Chunk::Chunk(spacevec basePos,int baseSize,ChunkManager * cm):
-base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
+Chunk::Chunk(spacevec basePos,IWorld& iw):
+base(basePos),size(iw.toMeters({1,0})+1),avgHeight(0)
 {
+	int baseSize=size-1;
 	float maxH=0;
 	float minH=0;
 	bool first=true;
-	defaultH=cm->fromMeters(defaultHeight*1.0f);
+	defaultH=iw.fromMeters(defaultHeight*1.0f);
 	module::Perlin myModule;
 	myModule.SetSeed(420);
 	myModule.SetOctaveCount(10);
@@ -166,8 +165,8 @@ base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 		}
 	}
 	avgHeight/=size*size;
-	spacelen minConv=cm->fromMeters(minH);
-	spacelen maxConv=cm->fromMeters(maxH);
+	spacelen minConv=iw.fromMeters(minH);
+	spacelen maxConv=iw.fromMeters(maxH);
 	spacevec middle=base;
 	middle.x.floatpart=0.5f;
 	middle.z.floatpart=0.5f;
@@ -179,7 +178,6 @@ base(basePos),size(baseSize+1),avgHeight(0),parent(cm)
 	size.z.intpart=0;
 	size.y=(maxConv-minConv)*0.5f;
 	bb=AABB(middle,size);
-	interMan=new InteractionManager(base,cm);
 
 	/*int smallSize=size-1;
 	int vertices=3*4*smallSize*smallSize;
@@ -209,61 +207,8 @@ inline float Chunk::getH(int xh, int yh)
 	return height[yh*size+xh];
 }
 
-void Chunk::tick(const SimClock::time_point& next_tick_end, TickServiceProvider* tsp)
-{
-	int size=managedEntities.size();
-	for(int i=0;i<size;i++)
-	{
-		if((managedEntities[i]->pos.x.intpart!=managedEntities[i]->residentPos.x.intpart)||
-			(managedEntities[i]->pos.z.intpart!=managedEntities[i]->residentPos.z.intpart))
-		{
-			parent->requestEntityMove(managedEntities[i]);
-		}
-		managedEntities[i]->tick(next_tick_end, tsp);
-	}
-}
-
-void Chunk::draw(const SimClock::time_point& draw_time, Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
-{
-	int size=managedEntities.size();
-	for(int i=0;i<size;i++)
-	{
-		//TODO check if removal broke anything:if(managedEntities[i]->exists)
-		//{
-			managedEntities[i]->draw(draw_time, viewFrustum, iw, perspective);
-			if(perspective.enable_aabbs) managedEntities[i]->bb.draw(draw_time, viewFrustum, iw, perspective);
-		//}
-	}
-}
-
-void Chunk::clearEntities()
-{
-	std::vector<Entity *> remain;
-	int size=managedEntities.size();
-	for(int i=0;i<size;i++)
-	{
-		if(managedEntities[i]->surviveClearing)
-		{
-			remain.push_back(managedEntities[i]);
-		}
-		else
-		{
-			delete managedEntities[i];
-		}
-	}
-	managedEntities.clear();
-
-	size=remain.size();
-	for(int i=0;i<size;i++)
-	{
-		managedEntities.push_back(remain[i]);
-	}
-	remain.clear();
-}
-
 Chunk::~Chunk()
 {
 	delete height;
-	delete interMan;
 }
 

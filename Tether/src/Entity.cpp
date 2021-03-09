@@ -50,10 +50,6 @@ void Entity::requestDestroy(IWorld * w)
 
 #include "WarnErrReporter.h"
 
-void Entity::onLeaveWorld(TickServiceProvider* tsp)
-{
-	//default: do nothing.
-}
 
 void Entity::follow(Entity* e)
 {

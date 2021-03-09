@@ -17,10 +17,12 @@ Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg,unique_ptr<IWo
 	, iw(std::move(iW))//iw(iW)
 	, pmLogic(1s, 8s)
 {
+	std::cout<<"sim"<<std::endl;
 	if(!iw)
 	{
 		iw.reset(new WorldDefault(16));
 	}
+	std::cout<<"sim2"<<std::endl;
 }
 
 Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg)

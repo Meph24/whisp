@@ -30,6 +30,7 @@ template<typename MasterIF,typename SlaveIF>
 class InteractFilterAlgoAsym;
 
 #include <vector>
+#include <mutex>
 
 class IWorld: public Tickable, public Drawable, public CreationDestructionListener<Entity>
 {
@@ -38,13 +39,17 @@ private:
 	void initAlgos();
 
 protected:
-	std::vector<Entity *> hibernating;
-
 	float gridSize;//sacelen.intpart scale in meters
 	std::vector<Entity *> deleteVec;//the entities that should be removed from world
-	//TODO addVec
+
+	std::vector<Entity *> addVec;//the entities that should be added to world
+
+	std::mutex m;
+	std::vector<Entity *> tsAddVec;//Thread safe add vector
 
 	void resetAlgos(TickServiceProvider& tsp);
+
+	void addThreadSafe(Entity * e);
 public:
 
 	CreationDestructionNotificationHandler<Entity> entityNotif;
@@ -82,14 +87,7 @@ public:
 	virtual void finishTick(TickServiceProvider& tsp);//finish main tick phase BEFORE reticks
 	virtual void postTick(TickServiceProvider& tsp)=0;//after all ticks and reticks
 
-	//Currently inactive
-	virtual void leaveWorld(Entity * e,TickServiceProvider * tsp);//is called if Entity is outside loaded area
-	virtual void hibernate(Entity * e);//Entity outside loaded area, but not deleted, does not get ticked
-	virtual void wakeHibernating(AABB bb);//awakes hibernating Entities inside bb and tries to insert them into active area
-	virtual void wakeHibernating();//awakes all hibernating Entities and tries to insert them into active area
-	virtual void wakeHibernating(Entity * e);//awakes this hibernating Entity and tries to insert it into active area, returns 0 if successful, e otherwise
-
-	virtual void requestEntitySpawn(Entity * e)=0;//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks
+	virtual void requestEntitySpawn(Entity * e,bool threadSafe=false);//spawn entity in world, call only once per entity!!! Can fail if not within loaded chunks
 
 	virtual void requestEntityDelete(Entity * e);//do not call this yourself, call Entiy.requestDestroy instead
 

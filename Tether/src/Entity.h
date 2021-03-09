@@ -31,10 +31,6 @@ class Entity: public Tickable, public Drawable, public Syncable
 	bool requestedDelete=false;
 public:
 	bool surviveClearing=false;
-	bool allowHibernating=false;//if true, survives being outside the world, being transferrred to a hibernation state
-
-	int refCounter=0;//DO NOT TOUCH (unless you rewrite the old chunk system...)
-
 
 	AABB bb;//physics AABB
 	vec3 bbColor;
@@ -48,7 +44,7 @@ public:
 	SimClock::time_point last_ticked;
 	//TODO check if removal broke anything: int lastTickID=0;//used for resets
 
-	std::vector<void *> alreadyChecked;//TODO remove/replace
+	//TODO check if removal broke anything: std::vector<void *> alreadyChecked;
 
 
 	//TODO check if removal broke anything:	bool exists=true;//if exists is false, memory will be freed soon
@@ -69,7 +65,6 @@ public:
 
 	//time is guaranteed to be between 0 and MAX_TICK_TIME (defined in Tickable.h)
 	virtual void tick(const SimClock::time_point& next_tick_begin,TickServiceProvider * tsp)=0;
-	virtual void onLeaveWorld(TickServiceProvider * tsp);//called when outside of loaded chunk area
 
 	void requestDestroy(IWorld * w);//call this to request delete, do NOT delete any other way
 

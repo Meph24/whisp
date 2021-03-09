@@ -21,11 +21,6 @@ WorldDefault::~WorldDefault()
 	for(auto ptr: managedEntities) delete ptr;
 }
 
-void WorldDefault::requestEntitySpawn(Entity* e)
-{
-	managedEntities.push_back(e);
-	entityNotif.notifyCreation(e);
-}
 
 void WorldDefault::clearEntities()
 {
@@ -80,6 +75,20 @@ void WorldDefault::postTick(TickServiceProvider& tsp)
 			}
 		}
 		size=managedEntities.size();
+	}
+	for(Entity * e: addVec)
+	{
+		managedEntities.push_back(e);
+		entityNotif.notifyCreation(e);
+	}
+	addVec.clear();
+	{
+		std::lock_guard lock(m);
+		for(Entity * e: tsAddVec)
+		{
+			managedEntities.push_back(e);
+		}
+		tsAddVec.clear();
 	}
 }
 

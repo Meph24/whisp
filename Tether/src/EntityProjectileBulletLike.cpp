@@ -112,7 +112,7 @@ void EntityProjectileBulletLike::tick(const SimClock::time_point& next_tick_begi
 	ITerrain * it=tsp->getITerrain();
 
 	spacevec gravity=it->getGravity(pos);
-	if(it->hitsGround(posOld,pos))
+	if(it->hitsGround(posOld,pos,*iw))
 	{
 		requestDestroy(iw);
 		return;

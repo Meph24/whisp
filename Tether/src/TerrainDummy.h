@@ -19,8 +19,8 @@ class TerrainDummy: public ITerrain
 {
 public:
 	spacelen height;
-	virtual spacevec clip(spacevec pos,bool forceGround);//If pos is below ground or forceGround, then return position on ground (movement along gravity vector)
-	virtual bool hitsGround(spacevec startpoint,spacevec endpoint);//true if any point in the given line is below ground
+	virtual spacevec clip(spacevec pos,bool forceGround,IWorld& iw);//If pos is below ground or forceGround, then return position on ground (movement along gravity vector)
+	virtual bool hitsGround(spacevec startpoint,spacevec endpoint,IWorld& iw);//true if any point in the given line is below ground
 
 	TerrainDummy(IWorld * iw,spacelen Height);
 	virtual ~TerrainDummy();

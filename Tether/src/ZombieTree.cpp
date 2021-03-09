@@ -21,7 +21,6 @@
 Zombie_Tree::Zombie_Tree(spacevec position)
 {
 	surviveClearing=true;
-	allowHibernating=true;
 	bb=AABB(position);
 	pos=position;
 	v.set0();
@@ -144,7 +143,7 @@ void Zombie_Tree::tick(const SimClock::time_point& next_tick_begin, TickServiceP
 	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 
-	pos=it->clip(pos,true);
+	pos=it->clip(pos,true,*iw);
 
 	int temp = (h - rootSize) + (d * dLeaves);
 	if(temp<rootSize) temp=rootSize;
@@ -167,7 +166,6 @@ Zombie_Tree::Zombie_Tree(sf::Packet p,SyncableManager& sm)
 {
 	p>>pos;
 	surviveClearing=true;
-	allowHibernating=true;
 	bb=AABB(pos);
 	v.set0();
 	d = 0.8f;//TODO

@@ -189,7 +189,7 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 
 		if(controlinputs.clip)
 		{
-			pos=it->clip(pos,true);
+			pos=it->clip(pos,true,*iw);
 			spacevec newPos=pos;
 			vec3 moved=iw->toMeters(newPos-oldPos);
 			if(glm::sqlen(moved) > 0.0000000001f)
@@ -200,7 +200,7 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 				float h=moved.y/glm::length(flat);
 				SpeedMod sm=SpeedMod();
 				float speedModB=sm.slowdownFromTerrain(h);
-				pos=it->clip(oldPos+iw->fromMeters(flat*speedModA*speedModB),true);
+				pos=it->clip(oldPos+iw->fromMeters(flat*speedModA*speedModB),true,*iw);
 			}
 		}
 

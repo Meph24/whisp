@@ -82,50 +82,10 @@ spacevec IWorld::fromMeters(const glm::vec3& v) const
 	return ret;
 }
 
-void IWorld::leaveWorld(Entity* e,TickServiceProvider * tsp)
+void IWorld::addThreadSafe(Entity* e)
 {
-	e->onLeaveWorld(tsp);//notify entity that it is leaving the world
-	if(e->allowHibernating)
-	{
-		hibernate(e);
-	}
-	else
-	{
-		e->requestDestroy(this);
-	}
-}
-
-void IWorld::hibernate(Entity* e)
-{
-	hibernating.push_back(e);
-}
-
-void IWorld::wakeHibernating(AABB bb)
-{
-	while(hibernating.size()>0)
-	{
-		Entity * e=hibernating.back();
-		if(bb.contains(e->pos))
-		{
-			wakeHibernating(e);
-			hibernating.pop_back();
-		}
-	}
-}
-
-void IWorld::wakeHibernating()
-{
-	while(hibernating.size()>0)
-	{
-		Entity * e=hibernating.back();
-		wakeHibernating(e);
-		hibernating.pop_back();
-	}
-}
-
-void IWorld::wakeHibernating(Entity* e)
-{
-	requestEntitySpawn(e);
+	std::lock_guard lock(m);
+	tsAddVec.push_back(e);
 }
 
 void IWorld::requestEntityDelete(Entity* e)
@@ -182,4 +142,16 @@ void IWorld::finishTick(TickServiceProvider& tsp)
 	collideAlgo->evaluationPhase(tsp);
 	benchAlgoAsym->evaluationPhase(tsp);
 	benchAlgoSym->evaluationPhase(tsp);
+}
+
+void IWorld::requestEntitySpawn(Entity* e, bool threadSafe)
+{
+	if(threadSafe)
+	{
+		addThreadSafe(e);
+	}
+	else
+	{
+		addVec.push_back(e);
+	}
 }

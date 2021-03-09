@@ -13,16 +13,16 @@ ITerrain(iw),height(Height)
 {
 }
 
-spacevec TerrainDummy::clip(spacevec pos, bool forceGround)
+spacevec TerrainDummy::clip(spacevec pos, bool forceGround,IWorld& iw)
 {
-	if(forceGround || hitsGround(pos,pos))
+	if(forceGround || hitsGround(pos,pos,iw))
 	{
 		pos.y=height;
 	}
 	return pos;
 }
 
-bool TerrainDummy::hitsGround(spacevec startpoint, spacevec endpoint)
+bool TerrainDummy::hitsGround(spacevec startpoint, spacevec endpoint,IWorld& iw)
 {
 	if(startpoint.y<height) return true;
 	if(endpoint.y<height) return true;

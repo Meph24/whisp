@@ -11,6 +11,8 @@
 
 #include "Drawable.h"
 
+class IWorld;
+
 #include "Spacevec.h"
 #include "IWorld.h"
 
@@ -25,8 +27,8 @@ public:
 	virtual void postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos);
 	virtual spacevec getGravity(spacevec pos);
 
-	virtual spacevec clip(spacevec pos,bool forceGround)=0;//If pos is below ground or forceGround, then return position on ground (movement along gravity vector)
-	virtual bool hitsGround(spacevec startpoint,spacevec endpoint)=0;//true if any point in the given line is below ground
+	virtual spacevec clip(spacevec pos,bool forceGround,IWorld& iw)=0;//If pos is below ground or forceGround, then return position on ground (movement along gravity vector)
+	virtual bool hitsGround(spacevec startpoint,spacevec endpoint,IWorld& iw)=0;//true if any point in the given line is below ground
 };
 
 #endif /* SRC_ITERRAIN_H_ */
