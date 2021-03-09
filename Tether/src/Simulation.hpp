@@ -3,6 +3,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include "AdaptiveQuality.h"
@@ -15,12 +16,14 @@
 #include "WorldDefault.h"
 
 using std::map;
+using std::mutex;
 using std::string;
 using std::unique_ptr;
 
 class Simulation: public TickServiceProvider, public Syncable
 {
 public:
+	mutex players_lock;	
 	map<SimulationUser*, EntityPlayer* > players;
 
 	SimClock clock;
@@ -43,7 +46,7 @@ public:
 
 	unique_ptr<Perspective> getPerspective( LocalUser* user );
 
-	EntityPlayer* registerUser(SimulationUser* new_user);
+	EntityPlayer* registerUser(SimulationUser* , spacevec spawn_pos = spacevec());
 	EntityPlayer* userAvatar(SimulationUser* user);
 	virtual void onRegisterUser( SimulationUser* );
 	void kickUser(SimulationUser* to_kick_user);

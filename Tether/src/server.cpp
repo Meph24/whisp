@@ -3,8 +3,22 @@
 #include <iostream> //TODO replace with logging #56
 
 #include "protocol.hpp"
+#include "Simulation.hpp"
 
 using std::cout; //TODO replace with logging #56
+
+void SyncUser::operateSimulation(Simulation& simulation)
+{
+    if(this->simulation) return;
+
+    this->simulation = &simulation;
+    simulation.registerUser(this);
+    if(!avatar()) { std::cerr << "User could not be registered in Simulation!" << std::endl; }
+}
+void SyncUser::disconnectSimulation()
+{
+    simulation->kickUser(this);
+}
 
 void ClientConnection::sendUdp(shared_ptr<syncprotocol::udp::Packet>& p)
 {
@@ -168,13 +182,27 @@ void ConnectionInitialProcessor::SingleConnectionProcessor::process()
     syncprotocol::ClientToken client_token;
     client_token.server_known_fullip = FullIPv4(IPv4Address(connection->tcpsocket.getRemoteAddress().toInteger()), connection->tcpsocket.getRemotePort());
 
-    //TODO 
-    //spawn entityplayer
-    //WAIT FOR ENTITYPLAYER to be spawned
-    //get the pointer
-    //wait for syncablemanager to have an id
-    //add id to clienttoken
+    //TODO
+    Simulation* sim = cip->server.syncman->getSim();
+    if(!sim) { cout << "No Simulation found on Server.\n"; return; }
 
+    connection->user.operateSimulation(*sim);
+    //WAIT FOR ENTITYPLAYER to be spawned
+    //wait for syncablemanager to have an id
+    WallClock::time_point wait_begin = cip->wc.now();
+    WallClock::duration timeout (10s);
+    while( !connection->user.avatar() || !connection->user.avatar()->sID)
+    {
+        if( cip->wc.now() - wait_begin > timeout )
+        {
+            cout << "Timeout in Avatar spawning process!\n";
+            return;
+        }
+        std::this_thread::sleep_for(50ms);
+    }
+    //add id to clienttoken
+    client_token.avatar_syncid = connection->user.avatar()->sID;
+    
     connection->tcpsocket.send( &client_token, sizeof(syncprotocol::ClientToken) );
     connection->token = client_token;
 
@@ -370,16 +398,15 @@ void SimulationServer::processIncomingConnections()
 void SimulationServer::process()
 {
     if(!syncman) return;
-    if(clients.connections.empty())
-        processIncomingConnections();
-    else
+    sf::Packet packet;
+
+    while(syncman->fetchEventPackets(packet))
+        broadcastTcp(packet);
+
+    processIncomingConnections();
+
+    if(!clients.connections.empty())
     {
-        sf::Packet packet;
-        while(syncman->fetchEventPackets(packet))
-            broadcastTcp(packet);
-
-        processIncomingConnections();
-
         unique_ptr<syncprotocol::udp::Packet> udp_packet = std::make_unique<syncprotocol::udp::Packet>();
         if(syncman->fillUpdatePacket(*udp_packet, sf::UdpSocket::MaxDatagramSize - udp_packet->getDataSize() ))
             broadcastUdp(std::move(udp_packet));

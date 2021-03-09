@@ -23,12 +23,20 @@ using std::string;
 using std::thread;
 using std::vector;
 
+struct SyncUser : public SimulationUser
+{
+	void operateSimulation(Simulation& simulation);
+	void disconnectSimulation();
+};
+
 struct ClientConnection
 {
     string name;
     sf::TcpSocket tcpsocket;
     syncprotocol::ClientToken token;
     Port udpport;
+
+    SyncUser user;
 
     void sendUdp(shared_ptr<syncprotocol::udp::Packet>&);
     unique_ptr<sf::Packet> receiveUdp();

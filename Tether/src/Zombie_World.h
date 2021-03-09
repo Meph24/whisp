@@ -39,7 +39,7 @@ public:
 	void step();
 
 	virtual ITerrain * getITerrain();
-	virtual Entity * getTarget( const Entity * me);
+	virtual Entity * getTarget( const Entity * me); //do not call outside of tick, as this needs ownership of the player_lock, which is locked in step();
 
 	PerformanceMeter::SingleTimer logicOutside;
 	PerformanceMeter::SingleTimer logicGunTick;

@@ -1,5 +1,7 @@
 #include "Zombie_World.h"
 
+#include <mutex>
+
 #include "AdaptiveQuality.h"
 #include "CameraTP.h"
 #include "Cfg.hpp"
@@ -26,7 +28,9 @@
 #include "IWorld.h"
 
 #include <iostream>
+
 using std::cout;
+using std::lock_guard;
 
 Zombie_World::Zombie_World(const WallClock& reference_clock, Cfg& cfg)
 	: Simulation(reference_clock, cfg)
@@ -88,6 +92,7 @@ void Zombie_World::doPhysics(const SimClock::time_point& next_tick_begin)
 
 void Zombie_World::step()
 {
+	lock_guard lg_ (players_lock);	
 	if(players.empty())
 		clock.setNextTargetRate(1.0);
 	else

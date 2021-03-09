@@ -28,8 +28,8 @@ public:
 	Simulation* simulation = nullptr;
 	SimulationInputStatusSet input_status;
 	
-	virtual void operateSimulation(Simulation& simulation) = 0;
 	EntityPlayer* avatar();
+	virtual void operateSimulation(Simulation& simulation) = 0;
 	virtual void disconnectSimulation() = 0;
 };
 

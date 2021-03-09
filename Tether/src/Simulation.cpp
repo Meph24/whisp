@@ -1,6 +1,7 @@
 #include "Simulation.hpp"
 
 #include <memory>
+#include <mutex>
 #include <utility>
 
 #include "Spacevec.h"
@@ -8,6 +9,7 @@
 #include "EntityPlayer.h"
 #include "CameraTP.h"
 
+using std::lock_guard;
 using std::unique_ptr;
 using std::pair;
 
@@ -33,23 +35,28 @@ unique_ptr<Perspective> Simulation::getPerspective( LocalUser* user )
 {
 	if(!user) return nullptr;
 	if(!user->simulation) return nullptr;
-	if( players.find(user) == players.end() ) return nullptr;
+
+	{
+		lock_guard lg_ (players_lock);	
+		if( players.find(user) == players.end() ) return nullptr;
+	}
 
 	return std::make_unique<Perspective>( user->window, *user);
 }
 
 void Simulation::onRegisterUser( SimulationUser* ){}
 
-EntityPlayer* Simulation::registerUser(SimulationUser* user)
+EntityPlayer* Simulation::registerUser(SimulationUser* user, spacevec spawn_pos)
 { 
+	lock_guard lg_ (players_lock);	
 	if( players.find(user) != players.end() ) return nullptr;
 
 	unique_ptr<EntityPlayer> newentityplayer = std::make_unique<EntityPlayer>( 
 		/* spawn time */		clock.now(),
-		/* spawn position */	spacevec(),
+		/* spawn position */	spawn_pos,
 		/* character speed */ 	(! *cfg.getInt("test","debug_movement") ) ? 7.6f : 30.6f );
 
-	iw->requestEntitySpawn(newentityplayer.get());
+	iw->requestEntitySpawn(newentityplayer.get(), true);
 	players[user] = newentityplayer.get();
 	players[user]->setUser(user);
 	newentityplayer.release();
@@ -59,18 +66,22 @@ EntityPlayer* Simulation::registerUser(SimulationUser* user)
 
 EntityPlayer* Simulation::userAvatar(SimulationUser* user) 
 { 
+	lock_guard lg_ (players_lock);	
 	auto f = players.find(user); 
 	return (f == players.end())? nullptr : f->second;
 }
 
-void Simulation::kickUser( SimulationUser* to_kick_user ){ players.erase(to_kick_user);}
+void Simulation::kickUser( SimulationUser* to_kick_user )
+{ 
+	lock_guard lg_ (players_lock);	
+	players.erase(to_kick_user);
+}
 
 void Simulation::getOwnedSyncables(std::vector<Syncable*> collectHere)
 {
-	for(auto& p : players)
-		collectHere.push_back(p.second);
 	iw->getOwnedSyncables(collectHere);
 }
+
 void Simulation::drawOtherStuff(const SimClock::time_point& draw_time,Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
 {} //default: nothing to draw
 

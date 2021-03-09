@@ -1,6 +1,7 @@
 
 #include "Simulation_World.h"
 
+#include <mutex>
 #include <random>
 
 #include <iostream>
@@ -46,6 +47,8 @@
 #include "InteractFilterAlgoSym.h"
 
 #include <utility>
+
+using std::lock_guard;
 
 Simulation_World::Simulation_World(const WallClock& reference_clock, Cfg& cfg)
 	: Simulation(reference_clock, cfg)
@@ -326,9 +329,12 @@ void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
 	bm_.tick(next_tick_begin,this);
 	initNextTick();
 	iw->preTick(*this);
-	for(auto& p : players)
 	{
-		p.second->tick(next_tick_begin,this);//TODO insert into IWorld
+		lock_guard lg_ (players_lock);	
+		for(auto& p : players)
+		{
+			p.second->tick(next_tick_begin,this);//TODO insert into IWorld
+		}
 	}
 	iw->tick(next_tick_begin,this);
 	logicTick.registerTime();
@@ -345,6 +351,7 @@ void Simulation_World::doPhysics(const SimClock::time_point& next_tick_begin)
 
 void Simulation_World::step()
 {
+	lock_guard lg_ (players_lock);	
 	if(players.empty())
 		clock.setNextTargetRate(1.0);
 	else
