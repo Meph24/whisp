@@ -27,7 +27,7 @@ public:
 
 	void serialize(sf::Packet& p,bool complete);
 	void deserialize(sf::Packet& p,SyncableManager & sm);
-	EntitySound(sf::Packet p,TickServiceProvider * tsp, SyncableManager& sm);//deserialize constructor
+	EntitySound(sf::Packet& p, SyncableManager& sm);//deserialize constructor
 	void getOwnedSyncables(std::vector<Syncable *> collectHere);
 	void getReferencedSyncables(std::vector<Syncable *> collectHere);
 	u32 getClassID();

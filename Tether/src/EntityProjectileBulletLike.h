@@ -47,7 +47,7 @@ public:
 
 	void serialize(sf::Packet& p,bool complete);
 	void deserialize(sf::Packet& p,SyncableManager & sm);
-	EntityProjectileBulletLike(sf::Packet p, SyncableManager& sm);//deserialize constructor
+	EntityProjectileBulletLike(sf::Packet& p, SyncableManager& sm);//deserialize constructor
 	void getOwnedSyncables(std::vector<Syncable *> collectHere);
 	void getReferencedSyncables(std::vector<Syncable *> collectHere);
 	u32 getClassID();

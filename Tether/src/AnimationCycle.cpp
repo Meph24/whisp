@@ -96,7 +96,7 @@ void AnimationCycle::deserialize(sf::Packet& p, SyncableManager& sm)
 	p>>confirmedProgress;
 }
 
-AnimationCycle::AnimationCycle(sf::Packet p, SyncableManager& sm)
+AnimationCycle::AnimationCycle(sf::Packet& p, SyncableManager& sm)
 {
 	deserialize(p,sm);
 	p>>maxCycles;

@@ -824,6 +824,7 @@ void Zombie_Enemy::deserialize(sf::Packet& p, SyncableManager& sm)
 	fallAnim.deserialize(p,sm);
 	transitionAnim.deserialize(p,sm);
 	deserializeNonNested(p,sm);
+	bb=AABB(pos,sizeBB(sm.getIWorld()));
 }
 
 void Zombie_Enemy::deserializeNonNested(sf::Packet& p, SyncableManager& sm)
@@ -836,11 +837,9 @@ void Zombie_Enemy::deserializeNonNested(sf::Packet& p, SyncableManager& sm)
 	p>>pos;
 	p>>v;
 	p>>last_ticked;
-
-	bb=AABB(pos,sizeBB(sm.getIWorld()));
 }
 
-Zombie_Enemy::Zombie_Enemy(sf::Packet p,SyncableManager& sm)
+Zombie_Enemy::Zombie_Enemy(sf::Packet& p,SyncableManager& sm)
 : bodyAnim(p,sm)
 , fallAnim(p,sm)
 , transitionAnim(p,sm)
@@ -851,6 +850,7 @@ Zombie_Enemy::Zombie_Enemy(sf::Packet p,SyncableManager& sm)
 	p>>maxHP;
 	//TODO AABBs (bb, bbColor)
 
+	bb=AABB(pos,sizeBB(sm.getIWorld()));
 
 
 	fac=FACTION_ZOMBIES;

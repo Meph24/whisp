@@ -33,7 +33,7 @@ Syncable* SyncableFactory::createFromPacket(sf::Packet& p,syncID sID, SyncableMa
 	Syncable * ret=nullptr;
 	u32 classID;
 	p>>classID;
-	std::cout<<"factory creates object with classID="<<classID<<std::endl;
+	std::cout<<"factory creates object with classID="<<classID<<" and sID="<<sID<<std::endl;
 	assert(classID!=CLASS_ID_INVALID);//TODO proper error handling
 	Entity * asEntity=nullptr;
 	Simulation * asSim=nullptr;
