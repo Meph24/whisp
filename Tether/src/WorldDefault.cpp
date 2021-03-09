@@ -68,7 +68,7 @@ void WorldDefault::postTick(TickServiceProvider& tsp)
 				Entity * toDelete=managedEntities[i];
 				removeIndexUnordered(managedEntities,i);
 				removeIndexUnordered(deleteVec,j);
-				entityNotif.notifyDestruction(managedEntities[i]);
+				entityNotif.notifyDestruction(toDelete);
 				delete toDelete;
 				i--;
 				break;
