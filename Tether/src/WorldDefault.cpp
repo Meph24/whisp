@@ -83,10 +83,11 @@ void WorldDefault::postTick(TickServiceProvider& tsp)
 	}
 	addVec.clear();
 	{
-		std::lock_guard lock(m);
+		std::lock_guard lock(tsAddVecMutex);
 		for(Entity * e: tsAddVec)
 		{
 			managedEntities.push_back(e);
+			entityNotif.notifyCreation(e);
 		}
 		tsAddVec.clear();
 	}

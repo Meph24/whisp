@@ -44,7 +44,7 @@ protected:
 
 	std::vector<Entity *> addVec;//the entities that should be added to world
 
-	std::mutex m;
+	std::mutex tsAddVecMutex;
 	std::vector<Entity *> tsAddVec;//Thread safe add vector
 
 	void resetAlgos(TickServiceProvider& tsp);

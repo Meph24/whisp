@@ -84,7 +84,7 @@ spacevec IWorld::fromMeters(const glm::vec3& v) const
 
 void IWorld::addThreadSafe(Entity* e)
 {
-	std::lock_guard lock(m);
+	std::lock_guard lock(tsAddVecMutex);
 	tsAddVec.push_back(e);
 }
 
