@@ -38,7 +38,7 @@ namespace syncprotocol
 
     ostream& operator<< (ostream& os, const syncprotocol::ClientToken& t)
     {
-        return os << t.server_known_fullip << t.avatar_syncid;
+        return os << "IPv4: " << t.server_known_fullip << "| SyncID: " << t.avatar_syncid;
     }
 
     ServerInfo::ServerInfo(string server_name, Port udpport)
