@@ -33,7 +33,6 @@ class EntityPlayer;
 
 class SyncableManager: public CreationDestructionListener<Entity>
 {
-
 	syncID nextID=1;
 
 	syncID updateQueryIndex=0;
