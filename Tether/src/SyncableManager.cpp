@@ -122,6 +122,7 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 		u32 eventID;
 		p>>eventID;
 		syncID sID;
+		std::cout<<"subPackLen="<<subPackLen<<"; eventID="<<eventID<<std::endl;
 		switch(eventID)
 		{
 		case NET_GAME_EVENT_INVALID:
@@ -152,6 +153,7 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 			l->notifyNetGameEvent(p);
 		}
 	}
+	std::cout<<"end of packet"<<std::endl;
 }
 
 void SyncableManager::createSpawnEvent(Syncable* s)
@@ -353,9 +355,12 @@ Simulation* SyncableManager::setSim(Simulation* s)
 
 Simulation* SyncableManager::removeSim()
 {
-	internalSpawn(sim);
-	entityNotif.removeCreationDestructionListener(sim->iw.get());
-	sim->iw->entityNotif.removeCreationDestructionListener(this);
+	if(sim)
+	{
+		internalRemove(sim);
+		entityNotif.removeCreationDestructionListener(sim->iw.get());
+		sim->iw->entityNotif.removeCreationDestructionListener(this);
+	}
 	Simulation * ret=sim;
 	sim=nullptr;
 	return ret;
