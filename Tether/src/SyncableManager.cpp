@@ -17,6 +17,7 @@
 
 SyncableManager::SyncableManager(Simulation & s)
 {
+	factory=new SyncableFactory();
 	addSim(&s);
 	sender=true;
 }
@@ -262,6 +263,7 @@ SyncableManager::~SyncableManager()
 		size_t sizeAfter=listenerMap.size();
 		assert(sizeBefore>sizeAfter);
 	}
+	delete factory;
 }
 
 IWorld& SyncableManager::getIWorld()
@@ -308,6 +310,7 @@ SyncableManager::SyncableManager(const WallClock& reference_clock, Cfg& cfg)
 : refClock(&reference_clock)
 , config(&cfg)
 {
+	factory=new SyncableFactory();
 	receiver=true;
 }
 
