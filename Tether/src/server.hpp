@@ -69,8 +69,8 @@ struct ConnectionListener
     bool hasNewConnections() const;
     unique_ptr<ClientConnection> nextConnection();
 
-    void startListening( Port port );
-    void stopListening();
+    void start( Port port );
+    void stop();
     bool isListening() const;
 
     ConnectionListener() = default;
@@ -97,10 +97,11 @@ struct ConnectionInitialProcessor
         );
     ~ConnectionInitialProcessor();
 
-    bool running = true;
+    bool running = false;
     thread main_process;
     void mainProcess();
-    void stopMainProcess();
+    void start();
+    void stop();
 
     struct SingleConnectionProcessor
     {
@@ -112,6 +113,7 @@ struct ConnectionInitialProcessor
         SingleConnectionProcessor(unique_ptr<ClientConnection>&&,
             ConnectionInitialProcessor& cip
             );
+        ~SingleConnectionProcessor();
 
         SingleConnectionProcessor(SingleConnectionProcessor&&);
         SingleConnectionProcessor& operator=(SingleConnectionProcessor&&);
@@ -119,20 +121,19 @@ struct ConnectionInitialProcessor
         SingleConnectionProcessor(const SingleConnectionProcessor&) = delete;
         SingleConnectionProcessor& operator=(const SingleConnectionProcessor&) = delete;
 
-
         void process();
         bool finished() const;
     };
 
-    mutex process_lock;
-    list<SingleConnectionProcessor> processes;
     void asyncProcessNewConnection();
 
-    list<unique_ptr<ClientConnection> > processed_connections;
     bool hasProcessedConnections();
     unique_ptr<ClientConnection> nextConnection();
 
 private:
+    mutex process_lock;
+    list<SingleConnectionProcessor> processes;
+
     deque<unique_ptr<ClientConnection> > connections;
     void processIncomingConnections();
 };

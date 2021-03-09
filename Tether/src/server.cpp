@@ -53,13 +53,13 @@ unique_ptr<ClientConnection> ConnectionListener::nextConnection()
     return next_connection;
 }
 
-void ConnectionListener::startListening( Port port )
+void ConnectionListener::start( Port port )
 { 
     tcplistener.listen(port);
     is_listening = true;
     t = thread(&ConnectionListener::listenProcess, this); 
 }
-void ConnectionListener::stopListening()
+void ConnectionListener::stop()
 { 
     is_listening = false;
     t.join();
@@ -68,7 +68,7 @@ bool ConnectionListener::isListening() const { return is_listening; }
 
 ConnectionListener::ConnectionListener(Port port) 
 {
-    startListening(port);
+    start(port);
 }
 
 void ConnectionListener::listenProcess()
@@ -99,12 +99,18 @@ ConnectionInitialProcessor::ConnectionInitialProcessor(
     : server(server)
     , listener(listener)
     , wc(wc)
-    , main_process(&ConnectionInitialProcessor::mainProcess, this)
 {}
 
-void ConnectionInitialProcessor::stopMainProcess()
+void ConnectionInitialProcessor::start()
+{
+    running = true;
+    main_process = thread(&ConnectionInitialProcessor::mainProcess, this);
+}
+
+void ConnectionInitialProcessor::stop()
 {
     running = false;
+    main_process.detach();
 }
 
 void ConnectionInitialProcessor::mainProcess()
@@ -122,8 +128,7 @@ void ConnectionInitialProcessor::mainProcess()
 
 ConnectionInitialProcessor::~ConnectionInitialProcessor()
 {
-    stopMainProcess();
-    main_process.detach();
+    stop();
 }
 
 ConnectionInitialProcessor::SingleConnectionProcessor::SingleConnectionProcessor(
@@ -219,6 +224,11 @@ ConnectionInitialProcessor::SingleConnectionProcessor::SingleConnectionProcessor
     , cip(other.cip)
     , t(std::move(other.t))
 {}
+
+ConnectionInitialProcessor::SingleConnectionProcessor::~SingleConnectionProcessor()
+{
+    t.detach();
+}
 
 bool ConnectionInitialProcessor::SingleConnectionProcessor::finished() const
 { return (bool)connection; }
@@ -418,6 +428,7 @@ void SimulationServer::setup(
     )
 { 
     syncman = &syncable_manager; 
+    initial_processor.start();
 }
 
 #include "Simulation_World.h"
