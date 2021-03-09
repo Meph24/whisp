@@ -11,7 +11,6 @@
 
 #include <cstdint>
 
-
 typedef std::uint64_t u64;
 typedef std::int64_t i64;
 typedef std::uint32_t u32;
@@ -22,8 +21,6 @@ typedef std::uint8_t u8;
 typedef std::int8_t i8;
 
 typedef long double f128;
-
-typedef u32 syncID;
 
 #define u64(x) (u64)(x)
 #define i64(x) (i64)(x)

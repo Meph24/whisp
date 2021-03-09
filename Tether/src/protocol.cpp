@@ -8,7 +8,7 @@ namespace syncprotocol
     {
         WallClock::time_point call_time = wc.now();
         size_t received = 0;
-        socket.setBlocking(true);
+        socket.setBlocking(false);
         while( received < size &&  wc.now() - call_time < timeout_duration )
         {
             socket.receive(buffer + received, size - received, received);
@@ -38,7 +38,7 @@ namespace syncprotocol
 
     ostream& operator<< (ostream& os, const syncprotocol::ClientToken& t)
     {
-        return os << (uint16_t) t.client_id << " - " << t.server_known_fullip;
+        return os << t.server_known_fullip << t.avatar_syncid;
     }
 
     ServerInfo::ServerInfo(string server_name, Port udpport)

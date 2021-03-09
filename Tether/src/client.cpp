@@ -6,6 +6,7 @@
 
 using std::cout; //TODO replace with logging #56
 
+
 ServerConnection::ServerConnection(SimulationClient& client, Cfg& cfg)
     : client(client)
 {
@@ -15,11 +16,18 @@ ServerConnection::ServerConnection(SimulationClient& client, Cfg& cfg)
 
 bool ServerConnection::tryConnect( Cfg& cfg, const IPv4Address& addr, Port port )
 {
-    cout << "Connecting to " << addr << ':' << port << '\n';
-    if(is_connected) return false;
 
-    is_connected = tcpsocket.connect(sf::IpAddress( (uint32_t)addr ), port) == sf::Socket::Done;
-    if(!is_connected) return false;
+    if(is_connected) return false;
+    cout << "Connecting to " << addr << ':' << port << '\n';
+
+    tcpsocket.setBlocking(true);
+    is_connected = sf::Socket::Status::Done == tcpsocket.connect(
+            sf::IpAddress( (uint32_t)addr ), port, sf::seconds(5) );
+    if(!is_connected)
+    {
+        cout << "tryConnect: connection attempt failed!\n";
+        return false;
+    }
 
     cout << "Socket connection established\nIntroduction with ";
 
@@ -50,7 +58,7 @@ bool ServerConnection::tryConnect( Cfg& cfg, const IPv4Address& addr, Port port 
 
     cout << "Client Token:" << client_token << '\n';
 
-    udpsocket.bind( *cfg.getInt("client", "default_udp_port") );
+    udpsocket.bind( server_info.udpport );
 
     return is_connected;
 }
@@ -60,6 +68,8 @@ void ServerConnection::disconnect()
     tcpsocket.disconnect();
     is_connected = false;
 }
+
+bool ServerConnection::connected() const { return tcpsocket.getRemoteAddress() != sf::IpAddress::None; }
 
 const WallClock::duration& ServerConnection::latency() const { return latency_; }
 
@@ -95,11 +105,57 @@ SimulationClient::SimulationClient(WallClock& wc, Cfg& cfg)
     : wc(wc)
     , name(*cfg.getStr("client", "name"))
     , connection(*this, cfg)
-{}
+    , syncman(wc, cfg)
+{
+    connection.tcpsocket.setBlocking(false);
+}
 
 SimulationClient::~SimulationClient()
 {
     connection.disconnect();
+}
+
+bool SimulationClient::connected() const { return connection.connected(); }
+bool SimulationClient::initialized() const { return syncman.getSim(); }
+
+bool SimulationClient::processInitialSync()
+{
+    if(initialized()) return true;
+    if(!connected()) return false;
+
+    sf::Packet incoming_tcp;
+
+    if(connection.tcpsocket.receive(incoming_tcp) != sf::Socket::Done)
+        return false;
+    syncman.applyEventPacket(incoming_tcp);
+    return initialized();
+}
+
+void SimulationClient::processCyclicSync()
+{
+    if(!connected() || !initialized()) return;
+
+    //tcp ; game events
+    unique_ptr<sf::Packet> incoming;
+    if(connection.tcpsocket.receive(*incoming) == sf::Socket::Done && incoming->getDataSize())
+    {
+        syncman.applyEventPacket(*incoming);
+    }
+
+    //udp ; update packets
+    incoming->clear();
+    incoming = connection.receiveUdp();
+    if(incoming)
+        syncman.applyUpdatePacket(*incoming);
+}
+
+EntityPlayer* SimulationClient::avatar() const
+{
+    //TODO implement
+    //the avatar must be sampled from the syncable manager
+    //the syncable manager must however be updated, so that
+    // the entity player can be probed
+    return nullptr;
 }
 
 ClientApp::ClientApp(WallClock& wc, Cfg& cfg, IPv4Address& addr, Port port)
@@ -118,8 +174,39 @@ ClientApp::ClientApp(WallClock& wc, Cfg& cfg, IPv4Address& addr, Port port)
 
 void ClientApp::run()
 {
+    cout << "Waiting on Simulation to be transmitted from server ...\n";
+    {
+        //for visual feedback of processing on terminal
+        char wheel[4] = {'-', '\\', '|', '/' };
+        int wheelindex = 0;
+        
+        glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+        while(user.window.isOpen() && !client.processInitialSync())
+        {
+            wheelindex = (wheelindex + 1) % sizeof(wheel);
+            cout << '\r' << wheel[wheelindex];
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            user.window.display();
+            InputEvent e; while(user.window.pollEvent(e)); //keep window open
+        }
+        cout << "\rSimulation received!\n";
+    }
+
     while(user.window.isOpen())
     {
+        if(!client.avatar())
+        {
+            //Switch the color to give visual feedback of no avatar
+            glClearColor(0.5f, 0.0f, 0.0f, 0.0f);
+            continue;
+        }
+        else
+        {
+            glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
+        }
+        client.processCyclicSync();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         user.draw();
         user.window.display();
 

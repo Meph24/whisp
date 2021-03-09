@@ -7,6 +7,7 @@
 
 #include "IPv4Address.hpp"
 #include "WallClock.hpp"
+#include "Syncable.h"
 
 using std::unique_ptr;
 
@@ -55,8 +56,8 @@ namespace syncprotocol {
     ostream& operator<< (ostream&, const ServerInfo&);
     struct ClientToken
     {
-        uint8_t client_id = 0;
         FullIPv4 server_known_fullip;
+        syncID avatar_syncid = 0;
     };
     ostream& operator<< (ostream&, const ClientToken&);
 

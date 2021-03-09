@@ -25,7 +25,7 @@ class Simulation;
 class SimulationUser
 {
 public:
-	Simulation* simulation;
+	Simulation* simulation = nullptr;
 	SimulationInputStatusSet input_status;
 	
 	virtual void operateSimulation(Simulation& simulation) = 0;

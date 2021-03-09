@@ -201,7 +201,8 @@ void RemoteControlSender::operateRemote()
 	);
 	event_mapper.registerMapping(
 		EVENT_ID_KEY_R,
-		Act::SendSignal(&input_status.restart)
+		Act::SendSignal(&input_status.restart),
+		Cond::keyPressed
 	);
 	event_mapper.registerMapping(
 		EVENT_ID_KEY_T,

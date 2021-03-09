@@ -2,6 +2,8 @@
 #define SERVER_HPP
 
 #include <deque>
+#include <list>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <string>
@@ -10,10 +12,13 @@
 
 #include "MainApp.hpp"
 #include "protocol.hpp"
+#include "SyncableManager.h"
 
 using std::deque;
+using std::list;
 using std::mutex;
 using std::queue;
+using std::shared_ptr;
 using std::string;
 using std::thread;
 using std::vector;
@@ -25,7 +30,7 @@ struct ClientConnection
     syncprotocol::ClientToken token;
     Port udpport;
 
-    void sendUdp(unique_ptr<syncprotocol::udp::Packet>);
+    void sendUdp(shared_ptr<syncprotocol::udp::Packet>&);
     unique_ptr<sf::Packet> receiveUdp();
 
     FullIPv4 remoteUdpFullip() const;
@@ -39,7 +44,7 @@ private:
     mutex udp_inbox_lock;
     mutex udp_outbox_lock;
     deque<unique_ptr<sf::Packet>  > udp_inbox; 
-    deque<unique_ptr<syncprotocol::udp::Packet> > udp_outbox;
+    deque<shared_ptr<syncprotocol::udp::Packet> > udp_outbox;
 
     friend struct UdpServerProcessor;
 };
@@ -77,27 +82,47 @@ struct ConnectionInitialProcessor
     ConnectionListener& listener;
     WallClock& wc;
 
-    syncprotocol::ServerInfo& server_info;
-
-
-    bool initial_processing_on = true;
-    thread initial_connection_processing_thread;
-
-    void stopThread();
-
     ConnectionInitialProcessor(
         SimulationServer& server,
         ConnectionListener& listener, 
-        WallClock& wc, 
-        syncprotocol::ServerInfo& server_info
+        WallClock& wc
         );
     ~ConnectionInitialProcessor();
 
-    mutex connections_lock;
+    bool running = true;
+    thread main_process;
+    void mainProcess();
+    void stopMainProcess();
+
+    struct SingleConnectionProcessor
+    {
+        unique_ptr<ClientConnection> connection;
+        ConnectionInitialProcessor* cip;
+
+        thread t;
+
+        SingleConnectionProcessor(unique_ptr<ClientConnection>&&,
+            ConnectionInitialProcessor& cip
+            );
+
+        SingleConnectionProcessor(SingleConnectionProcessor&&);
+        SingleConnectionProcessor& operator=(SingleConnectionProcessor&&);
+
+        SingleConnectionProcessor(const SingleConnectionProcessor&) = delete;
+        SingleConnectionProcessor& operator=(const SingleConnectionProcessor&) = delete;
+
+
+        void process();
+        bool finished() const;
+    };
+
+    mutex process_lock;
+    list<SingleConnectionProcessor> processes;
+    void asyncProcessNewConnection();
+
+    list<unique_ptr<ClientConnection> > processed_connections;
     bool hasProcessedConnections();
     unique_ptr<ClientConnection> nextConnection();
-
-    syncprotocol::ClientToken newClientToken() const;    
 
 private:
     deque<unique_ptr<ClientConnection> > connections;
@@ -109,7 +134,6 @@ struct ClientConnectionListing
     vector<unique_ptr<ClientConnection> > connections;
 
     void addClient(unique_ptr<ClientConnection>&& new_connection);
-    void removeClient(uint8_t);
 
     size_t size() const;
 
@@ -147,24 +171,37 @@ struct SimulationServer
     Cfg& cfg;
     ConnectionListener listener;
     ConnectionInitialProcessor initial_processor;
-
     UdpServerProcessor udp;
 
     syncprotocol::ServerInfo info;
 
     ClientConnectionListing clients;
 
+    SyncableManager* syncman;
+
     void processIncomingConnections();
     void process();
 
+    void setup(SyncableManager& syncable_manager);
+
     SimulationServer(WallClock& wc, Cfg& cfg, Port port);
     ~SimulationServer() = default;
+
+private:
+    void broadcastTcp(sf::Packet&);
+    void broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&&);
 };
 
-struct ServerApp : public App
+struct HostApp : public App
 {
+    unique_ptr<Simulation> simulation;
+
     SimulationServer server;
-    ServerApp(WallClock& wc, Cfg& cfg, Port port);
+    unique_ptr<SyncableManager> syncman;
+
+    LocalUser local_user;
+
+    HostApp(WallClock& wc, Cfg& cfg, Port port);
     void run();
 };
 

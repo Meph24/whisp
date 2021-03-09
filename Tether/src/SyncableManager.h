@@ -9,11 +9,12 @@
 #ifndef SRC_SYNCABLEMANAGER_H_
 #define SRC_SYNCABLEMANAGER_H_
 
-#include "ShortNames.h"
+#include "Shortnames.h"
 
 #include "CreationDestructionNotificationHandler.h"
 #include "WallClock.hpp"
 #include "Cfg.hpp"
+#include "Syncable.h"
 
 #include <map>
 #include <SFML/Network.hpp>
@@ -22,8 +23,6 @@
 #define NET_GAME_EVENT_SPAWN 1
 #define NET_GAME_EVENT_DELETE 2
 
-
-class Syncable;
 class NetGameEventListener;
 class SyncableFactory;
 class Simulation;
@@ -129,7 +128,7 @@ public:
 
 	IWorld & getIWorld();
 	TickServiceProvider & getTSP();
-	Simulation * getSim();
+	Simulation * getSim() const;
 	Simulation * setSim(Simulation * s);//returns old simulation or 0 if there was none before; (s==0 means remove Simulation)
 
 

@@ -15,6 +15,7 @@
 
 class SyncableManager;
 
+typedef u32 syncID;
 
 class Syncable
 {
