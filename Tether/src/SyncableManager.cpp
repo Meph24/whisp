@@ -93,9 +93,7 @@ void SyncableManager::applyUpdatePacket(sf::Packet& p)
 
 bool SyncableManager::exists(syncID sID)
 {
-	if(syncMap.find(sID) == syncMap.end())
-		return false;
-	return true;
+	return syncMap.find(sID) != syncMap.end();
 }
 
 bool SyncableManager::fetchEventPackets(sf::Packet& p)

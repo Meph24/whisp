@@ -35,9 +35,11 @@ void SimulationClient::processCyclicSync()
     if(!connected() || !initialized()) return;
 
     //tcp ; game events
-    unique_ptr<sf::Packet> incoming;
+    connection.tcpsocket.setBlocking(false);
+    unique_ptr<sf::Packet> incoming = std::make_unique<sf::Packet>();
     if(connection.tcpsocket.receive(*incoming) == sf::Socket::Done && incoming->getDataSize())
     {
+        std::cout << "Applying Event-Packet.\n";
         syncman.applyEventPacket(*incoming);
     }
 
@@ -50,9 +52,6 @@ void SimulationClient::processCyclicSync()
 
 EntityPlayer* SimulationClient::avatar() const
 {
-    //TODO implement
-    //the avatar must be sampled from the syncable manager
-    //the syncable manager must however be updated, so that
-    // the entity player can be probed
-    return nullptr;
+    auto f = syncman.syncMap.find(connection.client_token.avatar_syncid);
+    return ( f == syncman.syncMap.end() )? nullptr : (EntityPlayer*) f->second;
 }

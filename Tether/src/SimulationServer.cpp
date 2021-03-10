@@ -24,9 +24,11 @@ void SimulationServer::processIncomingConnections()
 
     sf::Packet packet;
     syncman->fillCompletePacket(packet);
+    std::cout << "Complete Packet is created!\n";
     for(auto& c : new_connections)
     {
         c->tcpsocket.send(packet);
+        std::cout << "Complete Packet sent!\n";
         clients.addClient(std::move(c));
     }
 }
@@ -37,7 +39,10 @@ void SimulationServer::process()
     sf::Packet packet;
 
     while(syncman->fetchEventPackets(packet))
+    {
         broadcastTcp(packet);
+        std::cout << "Event Packet broadcast!\n";
+    }
 
     processIncomingConnections();
 

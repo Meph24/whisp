@@ -77,9 +77,10 @@ unique_ptr<sf::Packet> ServerConnection::receiveUdp()
     sf::IpAddress sender_addr; Port sender_port;
     do
     {
+        udpsocket.setBlocking(false);
         if(udpsocket.receive(*newp, sender_addr, sender_port) != sf::Socket::Status::Done )
         {
-            newp.reset();
+            return nullptr;
             break;
         }
     } while (sender_addr != tcpsocket.getRemoteAddress() || sender_port != server_info.udpport );

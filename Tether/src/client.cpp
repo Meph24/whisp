@@ -40,13 +40,14 @@ void ClientApp::run()
         cout << "\rSimulation received!\n";
     }
 
+    user.operateSimulation(*client.syncman.getSim());;
+
     while(user.window.isOpen())
     {
         if(!client.avatar())
         {
             //Switch the color to give visual feedback of no avatar
             glClearColor(0.5f, 0.0f, 0.0f, 0.0f);
-            continue;
         }
         else
         {
