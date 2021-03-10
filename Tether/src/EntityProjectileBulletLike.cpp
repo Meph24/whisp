@@ -188,7 +188,7 @@ void EntityProjectileBulletLike::deserialize(sf::Packet& p, SyncableManager& sm)
 	bb=AABB(pos);
 }
 
-EntityProjectileBulletLike::EntityProjectileBulletLike(sf::Packet p,SyncableManager& sm)
+EntityProjectileBulletLike::EntityProjectileBulletLike(sf::Packet& p,SyncableManager& sm)
 : typeB(0,0,0,0)//dummy
 , source(0)//source not needed for draw
 {

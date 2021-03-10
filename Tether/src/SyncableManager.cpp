@@ -115,6 +115,17 @@ bool SyncableManager::fetchEventPackets(sf::Packet& p)
 
 void SyncableManager::applyEventPacket(sf::Packet& p)
 {
+	/* reenable to print packet contents
+
+	size_t dataSize=p.getDataSize();
+	u8 * data=(u8 *)p.getData();
+	std::cout<<"packet size: "<<dataSize<<std::endl;
+	std::cout<<"data:"<<std::endl;
+	for(size_t i=0;i<dataSize;i++)
+	{
+		std::cout<<(int)data[i]<<" ";
+	}
+	std::cout<<std::endl;*/
 	while(!p.endOfPacket())
 	{
 		u32 subPackLen;

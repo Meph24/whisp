@@ -100,7 +100,7 @@ void EntitySound::deserialize(sf::Packet& p, SyncableManager& sm)
 	assert(thisIsImplemented);
 }
 
-EntitySound::EntitySound(sf::Packet p, TickServiceProvider* tsp,SyncableManager& sm)
+EntitySound::EntitySound(sf::Packet& p,SyncableManager& sm)
 {
 	bool thisIsImplemented=false;
 	assert(thisIsImplemented);

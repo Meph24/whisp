@@ -32,7 +32,7 @@ public:
 
 	void serialize(sf::Packet& p,bool complete);
 	void deserialize(sf::Packet& p,SyncableManager & sm);
-	AnimationCycle(sf::Packet p, SyncableManager& sm);//deserialize constructor
+	AnimationCycle(sf::Packet& p, SyncableManager& sm);//deserialize constructor
 };
 
 #endif /* SRC_ANIMATIONCYCLE_H_ */
