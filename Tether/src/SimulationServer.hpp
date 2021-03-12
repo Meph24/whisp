@@ -10,6 +10,7 @@ struct Cfg;
 
 struct SimulationServer
 {
+    WallClock& wc;
     Cfg& cfg;
     ConnectionListener listener;
     ConnectionInitialProcessor initial_processor;

@@ -62,12 +62,13 @@ namespace syncprotocol {
     ostream& operator<< (ostream&, const ClientToken&);
 
     namespace udp {
-         struct Header
+        struct Header
         {
             WallClock::time_point server_time, client_time;
         };
         struct Packet : public sf::Packet
         {
+            Packet();
             using sf::Packet::operator<<;
             using sf::Packet::operator>>;
             void setHeader(const Header&);

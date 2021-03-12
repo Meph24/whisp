@@ -46,6 +46,7 @@ private:
     deque<shared_ptr<syncprotocol::udp::Packet> > udp_outbox;
 
     friend struct UdpServerProcessor;
+    friend struct SimulationServer;
 };
 
 #endif // CLIENTCONNECTION_HPP

@@ -43,15 +43,11 @@ void SimulationClient::processCyclicSync()
     }
 
     //udp ; update packets
-    std::cout << "1";
     incoming->clear();
-    std::cout << "2";
     incoming = connection.receiveUdp();
     if(incoming)
     {
-        std::cout << "3";
         syncman.applyUpdatePacket(*incoming);
-        std::cout << "4";
     }
 }
 

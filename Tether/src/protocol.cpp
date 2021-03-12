@@ -63,6 +63,11 @@ namespace syncprotocol
 
     namespace udp {
 
+        Packet::Packet()
+        {
+            Header h;
+            *this << h;
+        }
         sf::Packet& operator<<(sf::Packet& p, const Header& h){ return p << h.server_time << h.client_time; }
         sf::Packet& operator>>(sf::Packet& p, Header& h){ return p >> h.server_time >> h.client_time; }
         void Packet::setHeader(const Header& h)

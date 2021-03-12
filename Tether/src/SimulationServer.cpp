@@ -3,7 +3,8 @@
 #include "SyncableManager.h"
 
 SimulationServer::SimulationServer(WallClock& wc, Cfg& cfg, Port port)
-    : cfg(cfg)
+    : wc(wc)
+    , cfg(cfg)
     , listener(port)
     , initial_processor(*this, listener, wc)
 {
@@ -72,10 +73,11 @@ void SimulationServer::broadcastTcp(sf::Packet& p)
 
 void SimulationServer::broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&& packet)
 {
+    syncprotocol::udp::Header header; header.server_time = wc.now();
     for(auto& c : clients.connections)
     {
+        header.client_time = c->last_client_time;
         udpsocket.send(*packet, c->tcpsocket.getRemoteAddress(), c->udpport);
     }
-    std::cout << "Have broadcast udp packet with " << packet->getDataSize() << " bytes\n";
     packet.reset();
 }
