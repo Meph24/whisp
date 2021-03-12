@@ -19,10 +19,8 @@ struct UdpServerProcessor
     ClientConnectionListing& clients;
     sf::UdpSocket socket;
 
-    sf::UdpSocket udp_tester_socket;
-
     map<ClientConnection*, uint8_t> lock_fail_counters;
-    uint8_t lock_fail_tolerance = 3;
+    uint8_t lock_fail_tolerance = 1;
 
     const WallClock& wc;
 

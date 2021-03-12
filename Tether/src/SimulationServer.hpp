@@ -13,7 +13,8 @@ struct SimulationServer
     Cfg& cfg;
     ConnectionListener listener;
     ConnectionInitialProcessor initial_processor;
-    UdpServerProcessor udp;
+
+    sf::UdpSocket udpsocket;
 
     syncprotocol::ServerInfo info;
 

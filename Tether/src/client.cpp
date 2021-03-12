@@ -53,6 +53,7 @@ void ClientApp::run()
         {
             glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
         }
+
         client.processCyclicSync();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

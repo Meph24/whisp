@@ -11,7 +11,7 @@ UdpServerProcessor::UdpServerProcessor( ClientConnectionListing& clients, Cfg& c
     , wc(wc)
 {
     socket.bind( *cfg.getInt("server", "default_udp_port") );
-    socket.setBlocking(true);
+    socket.setBlocking(false);
     send_thread = thread(&UdpServerProcessor::sendProcess, this);
     receive_thread = thread(&UdpServerProcessor::receiveProcess, this);
 }
@@ -25,26 +25,45 @@ void UdpServerProcessor::stopThreads()
 
 void UdpServerProcessor::sendProcess()
 {
+    std::cout << "Processing outgoing udp : " << running << "\n";
     while(running)
     {
+        std::cout << "Connections: " << clients.connections.size() << '\n';
         for(auto& c : clients.connections)
         {
+            assert((bool)c);
+            std::cout << "Udp handling connection " << c->name << '\n';
             ClientConnection& connection = *c;
-            if( connection.udp_outbox.empty() ) continue;
-            
+
+            lock_guard lg_ (c->udp_outbox_lock);
+
+/*
             if( !connection.udp_outbox_lock.try_lock() )
             {
                 ClientConnection* cptr = c.get();
                 if(lock_fail_counters.find(cptr)==lock_fail_counters.end()) lock_fail_counters[cptr] = 0;
                 lock_fail_counters[cptr]++;
-                if(lock_fail_counters[cptr] < lock_fail_tolerance) continue;
-                else connection.udp_outbox_lock.lock();
+                std::cout << c->name << " failed to lock outbox " << lock_fail_counters[cptr] << '\n';
+                if(lock_fail_counters[cptr] <= lock_fail_tolerance) continue;
+                else 
+                {
+                    std::cout << "Waiting on Lock for " << c->name << '\n';
+                    connection.udp_outbox_lock.lock();
+                }
+            }
+*/
+            if( connection.udp_outbox.empty() ) 
+            {
+                std::this_thread::sleep_for(20ms);
+                continue;
             }
 
             syncprotocol::udp::Header header { wc.now(), c->last_client_time };
             connection.udp_outbox.front()->setHeader(header);
 
+            std::cout << "Send udp to " << connection.tcpsocket.getRemoteAddress() << ':' << connection.udpport << '\n'; 
             socket.send( *connection.udp_outbox.front(), connection.tcpsocket.getRemoteAddress(), connection.udpport);
+            std::cout << "Sent Udp Packet to " << connection.tcpsocket.getRemoteAddress() << ':' << connection.udpport << "!\n";
             connection.udp_outbox.pop_front();
             lock_fail_counters[c.get()] = 0;
 
@@ -61,7 +80,7 @@ void UdpServerProcessor::receiveProcess()
     std::cout << "Processing incoming udp.\n";
     while(running)
     {
-        newpacket.reset(new sf::Packet);
+        newpacket = std::make_unique<sf::Packet>();
         if( sf::Socket::Status::Done != socket.receive( *newpacket, sender_addr, sender_port ))
             continue;
 

@@ -76,6 +76,7 @@ void SyncableManager::applyUpdatePacket(sf::Packet& p)
 {
 	while(!p.endOfPacket())
 	{
+		std::cout << "+";
 		syncID sID;
 		u32 subPackLen;
 		p>>sID;

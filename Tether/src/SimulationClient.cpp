@@ -39,15 +39,20 @@ void SimulationClient::processCyclicSync()
     unique_ptr<sf::Packet> incoming = std::make_unique<sf::Packet>();
     if(connection.tcpsocket.receive(*incoming) == sf::Socket::Done && incoming->getDataSize())
     {
-        std::cout << "Applying Event-Packet.\n";
         syncman.applyEventPacket(*incoming);
     }
 
     //udp ; update packets
+    std::cout << "1";
     incoming->clear();
+    std::cout << "2";
     incoming = connection.receiveUdp();
     if(incoming)
+    {
+        std::cout << "3";
         syncman.applyUpdatePacket(*incoming);
+        std::cout << "4";
+    }
 }
 
 EntityPlayer* SimulationClient::avatar() const

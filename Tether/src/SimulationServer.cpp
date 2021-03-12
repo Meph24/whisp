@@ -6,10 +6,11 @@ SimulationServer::SimulationServer(WallClock& wc, Cfg& cfg, Port port)
     : cfg(cfg)
     , listener(port)
     , initial_processor(*this, listener, wc)
-    , udp(clients, cfg, wc)
 {
+    udpsocket.bind( *cfg.getInt("server", "default_udp_port") );
+    udpsocket.setBlocking(false);
     info.setName(*cfg.getStr("server", "name"));
-    info.udpport = udp.socket.getLocalPort();
+    info.udpport = udpsocket.getLocalPort();
 }
 
 void SimulationServer::processIncomingConnections()
@@ -24,11 +25,9 @@ void SimulationServer::processIncomingConnections()
 
     sf::Packet packet;
     syncman->fillCompletePacket(packet);
-    std::cout << "Complete Packet is created!\n";
     for(auto& c : new_connections)
     {
         c->tcpsocket.send(packet);
-        std::cout << "Complete Packet sent!\n";
         clients.addClient(std::move(c));
     }
 }
@@ -41,7 +40,6 @@ void SimulationServer::process()
     while(syncman->fetchEventPackets(packet))
     {
         broadcastTcp(packet);
-        std::cout << "Event Packet broadcast!\n";
     }
 
     processIncomingConnections();
@@ -50,7 +48,9 @@ void SimulationServer::process()
     {
         unique_ptr<syncprotocol::udp::Packet> udp_packet = std::make_unique<syncprotocol::udp::Packet>();
         if(syncman->fillUpdatePacket(*udp_packet, sf::UdpSocket::MaxDatagramSize - udp_packet->getDataSize() ))
+        {
             broadcastUdp(std::move(udp_packet));
+        }
     }
 }
 
@@ -72,11 +72,10 @@ void SimulationServer::broadcastTcp(sf::Packet& p)
 
 void SimulationServer::broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&& packet)
 {
-    syncprotocol::udp::Packet* packet_ptr = packet.get();
-    packet.release();
-    shared_ptr<syncprotocol::udp::Packet> shared_packet (packet_ptr);
     for(auto& c : clients.connections)
     {
-        c->sendUdp(shared_packet);
+        udpsocket.send(*packet, c->tcpsocket.getRemoteAddress(), c->udpport);
     }
+    std::cout << "Have broadcast udp packet with " << packet->getDataSize() << " bytes\n";
+    packet.reset();
 }

@@ -77,13 +77,13 @@ unique_ptr<sf::Packet> ServerConnection::receiveUdp()
     sf::IpAddress sender_addr; Port sender_port;
     do
     {
-        udpsocket.setBlocking(false);
         if(udpsocket.receive(*newp, sender_addr, sender_port) != sf::Socket::Status::Done )
         {
             return nullptr;
             break;
         }
-    } while (sender_addr != tcpsocket.getRemoteAddress() || sender_port != server_info.udpport );
+    } while (       sender_addr != tcpsocket.getRemoteAddress() 
+                ||  sender_port != server_info.udpport             );
 
     syncprotocol::udp::Header header; *newp >> header;
     latency_ = (header.client_time - client.wc.now()) / 2;

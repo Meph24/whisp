@@ -17,6 +17,7 @@ void SyncUser::disconnectSimulation()
 
 void ClientConnection::sendUdp(shared_ptr<syncprotocol::udp::Packet>& p)
 {
+    if(!p->getDataSize()) return;
     std::lock_guard<std::mutex> lockguard (udp_outbox_lock);
     udp_outbox.emplace_back(p);
 }
