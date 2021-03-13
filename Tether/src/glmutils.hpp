@@ -17,6 +17,8 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include <SFML/Network/Packet.hpp>
+
 #include "fltcmp.hpp"
 
 #include <iostream>
@@ -139,5 +141,13 @@ inline bool vecEquals(const vec_type& a, const vec_type& b)
 	return vecEqualsE(a, b, GLMUTILS_EQUALS_DEFAULT_EPSIOLON);
 }
 
+inline sf::Packet& operator <<(sf::Packet& p, const vec3& v)
+{ return p << v.x << v.y << v.z; }
+
+inline sf::Packet& operator >>(sf::Packet& p, vec3& v)
+{ return p >> v.x >> v.y >> v.z; }
+
 } /* namespace glm */	
+
+
 #endif /* GLMUTILS_HPP */

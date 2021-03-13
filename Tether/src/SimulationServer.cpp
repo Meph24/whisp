@@ -1,12 +1,17 @@
 #include "SimulationServer.hpp"
 
+#include <algorithm>
+
 #include "SyncableManager.h"
+
+using std::min;
 
 SimulationServer::SimulationServer(WallClock& wc, Cfg& cfg, Port port)
     : wc(wc)
     , cfg(cfg)
     , listener(port)
     , initial_processor(*this, listener, wc)
+    , last_sent(wc.now())
 {
     udpsocket.bind( *cfg.getInt("server", "default_udp_port") );
     udpsocket.setBlocking(false);
@@ -48,11 +53,34 @@ void SimulationServer::process()
     if(!clients.connections.empty())
     {
         unique_ptr<syncprotocol::udp::Packet> udp_packet = std::make_unique<syncprotocol::udp::Packet>();
-        if(syncman->fillUpdatePacket(*udp_packet, sf::UdpSocket::MaxDatagramSize - udp_packet->getDataSize() ))
+        //bytes allowed to send
+        FloatSeconds since_last_sent ( min(wc.now() - last_sent, WallClock::duration(1s)) );
+        float bytes_allowed = min( 
+            (float)since_last_sent * max_send_bytes_per_second,
+            (float)sf::UdpSocket::MaxDatagramSize
+            ) - udp_packet->getDataSize();
+
+        if( syncman->fillUpdatePacket(*udp_packet, bytes_allowed) )
         {
             broadcastUdp(std::move(udp_packet));
+            last_sent = wc.now();
         }
+
+        receiveClientInputs();
     }
+}
+
+void SimulationServer::receiveClientInputs()
+{
+    sf::Packet newpacket;
+    sf::IpAddress remote_addr; Port remote_port;
+    while(udpsocket.receive(newpacket, remote_addr, remote_port) == sf::Socket::Status::Done )
+    {
+        if(! clients.containsUdp(remote_addr, remote_port) ) continue;
+
+        newpacket >> clients.atUdp(remote_addr, remote_port)->user.input_status;
+    }
+
 }
 
 void SimulationServer::setup(

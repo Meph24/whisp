@@ -4,9 +4,11 @@
 #include <array>
 using std::array;
 
-#include "glmutils.hpp"
-
 #include <cstdint>
+
+#include <SFML/Network/Packet.hpp>
+
+#include "glmutils.hpp"
 
 using SignalCounter = std::uint16_t;
 
@@ -47,6 +49,20 @@ public:
 	operator IndexType() { return value(); }
 };
 
+template<IndexTypeBase max_indexable>
+sf::Packet& operator<< (sf::Packet& p, const Index<max_indexable>& i)
+{
+	return p << i.value();
+}
+
+
+template<IndexTypeBase max_indexable>
+sf::Packet& operator>> (sf::Packet& p, Index<max_indexable>& i)
+{
+	typename Index<max_indexable>::IndexType v; p >> v; i = Index<max_indexable>(v);
+	return p;
+}
+
 
 #include "WallClock.hpp"
 //this struct shall be kept sendable, that means no dynamic allocation and pointers allowed
@@ -82,5 +98,8 @@ struct SimulationInputStatusSet
 	//static float getStatusAndReset(float& f, float resetTo = 0.0f );//not thread safe; reset value
 
 };
+
+sf::Packet& operator<< (sf::Packet& p, const SimulationInputStatusSet& s);
+sf::Packet& operator>> (sf::Packet& p, SimulationInputStatusSet& s);
 
 #endif /* CONTROLINPUTSTATUSSET_HPP */

@@ -7,6 +7,8 @@
 #include "SyncableManager.h"
 #include "WallClock.hpp"
 
+struct SimulationUser;
+
 struct SimulationClient
 {
     WallClock& wc;
@@ -20,6 +22,11 @@ struct SimulationClient
     bool processInitialSync();
     void processCyclicSync();
     EntityPlayer* avatar() const;
+
+    void sendInput(SimulationUser* user);
+    
+    WallClock::time_point last_sent;
+    float max_send_bytes_per_second = 3000;
 
     SimulationClient(WallClock& wc, Cfg& cfg);
     ~SimulationClient();

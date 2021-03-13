@@ -56,3 +56,22 @@ EntityPlayer* SimulationClient::avatar() const
     auto f = syncman.syncMap.find(connection.client_token.avatar_syncid);
     return ( f == syncman.syncMap.end() )? nullptr : (EntityPlayer*) f->second;
 }
+
+#include "FloatSeconds.hpp"
+#include "User.hpp"
+
+void SimulationClient::sendInput(SimulationUser* user)
+{
+    if(!user || !connection.connected()) return;
+
+    FloatSeconds since_last_sent (wc.now() - last_sent);
+    float bytes_allowed = (float) since_last_sent * max_send_bytes_per_second;
+    if( bytes_allowed < sizeof(user->input_status) ) return;
+
+    syncprotocol::udp::Packet new_packet;
+    user->input_status.timestamp = wc.now().time_since_epoch().count();
+    new_packet << user->input_status;
+    connection.sendUdp( new_packet );
+
+    last_sent = wc.now();
+}

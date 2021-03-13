@@ -32,8 +32,12 @@ struct SimulationServer
     ~SimulationServer() = default;
 
 private:
+    WallClock::time_point last_sent;
+    float max_send_bytes_per_second = 3000;
     void broadcastTcp(sf::Packet&);
     void broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&&);
+
+    void receiveClientInputs();
 };
 
 #endif // SIMULATIONSERVER_HPP
