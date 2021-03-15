@@ -11,6 +11,7 @@ ServerConnection::ServerConnection(SimulationClient& client, Cfg& cfg)
     Port this_udp_port = *cfg.getInt("client", "default_udp_port");
     udpsocket.bind( this_udp_port );
     std::cout << "Udp port bound to " << udpsocket.getLocalPort() << '\n';
+    udpsocket.setBlocking(false);
 }
 
 bool ServerConnection::tryConnect( Cfg& cfg, const IPv4Address& addr, Port port )
