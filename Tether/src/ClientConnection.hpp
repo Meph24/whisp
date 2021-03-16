@@ -29,12 +29,11 @@ struct ClientConnection
 
     SyncUser user;
 
-    void sendUdp(shared_ptr<syncprotocol::udp::Packet>&);
-    unique_ptr<sf::Packet> receiveUdp();
-
     FullIPv4 remoteUdpFullip() const;
 
     const WallClock::duration& latency() const;
+
+    void receiveHeader(const syncprotocol::udp::Header& h);
 
 private:
     WallClock::duration latency_;

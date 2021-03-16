@@ -74,7 +74,16 @@ void SimulationServer::receiveClientInputs()
     {
         if(! clients.containsUdp(remote_addr, remote_port) ) continue;
 
-        newpacket >> clients.atUdp(remote_addr, remote_port)->user.input_status;
+        //extract header
+        syncprotocol::udp::Header header; newpacket >> header;
+
+        //friend access set latency
+        //TODO make less direct accessly
+        ClientConnection& client = *clients.atUdp(remote_addr, remote_port);
+        client.latency_ = header.server_time - wc.now();
+        client.last_client_time = max(header.client_time, client.last_client_time);
+
+        newpacket >> client.user.input_status;
     }
 }
 
