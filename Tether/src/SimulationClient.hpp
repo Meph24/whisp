@@ -5,6 +5,7 @@
 
 #include "ServerConnection.hpp"
 #include "SyncableManager.h"
+#include "UploadBudget.hpp"
 #include "WallClock.hpp"
 
 struct SimulationUser;
@@ -16,6 +17,7 @@ struct SimulationClient
     ServerConnection connection;
 
     SyncableManager syncman;
+    UploadBudget upload_budget;
 
     bool connected() const;
     bool initialized() const;
@@ -25,9 +27,6 @@ struct SimulationClient
 
     void sendInput(SimulationUser* user);
     
-    WallClock::time_point last_sent;
-    float max_send_bytes_per_second = 3000;
-
     SimulationClient(WallClock& wc, Cfg& cfg);
     ~SimulationClient();
 };

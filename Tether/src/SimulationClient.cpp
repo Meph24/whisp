@@ -5,6 +5,7 @@ SimulationClient::SimulationClient(WallClock& wc, Cfg& cfg)
     , name(*cfg.getStr("client", "name"))
     , connection(*this, cfg)
     , syncman(wc, cfg)
+    , upload_budget(wc, 50000)
 {
     connection.tcpsocket.setBlocking(false);
 }
@@ -27,6 +28,7 @@ bool SimulationClient::processInitialSync()
     if(connection.tcpsocket.receive(incoming_tcp) != sf::Socket::Done)
         return false;
     syncman.applyEventPacket(incoming_tcp);
+    upload_budget.reset();
     return initialized();
 }
 
@@ -64,14 +66,12 @@ void SimulationClient::sendInput(SimulationUser* user)
 {
     if(!user || !connection.connected()) return;
 
-    FloatSeconds since_last_sent (wc.now() - last_sent);
-    float bytes_allowed = (float) since_last_sent * max_send_bytes_per_second;
-    if( bytes_allowed < sizeof(user->input_status) ) return;
+    if( upload_budget.current() < (int) sizeof(user->input_status) ) return;
 
     syncprotocol::udp::Packet new_packet;
     user->input_status.timestamp = wc.now().time_since_epoch().count();
     new_packet << user->input_status;
     connection.sendUdp( new_packet );
 
-    last_sent = wc.now();
+    upload_budget.used(new_packet.getDataSize());
 }

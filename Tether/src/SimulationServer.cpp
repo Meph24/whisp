@@ -11,7 +11,7 @@ SimulationServer::SimulationServer(WallClock& wc, Cfg& cfg, Port port)
     , cfg(cfg)
     , listener(port)
     , initial_processor(*this, listener, wc)
-    , last_sent(wc.now())
+    , upload_budget(wc, 50000)
 {
     udpsocket.bind( *cfg.getInt("server", "default_udp_port") );
     udpsocket.setBlocking(false);
@@ -46,6 +46,7 @@ void SimulationServer::process()
     while(syncman->fetchEventPackets(packet))
     {
         broadcastTcp(packet);
+        upload_budget.used(clients.connections.size() * packet.getDataSize());
     }
 
     processIncomingConnections();
@@ -53,18 +54,13 @@ void SimulationServer::process()
     if(!clients.connections.empty())
     {
         unique_ptr<syncprotocol::udp::Packet> udp_packet = std::make_unique<syncprotocol::udp::Packet>();
-        //bytes allowed to send
-        FloatSeconds since_last_sent ( min(wc.now() - last_sent, WallClock::duration(1s)) );
-        float bytes_allowed = min( 
-            (float)since_last_sent * max_send_bytes_per_second,
-            (float)sf::UdpSocket::MaxDatagramSize
-            ) - udp_packet->getDataSize();
-
-        if( syncman->fillUpdatePacket(*udp_packet, bytes_allowed) )
+        i64 bytes = 0;
+        if( syncman->fillUpdatePacket(*udp_packet, upload_budget.current() / clients.connections.size()) )
         {
+            bytes = udp_packet->getDataSize() * clients.connections.size();
             broadcastUdp(std::move(udp_packet));
-            last_sent = wc.now();
         }
+        upload_budget.used(bytes);
 
         receiveClientInputs();
     }
@@ -80,7 +76,6 @@ void SimulationServer::receiveClientInputs()
 
         newpacket >> clients.atUdp(remote_addr, remote_port)->user.input_status;
     }
-
 }
 
 void SimulationServer::setup(
