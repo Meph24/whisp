@@ -187,11 +187,11 @@ inline intfloat<I, F> operator*(double scalar, const intfloat<I, F>& v)
 }
 
 template<typename I,typename F>
-std::ostream& operator<<(std::ostream &out, const struct intfloat<I, F> v);
+std::ostream& operator<<(std::ostream &out, const struct intfloat<I, F>& v);
 template<typename I,typename F>
-sf::Packet& operator<<(sf::Packet& p, const struct intfloat<I, F> v);
+sf::Packet& operator<<(sf::Packet& p, const struct intfloat<I, F>& v);
 template<typename I,typename F>
-sf::Packet& operator>>(sf::Packet& p, struct intfloat<I, F> v);
+sf::Packet& operator>>(sf::Packet& p, struct intfloat<I, F>& v);
 
 template<typename I, typename F>
 inline void intfloat<I, F>::operator *=(double scalar)
@@ -234,7 +234,7 @@ inline void intfloat<I, F>::correctPos()
 }
 
 template<typename I, typename F>
-inline std::ostream& operator<<(std::ostream& out, const struct intfloat<I, F> v)
+inline std::ostream& operator<<(std::ostream& out, const struct intfloat<I, F>& v)
 {
 	out << "[ ch: " << v.intpart << ", in: " << v.floatpart <<" ]";
 	return out;
@@ -277,7 +277,7 @@ struct vec3if
 	void operator/=(float scalar);
 
 	//low precision
-	vec3 operator/(vec3if<I,F> other) const;
+	vec3 operator/(vec3if<I,F>& other) const;
 
 	//returns bit vector of comparison lsb=x
 	unsigned int operator<(const vec3if<I,F>& other) const;
@@ -304,12 +304,12 @@ template<typename I,typename F>
 vec3if<I, F>::vec3if(const intfloat<I, F>& x, const intfloat<I, F>& y, const intfloat<I, F>& z ) : x(x), y(y), z(z) {}
 
 template<typename I,typename F>
-std::ostream& operator<<(std::ostream &out, const struct vec3if<I, F> v);
+std::ostream& operator<<(std::ostream &out, const struct vec3if<I, F>& v);
 
 template<typename I,typename F>
-sf::Packet& operator<<(sf::Packet& p, const struct vec3if<I, F> v);
+sf::Packet& operator<<(sf::Packet& p, const struct vec3if<I, F>& v);
 template<typename I,typename F>
-sf::Packet& operator>>(sf::Packet& p, struct vec3if<I, F> v);
+sf::Packet& operator>>(sf::Packet& p, struct vec3if<I, F>& v);
 
 template<typename I, typename F>
 inline vec3if<I, F> vec3if<I, F>::operator +(const vec3if<I, F>& other) const
@@ -471,7 +471,7 @@ inline unsigned int vec3if<I, F>::operator >=(const vec3if<I, F>& other) const
 }
 
 template<typename I, typename F>
-inline std::ostream& operator <<(std::ostream& out, const struct vec3if<I, F> v)
+inline std::ostream& operator <<(std::ostream& out, const struct vec3if<I, F>& v)
 {
 	out<<"\nx: "<<v.x<<"\ny: "<<v.y<<"\nz: "<<v.z<<"\n";
 	return out;
@@ -515,7 +515,7 @@ inline float vec3if<I, F>::dot(vec3 v) const
 }
 
 template<typename I, typename F>
-inline vec3 vec3if<I, F>::operator /(vec3if<I, F> other) const
+inline vec3 vec3if<I, F>::operator /(vec3if<I, F>& other) const
 {
 	vec3 ret;
 	ret.x=(x.intpart+x.floatpart)/(other.x.intpart+other.x.floatpart);
@@ -546,8 +546,8 @@ struct chunkCoordinate
 	chunkCoordinate(const struct vec3if<I, F>& from);
 	chunkCoordinate(I X,I Y,I Z);
 
-	bool operator==(chunkCoordinate<I, F> other) const;
-	bool operator!=(chunkCoordinate<I, F> other) const;
+	bool operator==(const chunkCoordinate<I, F>& other) const;
+	bool operator!=(const chunkCoordinate<I, F>& other) const;
 };
 
 
@@ -560,7 +560,7 @@ inline chunkCoordinate<I, F>::chunkCoordinate(const struct vec3if<I, F>& from)
 }
 
 template<typename I, typename F>
-inline bool chunkCoordinate<I, F>::operator ==(chunkCoordinate<I, F> other) const
+inline bool chunkCoordinate<I, F>::operator ==(const chunkCoordinate<I, F>& other) const
 {
 	return (x==other.x)&(y==other.y)&(z==other.z);
 }
@@ -572,7 +572,7 @@ x(X),y(Y),z(Z)
 }
 
 template<typename I, typename F>
-inline bool chunkCoordinate<I, F>::operator !=(chunkCoordinate<I, F> other) const
+inline bool chunkCoordinate<I, F>::operator !=(const chunkCoordinate<I, F>& other) const
 {
 	return !((*this)==other);
 }
@@ -586,7 +586,7 @@ typedef vec3if<gridInt, float> spacevec;
 typedef chunkCoordinate<gridInt, float> chunkCoo;
 
 template<typename I, typename F>
-inline sf::Packet& operator <<(sf::Packet& p, const struct intfloat<I, F> v)
+inline sf::Packet& operator <<(sf::Packet& p, const struct intfloat<I, F>& v)
 {
 	p<<v.floatpart;
 	p<<v.intpart;
@@ -594,7 +594,7 @@ inline sf::Packet& operator <<(sf::Packet& p, const struct intfloat<I, F> v)
 }
 
 template<typename I, typename F>
-inline sf::Packet& operator >>(sf::Packet& p, struct intfloat<I, F> v)
+inline sf::Packet& operator >>(sf::Packet& p, struct intfloat<I, F>& v)
 {
 	p>>v.floatpart;
 	p>>v.intpart;
@@ -602,7 +602,7 @@ inline sf::Packet& operator >>(sf::Packet& p, struct intfloat<I, F> v)
 }
 
 template<typename I, typename F>
-inline sf::Packet& operator <<(sf::Packet& p, const struct vec3if<I, F> v)
+inline sf::Packet& operator <<(sf::Packet& p, const struct vec3if<I, F>& v)
 {
 	p<<v.x;
 	p<<v.y;
@@ -611,7 +611,7 @@ inline sf::Packet& operator <<(sf::Packet& p, const struct vec3if<I, F> v)
 }
 
 template<typename I, typename F>
-inline sf::Packet& operator >>(sf::Packet& p, struct vec3if<I, F> v)
+inline sf::Packet& operator >>(sf::Packet& p, struct vec3if<I, F>& v)
 {
 	p>>v.x;
 	p>>v.y;

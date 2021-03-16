@@ -31,6 +31,7 @@ syncID SyncableManager::getNextID()
 
 bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool continueLastCall)
 {
+	std::cout<<"begin fillUpdatePacket"<<std::endl;
 	bool iDidSomething=false;
 	if(!continueLastCall)
 	{
@@ -57,7 +58,9 @@ bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool contin
 			iDidSomething=true;
 			justUpdated(s);
 		}
+		else break;
 	}
+	std::cout<<"end fillUpdatePacket"<<std::endl;
 	return iDidSomething;
 }
 
@@ -74,6 +77,16 @@ bool SyncableManager::fillCompletePacket(sf::Packet& p)
 
 void SyncableManager::applyUpdatePacket(sf::Packet& p)
 {
+	/*
+	size_t dataSize=p.getDataSize();
+	u8 * data=(u8 *)p.getData();
+	std::cout<<"packet size: "<<dataSize<<std::endl;
+	std::cout<<"update data:"<<std::endl;
+	for(size_t i=0;i<dataSize;i++)
+	{
+		std::cout<<(int)data[i]<<" ";
+	}
+	std::cout<<std::endl;*/
 	while(!p.endOfPacket())
 	{
 		syncID sID;
@@ -82,13 +95,16 @@ void SyncableManager::applyUpdatePacket(sf::Packet& p)
 		p>>subPackLen;
 		if(exists(sID))
 		{
+			//std::cout<<"update of "<<className(syncMap[sID]->getClassID())<<" (sID="<<sID<<") with len="<<subPackLen<<std::endl;
 			syncMap[sID]->deserialize(p,*this);
 		}
 		else
 		{
+			std::cout<<"skipping "<<subPackLen<<" bytes because sID="<<sID<<" was not found"<<std::endl;
 			skipBytes(p,subPackLen);//TODO add some kind of debugging message (maybe to F3 screen)
 		}
 	}
+	//std::cout<<"end applyUpdatePacket"<<std::endl;
 }
 
 bool SyncableManager::exists(syncID sID)
@@ -98,6 +114,7 @@ bool SyncableManager::exists(syncID sID)
 
 bool SyncableManager::fetchEventPackets(sf::Packet& p)
 {
+	std::cout<<"begin fetchEventPackets"<<std::endl;
 	bool iDidSomething=false;
 	for(auto eventPacket: events)
 	{
@@ -108,6 +125,7 @@ bool SyncableManager::fetchEventPackets(sf::Packet& p)
 		iDidSomething=true;
 	}
 	events.clear();
+	std::cout<<"end fetchEventPackets"<<std::endl;
 	return iDidSomething;
 }
 
@@ -118,7 +136,7 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 	size_t dataSize=p.getDataSize();
 	u8 * data=(u8 *)p.getData();
 	std::cout<<"packet size: "<<dataSize<<std::endl;
-	std::cout<<"data:"<<std::endl;
+	std::cout<<"event data:"<<std::endl;
 	for(size_t i=0;i<dataSize;i++)
 	{
 		std::cout<<(int)data[i]<<" ";
@@ -131,7 +149,7 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 		u32 eventID;
 		p>>eventID;
 		syncID sID;
-		std::cout<<"subPackLen="<<subPackLen<<"; eventID="<<eventID<<std::endl;
+		//std::cout<<"subPackLen="<<subPackLen<<"; eventID="<<eventID<<std::endl;
 		switch(eventID)
 		{
 		case NET_GAME_EVENT_INVALID:
@@ -162,7 +180,7 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 			l->notifyNetGameEvent(p);
 		}
 	}
-	std::cout<<"end of packet"<<std::endl;
+	//std::cout<<"end of event packet"<<std::endl;
 }
 
 void SyncableManager::createSpawnEvent(Syncable* s)

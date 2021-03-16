@@ -10,6 +10,7 @@
 #define SRC_CLASSIDS_HPP_
 
 #include "ShortNames.h"
+#include <string>
 
 
 static const u32 CLASS_ID_INVALID = 0;
@@ -54,5 +55,41 @@ static const u32 CLASS_ID_BenchEntityS = 14;
 //static const u32 CLASS_ID_ = 38;
 //static const u32 CLASS_ID_ = 39;
 
+inline std::string className(u32 classID)
+{
+	switch(classID)
+	{
+	case CLASS_ID_INVALID:
+		return "invalid class";
+	case CLASS_ID_Zombie_World:
+		return "Zombie_World";
+	case CLASS_ID_Zombie_Enemy:
+		return "Zombie_Enemy";
+	case CLASS_ID_EntityProjectileBulletLike:
+		return "EntityProjectileBulletLike";
+	case CLASS_ID_Simulation_World:
+		return "Simulation_World";
+	case CLASS_ID_EntitySound:
+		return "EntitySound";
+	case CLASS_ID_EntityPlayer:
+		return "EntityPlayer";
+	case CLASS_ID_ModelEntity:
+		return "ModelEntity";
+	case CLASS_ID_TransModelEntity:
+		return "TransModelEntity";
+	case CLASS_ID_OxelEntity:
+		return "OxelEntity";
+	case CLASS_ID_Zombie_Tree:
+		return "Zombie_Tree";
+	case CLASS_ID_BenchEntitySlave:
+		return "BenchEntitySlave";
+	case CLASS_ID_BenchEntityMaster:
+		return "BenchEntityMaster";
+	case CLASS_ID_BenchEntityS:
+		return "BenchEntityS";
+	default:
+		return "unknown: classID="+classID;
+	}
+}
 
 #endif /* SRC_CLASSIDS_HPP_ */
