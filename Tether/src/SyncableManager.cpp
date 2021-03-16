@@ -213,7 +213,7 @@ sf::Packet& SyncableManager::createGenericEvent(u32 eventID)
 	return p;
 }
 
-void SyncableManager::skipBytes(sf::Packet p,u32 bytes)
+void SyncableManager::skipBytes(sf::Packet& p,u32 bytes)
 {
 	u8 dummy;
 	for(u32 i=0;i<bytes;i++)

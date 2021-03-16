@@ -53,7 +53,7 @@ class SyncableManager: public CreationDestructionListener<Entity>
 
 	Simulation * sim=nullptr;
 
-	void skipBytes(sf::Packet p,u32 bytes);
+	void skipBytes(sf::Packet& p,u32 bytes);
 
 	void createSpawnEvent(Syncable * s);//just creates the event, does not spawn itself
 	void createDeleteEvent(syncID sID);//just creates the event, does not delete itself
