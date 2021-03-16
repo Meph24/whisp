@@ -31,7 +31,6 @@ syncID SyncableManager::getNextID()
 
 bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool continueLastCall)
 {
-	std::cout<<"begin fillUpdatePacket"<<std::endl;
 	bool iDidSomething=false;
 	if(!continueLastCall)
 	{
@@ -60,7 +59,6 @@ bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool contin
 		}
 		else break;
 	}
-	std::cout<<"end fillUpdatePacket"<<std::endl;
 	return iDidSomething;
 }
 
@@ -114,7 +112,6 @@ bool SyncableManager::exists(syncID sID)
 
 bool SyncableManager::fetchEventPackets(sf::Packet& p)
 {
-	std::cout<<"begin fetchEventPackets"<<std::endl;
 	bool iDidSomething=false;
 	for(auto eventPacket: events)
 	{
@@ -125,7 +122,6 @@ bool SyncableManager::fetchEventPackets(sf::Packet& p)
 		iDidSomething=true;
 	}
 	events.clear();
-	std::cout<<"end fetchEventPackets"<<std::endl;
 	return iDidSomething;
 }
 
