@@ -314,7 +314,7 @@ bool ChunkManager::isValid(gridInt cx, gridInt cz)
 }
 
 
-void ChunkManager::postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos)
+void ChunkManager::terrainCalcs(TickServiceProvider * tsp,spacevec playerPos)
 {
 	generateMissing(chunkLoadRate,tsp->world());//TODO load rate refactor
 	setMid(playerPos,tsp->world());

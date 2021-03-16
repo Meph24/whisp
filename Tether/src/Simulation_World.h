@@ -55,7 +55,6 @@ public:
 	PerformanceMeter::SingleTimer logicTick;
 	PerformanceMeter::SingleTimer logicIntersectEval;
 	PerformanceMeter::SingleTimer logicRetick;
-	PerformanceMeter::SingleTimer logicTerrain;
 
 
 	void serialize(sf::Packet& p,bool complete);

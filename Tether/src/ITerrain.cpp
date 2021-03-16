@@ -22,7 +22,7 @@ ITerrain::~ITerrain()
 	// TODO Auto-generated destructor stub
 }
 
-void ITerrain::postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos)
+void ITerrain::terrainCalcs(TickServiceProvider * tsp,spacevec playerPos)
 {
 	//default: no calculations needed
 }

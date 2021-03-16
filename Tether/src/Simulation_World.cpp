@@ -65,7 +65,6 @@ Simulation_World::Simulation_World(const WallClock& reference_clock, Cfg& cfg)
 	logicTick=pmLogic.createTimestep			("      entity tick");
 	logicIntersectEval=pmLogic.createTimestep	("   intersect eval");
 	logicRetick=pmLogic.createTimestep			("     re+post tick");
-	logicTerrain=pmLogic.createTimestep			("    terrain calcs");
 }
 
 void Simulation_World::restart(){}
@@ -426,10 +425,6 @@ void Simulation_World::doLogic(const SimClock::time_point& next_tick_begin)
 	logicGunTick.registerTime();
 
 	doPhysics(next_tick_begin);
-
-	if(!players.empty())
-		getITerrain()->postTickTerrainCalcs(this,players.begin()->second->pos); //behavior is temporary the first player in the list, until terrain gets a better place
-	logicTerrain.registerTime();
 }
 
 void Simulation_World::spawn(Entity* e, spacevec pos)

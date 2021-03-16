@@ -47,7 +47,6 @@ public:
 	PerformanceMeter::SingleTimer logicTick;
 	PerformanceMeter::SingleTimer logicIntersectEval;
 	PerformanceMeter::SingleTimer logicRetick;
-	PerformanceMeter::SingleTimer logicTerrain;
 
 
 

@@ -80,7 +80,7 @@ public:
 	//from ITerrain interface:
 	spacevec clip(spacevec pos,bool forceGround,IWorld& iw);
 	bool hitsGround(spacevec startpoint,spacevec endpoint,IWorld& iw);
-	void postTickTerrainCalcs(TickServiceProvider * tsp,spacevec playerPos);//centers chunks on player
+	void terrainCalcs(TickServiceProvider * tsp,spacevec playerPos);//centers chunks on player
 };
 
 #endif /* SRC_CHUNKMANAGER_H_ */

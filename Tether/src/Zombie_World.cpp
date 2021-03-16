@@ -51,7 +51,6 @@ Zombie_World::Zombie_World(const WallClock& reference_clock, Cfg& cfg)
 	logicTick 			= pmLogic.createTimestep	("      entity tick");
 	logicIntersectEval 	= pmLogic.createTimestep	("   intersect eval");
 	logicRetick 		= pmLogic.createTimestep	("     re+post tick");
-	logicTerrain 		= pmLogic.createTimestep	("    terrain calcs");
 }
 
 void Zombie_World::restart()
@@ -201,9 +200,6 @@ void Zombie_World::doLogic(const SimClock::time_point& next_tick_begin)
 	logicSpawn.registerTime();
 
 	doPhysics( next_tick_begin );
-
-	if(!players.empty()) getITerrain()->postTickTerrainCalcs(this, players.begin()->second->pos);
-	logicTerrain.registerTime();
 }
 
 ITerrain* Zombie_World::getITerrain() { return &cm_; }
@@ -229,5 +225,6 @@ u32 Zombie_World::getClassID()
 
 void Zombie_World::drawOtherStuff(const SimClock::time_point& draw_time,Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
 {
+	if(!players.empty()) getITerrain()->terrainCalcs(this, players.begin()->second->pos);
     cm_.draw(draw_time, viewFrustum, iw, perspective);
 }
