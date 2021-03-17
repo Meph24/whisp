@@ -43,6 +43,8 @@ bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool contin
 		sf::Packet temp;
 		Syncable * s=getNextToUpdate();
 		if(s==nullptr) break;
+		u32 classID=s->getClassID();
+		if(!syncAllowed(classID)) break;
 		s->serialize(temp,false);
 		size_t afterAppend=curBytes+sizeof(syncID)+sizeof(u32)+temp.getDataSize();
 		assert(afterAppend==u32(afterAppend));//packet size should NEVER EVER exceed 4GB
@@ -75,16 +77,8 @@ bool SyncableManager::fillCompletePacket(sf::Packet& p)
 
 void SyncableManager::applyUpdatePacket(sf::Packet& p)
 {
-	/*
-	size_t dataSize=p.getDataSize();
-	u8 * data=(u8 *)p.getData();
-	std::cout<<"packet size: "<<dataSize<<std::endl;
-	std::cout<<"update data:"<<std::endl;
-	for(size_t i=0;i<dataSize;i++)
-	{
-		std::cout<<(int)data[i]<<" ";
-	}
-	std::cout<<std::endl;*/
+	//printPacket(p);
+	bool printed=false;
 	while(!p.endOfPacket())
 	{
 		syncID sID;
@@ -99,6 +93,11 @@ void SyncableManager::applyUpdatePacket(sf::Packet& p)
 		else
 		{
 			std::cout<<"skipping "<<subPackLen<<" bytes because sID="<<sID<<" was not found"<<std::endl;
+			if(!printed)
+			{
+				printPacket(p);
+				printed=true;
+			}
 			skipBytes(p,subPackLen);//TODO add some kind of debugging message (maybe to F3 screen)
 		}
 	}
@@ -127,17 +126,7 @@ bool SyncableManager::fetchEventPackets(sf::Packet& p)
 
 void SyncableManager::applyEventPacket(sf::Packet& p)
 {
-	/* reenable to print packet contents
-
-	size_t dataSize=p.getDataSize();
-	u8 * data=(u8 *)p.getData();
-	std::cout<<"packet size: "<<dataSize<<std::endl;
-	std::cout<<"event data:"<<std::endl;
-	for(size_t i=0;i<dataSize;i++)
-	{
-		std::cout<<(int)data[i]<<" ";
-	}
-	std::cout<<std::endl;*/
+	//printPacket(p);
 	while(!p.endOfPacket())
 	{
 		u32 subPackLen;
@@ -162,6 +151,11 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 			break;
 		case NET_GAME_EVENT_DELETE:
 			p>>sID;
+			if(!exists(sID))
+			{
+				std::cout<<"sID not found:"<<sID<<"; subPackLen="<<subPackLen<<std::endl;
+				printPacket(p);
+			}
 			assert(exists(sID));//TODO proper error handling
 			{
 				if(sender) createDeleteEvent(sID);
@@ -183,14 +177,7 @@ void SyncableManager::createSpawnEvent(Syncable* s)
 {
 	//TODO remove this hack (begin)
 	u32 classID=s->getClassID();
-	if(classID==CLASS_ID_EntitySound) return;//do not sync sound events for now
-	if(classID==CLASS_ID_ModelEntity) return;
-	if(classID==CLASS_ID_TransModelEntity) return;
-	if(classID==CLASS_ID_GridEntity) return;
-	if(classID==CLASS_ID_OxelEntity) return;
-	if(classID==CLASS_ID_BenchEntitySlave) return;
-	if(classID==CLASS_ID_BenchEntityMaster) return;
-	if(classID==CLASS_ID_BenchEntityS) return;
+	if(!syncAllowed(classID)) return;
 	//TODO remove this hack (end)
 	sf::Packet& p=createGenericEvent(NET_GAME_EVENT_SPAWN);
 	p<<s->sID;
@@ -256,6 +243,7 @@ void SyncableManager::internalSpawn(Syncable* s)
 	{
 		assert(s->sID==0);
 		s->sID=getNextID();
+		//std::cout<<"assigning sID="<<s->sID<<" to "<<className(s->getClassID())<<std::endl;
 	}
 	syncMap[s->sID]=s;
 }
@@ -355,7 +343,8 @@ void SyncableManager::notifyDestruction(Entity* obj)
 	internalRemove(obj);
 	if(sender)
 	{
-		createDeleteEvent(obj->sID);
+		if(syncAllowed(obj->getClassID()))
+			createDeleteEvent(obj->sID);
 	}
 }
 
@@ -367,6 +356,19 @@ void SyncableManager::addSim(Simulation* s)
 	internalSpawn(sim);
 	entityNotif.registerCreationDestructionListener(sim->iw.get());
 	sim->iw->entityNotif.registerCreationDestructionListener(this);
+}
+
+void SyncableManager::printPacket(sf::Packet& p)
+{
+	size_t dataSize=p.getDataSize();
+	u8 * data=(u8 *)p.getData();
+	std::cout<<"packet size: "<<dataSize<<std::endl;
+	std::cout<<"event data:"<<std::endl;
+	for(size_t i=0;i<dataSize;i++)
+	{
+		std::cout<<(int)data[i]<<" ";
+	}
+	std::cout<<std::endl;
 }
 
 Simulation* SyncableManager::setSim(Simulation* s)
@@ -387,4 +389,17 @@ Simulation* SyncableManager::removeSim()
 	Simulation * ret=sim;
 	sim=nullptr;
 	return ret;
+}
+
+bool SyncableManager::syncAllowed(u32 classID)
+{
+	if(classID==CLASS_ID_EntitySound) return false;//do not sync sound events for now
+	if(classID==CLASS_ID_ModelEntity) return false;
+	if(classID==CLASS_ID_TransModelEntity) return false;
+	if(classID==CLASS_ID_GridEntity) return false;
+	if(classID==CLASS_ID_OxelEntity) return false;
+	if(classID==CLASS_ID_BenchEntitySlave) return false;
+	if(classID==CLASS_ID_BenchEntityMaster) return false;
+	if(classID==CLASS_ID_BenchEntityS) return false;
+	return true;
 }
