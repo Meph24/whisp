@@ -64,11 +64,16 @@ class SyncableManager: public CreationDestructionListener<Entity>
 
 	bool hasEntry(u32 netGameEventID);
 
+	void printPacket(sf::Packet& p);
+
+
 
 	syncID getNextID();//never call on client side!!!
 
 	void addSim(Simulation * s);
 	Simulation * removeSim();
+
+	bool syncAllowed(u32 classID);
 
 public:
 	/* send | recv	| use case
