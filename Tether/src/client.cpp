@@ -40,9 +40,10 @@ void ClientApp::run()
         cout << "\rSimulation received!\n";
     }
 
-    user.operateSimulation(*client.syncman.getSim());;
+    if(!client.syncman.getSim()) throw std::runtime_error("Simulation expected on client!");
 
-    while(user.window.isOpen())
+    user.perspective = std::make_unique<Perspective>( user, *client.syncman.getSim(), nullptr);
+    while(user.window.isOpen() && client.syncman.getSim())
     {
         if(!client.avatar())
         {
@@ -53,15 +54,16 @@ void ClientApp::run()
         {
             glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
         }
+        user.perspective->setAvatar(client.avatar());
 
         client.processCyclicSync();
-        client.sendInput(&user);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         user.draw();
         user.window.display();
 
         user.pollEvents();
+        client.sendInput(&user);
     }
 }
 

@@ -116,10 +116,14 @@ void DefaultApp::run()
 
 	sim->init();
 
+	local_user.perspective = std::make_unique<Perspective>(local_user, *sim);
+
 	while (local_user.window.isOpen())
 	{
 		//render
 		sim->step();
+
+		local_user.perspective->setAvatar(sim->userAvatar(&local_user));
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		local_user.draw();

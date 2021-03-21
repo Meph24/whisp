@@ -13,6 +13,7 @@ HostApp::HostApp(WallClock& wc, Cfg& cfg, Port port)
 	, local_user(cfg, *cfg.getStr("general", "application_name") + string(" - Host"),
         *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"))
 {
+    local_user.window.setPos({500,0});
     std::cout << "Initializing Host Application !\n";
 
 	int zombie_mode = *cfg.getInt("test", "zombie_mode");
@@ -38,11 +39,15 @@ void HostApp::run()
 
     simulation->init();
 
+    local_user.perspective = std::make_unique<Perspective>( local_user, *simulation );
+
     while(local_user.window.isOpen())
     {
         simulation->step();
 
-        server.process(); 
+        server.process();
+
+        local_user.perspective->setAvatar(simulation->userAvatar(&local_user));
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         local_user.draw();

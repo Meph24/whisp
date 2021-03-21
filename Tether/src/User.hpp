@@ -40,7 +40,7 @@ struct LocalUser : public SimulationUser , public InputDeviceConfigurator
 
 	//impl User
 	unique_ptr<Perspective> perspective;
-	void operateSimulation(Simulation& simulation);
+	void operateSimulation( Simulation& simulation );
 	void disconnectSimulation();
 
 	unique_ptr<EventMapper> event_mapper;

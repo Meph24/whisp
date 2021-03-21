@@ -14,9 +14,8 @@ void RemoteControlReceiverUser::operateSimulation(Simulation* simulation)
 	if(!simulation) return;
 
 	this->simulation = simulation;
-	simulation->registerUser(this);
+	simulation->makeAvatarFor(this);
 	if(!avatar()) { std::cerr << "User could not be registered in Simulation!" << std::endl; }
-	perspective = simulation->getPerspective(this);
 }
 
 void RemoteControlReceiverUser::disconnectSimulation()
@@ -24,7 +23,7 @@ void RemoteControlReceiverUser::disconnectSimulation()
 	if(!this->simulation) return;
 
 	perspective.reset();
-	simulation->kickUser(this);
+	simulation->disconnectAvatarFrom(this);
 	simulation = nullptr;
 }
 

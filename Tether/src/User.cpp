@@ -46,16 +46,6 @@ LocalUser::LocalUser(
 	glDepthMask(GL_TRUE);
 	glAlphaFunc(GL_GREATER, 0.02f);
 	glEnable(GL_ALPHA_TEST);
-}
-
-void LocalUser::operateSimulation(Simulation& simulation)
-{
-	if(this->simulation) return;
-
-	this->simulation = &simulation;
-	simulation.registerUser(this);
-	if(!avatar()) { std::cerr << "User could not be registered in Simulation!" << std::endl; }
-	perspective = simulation.getPerspective(this);
 
 	event_mapper.reset(new EventMapper(input_status));
 
@@ -89,7 +79,8 @@ void LocalUser::operateSimulation(Simulation& simulation)
 
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_F3,
-		Act::Toggle(&input_status.debug_screen_active)
+		[&](EVENTMAPPING_FUNCTION_PARAMETERS){ if(perspective) perspective->enable_debug = !perspective->enable_debug; },
+		Cond::keyPressed
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_R,
@@ -120,7 +111,8 @@ void LocalUser::operateSimulation(Simulation& simulation)
 
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_B,
-		Act::Toggle(&input_status.draw_aabbs)
+		[&](EVENTMAPPING_FUNCTION_PARAMETERS){ if(perspective) perspective->enable_aabbs = !perspective->enable_aabbs; },
+		Cond::keyPressed
 	);
 
 	event_mapper->registerMapping(
@@ -133,7 +125,8 @@ void LocalUser::operateSimulation(Simulation& simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_MOUSE_RMB,
-		Act::Toggle(&perspective->zoomed)
+		[&](EVENTMAPPING_FUNCTION_PARAMETERS){ if(perspective) perspective->zoomed = !perspective->zoomed; },
+		Cond::keyPressed
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_MOUSE_WHEEL,
@@ -149,7 +142,8 @@ void LocalUser::operateSimulation(Simulation& simulation)
 	);
 	event_mapper->registerMapping(
 		EVENT_ID_KEY_F2,
-		Act::Toggle(&perspective->enable_third_person)
+		[&](EVENTMAPPING_FUNCTION_PARAMETERS){ if(perspective) perspective->setThirdPerson(!perspective->isThirdPerson()); },
+		Cond::keyPressed
 	);
 
 	auto& container = mouse_mode_mappings[ InputDeviceConfigurator::MouseMode::diff ];
@@ -170,9 +164,17 @@ void LocalUser::operateSimulation(Simulation& simulation)
 	setMouseMode( MouseMode::diff );
 }
 
+void LocalUser::operateSimulation(Simulation& simulation)
+{
+	if(this->simulation) return;
+
+	this->simulation = &simulation;
+	simulation.makeAvatarFor(this);
+}
+
 void LocalUser::disconnectSimulation()
 {
-	simulation->kickUser(this);
+	simulation->disconnectAvatarFrom(this);
 	perspective.reset();
 	event_mapper.reset();
 }
@@ -235,7 +237,5 @@ vec2 LocalUser::turnSensitivity() const
 void LocalUser::draw()
 {
 	if (! perspective) return;
-	perspective->enableAABBDrawing(input_status.draw_aabbs);
-	perspective->enableDebugScreen(input_status.debug_screen_active);
 	perspective->draw();
 }

@@ -225,6 +225,6 @@ u32 Zombie_World::getClassID()
 
 void Zombie_World::drawOtherStuff(const SimClock::time_point& draw_time,Frustum* viewFrustum, IWorld& iw, Perspective& perspective)
 {
-	if(!players.empty()) getITerrain()->terrainCalcs(this, players.begin()->second->pos);
+	if(perspective.avatar_) getITerrain()->terrainCalcs(this, perspective.avatar_->pos);
     cm_.draw(draw_time, viewFrustum, iw, perspective);
 }

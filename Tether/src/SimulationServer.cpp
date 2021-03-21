@@ -66,6 +66,8 @@ void SimulationServer::process()
     }
 }
 
+#include "SimulationInputStatusSet.hpp"
+
 void SimulationServer::receiveClientInputs()
 {
     sf::Packet newpacket;
@@ -83,7 +85,12 @@ void SimulationServer::receiveClientInputs()
         client.latency_ = header.server_time - wc.now();
         client.last_client_time = max(header.client_time, client.last_client_time);
 
-        newpacket >> client.user.input_status;
+        SimulationInputStatusSet status_set;
+        newpacket >> status_set;
+        if(status_set.timestamp >= client.user.input_status.timestamp)
+        {
+            client.user.input_status = status_set;
+        }
     }
 }
 
@@ -105,10 +112,12 @@ void SimulationServer::broadcastTcp(sf::Packet& p)
 
 void SimulationServer::broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&& packet)
 {
-    syncprotocol::udp::Header header; header.server_time = wc.now();
+    syncprotocol::udp::Header header;
     for(auto& c : clients.connections)
     {
+        header.server_time = wc.now();
         header.client_time = c->last_client_time;
+        packet->setHeader(header);
         udpsocket.send(*packet, c->tcpsocket.getRemoteAddress(), c->udpport);
     }
     packet.reset();

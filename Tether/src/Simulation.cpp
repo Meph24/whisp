@@ -31,22 +31,7 @@ Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg)
 	: Simulation(reference_clock,cfg,unique_ptr<IWorld>() )
 {}
 
-unique_ptr<Perspective> Simulation::getPerspective( LocalUser* user )
-{
-	if(!user) return nullptr;
-	if(!user->simulation) return nullptr;
-
-	{
-		lock_guard lg_ (players_lock);	
-		if( players.find(user) == players.end() ) return nullptr;
-	}
-
-	return std::make_unique<Perspective>( user->window, *user);
-}
-
-void Simulation::onRegisterUser( SimulationUser* ){}
-
-EntityPlayer* Simulation::registerUser(SimulationUser* user, spacevec spawn_pos)
+EntityPlayer* Simulation::makeAvatarFor(SimulationUser* user, spacevec spawn_pos)
 { 
 	lock_guard lg_ (players_lock);	
 	if( players.find(user) != players.end() ) return nullptr;
@@ -60,7 +45,6 @@ EntityPlayer* Simulation::registerUser(SimulationUser* user, spacevec spawn_pos)
 	players[user] = newentityplayer.get();
 	players[user]->setUser(user);
 	newentityplayer.release();
-	onRegisterUser(user);
 	return players[user];
 }
 
@@ -71,7 +55,7 @@ EntityPlayer* Simulation::userAvatar(SimulationUser* user)
 	return (f == players.end())? nullptr : f->second;
 }
 
-void Simulation::kickUser( SimulationUser* to_kick_user )
+void Simulation::disconnectAvatarFrom( SimulationUser* to_kick_user )
 { 
 	lock_guard lg_ (players_lock);	
 	players.erase(to_kick_user);

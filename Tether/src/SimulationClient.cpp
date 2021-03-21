@@ -1,5 +1,7 @@
 #include "SimulationClient.hpp"
 
+#include "EntityPlayer.h"
+
 SimulationClient::SimulationClient(WallClock& wc, Cfg& cfg)
     : wc(wc)
     , name(*cfg.getStr("client", "name"))
@@ -56,7 +58,10 @@ void SimulationClient::processCyclicSync()
 EntityPlayer* SimulationClient::avatar() const
 {
     auto f = syncman.syncMap.find(connection.client_token.avatar_syncid);
-    return ( f == syncman.syncMap.end() )? nullptr : (EntityPlayer*) f->second;
+
+    return 
+        ( f == syncman.syncMap.end() )? 
+        nullptr : static_cast<EntityPlayer*>(f->second);
 }
 
 #include "FloatSeconds.hpp"
