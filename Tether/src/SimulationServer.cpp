@@ -53,12 +53,13 @@ void SimulationServer::process()
 
     if(!clients.connections.empty())
     {
+        const WallClock::time_point& server_time = wc.now();
         unique_ptr<syncprotocol::udp::Packet> udp_packet = std::make_unique<syncprotocol::udp::Packet>();
         i64 bytes = 0;
         if( syncman->fillUpdatePacket(*udp_packet, upload_budget.current() / clients.connections.size()) )
         {
             bytes = udp_packet->getDataSize() * clients.connections.size();
-            broadcastUdp(std::move(udp_packet));
+            broadcastUdp(std::move(udp_packet), server_time);
         }
         upload_budget.used(bytes);
 
@@ -110,12 +111,11 @@ void SimulationServer::broadcastTcp(sf::Packet& p)
     }
 }
 
-void SimulationServer::broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&& packet)
+void SimulationServer::broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&& packet, const WallClock::time_point& server_time)
 {
-    syncprotocol::udp::Header header;
+    syncprotocol::udp::Header header{ server_time, server_time };
     for(auto& c : clients.connections)
     {
-        header.server_time = wc.now();
         header.client_time = c->last_client_time;
         packet->setHeader(header);
         udpsocket.send(*packet, c->tcpsocket.getRemoteAddress(), c->udpport);

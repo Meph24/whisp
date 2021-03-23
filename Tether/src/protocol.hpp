@@ -69,11 +69,11 @@ namespace syncprotocol {
         struct Packet : public sf::Packet
         {
             Packet();
+            Packet( const Header& h );
             using sf::Packet::operator<<;
             using sf::Packet::operator>>;
             void setHeader(const Header&);
         };
-
         sf::Packet& operator<<(sf::Packet& p, const Header& h);
         sf::Packet& operator>>(sf::Packet& p, Header& h);
     } // namespace udp

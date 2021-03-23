@@ -69,6 +69,7 @@ void ServerConnection::disconnect()
 
 bool ServerConnection::connected() const { return tcpsocket.getRemoteAddress() != sf::IpAddress::None; }
 
+const WallClock::time_point& ServerConnection::latestServerTime() const { return latest_server_time; }
 const WallClock::duration& ServerConnection::latency() const { return latency_; }
 
 unique_ptr<sf::Packet> ServerConnection::receiveUdp()
@@ -95,7 +96,5 @@ unique_ptr<sf::Packet> ServerConnection::receiveUdp()
 
 bool ServerConnection::sendUdp( syncprotocol::udp::Packet& p ) 
 { 
-    syncprotocol::udp::Header header {latest_server_time, client.wc.now()};
-    p.setHeader(header);
     return sf::Socket::Status::Done == udpsocket.send(p, tcpsocket.getRemoteAddress(), server_info.udpport); 
 }

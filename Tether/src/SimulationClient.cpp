@@ -73,7 +73,12 @@ void SimulationClient::sendInput(SimulationUser* user)
 
     if( upload_budget.current() < (int) sizeof(user->input_status) ) return;
 
-    syncprotocol::udp::Packet new_packet;
+    syncprotocol::udp::Header header {connection.latestServerTime(), wc.now()};
+    syncprotocol::udp::Packet new_packet( header );
+
+    //this timestamp is redundant
+    //it is in, bc InputStatusSet had and has its own timestamp for remotecontrol.
+    // we need to evaluate how we remove this redundancy at some point
     user->input_status.timestamp = wc.now().time_since_epoch().count();
     new_packet << user->input_status;
     connection.sendUdp( new_packet );
