@@ -62,20 +62,15 @@ namespace syncprotocol
     }
 
     namespace udp {
-
-        Packet::Packet()
-        {
-            Header h;
-            *this << h;
-        }
+        Packet::Packet() : Packet(Header()) {}
+        Packet::Packet( const Header& h ){ *this << h; }
         sf::Packet& operator<<(sf::Packet& p, const Header& h){ return p << h.server_time << h.client_time; }
         sf::Packet& operator>>(sf::Packet& p, Header& h){ return p >> h.server_time >> h.client_time; }
         void Packet::setHeader(const Header& h)
         {
-            Header* headerptr = (Header*) const_cast<void*> (getData());
-            *headerptr = h;
+            Packet dummy(h);
+            std::memcpy(const_cast<void*>(getData()), dummy.getData(), dummy.getDataSize());
         }
-
     } // namespace udp
 
 } // namespace syncprotocol

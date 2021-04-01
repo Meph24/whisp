@@ -44,12 +44,9 @@ public:
             IWorld& iw,
             Perspective& perspective);
 
-	unique_ptr<Perspective> getPerspective( LocalUser* user );
-
-	EntityPlayer* registerUser(SimulationUser* , spacevec spawn_pos = spacevec());
+	EntityPlayer* makeAvatarFor(SimulationUser* , spacevec spawn_pos = spacevec());
 	EntityPlayer* userAvatar(SimulationUser* user);
-	virtual void onRegisterUser( SimulationUser* );
-	void kickUser(SimulationUser* to_kick_user);
+	void disconnectAvatarFrom(SimulationUser* to_kick_user);
 
 	void serialize(sf::Packet& p,bool complete);
 	void deserialize(sf::Packet& p,SyncableManager & sm);

@@ -35,7 +35,7 @@ struct SimulationServer
 
 private:
     void broadcastTcp(sf::Packet&);
-    void broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&&);
+    void broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&&, const WallClock::time_point& server_time);
 
     void receiveClientInputs();
 };

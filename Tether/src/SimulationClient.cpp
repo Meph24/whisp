@@ -1,5 +1,7 @@
 #include "SimulationClient.hpp"
 
+#include "EntityPlayer.h"
+
 SimulationClient::SimulationClient(WallClock& wc, Cfg& cfg)
     : wc(wc)
     , name(*cfg.getStr("client", "name"))
@@ -56,7 +58,10 @@ void SimulationClient::processCyclicSync()
 EntityPlayer* SimulationClient::avatar() const
 {
     auto f = syncman.syncMap.find(connection.client_token.avatar_syncid);
-    return ( f == syncman.syncMap.end() )? nullptr : (EntityPlayer*) f->second;
+
+    return 
+        ( f == syncman.syncMap.end() )? 
+        nullptr : static_cast<EntityPlayer*>(f->second);
 }
 
 #include "FloatSeconds.hpp"
@@ -68,7 +73,12 @@ void SimulationClient::sendInput(SimulationUser* user)
 
     if( upload_budget.current() < (int) sizeof(user->input_status) ) return;
 
-    syncprotocol::udp::Packet new_packet;
+    syncprotocol::udp::Header header {connection.latestServerTime(), wc.now()};
+    syncprotocol::udp::Packet new_packet( header );
+
+    //this timestamp is redundant
+    //it is in, bc InputStatusSet had and has its own timestamp for remotecontrol.
+    // we need to evaluate how we remove this redundancy at some point
     user->input_status.timestamp = wc.now().time_since_epoch().count();
     new_packet << user->input_status;
     connection.sendUdp( new_packet );

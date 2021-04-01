@@ -7,12 +7,12 @@ void SyncUser::operateSimulation(Simulation& simulation)
     if(this->simulation) return;
 
     this->simulation = &simulation;
-    simulation.registerUser(this);
+    simulation.makeAvatarFor(this);
     if(!avatar()) { std::cerr << "User could not be registered in Simulation!" << std::endl; }
 }
 void SyncUser::disconnectSimulation()
 {
-    simulation->kickUser(this);
+    simulation->disconnectAvatarFrom(this);
 }
 
 FullIPv4 ClientConnection::remoteUdpFullip() const

@@ -22,6 +22,7 @@ using std::unique_ptr;
 
 class ITexture;
 class Simulation;
+class LocalUser;
 
 //use with caution: when using this, code sections outside of these regions are called twice
 #define TRANSPARENT_SECTION_DO_LATER(priority) \
@@ -39,16 +40,26 @@ struct Perspective
 	bool enable_aabbs = false;
 	bool enable_hud = true;
 	bool enable_debug = false;
-	bool enable_third_person = false;
 	bool zoomed = false;
 	float zoom_mult = 8.0f;
 
 	static const float default_zoom;
 
+	//regarding first and third person
+private:
+	bool is_third_person = false;
 	float third_person_distance_min = 2;
 	float third_person_distance_max = 20;
+	float third_person_distance = 5;
 
-	SimulationUser* user;
+public:
+	bool isThirdPerson() const;
+	void setThirdPerson(bool b = false);
+	void setTargetThirdPersonDistance(float meters);
+
+	LocalUser& user;
+	EntityPlayer* avatar_ = nullptr;
+	Simulation& simulation;
 
 	Graphics2D graphics2d;
 	unique_ptr<CameraTP> camera;
@@ -69,13 +80,9 @@ struct Perspective
 
 //----------------------
 
-	Perspective(Window& window, SimulationUser& user);
+	Perspective(LocalUser& user, Simulation& simulation, EntityPlayer* avatar = nullptr);
 
-	void enableAABBDrawing(bool b = false);
-	void enableDebugScreen(bool b = false);
-	void enableHUD(bool b = true);
-	bool isThirdPerson() const;
-
+	void setAvatar(EntityPlayer* avatar);
 
 	vec3 forwardVec();
 	vec3 upVec();
@@ -98,8 +105,7 @@ private:
 	DebugScreen dsLogic;
 
 	//helps setting camera values correctly
-	void enableThirdPerson(bool b = false);
-	void setThirdPersonDistance(float meters);
+	void configureCameraPerson(bool third_person = false);
 };
 
 #endif /* SRC_DRAWSERVICEPROVIDER_H_ */

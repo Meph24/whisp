@@ -23,6 +23,7 @@ struct ServerConnection
     void disconnect();
     bool connected() const;
 
+    const WallClock::time_point& latestServerTime() const;
     const WallClock::duration& latency() const;
 
     bool sendUdp(syncprotocol::udp::Packet&);

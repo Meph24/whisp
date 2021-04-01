@@ -1,5 +1,7 @@
 #include "Perspective.hpp"
 
+#include <algorithm>
+
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
 
@@ -13,21 +15,21 @@
 #include "WarnErrReporter.h"
 #include "Zombie_Gun.h"
 
+using std::min; using std::max;
+
 const float Perspective::default_zoom = 1.0f;
 
-Perspective::Perspective(Window& window, SimulationUser& user_)
-	: user(&user_)
-	, graphics2d(64, window.width() / window.height())
-	, camera(std::make_unique<CameraTP>( user->avatar()->eye ))
+Perspective::Perspective(LocalUser& user, Simulation& simulation, EntityPlayer* avatar)
+	: user(user)
+	, avatar_(avatar)
+	, simulation(simulation)
+	, graphics2d(64, user.window.width() / user.window.height())
+	, camera(nullptr)
 	, pmGraphics(8s, 1s)
 	, dsGraphics(&pmGraphics, &graphics2d)
-	, dsLogic(&user->simulation->pmLogic, &graphics2d)
+	, dsLogic(&user.simulation->pmLogic, &graphics2d)
 {
-	enableThirdPerson(enable_third_person);
-	camera->height=window.height();
-	camera->width=window.width();
-	camera->maxView=1024*8;
-	camera->zoom=Perspective::default_zoom;
+	if(avatar) setAvatar(avatar);
 
 	timer_graphics=pmGraphics.createTimestep		("            other");
 	timer_graphics.setAsRoundtripMarker				("Total render time");
@@ -36,15 +38,21 @@ Perspective::Perspective(Window& window, SimulationUser& user_)
 	timer_graphics_flush=pmGraphics.createTimestep	(" GPU work + syncs");
 }
 
-void Perspective::enableAABBDrawing(bool b){ enable_aabbs = b; }
-void Perspective::enableDebugScreen(bool b){ enable_debug = b; }
-void Perspective::enableHUD(bool b){ enable_hud = b; }
-
-void Perspective::enableThirdPerson(bool on)
+bool Perspective::isThirdPerson() const { return is_third_person; }
+void Perspective::setThirdPerson(bool b)
 {
-	if(on)
+	if(b == is_third_person) return;
+
+	configureCameraPerson(b);
+	is_third_person = b;
+}
+
+void Perspective::configureCameraPerson(bool third_person)
+{
+	if(!camera) return;
+	if(third_person)
 	{
-		setThirdPersonDistance(4.0f);
+		camera->dist = third_person_distance;
 		camera->minView=0.5f;
 	}
 	else
@@ -54,16 +62,9 @@ void Perspective::enableThirdPerson(bool on)
 	}
 }
 
-void Perspective::setThirdPersonDistance(float meters)
+void Perspective::setTargetThirdPersonDistance(float meters)
 {
-	if(meters > third_person_distance_max) meters = third_person_distance_max;
-	if(meters < third_person_distance_min) meters = third_person_distance_min;
-	camera->dist = meters;
-}
-
-bool Perspective::isThirdPerson() const
-{
-	return camera->dist >= third_person_distance_min;
+	third_person_distance = max(min(meters, third_person_distance_max), third_person_distance_min);
 }
 
 void Perspective::drawGameOver()
@@ -76,7 +77,7 @@ void Perspective::drawGameOver()
 
 	char scoreString[8];
 
-	int scoreTemp = user->avatar()->score;
+	int scoreTemp = avatar_? avatar_->score : 0 ;
 	for (int i = 0; i < 8; i++)
 	{
 		scoreString[7 - i] = (scoreTemp % 10) + '0';
@@ -91,10 +92,11 @@ unique_ptr<Frustum> Perspective::newFrustumApplyPerspective(	SimClock::time_poin
 															bool fresh,
 															float viewDistRestriction	)
 {
+	if(!avatar_ || !camera) return nullptr;
 	float zoom_factor=zoomed?zoom_mult:1;
 	camera->zoom=default_zoom/zoom_factor;
-	float time=(float)FloatSeconds(t-user->avatar()->last_ticked);
-	spacevec curPos= user->avatar()->pos + user->avatar()->v*time;
+	float time=(float)FloatSeconds(t-avatar_->last_ticked);
+	spacevec curPos= avatar_->pos; // + avatar_->v*time;
 
 
 	if(fresh) camera->applyFresh();
@@ -132,7 +134,7 @@ unique_ptr<Frustum> Perspective::newFrustumApplyPerspective(	SimClock::time_poin
 void Perspective::draw()
 {
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
-	if( user->avatar()->HP < 0 ) drawGameOver();
+	if( !avatar_ || avatar_->HP < 0 ) drawGameOver();
 	else
 	{
 		drawAvatarPerspective();
@@ -142,12 +144,9 @@ void Perspective::draw()
 
 void Perspective::drawAvatarPerspective()
 {
-	EntityPlayer* avatar = user->avatar();
-	Simulation* simulation = user->simulation;
+	if(!avatar_) return;
 
-	const SimClock::time_point t = user->simulation->clock.now();
-
-	enableThirdPerson(enable_third_person);
+	const SimClock::time_point t = simulation.clock.now();
 
 	glMatrixMode(GL_MODELVIEW);      // To operate on Model-View matrix
 
@@ -156,24 +155,26 @@ void Perspective::drawAvatarPerspective()
 	unique_ptr<Frustum> viewFrustum =
 		newFrustumApplyPerspective(t, true); //TODO dangerouse allocations and ownership transferation
 
-	user->simulation->iw->draw(t, viewFrustum.get(), simulation->world(), *this);
-	simulation->drawOtherStuff(t,viewFrustum.get(),simulation->world(),*this);
+	if(!viewFrustum) return;
+
+	simulation.iw->draw(t, viewFrustum.get(), simulation.world(), *this);
+	simulation.drawOtherStuff(t,viewFrustum.get(), simulation.world(),*this);
 
 	timer_graphics_world.registerTime();
 
 	if(isThirdPerson())
-		avatar->draw( t, viewFrustum.get(), simulation->world() , *this );
+		avatar_->draw( t, viewFrustum.get(), simulation.world() , *this );
 
 	if(enable_debug)
 	{
-		simulation->pmLogic.draw(t, viewFrustum.get(), simulation->world(), *this);
+		simulation.pmLogic.draw(t, viewFrustum.get(), simulation.world(), *this);
 
 		transformViewToGUI(1.0f);
 		glColor3f(1, 0, 1);
 		glEnable(GL_TEXTURE_2D);
-		vec3 ppos = simulation->world().toMeters(user->avatar()->pos);
+		vec3 ppos = simulation.world().toMeters(avatar_->pos);
 		int offset=dsGraphics.draw(ppos.x, ppos.y, ppos.z, 0);
-		dsLogic.draw(avatar->pos.x.intpart,avatar->pos.y.intpart,avatar->pos.z.intpart,offset);
+		dsLogic.draw(avatar_->pos.x.intpart,avatar_->pos.y.intpart,avatar_->pos.z.intpart,offset);
 		glDisable(GL_TEXTURE_2D);
 		revertView();
 	}
@@ -186,14 +187,13 @@ void Perspective::drawAvatarPerspective()
 
 void Perspective::drawHUD()
 {
-	EntityPlayer* avatar = user->avatar();
-
+	if(!avatar_) return;
 	glEnable(GL_TEXTURE_2D);
 	transformViewToGUI();
 	glColor3f(0, 1, 0);
 	glPushMatrix();
 	char scoreString[8];
-	int scoreTemp = avatar->score;
+	int scoreTemp = avatar_->score;
 	for (int i = 0; i < 8; i++)
 	{
 		scoreString[7 - i] = (scoreTemp % 10)+'0';
@@ -202,7 +202,7 @@ void Perspective::drawHUD()
 	graphics2d.drawString("score:", -0.8f, 0.8f, 0.1f);
 	graphics2d.drawString(scoreString, -0.8f, 0.62f, 0.1f, 8);
 
-	scoreTemp = avatar->HP;
+	scoreTemp = avatar_->HP;
 	for (int i = 0; i < 3; i++)
 	{
 		scoreString[7 - i] = (scoreTemp % 10) + '0';
@@ -213,7 +213,8 @@ void Perspective::drawHUD()
 
 	glColor3f(1, 1, 0);
 	string current_weapon_name = "None";
-	if(avatar->current_gun) current_weapon_name = avatar->current_gun->name;
+	if(avatar_->current_gun)
+		current_weapon_name = avatar_->current_gun->name;
 	graphics2d.drawString("Weapon:", 0.6f, -0.66f, 0.1f);
 	graphics2d.drawString(current_weapon_name, 0.6f, -0.82f, 0.1f);
 
@@ -223,7 +224,7 @@ void Perspective::drawHUD()
 	int crosshairAmount = 4;
 
 	glDisable(GL_TEXTURE_2D);
-	glColor3f(1, avatar->hitmark, 0);
+	glColor3f(1, avatar_->hitmark, 0);
 
 	glPushMatrix();
 	for (int i = 0; i < crosshairAmount; i++)
@@ -282,4 +283,21 @@ void Perspective::doTransparentCallbacks(const SimClock::time_point& t,Frustum *
 		e.second->draw(t, viewFrustum, iw, *this);
 	}
 	isTransparentPass=false;
+}
+
+void Perspective::setAvatar(EntityPlayer* avatar)
+{
+	avatar_ = avatar;
+	if(!avatar_) return;
+
+	if(!camera)
+	{
+		camera = std::make_unique<CameraTP>( avatar_->eye );
+
+		camera->height=user.window.height();
+		camera->width=user.window.width();
+		camera->maxView=1024*8;
+		camera->zoom=Perspective::default_zoom;
+	}
+	configureCameraPerson( is_third_person );
 }
