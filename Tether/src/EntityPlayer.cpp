@@ -78,6 +78,7 @@ void EntityPlayer::selectWeapon(size_t selection)
 
 void EntityPlayer::draw(const SimClock::time_point& draw_time,Frustum * viewFrustum,IWorld& iw, Perspective& perspective)
 {
+	if(this == perspective.avatar_ && perspective.camera->dist < 0.1) return; //in first person we do not want to see ourselves
 	float tickOffset = (float) FloatSeconds(draw_time-last_ticked);
 
 	spacevec interPos = pos + v*tickOffset - viewFrustum->observerPos;

@@ -96,7 +96,7 @@ unique_ptr<Frustum> Perspective::newFrustumApplyPerspective(	SimClock::time_poin
 	float zoom_factor=zoomed?zoom_mult:1;
 	camera->zoom=default_zoom/zoom_factor;
 	float time=(float)FloatSeconds(t-avatar_->last_ticked);
-	spacevec curPos= avatar_->pos; // + avatar_->v*time;
+	spacevec curPos= avatar_->pos + avatar_->v*time;
 
 
 	if(fresh) camera->applyFresh();
@@ -161,9 +161,6 @@ void Perspective::drawAvatarPerspective()
 	simulation.drawOtherStuff(t,viewFrustum.get(), simulation.world(),*this);
 
 	timer_graphics_world.registerTime();
-
-	if(isThirdPerson())
-		avatar_->draw( t, viewFrustum.get(), simulation.world() , *this );
 
 	if(enable_debug)
 	{
