@@ -442,12 +442,6 @@ Entity* Simulation_World::getTarget(const Entity* enemy)
 	return nullptr;
 }
 
-void Simulation_World::serialize(sf::Packet& p, bool complete)
-{}
-
-void Simulation_World::deserialize(sf::Packet& p, SyncableManager& sm)
-{}
-
 void Simulation_World::getReferencedSyncables(std::vector<Syncable*> collectHere)
 {}
 

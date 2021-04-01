@@ -43,7 +43,7 @@ Syncable* SyncableFactory::createFromPacket(sf::Packet& p,syncID sID, SyncableMa
 	case CLASS_ID_Zombie_World:
 		assert(sm.refClock);
 		assert(sm.config);
-		asSim=new Zombie_World(*sm.refClock, *sm.config);
+		asSim=new Zombie_World(*sm.refClock, *sm.config,&p);
 		ret=asSim;
 		break;
 	case CLASS_ID_Zombie_Enemy:

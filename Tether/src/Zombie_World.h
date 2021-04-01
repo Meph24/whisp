@@ -31,7 +31,7 @@ class Zombie_World: public Simulation
 	void doLogic(const SimClock::time_point& t);
 
 public:
-	Zombie_World(const WallClock& reference_clock, Cfg& cfg);
+	Zombie_World(const WallClock& reference_clock, Cfg& cfg,sf::Packet * p=nullptr);
 	~Zombie_World() = default;
 
 	void spawnZombie(const SimClock::time_point& t);
@@ -49,9 +49,6 @@ public:
 	PerformanceMeter::SingleTimer logicRetick;
 
 
-
-	void serialize(sf::Packet& p,bool complete);
-	void deserialize(sf::Packet& p,SyncableManager & sm);
 	void getReferencedSyncables(std::vector<Syncable *> collectHere);
 	u32 getClassID();
 

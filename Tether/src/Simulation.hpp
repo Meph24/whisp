@@ -32,8 +32,8 @@ public:
 
 	PerformanceMeter pmLogic;
 
-	Simulation(const WallClock& reference_clock, Cfg& cfg,unique_ptr<IWorld> iW);
-	Simulation(const WallClock& reference_clock, Cfg& cfg);
+	Simulation(const WallClock& reference_clock, Cfg& cfg,unique_ptr<IWorld> iW,sf::Packet * p=nullptr);//TODO
+	Simulation(const WallClock& reference_clock, Cfg& cfg,sf::Packet * p=nullptr);
 
 	virtual ~Simulation() = default;
 
@@ -51,6 +51,8 @@ public:
 	virtual void onRegisterUser( SimulationUser* );
 	void kickUser(SimulationUser* to_kick_user);
 
+	void serialize(sf::Packet& p,bool complete);
+	void deserialize(sf::Packet& p,SyncableManager & sm);
 	virtual void getOwnedSyncables(std::vector<Syncable *> collectHere);
 
 	virtual IWorld& world();

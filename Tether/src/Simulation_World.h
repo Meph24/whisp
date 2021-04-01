@@ -56,9 +56,6 @@ public:
 	PerformanceMeter::SingleTimer logicIntersectEval;
 	PerformanceMeter::SingleTimer logicRetick;
 
-
-	void serialize(sf::Packet& p,bool complete);
-	void deserialize(sf::Packet& p,SyncableManager & sm);
 	void getReferencedSyncables(std::vector<Syncable *> collectHere);
 	u32 getClassID();
 

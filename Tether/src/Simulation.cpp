@@ -13,8 +13,9 @@ using std::lock_guard;
 using std::unique_ptr;
 using std::pair;
 
-Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg,unique_ptr<IWorld> iW)
-	: clock(reference_clock, /* rate */ 0.0f, 200ms, 20ms)
+
+Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg,unique_ptr<IWorld> iW,sf::Packet * p)
+	: clock(reference_clock, /* rate */ 0.0f, 200ms, 20ms,p)
 	, cfg(cfg)
 	, iw(std::move(iW))//iw(iW)
 	, pmLogic(1s, 8s)
@@ -27,8 +28,8 @@ Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg,unique_ptr<IWo
 	std::cout<<"sim2"<<std::endl;
 }
 
-Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg)
-	: Simulation(reference_clock,cfg,unique_ptr<IWorld>() )
+Simulation::Simulation(const WallClock& reference_clock, Cfg& cfg,sf::Packet * p)
+	: Simulation(reference_clock,cfg,unique_ptr<IWorld>(),p )
 {}
 
 unique_ptr<Perspective> Simulation::getPerspective( LocalUser* user )
@@ -88,4 +89,14 @@ void Simulation::drawOtherStuff(const SimClock::time_point& draw_time,Frustum* v
 IWorld& Simulation::world()
 {
 	return *iw;
+}
+
+void Simulation::serialize(sf::Packet& p, bool complete)
+{
+	clock.serialize(p,complete);
+}
+
+void Simulation::deserialize(sf::Packet& p, SyncableManager& sm)
+{
+	clock.deserialize(p,sm);
 }

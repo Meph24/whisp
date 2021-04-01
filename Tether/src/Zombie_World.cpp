@@ -32,8 +32,8 @@
 using std::cout;
 using std::lock_guard;
 
-Zombie_World::Zombie_World(const WallClock& reference_clock, Cfg& cfg)
-	: Simulation(reference_clock, cfg)
+Zombie_World::Zombie_World(const WallClock& reference_clock, Cfg& cfg,sf::Packet * p)
+	: Simulation(reference_clock, cfg,p)
 	, cm_(	*cfg.getFlt("graphics", "terrainQuality"),
 			*cfg.getInt("graphics", "renderDistance"),
 			*cfg.getInt("graphics", "chunkLoadRate"),
@@ -208,12 +208,6 @@ Entity* Zombie_World::getTarget(const Entity* me)
 	if(players.empty()) return nullptr;
 	return players.begin()->second;
 }
-
-void Zombie_World::serialize(sf::Packet& p, bool complete)
-{}
-
-void Zombie_World::deserialize(sf::Packet& p, SyncableManager& sm)
-{}
 
 void Zombie_World::getReferencedSyncables(std::vector<Syncable*> collectHere)
 {}

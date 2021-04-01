@@ -138,6 +138,7 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 		switch(eventID)
 		{
 		case NET_GAME_EVENT_INVALID:
+			printPacket(p);
 			assert(eventID!=NET_GAME_EVENT_INVALID);//TODO proper error handling
 			break;
 		case NET_GAME_EVENT_SPAWN:

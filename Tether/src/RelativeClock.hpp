@@ -4,6 +4,8 @@
 #include <chrono>
 
 #include "WarnErrReporter.h"
+#include "NestedSyncable.h"
+#include <SFML/Network.hpp>
 
 using namespace std::chrono;
 
@@ -18,7 +20,7 @@ using namespace std::chrono;
  * @tparam BaseClock The BaseClock is the clock the RelativeClock is relative to.
  */
 template<typename BaseClock>
-struct RelativeClock
+struct RelativeClock: public NestedSyncable
 {
 	//std::chrono typedefs
 	typedef typename BaseClock::duration duration;
@@ -34,6 +36,8 @@ private:
 				duration				max_rel_time;
 public:
 
+	void serialize(sf::Packet& p,bool complete);
+	void deserialize(sf::Packet& p,SyncableManager & sm);
 
 private:
 	typename	BaseClock::time_point	last_update_base_time;
@@ -44,9 +48,9 @@ private:
 	float to_set_target_rate;
 	typename BaseClock::duration to_set_max_base_time;
 	duration to_set_max_rel_time;
-public:
+
 	RelativeClock(const BaseClock& baseclock, float target_rate, typename BaseClock::duration max_base_time,
-			duration max_rel_time)
+			duration max_rel_time,bool bullshit)
 		: baseclock(baseclock)
 		, max_base_time(max_base_time)
 		, max_rel_time(max_rel_time)
@@ -60,7 +64,8 @@ public:
 		last_update_rel_time = tick();
 	}
 
-
+public:
+	RelativeClock(const BaseClock& baseclock, float target_rate,duration max_base_time,duration max_rel_time,sf::Packet* p=nullptr);//constructor with optional deserialization
 	void setNextTargetRate(float new_target_rate){ to_set_target_rate = new_target_rate; }
 	float targetRate() const { return target_rate; }
 	void setNextMaxBaseTime(const typename BaseClock::duration& new_max_base_time) {to_set_max_base_time = new_max_base_time;}
@@ -128,5 +133,57 @@ public:
 		return last_update_rel_time + elapsed_rel_time;
 	}
 };
+
+template<typename BaseClock>
+inline void RelativeClock<BaseClock>::serialize(sf::Packet& p, bool complete)
+{
+	p<<target_rate;
+	p<<last_rate;
+	p<<last_update_rel_time;
+}
+#include "myAssert.h"
+#include "protocol.hpp"
+#include "sfml_packet_utils.hpp"
+template<typename BaseClock>
+inline void RelativeClock<BaseClock>::deserialize(sf::Packet& p,SyncableManager& sm)
+{
+	sf::Packet hackPack1;
+	sf::Packet hackPack2;
+	syncprotocol::udp::Header h;
+	hackPack1<<h;
+	size_t timestampSize=hackPack1.getDataSize();
+	assert(p.getDataSize()>=timestampSize);
+	hackPack2.append(p.getData(),timestampSize);
+	hackPack2>>h;
+	last_update_base_time=h.client_time;//TODO tolerance
+
+	p>>target_rate;
+	p>>last_rate;
+	p>>last_update_rel_time;
+	to_set_target_rate=target_rate;
+	to_set_max_base_time=max_base_time;
+	to_set_max_rel_time=max_rel_time;
+}
+
+
+template<typename BaseClock>
+inline RelativeClock<BaseClock>::RelativeClock(const BaseClock& baseclock,
+		float target_rate, duration max_base_time, duration max_rel_time,
+		sf::Packet* p)
+		: RelativeClock<BaseClock>(baseclock,target_rate,max_base_time,max_rel_time,true)
+{
+	if(p)
+	{
+		max_base_time=1h;
+		max_rel_time=1h;
+		*p>>target_rate;
+		*p>>last_rate;
+		*p>>last_update_rel_time;
+
+		to_set_target_rate=target_rate;
+		to_set_max_base_time=max_base_time;
+		to_set_max_rel_time=max_rel_time;
+	}
+}
 
 #endif /* RELATIVECLOCK_HPP */
