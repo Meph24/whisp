@@ -76,6 +76,7 @@ class SyncableManager: public CreationDestructionListener<Entity>
 	bool syncAllowed(u32 classID);
 
 public:
+	bool verbose=false;//TODO
 	/* send | recv	| use case
 	 * 	0	|	0	| singleplayer	(currently unused)
 	 * 	1	|	0	| server

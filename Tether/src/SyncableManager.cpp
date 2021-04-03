@@ -92,8 +92,8 @@ void SyncableManager::applyUpdatePacket(sf::Packet& p)
 		}
 		else
 		{
-			std::cout<<"skipping "<<subPackLen<<" bytes because sID="<<sID<<" was not found"<<std::endl;
-			if(!printed)
+			if(verbose) std::cout<<"skipping "<<subPackLen<<" bytes because sID="<<sID<<" was not found"<<std::endl;
+			if(verbose) if(!printed)
 			{
 				printPacket(p);
 				printed=true;
@@ -244,7 +244,7 @@ void SyncableManager::internalSpawn(Syncable* s)
 	{
 		assert(s->sID==0);
 		s->sID=getNextID();
-		//std::cout<<"assigning sID="<<s->sID<<" to "<<className(s->getClassID())<<std::endl;
+		if(verbose) std::cout<<"assigning sID="<<s->sID<<" to "<<className(s->getClassID())<<std::endl;
 	}
 	syncMap[s->sID]=s;
 }

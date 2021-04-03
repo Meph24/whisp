@@ -96,7 +96,7 @@ unique_ptr<Frustum> Perspective::newFrustumApplyPerspective(	SimClock::time_poin
 	float zoom_factor=zoomed?zoom_mult:1;
 	camera->zoom=default_zoom/zoom_factor;
 	float time=(float)FloatSeconds(t-avatar_->last_ticked);
-	spacevec curPos= avatar_->pos; // + avatar_->v*time;
+	spacevec curPos= avatar_->pos + avatar_->v*time;
 
 
 	if(fresh) camera->applyFresh();
