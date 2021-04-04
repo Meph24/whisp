@@ -14,15 +14,15 @@
 class AnimationCycle: public NestedSyncable
 {
 	float tempProgress;//client side
-	float modFloat(float x,float by);
-	float cap01(float x);
-	float cap0max(float x);
+	float modFloat(float x,float by) const;
+	float cap01(float x) const;
+	float cap0max(float x) const;
 	u8 maxCycles;//precision problems with higher numbers
 	float cycleLenInv;
 	float confirmedProgress;
 public:
-	float getCurStep(float phaseOffset,bool withTempProgress);//returns step between 0 and 1
-	float getCurStepTau(float phaseOffset,bool withTempProgress);//returns what you should pass into sin() function
+	float getCurStep(float phaseOffset,bool withTempProgress) const;//returns step between 0 and 1
+	float getCurStepTau(float phaseOffset,bool withTempProgress) const;//returns what you should pass into sin() function
 
 	void update(float timePassed);//for use in tick
 	void updateTemp(float timeOffset);//for use in draw

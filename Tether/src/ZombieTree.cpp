@@ -161,15 +161,19 @@ void Zombie_Tree::serialize(sf::Packet& p, bool complete)
 void Zombie_Tree::deserialize(sf::Packet& p, SyncableManager& sm)
 {
 }
-
+#include "SyncableManager.h"
+#include "TickServiceProvider.h"
+#include "IWorld.h"
 Zombie_Tree::Zombie_Tree(sf::Packet& p,SyncableManager& sm)
 {
 	p>>pos;
 	surviveClearing=true;
-	bb=AABB(pos);
 	v.set0();
 	d = 0.8f;//TODO
 	h = 18;
+	int temp = (h - rootSize) + (d * dLeaves);
+	if(temp<rootSize) temp=rootSize;
+	bb=AABB(pos, sm.getTSP().world().fromMeters(vec3(d*dLeaves,temp,d*dLeaves)));
 }
 
 void Zombie_Tree::getOwnedSyncables(std::vector<Syncable*> collectHere)

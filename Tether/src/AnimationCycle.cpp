@@ -8,14 +8,14 @@
 
 #include "AnimationCycle.h"
 
-float AnimationCycle::modFloat(float x, float by)
+float AnimationCycle::modFloat(float x, float by) const
 {
 	int a=(int)(x/by);
 	if(x<0) a--;
 	return x-a*by;
 }
 
-float AnimationCycle::cap01(float x)
+float AnimationCycle::cap01(float x) const
 {
 	if(maxCycles==0)//no limit
 	{
@@ -30,7 +30,7 @@ float AnimationCycle::cap01(float x)
 	return 0;//x<0
 }
 
-float AnimationCycle::cap0max(float x)
+float AnimationCycle::cap0max(float x) const
 {
 	if(maxCycles==0)//no limit
 	{
@@ -56,14 +56,14 @@ void AnimationCycle::updateTemp(float timeOffset)
 	tempProgress=timeOffset*cycleLenInv;
 }
 
-float AnimationCycle::getCurStep(float phaseOffset,bool withTempProgress)
+float AnimationCycle::getCurStep(float phaseOffset,bool withTempProgress) const
 {
 	float myProgress=confirmedProgress+phaseOffset;
 	if(withTempProgress) myProgress+=tempProgress;
 	return cap01(myProgress);
 }
 #include "MathStuff.h"
-float AnimationCycle::getCurStepTau(float phaseOffset,bool withTempProgress)
+float AnimationCycle::getCurStepTau(float phaseOffset,bool withTempProgress) const
 {
 	return getCurStep(phaseOffset,withTempProgress)*TAU;
 }
@@ -97,6 +97,7 @@ void AnimationCycle::deserialize(sf::Packet& p, SyncableManager& sm)
 }
 
 AnimationCycle::AnimationCycle(sf::Packet& p, SyncableManager& sm)
+: tempProgress(0)
 {
 	deserialize(p,sm);
 	p>>maxCycles;

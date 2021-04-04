@@ -260,7 +260,14 @@ void Zombie_Enemy::draw(const SimClock::time_point& draw_time ,Frustum * viewFru
 	if(legDmg>0.25f*maxHP)
 		transitionAnim.updateTemp(tickOffset);
 	if(remainingHP<=0) fallAnim.updateTemp(tickOffset);
-
+//	if(fallAnim.getCurStep(0,true)!=0)
+//	{
+//		std::cout<<"zombie: sID="<<sID<<std::endl;
+//		std::cout<<"fallAnim true:  "<<fallAnim.getCurStep(0,true)<<std::endl;
+//		std::cout<<"fallAnim false: "<<fallAnim.getCurStep(0,false)<<std::endl;
+//		std::cout<<"HP: "<<remainingHP<<std::endl;
+//		std::cout<<std::endl;
+//	}
 
 	spacevec interPos=pos+v*tickOffset-viewFrustum->observerPos;
 	vec3 interPosMeters=iw.toMeters(interPos);
@@ -820,11 +827,29 @@ void Zombie_Enemy::serialize(sf::Packet& p, bool complete)
 
 void Zombie_Enemy::deserialize(sf::Packet& p, SyncableManager& sm)
 {
+
+//	if(fallAnim.getCurStep(0,true)!=0)
+//	{
+//		std::cout<<"zombie deserialize pre: sID="<<sID<<std::endl;
+//		std::cout<<"fallAnim true:  "<<fallAnim.getCurStep(0,true)<<std::endl;
+//		std::cout<<"fallAnim false: "<<fallAnim.getCurStep(0,false)<<std::endl;
+//		std::cout<<"HP: "<<remainingHP<<std::endl;
+//		std::cout<<std::endl;
+//	}
 	bodyAnim.deserialize(p,sm);
 	fallAnim.deserialize(p,sm);
 	transitionAnim.deserialize(p,sm);
 	deserializeNonNested(p,sm);
 	bb=AABB(pos,sizeBB(sm.getIWorld()));
+
+//	if(fallAnim.getCurStep(0,true)!=0)
+//	{
+//		std::cout<<"zombie deserialize post: sID="<<sID<<std::endl;
+//		std::cout<<"fallAnim true:  "<<fallAnim.getCurStep(0,true)<<std::endl;
+//		std::cout<<"fallAnim false: "<<fallAnim.getCurStep(0,false)<<std::endl;
+//		std::cout<<"HP: "<<remainingHP<<std::endl;
+//		std::cout<<std::endl;
+//	}
 }
 
 void Zombie_Enemy::deserializeNonNested(sf::Packet& p, SyncableManager& sm)
@@ -844,6 +869,7 @@ Zombie_Enemy::Zombie_Enemy(sf::Packet& p,SyncableManager& sm)
 , fallAnim(p,sm)
 , transitionAnim(p,sm)
 {
+
 	deserializeNonNested(p,sm);
 	p>>tilted;
 	p>>size;
@@ -856,6 +882,14 @@ Zombie_Enemy::Zombie_Enemy(sf::Packet& p,SyncableManager& sm)
 	fac=FACTION_ZOMBIES;
 	acceptedConversions=FLAG_HIT_TYPE_BULLET_LIKE;
 	zombieCount++;
+//	if(fallAnim.getCurStep(0,true)!=0)
+//	{
+//		std::cout<<"zombie constructor: sID="<<sID<<std::endl;
+//		std::cout<<"fallAnim true:  "<<fallAnim.getCurStep(0,true)<<std::endl;
+//		std::cout<<"fallAnim false: "<<fallAnim.getCurStep(0,false)<<std::endl;
+//		std::cout<<"HP: "<<remainingHP<<std::endl;
+//		std::cout<<std::endl;
+//	}
 }
 
 void Zombie_Enemy::getOwnedSyncables(std::vector<Syncable*> collectHere)
