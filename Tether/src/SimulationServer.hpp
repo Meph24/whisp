@@ -26,6 +26,7 @@ struct SimulationServer
     SyncableManager* syncman;
 
     void processIncomingConnections();
+    void processClosedConnections();
     void process();
 
     void setup(SyncableManager& syncable_manager);

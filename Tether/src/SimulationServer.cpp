@@ -38,6 +38,16 @@ void SimulationServer::processIncomingConnections()
     }
 }
 
+void SimulationServer::processClosedConnections()
+{
+    auto& cs = clients.connections;
+    cs.erase(
+        std::remove_if(cs.begin(), cs.end(), 
+            [](const unique_ptr<ClientConnection>& c)->bool{ return !c->tcpsocket.getRemotePort(); }),
+        cs.end()
+    );
+}
+
 void SimulationServer::process()
 {
     if(!syncman) return;
@@ -49,6 +59,7 @@ void SimulationServer::process()
         upload_budget.used(clients.connections.size() * packet.getDataSize());
     }
 
+    processClosedConnections();
     processIncomingConnections();
 
     if(!clients.connections.empty())
