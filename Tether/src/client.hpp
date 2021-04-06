@@ -17,6 +17,7 @@ struct ClientApp : public App
     LocalUser user;
 
     ClientApp(WallClock& wc, Cfg& cfg, IPv4Address& addr, Port port);
+    ~ClientApp();
     void run();
 };
 

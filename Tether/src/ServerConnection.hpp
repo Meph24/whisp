@@ -17,11 +17,13 @@ struct ServerConnection
     syncprotocol::ServerInfo server_info;
     syncprotocol::ClientToken client_token;
 
+    WallClock::duration udp_remote_timeout_check_time = 1s;
     sf::UdpSocket udpsocket;
 
-    bool tryConnect(Cfg& cfg, const IPv4Address& addr, Port port);
+    bool tryConnect(WallClock& wc, Cfg& cfg, const IPv4Address& addr, Port port);
     void disconnect();
     bool connected() const;
+    bool isTimedOut();
 
     const WallClock::time_point& latestServerTime() const;
     const WallClock::duration& latency() const;
@@ -32,6 +34,7 @@ struct ServerConnection
     ServerConnection(SimulationClient& client, Cfg& cfg);
 private:
     bool is_connected = false;
+    WallClock::time_point last_remote_received;
     WallClock::duration latency_;
     WallClock::time_point latest_server_time;
 };

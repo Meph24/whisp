@@ -10,7 +10,7 @@ ClientApp::ClientApp(WallClock& wc, Cfg& cfg, IPv4Address& addr, Port port)
     : client(wc, cfg)
 	, user(cfg, "Dwengine - Client", *cfg.getInt("graphics", "resolutionX"), *cfg.getInt("graphics", "resolutionY"))
 {
-    if( !client.connection.tryConnect(cfg, addr, port) )
+    if( !client.connection.tryConnect(wc, cfg, addr, port) )
         cout << "Connection failed on " << addr << ':' << port << " !\n";
     else
     {
@@ -18,6 +18,11 @@ ClientApp::ClientApp(WallClock& wc, Cfg& cfg, IPv4Address& addr, Port port)
        cout << "Client Name : " << client.name << '\n';
        cout << "Server : " << client.connection.server_info.name << '\n';
     }
+}
+
+ClientApp::~ClientApp()
+{
+    std::cout << "Destructing client application.\n";
 }
 
 void ClientApp::run()
@@ -43,8 +48,15 @@ void ClientApp::run()
     if(!client.syncman.getSim()) throw std::runtime_error("Simulation expected on client!");
 
     user.perspective = std::make_unique<Perspective>( user, *client.syncman.getSim(), nullptr);
-    while(user.window.isOpen() && client.syncman.getSim())
+    while(      user.window.isOpen() 
+            &&  client.syncman.getSim() )
     {
+        if(client.connection.isTimedOut())
+        {
+            std::cout << "Server connection timed out!\n";
+            break;
+        }
+
         if(!client.avatar())
         {
             //Switch the color to give visual feedback of no avatar
@@ -55,6 +67,7 @@ void ClientApp::run()
             glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
         }
         user.perspective->setAvatar(client.avatar());
+
 
         client.processCyclicSync();
 

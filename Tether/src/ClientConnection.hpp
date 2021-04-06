@@ -24,6 +24,7 @@ struct ClientConnection
 {
     string name;
     sf::TcpSocket tcpsocket;
+    bool disconnected = false;
     syncprotocol::ClientToken token;
     Port udpport;
 
@@ -36,6 +37,7 @@ struct ClientConnection
     void receiveHeader(const syncprotocol::udp::Header& h);
 
 private:
+    WallClock::time_point last_udp_received;
     WallClock::duration latency_;
     WallClock::time_point last_client_time;
 

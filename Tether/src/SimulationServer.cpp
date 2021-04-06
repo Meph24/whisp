@@ -34,6 +34,7 @@ void SimulationServer::processIncomingConnections()
     for(auto& c : new_connections)
     {
         c->tcpsocket.send(packet);
+        c->last_udp_received = wc.now();
         clients.addClient(std::move(c));
     }
 }
@@ -41,11 +42,36 @@ void SimulationServer::processIncomingConnections()
 void SimulationServer::processClosedConnections()
 {
     auto& cs = clients.connections;
+
+    //check for timeouts
+    for(auto& c : cs)
+    {
+        if( wc.now() - c->last_udp_received > udp_remote_timeout_check_time)
+        {
+            //preserve blocking status of socket
+            bool blocking_status = c->tcpsocket.isBlocking();
+            c->tcpsocket.setBlocking(false);
+            size_t dummy;
+            //tcp connection is checked for disconnection, since we haven't heard from the client on udp
+            if(c->tcpsocket.receive(&dummy, 0, dummy) == sf::Socket::Disconnected)
+            {
+                c->disconnected = true;
+                std::cout << "Client connection " << c->tcpsocket.getRemoteAddress() << ':' << c->tcpsocket.getRemotePort() << " timed out!\n";
+            }
+            c->tcpsocket.setBlocking(blocking_status);
+        }
+    }
+
+    //send reminders
+
+    size_t initial_size = cs.size();
     cs.erase(
         std::remove_if(cs.begin(), cs.end(), 
-            [](const unique_ptr<ClientConnection>& c)->bool{ return !c->tcpsocket.getRemotePort(); }),
+            [](const unique_ptr<ClientConnection>& c)->bool{ return !c->tcpsocket.getRemotePort() || c->disconnected; }),
         cs.end()
     );
+    size_t closed = initial_size-cs.size();
+    if(closed) std::cout << "Removed " << closed << " closed connections!\n";
 }
 
 void SimulationServer::process()
@@ -94,6 +120,7 @@ void SimulationServer::receiveClientInputs()
         //friend access set latency
         //TODO make less direct accessly
         ClientConnection& client = *clients.atUdp(remote_addr, remote_port);
+        client.last_udp_received = wc.now();
         client.latency_ = header.server_time - wc.now();
         client.last_client_time = max(header.client_time, client.last_client_time);
 
@@ -118,7 +145,7 @@ void SimulationServer::broadcastTcp(sf::Packet& p)
 {
     for(auto& c : clients.connections)
     {
-        c->tcpsocket.send(p);
+        c->disconnected = sf::Socket::Status::Disconnected == c->tcpsocket.send(p);
     }
 }
 

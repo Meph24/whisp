@@ -16,6 +16,7 @@ struct SimulationServer
     ConnectionListener listener;
     ConnectionInitialProcessor initial_processor;
 
+    WallClock::duration udp_remote_timeout_check_time = 1s;
     sf::UdpSocket udpsocket;
     UploadBudget upload_budget;
 

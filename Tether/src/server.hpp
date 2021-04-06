@@ -20,6 +20,7 @@ struct HostApp : public App
     LocalUser local_user;
 
     HostApp(WallClock& wc, Cfg& cfg, Port port);
+    ~HostApp();
     void run();
 };
 

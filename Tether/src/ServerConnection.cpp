@@ -14,7 +14,7 @@ ServerConnection::ServerConnection(SimulationClient& client, Cfg& cfg)
     udpsocket.setBlocking(false);
 }
 
-bool ServerConnection::tryConnect( Cfg& cfg, const IPv4Address& addr, Port port )
+bool ServerConnection::tryConnect( WallClock& wc, Cfg& cfg, const IPv4Address& addr, Port port )
 {
 
     if(is_connected) return false;
@@ -58,6 +58,8 @@ bool ServerConnection::tryConnect( Cfg& cfg, const IPv4Address& addr, Port port 
 
     std::cout << "Client Token:" << client_token << '\n';
 
+    last_remote_received = wc.now();
+
     return is_connected;
 }
 
@@ -67,7 +69,36 @@ void ServerConnection::disconnect()
     is_connected = false;
 }
 
-bool ServerConnection::connected() const { return tcpsocket.getRemoteAddress() != sf::IpAddress::None; }
+bool ServerConnection::connected() const 
+{ 
+    return is_connected;
+}
+
+bool ServerConnection::isTimedOut()
+{
+    if(! is_connected ) return true;
+
+    if(!tcpsocket.getRemotePort()) 
+    { 
+        is_connected = false;
+        return true;
+    }
+
+    if(client.wc.now() - last_remote_received > udp_remote_timeout_check_time)
+    {
+        bool blocking_status = tcpsocket.isBlocking();
+        tcpsocket.setBlocking(false);
+        //check for remote tcp status
+        size_t dummy;
+        if(tcpsocket.receive(&dummy, 0, dummy) == sf::Socket::Disconnected)
+        {
+            is_connected = false;
+        }
+        tcpsocket.setBlocking(blocking_status);
+    }
+
+    return !is_connected;
+}
 
 const WallClock::time_point& ServerConnection::latestServerTime() const { return latest_server_time; }
 const WallClock::duration& ServerConnection::latency() const { return latency_; }
@@ -87,6 +118,7 @@ unique_ptr<sf::Packet> ServerConnection::receiveUdp()
     } while (       sender_addr != tcpsocket.getRemoteAddress() 
                 ||  sender_port != server_info.udpport             );
 
+    last_remote_received = client.wc.now();
     syncprotocol::udp::Header header; *newp >> header;
     latency_ = (header.client_time - client.wc.now()) / 2;
     if(latest_server_time < header.server_time) latest_server_time = header.server_time;

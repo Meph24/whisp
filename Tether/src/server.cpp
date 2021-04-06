@@ -32,6 +32,8 @@ HostApp::HostApp(WallClock& wc, Cfg& cfg, Port port)
     server.setup(*syncman);
 }
 
+HostApp::~HostApp() { std::cout << "Destructing Host application!\n"; }
+
 void HostApp::run()
 {
     if(!simulation || !syncman) 
