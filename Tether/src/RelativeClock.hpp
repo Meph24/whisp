@@ -191,6 +191,7 @@ inline void RelativeClock<BaseClock>::deserialize(sf::Packet& p,SyncableManager&
 	if(diff>tolerance)
 	{
 		std::cout<<"updating clock, diff="<<(float)FloatSeconds(diff)<<std::endl;
+		std::cout<<"clock elapsed="<<(float)FloatSeconds(current_base_time - newBaseTime)<<std::endl;
 		last_update_base_time=newBaseTime;
 		last_update_rel_time=newRelTime;
 	}

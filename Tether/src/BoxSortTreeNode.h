@@ -98,6 +98,16 @@ dim(d)
 			break;
 		}
 	}
+	if(medianIndx==(unsigned int)-1)
+	{
+		std::cout<<"samples="<<samples<<std::endl;
+		std::cout<<"medianValue="<<medianValue<<std::endl;
+		for(unsigned int i=0;i<samples;i++)
+		{
+			InteractFilterEntry<PhysicsIF> entry=toSort[choices[i]];
+			std::cout<<"entry="<<entry.e.e->bb.low.*dim<<std::endl;
+		}
+	}
 	assert(medianIndx!=(unsigned int)-1);
 	init(toSort[choices[medianIndx]]);
 	std::vector<InteractFilterEntry<PhysicsIF> > toLower;

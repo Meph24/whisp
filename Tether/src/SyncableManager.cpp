@@ -31,13 +31,16 @@ syncID SyncableManager::getNextID()
 
 bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool continueLastCall)
 {
+	byteBudget-=sizeof(nextPackID);//TODO remove after debugging
+	bool first=true;//TODO remove after debugging
 	bool iDidSomething=false;
 	if(!continueLastCall)
 	{
 		newRound();
 	}
 	u32 curBytes=0;
-	u32 sizeBefore=(u32)p.getDataSize();
+	u32 sizeBefore=(u32)p.getDataSize()
+			+sizeof(nextPackID);//TODO remove after debugging
 	while(curBytes<byteBudget)
 	{
 		sf::Packet temp;
@@ -50,6 +53,13 @@ bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool contin
 		assert(afterAppend==u32(afterAppend));//packet size should NEVER EVER exceed 4GB
 		if(afterAppend<=byteBudget)
 		{
+			if(first)//TODO remove after debugging
+			{
+				std::cout<<"UDP Packet "<<nextPackID<<" packed"<<std::endl;//TODO remove after debugging
+				p<<nextPackID;//TODO remove after debugging
+				nextPackID++;//TODO remove after debugging
+				first=false;//TODO remove after debugging
+			}
 			p<<s->sID;
 			p<<u32(temp.getDataSize());
 			p.append(temp.getData(),temp.getDataSize());
@@ -78,6 +88,8 @@ bool SyncableManager::fillCompletePacket(sf::Packet& p)
 void SyncableManager::applyUpdatePacket(sf::Packet& p)
 {
 	//printPacket(p);
+	p>>nextPackID;//TODO remove after debugging
+	std::cout<<"UDP Packet "<<nextPackID<<" unpacked"<<std::endl;//TODO remove after debugging
 	bool printed=false;
 	while(!p.endOfPacket())
 	{
@@ -111,6 +123,9 @@ bool SyncableManager::exists(syncID sID)
 
 bool SyncableManager::fetchEventPackets(sf::Packet& p)
 {
+	p<<nextPackID;//TODO remove after debugging
+	std::cout<<"TCP Packet "<<nextPackID<<" packed"<<std::endl;//TODO remove after debugging
+	nextPackID++;//TODO remove after debugging
 	bool iDidSomething=false;
 	for(auto eventPacket: events)
 	{
@@ -127,6 +142,8 @@ bool SyncableManager::fetchEventPackets(sf::Packet& p)
 void SyncableManager::applyEventPacket(sf::Packet& p)
 {
 	//printPacket(p);
+	p>>nextPackID;//TODO remove after debugging
+	std::cout<<"TCP Packet "<<nextPackID<<" unpacked"<<std::endl;//TODO remove after debugging
 	while(!p.endOfPacket())
 	{
 		u32 subPackLen;

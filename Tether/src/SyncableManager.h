@@ -45,6 +45,7 @@ class SyncableManager: public CreationDestructionListener<Entity>
 	void newRound();
 
 
+	syncID nextPackID=1;//TODO remove after debugging
 	std::vector<sf::Packet> events;//TODO no doubles
 
 	std::map<u32,NetGameEventListener *> listenerMap;
@@ -76,7 +77,7 @@ class SyncableManager: public CreationDestructionListener<Entity>
 	bool syncAllowed(u32 classID);
 
 public:
-	bool verbose=false;//TODO
+	bool verbose=true;//false;//TODO
 	/* send | recv	| use case
 	 * 	0	|	0	| singleplayer	(currently unused)
 	 * 	1	|	0	| server
