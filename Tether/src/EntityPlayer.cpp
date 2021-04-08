@@ -116,6 +116,11 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 
+	std::cout << (u64)this  << " is ";
+	if(user()) std::cout << "controlled by " << (u64) user();
+	else std::cout << "not controlled";
+	std::cout << "!\n";
+
 	if( user() )
 	{
 		const SimulationInputStatusSet& controlinputs = user()->input_status;

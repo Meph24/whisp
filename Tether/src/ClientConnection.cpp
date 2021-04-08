@@ -12,7 +12,7 @@ void SyncUser::operateSimulation(Simulation& simulation)
 }
 void SyncUser::disconnectSimulation()
 {
-    simulation->disconnectAvatarFrom(this);
+    if(simulation) simulation->disconnectAvatarFrom(this);
 }
 
 FullIPv4 ClientConnection::remoteUdpFullip() const

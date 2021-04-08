@@ -12,6 +12,15 @@
 
 using std::string;
 
+SimulationUser::~SimulationUser()
+{
+	if(simulation) 
+	{
+		simulation->disconnectAvatarFrom(this);
+		simulation = nullptr;
+	}
+}
+
 EntityPlayer* SimulationUser::avatar()
 {
 	return (simulation)? simulation->userAvatar(this) : nullptr;

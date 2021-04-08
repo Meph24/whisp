@@ -25,6 +25,8 @@ class Simulation;
 class SimulationUser
 {
 public:
+	virtual ~SimulationUser();
+
 	Simulation* simulation = nullptr;
 	SimulationInputStatusSet input_status;
 	
