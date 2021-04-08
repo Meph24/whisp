@@ -158,6 +158,11 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	if(held_item) held_item->tick(next_tick_begin, tsp);
 
 	float time=(float) FloatSeconds(next_tick_begin - last_ticked);
+	std::cout<<"ticked "<<this<<" ("<<className(getClassID())<<")"<<std::endl;//TODO remove after debugging
+	std::cout<<"sID="<<sID<<std::endl;//TODO remove after debugging
+	std::cout<<"lastTicked="<<last_ticked.time_since_epoch().count()<<std::endl;//TODO remove after debugging
+	std::cout<<"time="<<time<<std::endl;//TODO remove after debugging
+
 	last_ticked = next_tick_begin;
 	hitmark -= time * 10;
 	if (hitmark < 0) hitmark = 0;
@@ -221,6 +226,7 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	size.y=iw->fromMeters( eye.offsetFromEntity().y*1.5f );
 	size.z=size.x;
 	bb=AABB(pos,size,v*time);
+	std::cout<<"AABB="<<bb<<std::endl;//TODO remove after debugging
 	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,time,*tsp);
 }
 

@@ -102,10 +102,21 @@ dim(d)
 	{
 		std::cout<<"samples="<<samples<<std::endl;
 		std::cout<<"medianValue="<<medianValue<<std::endl;
+		std::cout<<"toSortSize="<<toSortSize<<std::endl;
 		for(unsigned int i=0;i<samples;i++)
 		{
 			InteractFilterEntry<PhysicsIF> entry=toSort[choices[i]];
 			std::cout<<"entry="<<entry.e.e->bb.low.*dim<<std::endl;
+			std::cout<<"entity="<<entry.e.e<<std::endl;
+			std::cout<<"entity sID="<<entry.e.e->sID<<std::endl;
+			std::cout<<"entity class="<<className(entry.e.e->getClassID())<<std::endl;
+		}
+		for(InteractFilterEntry<PhysicsIF> elem: toSort)
+		{
+			std::cout<<"bbLow="<<elem.e.e->bb.low.*dim<<std::endl;
+			std::cout<<"entity="<<elem.e.e<<std::endl;
+			std::cout<<"entity sID="<<elem.e.e->sID<<std::endl;
+			std::cout<<"entity class="<<className(elem.e.e->getClassID())<<std::endl;
 		}
 	}
 	assert(medianIndx!=(unsigned int)-1);

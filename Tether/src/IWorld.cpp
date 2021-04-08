@@ -149,6 +149,9 @@ void IWorld::requestEntitySpawn(Entity* e, bool threadSafe)
 	if(threadSafe)
 	{
 		addThreadSafe(e);
+		std::cout<<"thread safe spawn requested for "<<e<<" ("<<className(e->getClassID())<<")"<<std::endl;
+		std::cout<<"sID="<<e->sID<<std::endl;
+		std::cout<<"AABB="<<e->bb<<std::endl;
 	}
 	else
 	{

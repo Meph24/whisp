@@ -74,8 +74,8 @@ void Zombie_World::doPhysics(const SimClock::time_point& next_tick_begin)
 {
 	initNextTick();
 	iw->preTick(*this);
-	for(auto& p : players)
-		p.second->tick(next_tick_begin,this);//TODO insert into IWorld
+//	for(auto& p : players)
+//		p.second->tick(next_tick_begin,this);//TODO insert into IWorld
 
 	iw->tick(next_tick_begin,this);
 	logicTick.registerTime();

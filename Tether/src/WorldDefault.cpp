@@ -80,6 +80,10 @@ void WorldDefault::postTick(TickServiceProvider& tsp)
 	{
 		managedEntities.push_back(e);
 		entityNotif.notifyCreation(e);
+
+		std::cout<<"spawn executed for "<<e<<" ("<<className(e->getClassID())<<")"<<std::endl;//TODO remove after debugging
+		std::cout<<"sID="<<e->sID<<std::endl;//TODO remove after debugging
+		std::cout<<"AABB="<<e->bb<<std::endl;//TODO remove after debugging
 	}
 	addVec.clear();
 	{
@@ -88,6 +92,9 @@ void WorldDefault::postTick(TickServiceProvider& tsp)
 		{
 			managedEntities.push_back(e);
 			entityNotif.notifyCreation(e);
+			std::cout<<"thread safe spawn executed for "<<e<<" ("<<className(e->getClassID())<<")"<<std::endl;//TODO remove after debugging
+			std::cout<<"sID="<<e->sID<<std::endl;//TODO remove after debugging
+			std::cout<<"AABB="<<e->bb<<std::endl;//TODO remove after debugging
 		}
 		tsAddVec.clear();
 	}
