@@ -58,7 +58,8 @@ EntityPlayer* Simulation::userAvatar(SimulationUser* user)
 
 void Simulation::disconnectAvatarFrom( SimulationUser* to_kick_user )
 { 
-	lock_guard lg_ (players_lock);	
+	lock_guard lg_ (players_lock);
+	players[to_kick_user]->setUser(nullptr);
 	players.erase(to_kick_user);
 }
 

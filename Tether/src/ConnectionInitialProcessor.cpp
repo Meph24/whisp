@@ -118,6 +118,7 @@ void ConnectionInitialProcessor::SingleConnectionProcessor::process()
     {
         if( cip->wc.now() - wait_begin > timeout )
         {
+            connection->user.disconnectSimulation();
             cout << "Timeout in Avatar spawning process!\n";
             return;
         }
