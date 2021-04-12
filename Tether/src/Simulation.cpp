@@ -42,9 +42,9 @@ EntityPlayer* Simulation::makeAvatarFor(SimulationUser* user, spacevec spawn_pos
 		/* spawn position */	spawn_pos,
 		/* character speed */ 	(! *cfg.getInt("test","debug_movement") ) ? 7.6f : 30.6f );
 
+	newentityplayer->setUser(user);
 	iw->requestEntitySpawn(newentityplayer.get(), true);
 	players[user] = newentityplayer.get();
-	players[user]->setUser(user);
 	newentityplayer.release();
 	return players[user];
 }

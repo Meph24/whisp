@@ -116,6 +116,7 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 
+	if(!user()) requestDestroy(iw);
 
 	if( user() )
 	{
@@ -155,6 +156,8 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 			controlinputs.toggleCondition(controlinputs.selection_active);//TODO find out which is inventory and set value ORed accordingly
 		}
 	}
+
+	
 
 	if(held_item) held_item->tick(next_tick_begin, tsp);
 
