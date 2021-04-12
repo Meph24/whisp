@@ -47,12 +47,13 @@ void SimulationClient::processCyclicSync()
     }
 
     //udp ; update packets
-    incoming->clear();
-    incoming = connection.receiveUdp();
-    if(incoming)
+    do
     {
-        syncman.applyUpdatePacket(*incoming);
-    }
+        incoming->clear();
+        incoming = connection.receiveUdp();
+        if(incoming)
+            syncman.applyUpdatePacket(*incoming);
+    }while(incoming);
 }
 
 EntityPlayer* SimulationClient::avatar() const
