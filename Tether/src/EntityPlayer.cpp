@@ -116,10 +116,6 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	IWorld * iw=&tsp->world();
 	ITerrain * it=tsp->getITerrain();
 
-	std::cout << (u64)this  << " is ";
-	if(user()) std::cout << "controlled by " << (u64) user();
-	else std::cout << "not controlled";
-	std::cout << "!\n";
 
 	if( user() )
 	{
@@ -163,10 +159,7 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 	if(held_item) held_item->tick(next_tick_begin, tsp);
 
 	float time=(float) FloatSeconds(next_tick_begin - last_ticked);
-	std::cout<<"ticked "<<this<<" ("<<className(getClassID())<<")"<<std::endl;//TODO remove after debugging
-	std::cout<<"sID="<<sID<<std::endl;//TODO remove after debugging
-	std::cout<<"lastTicked="<<last_ticked.time_since_epoch().count()<<std::endl;//TODO remove after debugging
-	std::cout<<"time="<<time<<std::endl;//TODO remove after debugging
+	auto lastTickedBefore=last_ticked;//for debugging purposes only
 
 	last_ticked = next_tick_begin;
 	hitmark -= time * 10;
@@ -225,13 +218,28 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 		if(time>0.0000000001f)
 			v=(pos-oldPos)/time;
 	}
-
+	bool invalid=pos.isInvalid(false)||v.isInvalid();
 	spacevec size;
 	size.x=iw->fromMeters( eye.offsetFromEntity().y*0.5f );
 	size.y=iw->fromMeters( eye.offsetFromEntity().y*1.5f );
 	size.z=size.x;
+	if(invalid)
+	{
+		std::cout << (u64)this  << " is ";
+		if(user()) std::cout << "controlled by " << (u64) user();
+		else std::cout << "not controlled";
+		std::cout << "!\n";
+
+		std::cout<<"ticked "<<this<<" ("<<className(getClassID())<<")"<<std::endl;
+		std::cout<<"sID="<<sID<<std::endl;
+
+		std::cout<<"lastTicked="<<lastTickedBefore.time_since_epoch().count()<<std::endl;
+		std::cout<<"time="<<time<<std::endl;
+
+		std::cout<<"pos="<<pos<<std::endl;
+		std::cout<<"v="<<v<<std::endl;
+	}
 	bb=AABB(pos,size,v*time);
-	std::cout<<"AABB="<<bb<<std::endl;//TODO remove after debugging
 	iw->pushAlgo->doChecks((Pushable *)this,(Entity *)this,time,*tsp);
 }
 

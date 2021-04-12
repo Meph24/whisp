@@ -151,12 +151,27 @@ void SimulationServer::broadcastTcp(sf::Packet& p)
 
 void SimulationServer::broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&& packet, const WallClock::time_point& server_time)
 {
+	syncID packID;//TODO remove after debugging start
+	sf::Packet hackPack1;
+	sf::Packet hackPack2;
+	syncprotocol::udp::Header h;
+	hackPack1<<h;
+	hackPack1<<packID;
+	size_t timestampSize=hackPack1.getDataSize();
+	assert(packet.get()->getDataSize()>=timestampSize);
+	hackPack2.append(packet.get()->getData(),timestampSize);
+	hackPack2>>h;
+	hackPack2>>packID;
+	//TODO remove after debugging end
+
     syncprotocol::udp::Header header{ server_time, server_time };
     for(auto& c : clients.connections)
     {
         header.client_time = c->last_client_time;
         packet->setHeader(header);
+        std::cout<<"before UDP send (packetID="<<packID<<")"<<std::endl;//TODO remove after debugging
         udpsocket.send(*packet, c->tcpsocket.getRemoteAddress(), c->udpport);
+        std::cout<<"after UDP send (packetID="<<packID<<")"<<std::endl;//TODO remove after debugging
     }
     packet.reset();
 }

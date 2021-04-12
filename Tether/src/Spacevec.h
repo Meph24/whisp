@@ -56,6 +56,8 @@ struct intfloat
 	bool operator==(const intfloat<I,F>& other) const;
 
 	bool equalsZero() const;//tiny epsilon tolerance
+
+	bool isInvalid(bool strict=true);//non-strict returns only true if guaranteed to be invalid, strict=true means also return true if invalidity is likely
 };
 
 template<typename I, typename F>
@@ -297,6 +299,8 @@ struct vec3if
 	float dot(vec3 v) const;//use only if already relativized, otherwise precision problems
 
 	vec3if<I, F> selectWhere(int boolvec);
+
+	bool isInvalid(bool strict=true);//non-strict returns only true if guaranteed to be invalid, strict=true means also return true if invalidity is likely
 };
 
 
@@ -617,6 +621,25 @@ inline sf::Packet& operator >>(sf::Packet& p, struct vec3if<I, F>& v)
 	p>>v.y;
 	p>>v.z;
 	return p;
+}
+
+template<typename I, typename F>
+inline bool vec3if<I, F>::isInvalid(bool strict)
+{
+	return x.isInvalid(strict)||y.isInvalid(strict)||z.isInvalid(strict);
+}
+
+template<typename I, typename F>
+inline bool intfloat<I, F>::isInvalid(bool strict)
+{
+	if(strict)
+	{
+		if(intpart>1024) return true;
+		if(intpart<-1024) return true;
+	}
+	if(!(floatpart>=0)) return true;
+	if(!(floatpart<=1)) return true;
+	return false;
 }
 
 #endif /* SRC_SPACEVEC_H_ */
