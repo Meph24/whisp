@@ -150,10 +150,6 @@ void EntityPlayer::tick(const SimClock::time_point& next_tick_begin, TickService
 			prev_input_status.inventory = controlinputs.inventory;
 
 			unused_inventory_slot.swap(held_item);
-
-			//this writes to controlinputs, which shall not be permitted in the future ( issue #36 )
-			//this line will need to go
-			controlinputs.toggleCondition(controlinputs.selection_active);//TODO find out which is inventory and set value ORed accordingly
 		}
 	}
 

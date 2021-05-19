@@ -86,17 +86,7 @@ struct SimulationInputStatusSet
 	vec3 turn = vec3(0.0f, 0.1f, 0.0f);
 	bool trigger = false;
 
-	//this needs to go as it is assigned from the wrong direction as of now (issue #36)
 	bool selection_active = 0;
-
-	//these methods probably need to go, as they participate in writing to this status-set
-	// from the wrong side ( issue #36 )
-	static void toggleCondition(bool b);
-	static void setConditionTrue(bool b);
-	static void setConditionFalse(bool b);
-
-	//static float getStatusAndReset(float& f, float resetTo = 0.0f );//not thread safe; reset value
-
 };
 
 sf::Packet& operator<< (sf::Packet& p, const SimulationInputStatusSet& s);
