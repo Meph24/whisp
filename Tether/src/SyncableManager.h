@@ -77,6 +77,9 @@ class SyncableManager: public CreationDestructionListener<Entity>
 	bool syncAllowed(u32 classID);
 
 public:
+
+	u32 minUpdatePacketBudget=120;
+
 	bool verbose=true;//false;//TODO
 	/* send | recv	| use case
 	 * 	0	|	0	| singleplayer	(currently unused)

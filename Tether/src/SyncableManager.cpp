@@ -31,6 +31,7 @@ syncID SyncableManager::getNextID()
 
 bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool continueLastCall)
 {
+	if(byteBudget<minUpdatePacketBudget) return false;
 	byteBudget-=sizeof(nextPackID);//TODO remove after debugging
 	bool first=true;//TODO remove after debugging
 	bool iDidSomething=false;
