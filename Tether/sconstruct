@@ -72,6 +72,7 @@ if get_platform() == "Windows":
     env.Append(CPPPATH=['./deps/include'])
     libpaths += ['./deps/lib']
 
+env.Append(CPPPATH=['./deps/imgui'])
 
 
 env.Replace(CXX = cxx)
