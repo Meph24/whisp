@@ -33,6 +33,9 @@ Tether/test/logging_test/*.exe
 Tether/test/logging_test/*.o
 Tether/test/logging_test/log_*
 
+#test copies in executable location for windows
+Tether/*.exe
+
 
 #vscode & Windows dependencies
 deps

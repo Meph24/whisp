@@ -159,9 +159,22 @@ inline void RelativeClock<BaseClock>::serialize(sf::Packet& p, bool complete)
 #include "myAssert.h"
 #include "protocol.hpp"
 #include "sfml_packet_utils.hpp"
+
 template<typename BaseClock>
 inline void RelativeClock<BaseClock>::deserialize(sf::Packet& p,SyncableManager& sm)
 {
+	float f;
+	p >> f;
+	p >> f;
+	p >> f;
+	throw std::runtime_error ( "RelativeClock::deserialize() : This method is not properly implemented for the given base-clock type. The BaseClock::duration must match with transmission protocoll, therefore this method is only implemented for one type of clock. We have flushed the respective packet contents according to function specifications, but this call definitely is wrong!" );
+}
+
+template<>
+inline void RelativeClock<SFMLClock>::deserialize(sf::Packet& p,SyncableManager& sm)
+{
+	typedef SFMLClock BaseClock; //for syntax consistency
+
 	sf::Packet hackPack1;
 	sf::Packet hackPack2;
 	syncprotocol::udp::Header h;
@@ -171,7 +184,8 @@ inline void RelativeClock<BaseClock>::deserialize(sf::Packet& p,SyncableManager&
 	hackPack2.append(p.getData(),timestampSize);
 	hackPack2>>h;
 
-	typename BaseClock::time_point newBaseTime=h.client_time;
+    BaseClock::time_point newBaseTime = time_point_cast<BaseClock::duration>(h.client_time); //Header might be implemented by a different time_point type, therfore cast needed
+
 	time_point newRelTime;
 
 	p>>target_rate;
