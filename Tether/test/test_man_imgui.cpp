@@ -1,41 +1,67 @@
+#include <GL/glew.h>
+#include <SFML/Window.hpp>
+
 #include "../src/imgui/imgui.h"
 #include "../src/imgui/imgui-SFML.h"
+#include "../src/imgui/imgui_impl_opengl3.h"
 
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/System/Clock.hpp>
-#include <SFML/Window/Event.hpp>
+#include <iostream>
 
-int main() {
-    sf::RenderWindow window(sf::VideoMode(640, 480), "ImGui + SFML = <3");
-    window.setFramerateLimit(60);
-    ImGui::SFML::Init(window);
+bool setUpGlew()
+{
+    GLenum error = glewInit();
+    if(error != GLEW_OK)
+    {
+        std::cerr << "Error: " << glewGetErrorString(error) << std::endl;
+        return false;
+    }
+    std::cout << "Status: Using GLEW " << glewGetString(GLEW_VERSION) << "\n";
+    return true;
+}
 
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+int main()
+{    
+    sf::ContextSettings settings;
+    settings.depthBits = 24;
+    settings.stencilBits = 8;
+    sf::Window window(sf::VideoMode(800,600),"IMGUI?", 7U, settings);
 
-    sf::Clock deltaClock;
-    while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(event);
+    if(!setUpGlew())
+        return -1;
 
-            if (event.type == sf::Event::Closed) {
-                window.close();
-            }
-        }
+    ImGui::SFML::Init(window, static_cast<sf::Vector2f>(window.getSize()));
+    ImGui_ImplOpenGL3_Init();//const char* glslversion?
 
-        ImGui::SFML::Update(window, deltaClock.restart());
+    glClearColor(1,0,1,1);
 
-        ImGui::Begin("Hello, world!");
-        ImGui::Button("Look at this pretty button");
+    sf::Event event;
+    bool running = true;
+    sf::Clock clock;
+    while (running)
+    {
+        ImGui::SFML::Update(sf::Mouse::getPosition(window),static_cast<sf::Vector2f>(window.getSize()),clock.restart());
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui::NewFrame();
+        ImGui::Begin("Hello");
+        ImGui::Text("This is some useful text.");
         ImGui::End();
-
-        window.clear();
-        window.draw(shape);
-        ImGui::SFML::Render(window);
+        
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         window.display();
+
+        while(window.pollEvent(event))
+        {
+            if(event.type == sf::Event::Closed)
+                running = false;
+            ImGui::SFML::ProcessEvent(event);
+        }
     }
 
     ImGui::SFML::Shutdown();
+    window.close();
+    
+    return 0;
 }
