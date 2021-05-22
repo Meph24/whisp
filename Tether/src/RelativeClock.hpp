@@ -159,6 +159,7 @@ inline void RelativeClock<BaseClock>::serialize(sf::Packet& p, bool complete)
 #include "myAssert.h"
 #include "protocol.hpp"
 #include "sfml_packet_utils.hpp"
+#include "SyncableManager.h"
 template<typename BaseClock>
 inline void RelativeClock<BaseClock>::deserialize(sf::Packet& p,SyncableManager& sm)
 {
@@ -175,12 +176,12 @@ inline void RelativeClock<BaseClock>::deserialize(sf::Packet& p,SyncableManager&
 	time_point newRelTime;
 
 	p>>target_rate;
-	std::cout<<"unpacking RelativeClock: target_rate="<<target_rate<<std::endl;
+	if(sm.verbose) std::cout<<"unpacking RelativeClock: target_rate="<<target_rate<<std::endl;
 	p>>last_rate;
-	std::cout<<"last_rate="<<last_rate<<std::endl;
+	if(sm.verbose) std::cout<<"last_rate="<<last_rate<<std::endl;
 	p>>newRelTime;
 	to_set_target_rate=target_rate;
-	std::cout<<"newRelTime="<<newRelTime.time_since_epoch().count()*0.000001f<<std::endl;
+	if(sm.verbose) std::cout<<"newRelTime="<<newRelTime.time_since_epoch().count()*0.000001f<<std::endl;
 
 	typename BaseClock::time_point current_base_time = baseclock.now();
 	time_point oldT=sim(current_base_time,last_update_rel_time,last_update_base_time);
