@@ -10,6 +10,12 @@
 #include "SFMLWindow.hpp"
 #include "Simulation.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui-SFML.h"
+#include "imgui/imgui_impl_opengl3.h"
+
+#include <SFML/Window/Mouse.hpp>
+
 using std::string;
 
 SimulationUser::~SimulationUser()
@@ -45,6 +51,9 @@ LocalUser::LocalUser(
 	{
 		std::cerr << "GLEW failed to initialize !" << std::endl;
 	}
+
+    ImGui::SFML::Init(window.w, static_cast<sf::Vector2f>(window.w.getSize()));
+    ImGui_ImplOpenGL3_Init();//const char* glslversion?
 
 	glClearDepth(1.0f);
 	glClearColor(0.0f, 0.0f, 0.25f, 0.0f);
@@ -193,6 +202,8 @@ void LocalUser::pollEvents()
 	InputEvent e;
 	while (event_source->pollEvent(e))
 	{
+		if(MouseMode::pointer == mousemode)
+			if(ImGui::SFML::ProcessEvent(e)) continue;
 		if(event_mapper)event_mapper->mapEvent(e);
 	}
 }
@@ -246,5 +257,29 @@ vec2 LocalUser::turnSensitivity() const
 void LocalUser::draw()
 {
 	if (! perspective) return;
+
+	if(mousemode == MouseMode::pointer) ImGui::SFML::Update(sf::Mouse::getPosition(window.w),static_cast<sf::Vector2f>(window.w.getSize()), last_imgui_update_clock.restart());
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui::NewFrame();
+	ImGui::Begin("Hello");
+	if(perspective)
+	{
+		auto simduration = perspective->simulation.clock.now().time_since_epoch();
+		string timestring;
+		auto hours = std::chrono::duration_cast<std::chrono::hours>(simduration); simduration -= hours; timestring += std::to_string(hours.count());
+		auto minutes = std::chrono::duration_cast<std::chrono::minutes>(simduration); simduration -= minutes; timestring += ':' + std::to_string(minutes.count());
+		auto seconds = std::chrono::duration_cast<std::chrono::seconds>(simduration); simduration -= seconds; timestring += ':' + std::to_string(seconds.count());
+		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(simduration); simduration -= microseconds; timestring += ':' + std::to_string(microseconds.count());
+
+		ImGui::Text( ("Simulation Time: " + timestring).c_str() );
+	}
+	ImGui::End();
+
 	perspective->draw();
+
+	ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
+LocalUser::~LocalUser(){ ImGui::SFML::Shutdown(); }

@@ -55,12 +55,15 @@ struct LocalUser : public SimulationUser , public InputDeviceConfigurator
 	virtual MouseMode mouseMode() const;
 	vec2 turnSensitivity() const;
 
+	sf::Clock last_imgui_update_clock; //measuring time since the last imgui update
+
 	LocalUser(	
 				const Cfg& cfg, 
 				string window_name,
 				int reswidth, 
 				int resheight 
 	);
+	~LocalUser();
 
 	LocalUser(const LocalUser&) = delete;
 	LocalUser& operator=(const LocalUser&) = delete;

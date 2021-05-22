@@ -6,6 +6,7 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Joystick.hpp>
+#include "../InputEvent.hpp"
 
 #include "imgui-SFML_export.h"
 
@@ -25,6 +26,16 @@ IMGUI_SFML_API void Init(sf::Window& window, const sf::Vector2f& displaySize,
                          bool loadDefaultFont = true);
 
 IMGUI_SFML_API void ProcessEvent(const sf::Event& event);
+/**
+ * @brief Processes Events
+ * Refactoring of ProcessEvents(const sf::Event& event) for this event type.
+ * Addition: Returns bool 
+ * 
+ * @return bool     true if the event passed in is one ImGui would want you to Hide 
+ *   from your underlying application.
+ */
+IMGUI_SFML_API bool ProcessEvent(const InputEvent& event);
+
 IMGUI_SFML_API void Update(sf::Window& window, sf::Time dt);
 IMGUI_SFML_API void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize,
                            sf::Time dt);

@@ -158,6 +158,84 @@ void Init(sf::Window& window, const sf::Vector2f& displaySize, bool loadDefaultF
     io.DisplaySize = ImVec2(displaySize.x, displaySize.y);
 }
 
+bool ProcessEvent(const InputEvent& event)
+{
+    bool ret = false;
+    if (s_windowHasFocus) {
+        ImGuiIO& io = ImGui::GetIO();
+
+        switch (event.id) {
+        case 2048 : case 2049 : //Mousemovement
+            s_mouseMoved = true;
+            ret = io.WantCaptureMouse;
+            break;
+        case 2052: case 2053: case 2054: //Mousebuttons left, right, middle
+            s_mousePressed[event.id - 2052] = true;
+            ret = io.WantCaptureMouse;
+            break;
+        /*
+        case sf::Event::TouchBegan: // fall-through
+        case sf::Event::TouchEnded: {
+            s_mouseMoved = false;
+            int button = event.touch.finger;
+            if (event.type == sf::Event::TouchBegan && button >= 0 && button < 3) {
+                s_touchDown[event.touch.finger] = true;
+            }
+        } break;
+        */
+        case 2051 : //Horizontal Mousewheel
+            if(!io.KeyShift) { io.MouseWheelH += event.value; break; }
+            //else falltrough
+        case 2050 : //Vertical Mousewheel
+            io.MouseWheel += event.value;
+            ret = io.WantCaptureMouse;
+            break;
+
+
+        case 4100 : //Text Entered
+            // Don't handle the event for unprintable characters
+            if ((char) event.value < ' ' || (char) event.value == 127) {
+                break;
+            }
+            io.AddInputCharacter((char) event.value);
+            ret = io.WantTextInput || io.WantCaptureKeyboard;
+            break;
+  
+        default:
+            if( event.id >= 1024 && event.id < 2048 ) //Keyboard key has been pressed or released
+            {
+                io.KeysDown[(unsigned int)event.id - 1024] = event.value;
+                ret = io.WantTextInput || io.WantCaptureKeyboard;
+            }
+            else if (event.id >= 4102 && event.id < 4102 + sf::Joystick::Count)
+            {
+                if(event.value > 0.5) //connected if 1.0f
+                {
+                    if (s_joystickId == NULL_JOYSTICK_ID) {
+                    s_joystickId = (unsigned int)event.id - 4102;
+                    }
+                }
+                else if (event.value < 0.5)
+                {
+                    if (s_joystickId == (unsigned int)event.id - 4102) { // used gamepad was disconnected
+                        s_joystickId = getConnectedJoystickId();
+                    }
+                }
+                
+            break;
+            }
+            break;
+        }
+    }
+
+    if(event.id == 3) // Window Focus
+    {
+        s_windowHasFocus = (bool) event.value;
+    }
+
+    return ret;
+}
+
 void ProcessEvent(const sf::Event& event) {
     if (s_windowHasFocus) {
         ImGuiIO& io = ImGui::GetIO();
