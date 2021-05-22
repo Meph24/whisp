@@ -39,11 +39,11 @@ void SFMLWindow::mapSFEventToEventHandlerEvents( const sf::Event& e, deque<Input
 		break;
 
 	case sf::Event::EventType::LostFocus:
-		event_backlog.emplace_back(InputEvent(InputEvent::Type::System, 3, 1));
+		event_backlog.emplace_back(InputEvent(InputEvent::Type::System, 3, 0));
 		break;
 
 	case sf::Event::EventType::GainedFocus:
-		event_backlog.emplace_back(InputEvent(InputEvent::Type::System, 3, 0));
+		event_backlog.emplace_back(InputEvent(InputEvent::Type::System, 3, 1));
 		break;
 
 	case sf::Event::EventType::TextEntered:
@@ -102,7 +102,7 @@ void SFMLWindow::mapSFEventToEventHandlerEvents( const sf::Event& e, deque<Input
 	case sf::Event::EventType::JoystickButtonReleased:
 		event_backlog.emplace_back(InputEvent(InputEvent::Type::Joystick, e.joystickButton.joystickId *JOYSTICK_ID_OFFSET + JOYSTICK_BUTTON_OFFSET + e.joystickButton.button, 0));
 		break;
-	
+
 	default :
         break;
 	}
