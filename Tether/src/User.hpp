@@ -56,6 +56,7 @@ struct LocalUser : public SimulationUser , public InputDeviceConfigurator
 	vec2 turnSensitivity() const;
 
 	sf::Clock last_imgui_update_clock; //measuring time since the last imgui update
+	char temp_type_buffer[256]; //buffer for receiving textinput from a testfield of a textbox
 
 	LocalUser(	
 				const Cfg& cfg, 

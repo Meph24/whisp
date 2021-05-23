@@ -214,7 +214,6 @@ inline void RelativeClock<SessionClock<SFMLClock> >::deserialize(sf::Packet& p,S
 	}
 }
 
-
 template<typename BaseClock>
 inline RelativeClock<BaseClock>::RelativeClock(const BaseClock& Baseclock,
 		float Target_rate, duration Max_base_time, duration Max_rel_time,
