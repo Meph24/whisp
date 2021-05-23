@@ -169,9 +169,9 @@ void SimulationServer::broadcastUdp(unique_ptr<syncprotocol::udp::Packet>&& pack
     {
         header.client_time = c->last_client_time;
         packet->setHeader(header);
-        std::cout<<"before UDP send (packetID="<<packID<<")"<<std::endl;//TODO remove after debugging
+        //std::cout<<"before UDP send (packetID="<<packID<<")"<<std::endl;//TODO remove after debugging
         udpsocket.send(*packet, c->tcpsocket.getRemoteAddress(), c->udpport);
-        std::cout<<"after UDP send (packetID="<<packID<<")"<<std::endl;//TODO remove after debugging
+        //std::cout<<"after UDP send (packetID="<<packID<<")"<<std::endl;//TODO remove after debugging
     }
     packet.reset();
 }

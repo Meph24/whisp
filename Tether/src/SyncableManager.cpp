@@ -31,6 +31,7 @@ syncID SyncableManager::getNextID()
 
 bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool continueLastCall)
 {
+	if(byteBudget<minUpdatePacketBudget) return false;
 	byteBudget-=sizeof(nextPackID);//TODO remove after debugging
 	bool first=true;//TODO remove after debugging
 	bool iDidSomething=false;
@@ -55,7 +56,7 @@ bool SyncableManager::fillUpdatePacket(sf::Packet& p, u32 byteBudget,bool contin
 		{
 			if(first)//TODO remove after debugging
 			{
-				std::cout<<"UDP Packet "<<nextPackID<<" packed"<<std::endl;//TODO remove after debugging
+				if(verbose) std::cout<<"UDP Packet "<<nextPackID<<" packed"<<std::endl;//TODO remove after debugging
 				p<<nextPackID;//TODO remove after debugging
 				nextPackID++;//TODO remove after debugging
 				first=false;//TODO remove after debugging
@@ -89,7 +90,7 @@ void SyncableManager::applyUpdatePacket(sf::Packet& p)
 {
 	//printPacket(p);
 	p>>nextPackID;//TODO remove after debugging
-	std::cout<<"UDP Packet "<<nextPackID<<" unpacked"<<std::endl;//TODO remove after debugging
+	if(verbose) std::cout<<"UDP Packet "<<nextPackID<<" unpacked"<<std::endl;//TODO remove after debugging
 	bool printed=false;
 	while(!p.endOfPacket())
 	{
@@ -113,7 +114,7 @@ void SyncableManager::applyUpdatePacket(sf::Packet& p)
 			skipBytes(p,subPackLen);//TODO add some kind of debugging message (maybe to F3 screen)
 		}
 	}
-	std::cout<<"end applyUpdatePacket"<<std::endl;
+	if(verbose) std::cout<<"end applyUpdatePacket"<<std::endl;
 }
 
 bool SyncableManager::exists(syncID sID)
@@ -126,7 +127,7 @@ bool SyncableManager::fetchEventPackets(sf::Packet& p)
 	if(!events.empty())//TODO remove after debugging
 	{
 		p<<nextPackID;//TODO remove after debugging
-		std::cout<<"    TCP Packet "<<nextPackID<<" packed"<<std::endl;//TODO remove after debugging
+		if(verbose) std::cout<<"    TCP Packet "<<nextPackID<<" packed"<<std::endl;//TODO remove after debugging
 		nextPackID++;//TODO remove after debugging
 	}
 	bool iDidSomething=false;
@@ -146,7 +147,7 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 {
 	//printPacket(p);
 	p>>nextPackID;//TODO remove after debugging
-	std::cout<<"    TCP Packet "<<nextPackID<<" unpacked"<<std::endl;//TODO remove after debugging
+	if(verbose) std::cout<<"    TCP Packet "<<nextPackID<<" unpacked"<<std::endl;//TODO remove after debugging
 	while(!p.endOfPacket())
 	{
 		u32 subPackLen;
@@ -191,7 +192,7 @@ void SyncableManager::applyEventPacket(sf::Packet& p)
 			l->notifyNetGameEvent(p);
 		}
 	}
-	std::cout<<"    end of event packet"<<std::endl;
+	if(verbose) std::cout<<"    end of event packet"<<std::endl;
 }
 
 void SyncableManager::createSpawnEvent(Syncable* s)
