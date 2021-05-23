@@ -273,9 +273,10 @@ void LocalUser::draw()
 		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(simduration); simduration -= microseconds; timestring += ':' + std::to_string(microseconds.count());
 
 		ImGui::Text( ("Simulation Time: " + timestring).c_str() );
-		ImGui::InputText("Type here!", temp_type_buffer, sizeof(temp_type_buffer));
 	}
 	ImGui::End();
+
+	ImGui::ShowDemoWindow();
 
 	perspective->draw();
 
