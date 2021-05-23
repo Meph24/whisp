@@ -57,6 +57,7 @@ struct LocalUser : public SimulationUser , public InputDeviceConfigurator
 
 	sf::Clock last_imgui_update_clock; //measuring time since the last imgui update
 	char temp_type_buffer[256] = {0}; //buffer for receiving textinput from a testfield of a textbox
+	bool showimguidemo = false;
 
 	LocalUser(	
 				const Cfg& cfg, 

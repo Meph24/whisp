@@ -262,7 +262,6 @@ void LocalUser::draw()
 
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui::NewFrame();
-	ImGui::Begin("Hello");
 	if(perspective)
 	{
 		auto simduration = perspective->simulation.clock.now().time_since_epoch();
@@ -272,11 +271,23 @@ void LocalUser::draw()
 		auto seconds = std::chrono::duration_cast<std::chrono::seconds>(simduration); simduration -= seconds; timestring += ':' + std::to_string(seconds.count());
 		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(simduration); simduration -= microseconds; timestring += ':' + std::to_string(microseconds.count());
 
+		ImGui::Begin("dwengine", nullptr, ImGuiWindowFlags_MenuBar);
+		if(ImGui::BeginMenuBar())
+		{
+			if(ImGui::BeginMenu("View"))
+			{
+				ImGui::Checkbox("ImGui Demo", &showimguidemo);
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+		
 		ImGui::Text( ("Simulation Time: " + timestring).c_str() );
+		ImGui::End();
+		if(showimguidemo) ImGui::ShowDemoWindow();
 	}
-	ImGui::End();
 
-	ImGui::ShowDemoWindow();
+
 
 	perspective->draw();
 
