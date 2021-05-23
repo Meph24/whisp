@@ -164,16 +164,17 @@ template<typename BaseClock>
 inline void RelativeClock<BaseClock>::deserialize(sf::Packet& p,SyncableManager& sm)
 {
 	float f;
+	SessionClock<SFMLClock>::time_point tp;
 	p >> f;
 	p >> f;
-	p >> f;
+	p >> tp;
 	throw std::runtime_error ( "RelativeClock::deserialize() : This method is not properly implemented for the given base-clock type. The BaseClock::duration must match with transmission protocoll, therefore this method is only implemented for one type of clock. We have flushed the respective packet contents according to function specifications, but this call definitely is wrong!" );
 }
 
 template<>
-inline void RelativeClock<SFMLClock>::deserialize(sf::Packet& p,SyncableManager& sm)
+inline void RelativeClock<SessionClock<SFMLClock> >::deserialize(sf::Packet& p,SyncableManager& sm)
 {
-	typedef SFMLClock BaseClock; //for syntax consistency
+	typedef SessionClock<SFMLClock> BaseClock; //for syntax consistency
 
 	sf::Packet hackPack1;
 	sf::Packet hackPack2;
