@@ -192,7 +192,7 @@ bool ProcessEvent(const InputEvent& event)
             break;
 
 
-        case 4100 : //Text Entered
+        case 4 : //Text Entered
             // Don't handle the event for unprintable characters
             if ((char) event.value < ' ' || (char) event.value == 127) {
                 break;
