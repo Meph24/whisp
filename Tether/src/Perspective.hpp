@@ -77,6 +77,7 @@ public:
 	void drawAvatarPerspective();
 	void drawGameOver();
 	void drawHUD();
+	void drawGui();
 
 //----------------------
 

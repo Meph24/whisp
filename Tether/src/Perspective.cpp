@@ -9,6 +9,7 @@
 #include "Frustum.h"
 #include "Graphics2D.h"
 #include "ICamera3D.h"
+#include "imgui/imgui.h"
 #include "IWorld.h"
 #include "Simulation.hpp"
 #include "TextureStatic2D.h"
@@ -183,6 +184,23 @@ void Perspective::drawAvatarPerspective()
 	sf::sleep(sf::microseconds(1000));
 	glFlush();
 	timer_graphics_flush.registerTime();
+
+	drawGui();
+}
+
+void Perspective::drawGui()
+{
+    auto simduration = simulation.clock.now().time_since_epoch();
+	string timestring;
+	auto hours = std::chrono::duration_cast<std::chrono::hours>(simduration); simduration -= hours; timestring += std::to_string(hours.count());
+	auto minutes = std::chrono::duration_cast<std::chrono::minutes>(simduration); simduration -= minutes; timestring += ':' + std::to_string(minutes.count());
+	auto seconds = std::chrono::duration_cast<std::chrono::seconds>(simduration); simduration -= seconds; timestring += ':' + std::to_string(seconds.count());
+	auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(simduration); simduration -= microseconds; timestring += ':' + std::to_string(microseconds.count());
+
+	ImGui::SetNextWindowPos(ImVec2(10,10));
+    ImGui::Begin("dwengine", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Text( ("Simulation Time: " + timestring).c_str() );
+    ImGui::End();
 }
 
 void Perspective::drawHUD()

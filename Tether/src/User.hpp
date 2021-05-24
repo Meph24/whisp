@@ -1,24 +1,23 @@
 #ifndef USER_HPP
 #     define USER_HPP
 
-#include <SFML/Window.hpp>
-#include "EventMapper.hpp"
-#include "WallClock.hpp"
-
 #include <memory>
-#include "Cfg.hpp"
-
-#include <glm/vec2.hpp>
-
-#include "SFMLWindow.hpp"
-#include "InputDeviceConfigurator.hpp"
-#include "Perspective.hpp"
-
 #include <utility>
 
-using glm::vec2;
+#include <glm/vec2.hpp>
+#include <SFML/Window.hpp>
+
+#include "Cfg.hpp"
+#include "EventMapper.hpp"
+#include "gui.hpp"
+#include "InputDeviceConfigurator.hpp"
+#include "Perspective.hpp"
+#include "SFMLWindow.hpp"
+#include "WallClock.hpp"
+
 using std::pair;
 using std::unique_ptr;
+using glm::vec2;
 
 class Simulation;
 
@@ -55,9 +54,8 @@ struct LocalUser : public SimulationUser , public InputDeviceConfigurator
 	virtual MouseMode mouseMode() const;
 	vec2 turnSensitivity() const;
 
-	sf::Clock last_imgui_update_clock; //measuring time since the last imgui update
-	char temp_type_buffer[256] = {0}; //buffer for receiving textinput from a testfield of a textbox
-	bool showimguidemo = false;
+	gui::ImGuiController imguicontrol;
+	gui::MainMenu mainmenu;
 
 	LocalUser(	
 				const Cfg& cfg, 
@@ -65,7 +63,6 @@ struct LocalUser : public SimulationUser , public InputDeviceConfigurator
 				int reswidth, 
 				int resheight 
 	);
-	~LocalUser();
 
 	LocalUser(const LocalUser&) = delete;
 	LocalUser& operator=(const LocalUser&) = delete;
