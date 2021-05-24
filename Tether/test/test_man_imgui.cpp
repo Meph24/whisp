@@ -43,9 +43,7 @@ int main()
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
-        ImGui::Begin("Hello");
-        ImGui::Text("This is some useful text.");
-        ImGui::End();
+        ImGui::ShowDemoWindow();
         
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui::Render();
