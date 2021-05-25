@@ -9,7 +9,7 @@
 #ifndef SRC_SYNCABLEMANAGER_H_
 #define SRC_SYNCABLEMANAGER_H_
 
-#include "Shortnames.h"
+#include "ShortNames.h"
 
 #include "CreationDestructionNotificationHandler.h"
 #include "WallClock.hpp"
